@@ -1,4 +1,4 @@
-# Project Title
+# Lisan
 One-line description (e.g., "Volunteer scheduling app for [Non‑Profit Name]")
 
 ## Contents
@@ -13,8 +13,12 @@ Briefly describe what the project does, who it serves, and the main value (1–2
 - Key deliverable for them: e.g., "Simple roster export and sign-up form."
 
 ## Team
-- Team lead — Name — email — GitHub  
-- Members — Name — role — GitHub  
+- Team lead — Name — email — GitHub
+- Team lead — Anas Akkari — anasakkari3
+- Members — Name — role — GitHub
+- Tala Herbawi — Developer — talaher
+- Abdullah Ahmaro — SM — AbdullahAhmaro
+- Layan Rabba — Developer — LayanRabba
 Include student IDs if required.
 
 ## Quick start (local)
