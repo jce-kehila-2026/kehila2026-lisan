@@ -17,8 +17,7 @@ Briefly describe what the project does, who it serves, and the main value (1–2
 - Abdullah Ahmaro — SM — AbdullahAhmaro
 - Layan Rabba — Developer — LayanRabba
 - Mohammd Salameh — Developer — Mohammd-Salameh-44
-Include student IDs if required.
-
+  
 ## Quick start (local)
 1. git clone https://github.com/<org>/<repo>.git
 2. cd <repo>
