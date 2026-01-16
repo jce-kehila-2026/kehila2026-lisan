@@ -13,7 +13,7 @@ Briefly describe what the project does, who it serves, and the main value (1–2
 
 ## Team
 - Team lead — Anas Akkari — anasakkari3.
-- Tala Herbawi — Developer — talaher
+- Tala Herbawi — Developer — talaher.
 - Abdullah Ahmaro — SM — AbdullahAhmaro
 - Mohammd Salameh — Developer — Mohammd-Salameh-44
 - Layan Rabba — Developer — LayanRabba
