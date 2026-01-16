@@ -1,5 +1,5 @@
 # Lisan
-Lisan Application
+Lisan Application.
 ## Contents
 - [Overview](#overview) • [Non‑Profit](#non-profit) • [Team](#team) • [Quick start](#quick-start) • [Handover](#handover) • [Privacy](#privacy) • [Contacts](#contacts)
 
