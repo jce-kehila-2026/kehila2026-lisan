@@ -42,6 +42,10 @@ List data collected (names, emails), storage location, and retention policy. Nev
 ## Known limitations
 Briefly list major limitations or missing features and any workarounds.
 
+## Wiki
+See Team document code conversation.
+
+
 ## Contacts
 - Project lead: Name — email  
 - Non‑profit contact: Name — email  
