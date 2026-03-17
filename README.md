@@ -42,6 +42,10 @@ List data collected (names, emails), storage location, and retention policy. Nev
 ## Known limitations
 Briefly list major limitations or missing features and any workarounds.
 
+## Wiki
+The Team Workflow page was created in the Wiki.
+See the Team Workflow document for details.
+
 ## Contacts
 - Project lead: Name — email  
 - Non‑profit contact: Name — email  
