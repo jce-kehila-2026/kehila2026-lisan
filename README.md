@@ -1,5 +1,5 @@
-# Lisan organaisation
-Lisan Application
+# Lisan organisation
+Lisan Application.
 ## Contents
 - [Overview](#overview) • [Non‑Profit](#non-profit) • [Team](#team) • [Quick start](#quick-start) • [Handover](#handover) • [Privacy](#privacy) • [Contacts](#contacts)
 
@@ -13,7 +13,7 @@ Briefly describe what the project does, who it serves, and the main value (1–2
 
 ## Team
 - Team lead — Anas Akkari — anasakkari3.
-- Tala Herbawi — Developer — talaher.
+- TALA HERBAWI — Developer — talaher.
 - Abdullah Ahmaro — SM — AbdullahAhmaro
 - Mohammd Salameh — Developer — Mohammd-Salameh-44
 - Layan Rabba — Developer — LayanRabba.  
@@ -41,6 +41,7 @@ List data collected (names, emails), storage location, and retention policy. Nev
 
 ## Known limitations
 Briefly list major limitations or missing features and any workarounds.
+
 
 ## Contacts
 - Project lead: Name — email  
