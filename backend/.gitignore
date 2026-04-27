@@ -1,2 +1,5 @@
 .env
 .secrets
+node_modules
+privateKey.json
+../frontend/package-lock.json
