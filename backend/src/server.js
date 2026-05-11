@@ -7,6 +7,7 @@ dotenv.config();
 
 const authRoutes = require('./routes/auth');
 const usersRoutes = require('./routes/users');
+const transcriptsRoutes = require('./routes/transcripts');
 require('./config/firebase');
 
 const app = express();
@@ -44,6 +45,7 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api/transcripts', transcriptsRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
