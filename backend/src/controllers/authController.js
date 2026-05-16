@@ -1,8 +1,6 @@
-const admin = require('../config/firebase');
+const { admin, db } = require('../config/firebase');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
-const db = admin.firestore();
 
 exports.login = async (req, res) => {
   try {

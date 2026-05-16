@@ -3,8 +3,12 @@ const path = require('path');
 
 const serviceAccount = require(path.join(__dirname, '../../privateKey.json'));
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+  });
+}
 
-module.exports = admin;
+const db = admin.firestore();
+
+module.exports = { admin, db };
