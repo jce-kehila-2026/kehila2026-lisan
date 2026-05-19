@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lisan</title>
+    <style>
+      :root {
+        --primary: #7c3aed;
+        --primary-dark: #5b21b6;
+        --primary-light: #ede9fe;
+        --background: #f8f5ff;
+        --surface: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --border: #e5e7eb;
+        --accent: #f472b6;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--text);
+        background: linear-gradient(180deg, #f8f5ff 0%, #fff7fb 55%, #f8f5ff 100%);
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .app {
+        position: relative;
+        width: min(100%, 620px);
+        min-height: 100vh;
+        margin: 0 auto;
+        padding: 20px 16px 112px;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .logo-mark {
+        display: grid;
+        width: 56px;
+        height: 56px;
+        place-items: center;
+        border-radius: 18px;
+        color: white;
+        background: var(--primary);
+        box-shadow: 0 8px 18px rgba(124, 58, 237, 0.25);
+      }
+
+      .logo-title {
+        margin: 0;
+        color: #111827;
+        font-size: 28px;
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .logo-subtitle {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .language-toggle {
+        display: inline-flex;
+        padding: 4px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: white;
+        box-shadow: 0 2px 8px rgba(31, 41, 55, 0.06);
+      }
+
+      .language-toggle button {
+        min-height: 40px;
+        padding: 8px 14px;
+        border: 0;
+        border-radius: 999px;
+        color: var(--muted);
+        background: transparent;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .language-toggle button.active {
+        color: white;
+        background: var(--primary);
+      }
+
+      .panel,
+      .card {
+        border: 1px solid rgba(229, 231, 235, 0.85);
+        border-radius: 28px;
+        background: var(--surface);
+        box-shadow: 0 10px 25px rgba(124, 58, 237, 0.1);
+      }
+
+      .login {
+        display: grid;
+        min-height: calc(100vh - 40px);
+        align-content: center;
+      }
+
+      .login .language-row {
+        display: flex;
+        justify-content: flex-start;
+        margin-bottom: 24px;
+      }
+
+      .login-card {
+        padding: 28px;
+      }
+
+      .eyebrow {
+        margin: 34px 0 0;
+        color: var(--primary);
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      h1 {
+        margin: 10px 0 0;
+        color: #111827;
+        font-size: 32px;
+        line-height: 1.15;
+      }
+
+      .copy {
+        margin: 14px 0 0;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.75;
+      }
+
+      form {
+        display: grid;
+        gap: 18px;
+        margin-top: 30px;
+      }
+
+      label {
+        display: grid;
+        gap: 8px;
+        color: #374151;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      input {
+        min-height: 50px;
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 12px 16px;
+        color: #111827;
+        background: white;
+        outline: none;
+        box-shadow: 0 2px 8px rgba(31, 41, 55, 0.04);
+      }
+
+      input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.12);
+      }
+
+      .button {
+        min-height: 52px;
+        border: 0;
+        border-radius: 18px;
+        padding: 12px 20px;
+        color: white;
+        background: var(--primary);
+        font-size: 15px;
+        font-weight: 800;
+        box-shadow: 0 8px 18px rgba(124, 58, 237, 0.25);
+      }
+
+      .button:hover {
+        background: var(--primary-dark);
+      }
+
+      .button.secondary {
+        border: 1px solid var(--border);
+        color: #374151;
+        background: white;
+        box-shadow: 0 2px 8px rgba(31, 41, 55, 0.06);
+      }
+
+      .home-hero {
+        margin-top: 24px;
+        padding: 22px;
+      }
+
+      .hero-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .level-pill {
+        min-width: 104px;
+        border-radius: 18px;
+        padding: 14px;
+        text-align: center;
+        background: var(--primary-light);
+      }
+
+      .level-pill small {
+        display: block;
+        color: var(--muted);
+        font-weight: 800;
+      }
+
+      .level-pill strong {
+        display: block;
+        margin-top: 6px;
+        color: var(--primary);
+      }
+
+      .progress-card {
+        margin-top: 20px;
+        padding: 16px;
+        border: 1px solid #ddd6fe;
+        border-radius: 20px;
+        background: rgba(237, 233, 254, 0.7);
+      }
+
+      .progress-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      .progress-track {
+        height: 12px;
+        margin-top: 12px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: white;
+      }
+
+      .progress-fill {
+        width: 45%;
+        height: 100%;
+        border-radius: inherit;
+        background: var(--primary);
+      }
+
+      .stories {
+        margin-top: 20px;
+        padding: 18px;
+      }
+
+      .section-title {
+        margin: 0 0 16px;
+        color: #111827;
+        font-size: 16px;
+        font-weight: 800;
+      }
+
+      .story-row {
+        display: flex;
+        gap: 16px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        padding-bottom: 6px;
+      }
+
+      .story-row::-webkit-scrollbar {
+        display: none;
+      }
+
+      .story {
+        display: grid;
+        width: 94px;
+        flex: 0 0 auto;
+        justify-items: center;
+        gap: 8px;
+        border: 0;
+        background: transparent;
+        color: #374151;
+        text-align: center;
+        scroll-snap-align: start;
+      }
+
+      .story-ring {
+        display: grid;
+        width: 76px;
+        height: 76px;
+        place-items: center;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--accent), #fbbf24);
+      }
+
+      .story-icon {
+        display: grid;
+        width: 68px;
+        height: 68px;
+        place-items: center;
+        border: 4px solid white;
+        border-radius: 50%;
+        color: var(--primary);
+        background: var(--primary-light);
+      }
+
+      .story span:last-child {
+        min-height: 38px;
+        font-size: 12px;
+        font-weight: 800;
+        line-height: 1.45;
+      }
+
+      .features {
+        display: grid;
+        gap: 16px;
+        margin-top: 20px;
+      }
+
+      .feature {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        width: 100%;
+        border: 1px solid rgba(229, 231, 235, 0.85);
+        border-radius: 28px;
+        padding: 20px;
+        color: inherit;
+        background: white;
+        text-align: start;
+        box-shadow: 0 10px 25px rgba(124, 58, 237, 0.1);
+      }
+
+      .feature-icon {
+        display: grid;
+        width: 64px;
+        height: 64px;
+        flex: 0 0 auto;
+        place-items: center;
+        border-radius: 18px;
+        color: var(--primary);
+        background: var(--primary-light);
+      }
+
+      .feature h2 {
+        margin: 0;
+        color: #111827;
+        font-size: 20px;
+      }
+
+      .feature p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .bottom-nav {
+        position: fixed;
+        right: 50%;
+        bottom: 16px;
+        z-index: 10;
+        display: grid;
+        width: min(calc(100% - 32px), 588px);
+        grid-template-columns: repeat(3, 1fr);
+        align-items: center;
+        transform: translateX(50%);
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        padding: 12px 20px;
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 14px 40px rgba(31, 41, 55, 0.16);
+        backdrop-filter: blur(12px);
+      }
+
+      .nav-item {
+        display: grid;
+        min-height: 52px;
+        place-items: center;
+        gap: 4px;
+        border: 0;
+        border-radius: 18px;
+        color: var(--muted);
+        background: transparent;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .nav-item.primary {
+        width: 68px;
+        height: 68px;
+        min-height: 68px;
+        margin: -36px auto 0;
+        border-radius: 50%;
+        color: white;
+        background: var(--primary);
+        box-shadow: 0 8px 18px rgba(124, 58, 237, 0.25);
+      }
+
+      .nav-item.active {
+        color: var(--primary);
+        background: var(--primary-light);
+      }
+
+      .placeholder {
+        display: grid;
+        min-height: calc(100vh - 132px);
+        align-content: center;
+      }
+
+      .placeholder-card {
+        padding: 34px 26px;
+        text-align: center;
+      }
+
+      .placeholder-card h1 {
+        margin-top: 12px;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      svg {
+        width: 28px;
+        height: 28px;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      @media (min-width: 760px) {
+        .app {
+          min-height: 820px;
+          padding-top: 32px;
+        }
+
+        .login-card,
+        .home-hero,
+        .stories,
+        .feature,
+        .placeholder-card {
+          border-radius: 32px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="app"></div>
+
+    <script>
+      const translations = {
+        ar: {
+          appName: "لسان",
+          tagline: "تعلّمي العبرية بخطوات هادئة وواضحة",
+          languageArabic: "العربية",
+          languageHebrew: "עברית",
+          loginWelcome: "مرحبًا بك في لسان",
+          startLearning: "ابدئي التعلّم",
+          loginIntro: "واجهة بسيطة وداعمة لتعلّم العبرية بالعربية.",
+          email: "البريد الإلكتروني أو اسم المستخدم",
+          password: "كلمة المرور",
+          loginButton: "دخول",
+          welcome: "أهلًا ليان",
+          homeGreeting: "يوم لطيف للتعلّم",
+          homeIntro: "اختاري نشاطًا قصيرًا وواصلي رحلتك مع العبرية بثقة.",
+          level: "المستوى",
+          beginner: "مبتدئة",
+          progress: "تقدم اليوم",
+          storiesTitle: "أنشطة سريعة",
+          dailyWord: "كلمة اليوم",
+          letters: "الحروف العبرية",
+          listening: "استماع",
+          speaking: "محادثة",
+          quiz: "اختبار قصير",
+          culture: "نصيحة ثقافية",
+          games: "الألعاب",
+          gamesDescription: "تدريبات خفيفة تساعدك على تذكّر الكلمات والحروف.",
+          links: "روابط مفيدة",
+          linksDescription: "مصادر مختارة للتعلّم والمراجعة بهدوء.",
+          profile: "الملف الشخصي",
+          chatbot: "المحادثة",
+          more: "المزيد",
+          comingSoon: "قريبًا",
+          comingSoonText: "هذه الصفحة قيد التحضير وستكون متاحة قريبًا.",
+          backHome: "العودة إلى الرئيسية"
+        },
+        he: {
+          appName: "ליסאן",
+          tagline: "לומדות עברית בצעדים רגועים וברורים",
+          languageArabic: "العربية",
+          languageHebrew: "עברית",
+          loginWelcome: "ברוכה הבאה לליסאן",
+          startLearning: "התחילי ללמוד",
+          loginIntro: "ממשק פשוט ותומך ללימוד עברית בערבית.",
+          email: "אימייל או שם משתמש",
+          password: "סיסמה",
+          loginButton: "כניסה",
+          welcome: "שלום ליאן",
+          homeGreeting: "יום נעים ללמידה",
+          homeIntro: "בחרי פעילות קצרה והמשיכי ללמוד עברית בביטחון.",
+          level: "רמה",
+          beginner: "מתחילה",
+          progress: "התקדמות היום",
+          storiesTitle: "פעילויות קצרות",
+          dailyWord: "מילת היום",
+          letters: "אותיות עבריות",
+          listening: "האזנה",
+          speaking: "דיבור",
+          quiz: "בוחן קצר",
+          culture: "טיפ תרבותי",
+          games: "משחקים",
+          gamesDescription: "תרגולים קלים שעוזרים לזכור מילים ואותיות.",
+          links: "קישורים שימושיים",
+          linksDescription: "מקורות נבחרים ללמידה ולחזרה רגועה.",
+          profile: "פרופיל",
+          chatbot: "שיחה",
+          more: "עוד",
+          comingSoon: "בקרוב",
+          comingSoonText: "העמוד הזה בהכנה ויהיה זמין בקרוב.",
+          backHome: "חזרה לבית"
+        }
+      };
+
+      const icons = {
+        sparkles: '<svg viewBox="0 0 24 24"><path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2Z"/><path d="M19 3v4"/><path d="M21 5h-4"/></svg>',
+        quote: '<svg viewBox="0 0 24 24"><path d="M3 21c3 0 7-1 7-8V5H4v8h4c0 4-2 6-5 6Z"/><path d="M14 21c3 0 7-1 7-8V5h-6v8h4c0 4-2 6-5 6Z"/></svg>',
+        book: '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5Z"/></svg>',
+        headphones: '<svg viewBox="0 0 24 24"><path d="M3 14a9 9 0 0 1 18 0"/><path d="M21 14v4a2 2 0 0 1-2 2h-1v-8h1a2 2 0 0 1 2 2Z"/><path d="M3 14v4a2 2 0 0 0 2 2h1v-8H5a2 2 0 0 0-2 2Z"/></svg>',
+        message: '<svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"/></svg>',
+        pen: '<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+        game: '<svg viewBox="0 0 24 24"><path d="M6 12h4"/><path d="M8 10v4"/><path d="M15 13h.01"/><path d="M18 11h.01"/><path d="M19 6H5a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h1l2-2h8l2 2h1a3 3 0 0 0 3-3V9a3 3 0 0 0-3-3Z"/></svg>',
+        link: '<svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1"/><path d="M14 11a5 5 0 0 0-7.1 0l-2 2A5 5 0 0 0 12 20.1l1.1-1.1"/></svg>',
+        user: '<svg viewBox="0 0 24 24"><path d="M18 20a6 6 0 0 0-12 0"/><circle cx="12" cy="10" r="4"/></svg>',
+        bot: '<svg viewBox="0 0 24 24"><path d="M12 6V2"/><path d="M8 2h8"/><rect x="4" y="6" width="16" height="12" rx="4"/><path d="M8 12h.01"/><path d="M16 12h.01"/><path d="M9 16h6"/></svg>',
+        grid: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>'
+      };
+
+      let lang = localStorage.getItem("lisan-language") || "ar";
+      let page = "login";
+      const app = document.getElementById("app");
+
+      function t(key) {
+        return translations[lang][key] || key;
+      }
+
+      function setLanguage(nextLang) {
+        lang = nextLang;
+        localStorage.setItem("lisan-language", lang);
+        document.documentElement.lang = lang;
+        document.documentElement.dir = "rtl";
+        render();
+      }
+
+      function go(nextPage) {
+        page = nextPage;
+        render();
+      }
+
+      function languageToggle() {
+        return `
+          <div class="language-toggle" aria-label="language">
+            <button class="${lang === "ar" ? "active" : ""}" onclick="setLanguage('ar')">${t("languageArabic")}</button>
+            <button class="${lang === "he" ? "active" : ""}" onclick="setLanguage('he')">${t("languageHebrew")}</button>
+          </div>
+        `;
+      }
+
+      function logo() {
+        return `
+          <div class="logo">
+            <div class="logo-mark">${icons.sparkles}</div>
+            <div>
+              <p class="logo-title">${t("appName")}</p>
+              <p class="logo-subtitle">${t("tagline")}</p>
+            </div>
+          </div>
+        `;
+      }
+
+      function header() {
+        return `<header class="header">${logo()}${languageToggle()}</header>`;
+      }
+
+      function login() {
+        return `
+          <main class="login">
+            <div class="language-row">${languageToggle()}</div>
+            <section class="login-card panel">
+              ${logo()}
+              <p class="eyebrow">${t("loginWelcome")}</p>
+              <h1>${t("startLearning")}</h1>
+              <p class="copy">${t("loginIntro")}</p>
+              <form onsubmit="event.preventDefault(); go('home')">
+                <label>${t("email")}<input type="text" placeholder="${t("email")}" /></label>
+                <label>${t("password")}<input type="password" placeholder="${t("password")}" /></label>
+                <button class="button" type="submit">${t("loginButton")}</button>
+              </form>
+            </section>
+          </main>
+        `;
+      }
+
+      function home() {
+        const stories = [
+          ["dailyWord", icons.quote],
+          ["letters", icons.book],
+          ["listening", icons.headphones],
+          ["speaking", icons.message],
+          ["quiz", icons.pen],
+          ["culture", icons.sparkles]
+        ];
+
+        return `
+          ${header()}
+          <section class="home-hero panel">
+            <div class="hero-top">
+              <div>
+                <p class="eyebrow" style="margin-top:0">${t("welcome")}</p>
+                <h1>${t("homeGreeting")}</h1>
+                <p class="copy">${t("homeIntro")}</p>
+              </div>
+              <div class="level-pill">
+                <small>${t("level")}</small>
+                <strong>${t("beginner")}</strong>
+              </div>
+            </div>
+            <div class="progress-card">
+              <div class="progress-row"><span>${t("progress")}</span><span>45%</span></div>
+              <div class="progress-track"><div class="progress-fill"></div></div>
+            </div>
+          </section>
+
+          <section class="stories panel">
+            <h2 class="section-title">${t("storiesTitle")}</h2>
+            <div class="story-row">
+              ${stories
+                .map(
+                  ([key, icon]) => `
+                    <button class="story" onclick="go('${key}')">
+                      <span class="story-ring"><span class="story-icon">${icon}</span></span>
+                      <span>${t(key)}</span>
+                    </button>
+                  `
+                )
+                .join("")}
+            </div>
+          </section>
+
+          <section class="features">
+            <button class="feature" onclick="go('games')">
+              <span class="feature-icon">${icons.game}</span>
+              <span><h2>${t("games")}</h2><p>${t("gamesDescription")}</p></span>
+            </button>
+            <button class="feature" onclick="go('links')">
+              <span class="feature-icon">${icons.link}</span>
+              <span><h2>${t("links")}</h2><p>${t("linksDescription")}</p></span>
+            </button>
+          </section>
+          ${bottomNav()}
+        `;
+      }
+
+      function bottomNav() {
+        return `
+          <nav class="bottom-nav">
+            <button class="nav-item" onclick="go('profile')">${icons.user}<span>${t("profile")}</span></button>
+            <button class="nav-item primary" onclick="go('chatbot')" aria-label="${t("chatbot")}">${icons.bot}</button>
+            <button class="nav-item" onclick="go('more')">${icons.grid}<span>${t("more")}</span></button>
+          </nav>
+        `;
+      }
+
+      function placeholder(title) {
+        return `
+          ${header()}
+          <main class="placeholder">
+            <section class="placeholder-card panel">
+              <p class="eyebrow" style="margin-top:0">${title}</p>
+              <h1>${t("comingSoon")}</h1>
+              <p class="copy">${t("comingSoonText")}</p>
+              <button class="button" style="margin-top:28px" onclick="go('home')">${t("backHome")}</button>
+            </section>
+          </main>
+          ${bottomNav()}
+        `;
+      }
+
+      function render() {
+        document.documentElement.lang = lang;
+        document.documentElement.dir = "rtl";
+
+        if (page === "login") {
+          app.innerHTML = login();
+          return;
+        }
+
+        if (page === "home") {
+          app.innerHTML = home();
+          return;
+        }
+
+        const titles = {
+          games: t("games"),
+          links: t("links"),
+          profile: t("profile"),
+          chatbot: t("chatbot"),
+          more: t("more"),
+          dailyWord: t("dailyWord"),
+          letters: t("letters"),
+          listening: t("listening"),
+          speaking: t("speaking"),
+          quiz: t("quiz"),
+          culture: t("culture")
+        };
+        app.innerHTML = placeholder(titles[page] || t("comingSoon"));
+      }
+
+      render();
+    </script>
+  </body>
+</html>
