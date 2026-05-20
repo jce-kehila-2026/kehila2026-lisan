@@ -1,0 +1,7497 @@
+[
+  {
+    "id": "L1_001",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "מי אני?",
+    "arabic": "من أنا؟",
+    "transliteration": "mi ani?",
+    "phonetic_breakdown": [
+      "מי",
+      "אני"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to ask who I am or to practice identity questions.",
+    "source_transcript": "01_mi-ani.txt",
+    "approved_responses": [
+      {
+        "student_says": "מי אני?",
+        "expected_hebrew": "מי אני?",
+        "response_hebrew": "אני [שם].",
+        "response_arabic": "أنا [اسم].",
+        "teaching_note": "هذه جملة أساسية للتعريف بالنفس."
+      }
+    ],
+    "related_vocabulary": [
+      "מי",
+      "אני"
+    ],
+    "common_mistakes": [
+      "الخلط بين אני و את."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ אני?",
+      "options": [
+        "מי",
+        "מה",
+        "איפה"
+      ],
+      "correct": "מי",
+      "matching_pair": "מי אני? ↔ من أنا؟"
+    }
+  },
+  {
+    "id": "L1_002",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "אני איה.",
+    "arabic": "أنا آية.",
+    "transliteration": "ani aya.",
+    "phonetic_breakdown": [
+      "אני",
+      "איה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used by a student to introduce herself by name.",
+    "source_transcript": "01_mi-ani.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני איה.",
+        "expected_hebrew": "אני איה.",
+        "response_hebrew": "שלום איה.",
+        "response_arabic": "مرحبًا آية.",
+        "teaching_note": "أنا + الاسم = אני + שם."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "איה"
+    ],
+    "common_mistakes": [
+      "نسيان كلمة אני قبل الاسم."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ איה.",
+      "options": [
+        "אני",
+        "מי",
+        "את"
+      ],
+      "correct": "אני",
+      "matching_pair": "אני איה. ↔ أنا آية."
+    }
+  },
+  {
+    "id": "L1_003",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "אני אימה.",
+    "arabic": "أنا إيمان.",
+    "transliteration": "ani iman.",
+    "phonetic_breakdown": [
+      "אני",
+      "אימה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used by a student to introduce herself by name.",
+    "source_transcript": "01_mi-ani.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני אימה.",
+        "expected_hebrew": "אני אימה.",
+        "response_hebrew": "שלום אימה.",
+        "response_arabic": "مرحبًا إيمان.",
+        "teaching_note": "الجملة تستخدم نفس القالب: אני + שם."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "אימה"
+    ],
+    "common_mistakes": [
+      "نسيان النقطة في نهاية الجملة عند الكتابة."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ אימה.",
+      "options": [
+        "אני",
+        "מי",
+        "אתה"
+      ],
+      "correct": "אני",
+      "matching_pair": "אני אימה. ↔ أنا إيمان."
+    }
+  },
+  {
+    "id": "L1_004",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "מי את?",
+    "arabic": "من أنتِ؟",
+    "transliteration": "mi at?",
+    "phonetic_breakdown": [
+      "מי",
+      "את"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to ask a female person who she is.",
+    "source_transcript": "02_mi-at.txt",
+    "approved_responses": [
+      {
+        "student_says": "מי את?",
+        "expected_hebrew": "מי את?",
+        "response_hebrew": "אני [שם].",
+        "response_arabic": "أنا [اسم].",
+        "teaching_note": "את تستخدم لمخاطبة المؤنث."
+      }
+    ],
+    "related_vocabulary": [
+      "מי",
+      "את",
+      "אני"
+    ],
+    "common_mistakes": [
+      "استخدام אתה بدل את عند مخاطبة أنثى."
+    ],
+    "game_usage": {
+      "fill_in_blank": "מי ____?",
+      "options": [
+        "את",
+        "אתה",
+        "אני"
+      ],
+      "correct": "את",
+      "matching_pair": "מי את? ↔ من أنتِ؟"
+    }
+  },
+  {
+    "id": "L1_005",
+    "level": "beginner",
+    "category": "greetings",
+    "hebrew": "שלום, אני אמל.",
+    "arabic": "مرحبًا، أنا أمل.",
+    "transliteration": "shalom, ani amal.",
+    "phonetic_breakdown": [
+      "שלום",
+      "אני",
+      "אמל"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to greet someone and introduce yourself.",
+    "source_transcript": "02_mi-at.txt",
+    "approved_responses": [
+      {
+        "student_says": "שלום, אני אמל.",
+        "expected_hebrew": "שלום, אני אמל.",
+        "response_hebrew": "שלום אמל.",
+        "response_arabic": "مرحبًا أمل.",
+        "teaching_note": "שלום تعني مرحبًا أو سلام."
+      }
+    ],
+    "related_vocabulary": [
+      "שלום",
+      "אני",
+      "אמל"
+    ],
+    "common_mistakes": [
+      "نسيان الفاصلة بعد שלום عند الكتابة."
+    ],
+    "game_usage": {
+      "fill_in_blank": "שלום, ____ אמל.",
+      "options": [
+        "אני",
+        "מי",
+        "את"
+      ],
+      "correct": "אני",
+      "matching_pair": "שלום, אני אמל. ↔ مرحبًا، أنا أمل."
+    }
+  },
+  {
+    "id": "L1_006",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "אני מאיה.",
+    "arabic": "أنا مايا.",
+    "transliteration": "ani maya.",
+    "phonetic_breakdown": [
+      "אני",
+      "מאיה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used by a student to introduce herself by name.",
+    "source_transcript": "02_mi-at.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני מאיה.",
+        "expected_hebrew": "אני מאיה.",
+        "response_hebrew": "שלום מאיה.",
+        "response_arabic": "مرحبًا مايا.",
+        "teaching_note": "أنا + الاسم = אני + שם."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "מאיה"
+    ],
+    "common_mistakes": [
+      "نسيان كلمة אני قبل الاسم."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ מאיה.",
+      "options": [
+        "אני",
+        "מי",
+        "את"
+      ],
+      "correct": "אני",
+      "matching_pair": "אני מאיה. ↔ أنا مايا."
+    }
+  },
+  {
+    "id": "L1_007",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "אני מירושלים, ואת?",
+    "arabic": "أنا من القدس، وأنتِ؟",
+    "transliteration": "ani mi-yerushalayim, ve-at?",
+    "phonetic_breakdown": [
+      "אני",
+      "מירושלים",
+      "ואת"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say where you are from and ask the other female person.",
+    "source_transcript": "02_mi-at.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני מירושלים, ואת?",
+        "expected_hebrew": "אני מירושלים, ואת?",
+        "response_hebrew": "גם אני מירושלים.",
+        "response_arabic": "أنا أيضًا من القدس.",
+        "teaching_note": "ו في ואת تعني و."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "מירושלים",
+      "ואת",
+      "גם"
+    ],
+    "common_mistakes": [
+      "نسيان ו في ואת عند قول وأنتِ."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני מירושלים, ____?",
+      "options": [
+        "ואת",
+        "מי",
+        "אני"
+      ],
+      "correct": "ואת",
+      "matching_pair": "אני מירושלים, ואת? ↔ أنا من القدس، وأنتِ؟"
+    }
+  },
+  {
+    "id": "L1_008",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "גם אני מירושלים.",
+    "arabic": "أنا أيضًا من القدس.",
+    "transliteration": "gam ani mi-yerushalayim.",
+    "phonetic_breakdown": [
+      "גם",
+      "אני",
+      "מירושלים"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say that you are also from Jerusalem.",
+    "source_transcript": "02_mi-at.txt",
+    "approved_responses": [
+      {
+        "student_says": "גם אני מירושלים.",
+        "expected_hebrew": "גם אני מירושלים.",
+        "response_hebrew": "יפה מאוד.",
+        "response_arabic": "جيد جدًا.",
+        "teaching_note": "גם تعني أيضًا."
+      }
+    ],
+    "related_vocabulary": [
+      "גם",
+      "אני",
+      "מירושלים"
+    ],
+    "common_mistakes": [
+      "وضع גם في مكان خاطئ داخل الجملة."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ אני מירושלים.",
+      "options": [
+        "גם",
+        "מי",
+        "את"
+      ],
+      "correct": "גם",
+      "matching_pair": "גם אני מירושלים. ↔ أنا أيضًا من القدس."
+    }
+  },
+  {
+    "id": "L1_009",
+    "level": "beginner",
+    "category": "greetings",
+    "hebrew": "להתראות, מאיה.",
+    "arabic": "إلى اللقاء، مايا.",
+    "transliteration": "lehitraot, maya.",
+    "phonetic_breakdown": [
+      "להתראות",
+      "מאיה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to say goodbye to Maya.",
+    "source_transcript": "02_mi-at.txt",
+    "approved_responses": [
+      {
+        "student_says": "להתראות, מאיה.",
+        "expected_hebrew": "להתראות, מאיה.",
+        "response_hebrew": "להתראות.",
+        "response_arabic": "إلى اللقاء.",
+        "teaching_note": "להתראות تعني إلى اللقاء."
+      }
+    ],
+    "related_vocabulary": [
+      "להתראות",
+      "מאיה"
+    ],
+    "common_mistakes": [
+      "نطق להתראות بسرعة بدون تقسيم الكلمة."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____, מאיה.",
+      "options": [
+        "להתראות",
+        "שלום",
+        "מי"
+      ],
+      "correct": "להתראות",
+      "matching_pair": "להתראות, מאיה. ↔ إلى اللقاء، مايا."
+    }
+  },
+  {
+    "id": "L1_010",
+    "level": "beginner",
+    "category": "greetings",
+    "hebrew": "להתראות, אמל.",
+    "arabic": "إلى اللقاء، أمل.",
+    "transliteration": "lehitraot, amal.",
+    "phonetic_breakdown": [
+      "להתראות",
+      "אמל"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to say goodbye to Amal.",
+    "source_transcript": "02_mi-at.txt",
+    "approved_responses": [
+      {
+        "student_says": "להתראות, אמל.",
+        "expected_hebrew": "להתראות, אמל.",
+        "response_hebrew": "להתראות.",
+        "response_arabic": "إلى اللقاء.",
+        "teaching_note": "هذه جملة وداع بسيطة."
+      }
+    ],
+    "related_vocabulary": [
+      "להתראות",
+      "אמל"
+    ],
+    "common_mistakes": [
+      "الخلط بين שלום كتحية و להתראות كوداع."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____, אמל.",
+      "options": [
+        "להתראות",
+        "מי",
+        "אני"
+      ],
+      "correct": "להתראות",
+      "matching_pair": "להתראות, אמל. ↔ إلى اللقاء، أمل."
+    }
+  },
+  {
+    "id": "L1_011",
+    "level": "beginner",
+    "category": "greetings",
+    "hebrew": "היי, מי את?",
+    "arabic": "مرحبًا، من أنتِ؟",
+    "transliteration": "hai, mi at?",
+    "phonetic_breakdown": [
+      "היי",
+      "מי",
+      "את"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to greet a female person and ask who she is.",
+    "source_transcript": "03_mi-ata.txt",
+    "approved_responses": [
+      {
+        "student_says": "היי, מי את?",
+        "expected_hebrew": "היי, מי את?",
+        "response_hebrew": "היי, אני [שם].",
+        "response_arabic": "مرحبًا، أنا [اسم].",
+        "teaching_note": "היי هي تحية بسيطة مثل hi."
+      }
+    ],
+    "related_vocabulary": [
+      "היי",
+      "מי",
+      "את"
+    ],
+    "common_mistakes": [
+      "استخدام אתה بدل את عند مخاطبة أنثى."
+    ],
+    "game_usage": {
+      "fill_in_blank": "היי, מי ____?",
+      "options": [
+        "את",
+        "אתה",
+        "אני"
+      ],
+      "correct": "את",
+      "matching_pair": "היי, מי את? ↔ مرحبًا، من أنتِ؟"
+    }
+  },
+  {
+    "id": "L1_012",
+    "level": "beginner",
+    "category": "greetings",
+    "hebrew": "היי, אני מאיה. מי אתה?",
+    "arabic": "مرحبًا، أنا مايا. من أنتَ؟",
+    "transliteration": "hai, ani maya. mi ata?",
+    "phonetic_breakdown": [
+      "היי",
+      "אני",
+      "מאיה",
+      "מי",
+      "אתה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to introduce yourself and ask a male person who he is.",
+    "source_transcript": "03_mi-ata.txt",
+    "approved_responses": [
+      {
+        "student_says": "היי, אני מאיה. מי אתה?",
+        "expected_hebrew": "היי, אני מאיה. מי אתה?",
+        "response_hebrew": "אני [שם].",
+        "response_arabic": "أنا [اسم].",
+        "teaching_note": "אתה تستخدم لمخاطبة المذكر."
+      }
+    ],
+    "related_vocabulary": [
+      "היי",
+      "אני",
+      "מאיה",
+      "מי",
+      "אתה"
+    ],
+    "common_mistakes": [
+      "الخلط بين את و אתה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "היי, אני מאיה. מי ____?",
+      "options": [
+        "אתה",
+        "את",
+        "אני"
+      ],
+      "correct": "אתה",
+      "matching_pair": "מי אתה? ↔ من أنتَ؟"
+    }
+  },
+  {
+    "id": "L1_013",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "אני מתן.",
+    "arabic": "أنا متان.",
+    "transliteration": "ani matan.",
+    "phonetic_breakdown": [
+      "אני",
+      "מתן"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used by a male student to introduce himself by name.",
+    "source_transcript": "03_mi-ata.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני מתן.",
+        "expected_hebrew": "אני מתן.",
+        "response_hebrew": "שלום מתן.",
+        "response_arabic": "مرحبًا متان.",
+        "teaching_note": "قالب التعريف البسيط هو: אני + שם."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "מתן"
+    ],
+    "common_mistakes": [
+      "نسيان كلمة אני قبل الاسم."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ מתן.",
+      "options": [
+        "אני",
+        "מי",
+        "אתה"
+      ],
+      "correct": "אני",
+      "matching_pair": "אני מתן. ↔ أنا متان."
+    }
+  },
+  {
+    "id": "L1_014",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "מי זה? מי זאת?",
+    "arabic": "من هذا؟ من هذه؟",
+    "transliteration": "mi ze? mi zot?",
+    "phonetic_breakdown": [
+      "מי",
+      "זה",
+      "מי",
+      "זאת"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to ask who a male or female person is.",
+    "source_transcript": "04_mi-ze-mi-zot.txt",
+    "approved_responses": [
+      {
+        "student_says": "מי זה? מי זאת?",
+        "expected_hebrew": "מי זה? מי זאת?",
+        "response_hebrew": "זה [שם]. זאת [שם].",
+        "response_arabic": "هذا [اسم]. هذه [اسم].",
+        "teaching_note": "זה للمذكر، זאת للمؤنث."
+      }
+    ],
+    "related_vocabulary": [
+      "מי",
+      "זה",
+      "זאת"
+    ],
+    "common_mistakes": [
+      "الخلط بين זה و זאת."
+    ],
+    "game_usage": {
+      "fill_in_blank": "מי ____? מי זאת?",
+      "options": [
+        "זה",
+        "את",
+        "אני"
+      ],
+      "correct": "זה",
+      "matching_pair": "מי זה? ↔ من هذا؟"
+    }
+  },
+  {
+    "id": "L1_015",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "מי זה? זה אחמד.",
+    "arabic": "من هذا؟ هذا أحمد.",
+    "transliteration": "mi ze? ze ahmad.",
+    "phonetic_breakdown": [
+      "מי",
+      "זה",
+      "זה",
+      "אחמד"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to ask and answer who a male person is.",
+    "source_transcript": "04_mi-ze-mi-zot.txt",
+    "approved_responses": [
+      {
+        "student_says": "מי זה? זה אחמד.",
+        "expected_hebrew": "מי זה? זה אחמד.",
+        "response_hebrew": "נכון, זה אחמד.",
+        "response_arabic": "صحيح، هذا أحمد.",
+        "teaching_note": "זה אחמד تعني هذا أحمد."
+      }
+    ],
+    "related_vocabulary": [
+      "מי",
+      "זה",
+      "אחמד"
+    ],
+    "common_mistakes": [
+      "استخدام זאת بدل זה مع أحمد."
+    ],
+    "game_usage": {
+      "fill_in_blank": "מי זה? ____ אחמד.",
+      "options": [
+        "זה",
+        "זאת",
+        "אני"
+      ],
+      "correct": "זה",
+      "matching_pair": "זה אחמד. ↔ هذا أحمد."
+    }
+  },
+  {
+    "id": "L1_016",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "הוא מירדן.",
+    "arabic": "هو من الأردن.",
+    "transliteration": "hu mi-yarden.",
+    "phonetic_breakdown": [
+      "הוא",
+      "מירדן"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say that a male person is from Jordan.",
+    "source_transcript": "04_mi-ze-mi-zot.txt",
+    "approved_responses": [
+      {
+        "student_says": "הוא מירדן.",
+        "expected_hebrew": "הוא מירדן.",
+        "response_hebrew": "נכון, הוא מירדן.",
+        "response_arabic": "صحيح، هو من الأردن.",
+        "teaching_note": "הוא تعني هو، و־מ تعني من."
+      }
+    ],
+    "related_vocabulary": [
+      "הוא",
+      "מירדן",
+      "ירדן"
+    ],
+    "common_mistakes": [
+      "نسيان מ في מירדן عند معنى من الأردن."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ מירדן.",
+      "options": [
+        "הוא",
+        "היא",
+        "מי"
+      ],
+      "correct": "הוא",
+      "matching_pair": "הוא מירדן. ↔ هو من الأردن."
+    }
+  },
+  {
+    "id": "L1_017",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "מי זאת? זאת טינה.",
+    "arabic": "من هذه؟ هذه تينا.",
+    "transliteration": "mi zot? zot tina.",
+    "phonetic_breakdown": [
+      "מי",
+      "זאת",
+      "זאת",
+      "טינה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to ask and answer who a female person is.",
+    "source_transcript": "04_mi-ze-mi-zot.txt",
+    "approved_responses": [
+      {
+        "student_says": "מי זאת? זאת טינה.",
+        "expected_hebrew": "מי זאת? זאת טינה.",
+        "response_hebrew": "נכון, זאת טינה.",
+        "response_arabic": "صحيح، هذه تينا.",
+        "teaching_note": "זאת טינה تعني هذه تينا."
+      }
+    ],
+    "related_vocabulary": [
+      "מי",
+      "זאת",
+      "טינה"
+    ],
+    "common_mistakes": [
+      "استخدام זה بدل זאת مع اسم مؤنث."
+    ],
+    "game_usage": {
+      "fill_in_blank": "מי זאת? ____ טינה.",
+      "options": [
+        "זאת",
+        "זה",
+        "הוא"
+      ],
+      "correct": "זאת",
+      "matching_pair": "זאת טינה. ↔ هذه تينا."
+    }
+  },
+  {
+    "id": "L1_018",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "היא מהולנד.",
+    "arabic": "هي من هولندا.",
+    "transliteration": "hi me-holand.",
+    "phonetic_breakdown": [
+      "היא",
+      "מהולנד"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say that a female person is from Holland.",
+    "source_transcript": "04_mi-ze-mi-zot.txt",
+    "approved_responses": [
+      {
+        "student_says": "היא מהולנד.",
+        "expected_hebrew": "היא מהולנד.",
+        "response_hebrew": "נכון, היא מהולנד.",
+        "response_arabic": "صحيح، هي من هولندا.",
+        "teaching_note": "היא تعني هي، و־מ تعني من."
+      }
+    ],
+    "related_vocabulary": [
+      "היא",
+      "מהולנד",
+      "הולנד"
+    ],
+    "common_mistakes": [
+      "الخلط بين הוא و היא."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ מהולנד.",
+      "options": [
+        "היא",
+        "הוא",
+        "מי"
+      ],
+      "correct": "היא",
+      "matching_pair": "היא מהולנד. ↔ هي من هولندا."
+    }
+  },
+  {
+    "id": "L1_019",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "זה נתן.",
+    "arabic": "هذا نتان.",
+    "transliteration": "ze natan.",
+    "phonetic_breakdown": [
+      "זה",
+      "נתן"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to identify a male person by name.",
+    "source_transcript": "06_mi-ze-mi-zot-2.txt",
+    "approved_responses": [
+      {
+        "student_says": "זה נתן.",
+        "expected_hebrew": "זה נתן.",
+        "response_hebrew": "נכון, זה נתן.",
+        "response_arabic": "صحيح، هذا نتان.",
+        "teaching_note": "זה تستخدم للمذكر."
+      }
+    ],
+    "related_vocabulary": [
+      "זה",
+      "נתן"
+    ],
+    "common_mistakes": [
+      "استخدام זאת بدل זה مع اسم مذكر."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ נתן.",
+      "options": [
+        "זה",
+        "זאת",
+        "היא"
+      ],
+      "correct": "זה",
+      "matching_pair": "זה נתן. ↔ هذا نتان."
+    }
+  },
+  {
+    "id": "L1_020",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "הוא מירושלים.",
+    "arabic": "هو من القدس.",
+    "transliteration": "hu mi-yerushalayim.",
+    "phonetic_breakdown": [
+      "הוא",
+      "מירושלים"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say that a male person is from Jerusalem.",
+    "source_transcript": "06_mi-ze-mi-zot-2.txt",
+    "approved_responses": [
+      {
+        "student_says": "הוא מירושלים.",
+        "expected_hebrew": "הוא מירושלים.",
+        "response_hebrew": "נכון, הוא מירושלים.",
+        "response_arabic": "صحيح، هو من القدس.",
+        "teaching_note": "הוא تعني هو، و־מ تعني من."
+      }
+    ],
+    "related_vocabulary": [
+      "הוא",
+      "מירושלים",
+      "ירושלים"
+    ],
+    "common_mistakes": [
+      "الخلط بين הוא و היא."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ מירושלים.",
+      "options": [
+        "הוא",
+        "היא",
+        "את"
+      ],
+      "correct": "הוא",
+      "matching_pair": "הוא מירושלים. ↔ هو من القدس."
+    }
+  },
+  {
+    "id": "L1_021",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "ומי זאת?",
+    "arabic": "ومن هذه؟",
+    "transliteration": "ve-mi zot?",
+    "phonetic_breakdown": [
+      "ומי",
+      "זאת"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to ask who a female person is after asking about someone else.",
+    "source_transcript": "06_mi-ze-mi-zot-2.txt",
+    "approved_responses": [
+      {
+        "student_says": "ומי זאת?",
+        "expected_hebrew": "ומי זאת?",
+        "response_hebrew": "זאת [שם].",
+        "response_arabic": "هذه [اسم].",
+        "teaching_note": "ו في ומי تعني و."
+      }
+    ],
+    "related_vocabulary": [
+      "ומי",
+      "זאת",
+      "מי"
+    ],
+    "common_mistakes": [
+      "نسيان ו في بداية ומי."
+    ],
+    "game_usage": {
+      "fill_in_blank": "ומי ____?",
+      "options": [
+        "זאת",
+        "זה",
+        "אני"
+      ],
+      "correct": "זאת",
+      "matching_pair": "ומי זאת? ↔ ومن هذه؟"
+    }
+  },
+  {
+    "id": "L1_022",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "זאת סרה.",
+    "arabic": "هذه سارة.",
+    "transliteration": "zot sara.",
+    "phonetic_breakdown": [
+      "זאת",
+      "סרה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to identify a female person by name.",
+    "source_transcript": "06_mi-ze-mi-zot-2.txt",
+    "approved_responses": [
+      {
+        "student_says": "זאת סרה.",
+        "expected_hebrew": "זאת סרה.",
+        "response_hebrew": "נכון, זאת סרה.",
+        "response_arabic": "صحيح، هذه سارة.",
+        "teaching_note": "זאת تستخدم للمؤنث."
+      }
+    ],
+    "related_vocabulary": [
+      "זאת",
+      "סרה"
+    ],
+    "common_mistakes": [
+      "استخدام זה بدل זאת مع اسم مؤنث."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ סרה.",
+      "options": [
+        "זאת",
+        "זה",
+        "הוא"
+      ],
+      "correct": "זאת",
+      "matching_pair": "זאת סרה. ↔ هذه سارة."
+    }
+  },
+  {
+    "id": "L1_023",
+    "level": "beginner",
+    "category": "family",
+    "hebrew": "היא אחות של נתן.",
+    "arabic": "هي أخت نتان.",
+    "transliteration": "hi achot shel natan.",
+    "phonetic_breakdown": [
+      "היא",
+      "אחות",
+      "של",
+      "נתן"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to describe a family relation.",
+    "source_transcript": "06_mi-ze-mi-zot-2.txt",
+    "approved_responses": [
+      {
+        "student_says": "היא אחות של נתן.",
+        "expected_hebrew": "היא אחות של נתן.",
+        "response_hebrew": "נכון, היא אחות של נתן.",
+        "response_arabic": "صحيح، هي أخت نتان.",
+        "teaching_note": "אחות של تعني أخت لـ."
+      }
+    ],
+    "related_vocabulary": [
+      "היא",
+      "אחות",
+      "של",
+      "נתן"
+    ],
+    "common_mistakes": [
+      "الخلط بين אח وأחות."
+    ],
+    "game_usage": {
+      "fill_in_blank": "היא ____ של נתן.",
+      "options": [
+        "אחות",
+        "אח",
+        "מי"
+      ],
+      "correct": "אחות",
+      "matching_pair": "אחות ↔ أخت"
+    }
+  },
+  {
+    "id": "L1_024",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "לא, היא מנתניה.",
+    "arabic": "لا، هي من نتانيا.",
+    "transliteration": "lo, hi mi-netanya.",
+    "phonetic_breakdown": [
+      "לא",
+      "היא",
+      "מנתניה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to answer negatively and say where a female person is from.",
+    "source_transcript": "06_mi-ze-mi-zot-2.txt",
+    "approved_responses": [
+      {
+        "student_says": "לא, היא מנתניה.",
+        "expected_hebrew": "לא, היא מנתניה.",
+        "response_hebrew": "נכון.",
+        "response_arabic": "صحيح.",
+        "teaching_note": "לא تعني لا، و־מנתניה تعني من نتانيا."
+      }
+    ],
+    "related_vocabulary": [
+      "לא",
+      "היא",
+      "מנתניה"
+    ],
+    "common_mistakes": [
+      "نسيان מ في מנתניה عند معنى من نتانيا."
+    ],
+    "game_usage": {
+      "fill_in_blank": "לא, היא ____.",
+      "options": [
+        "מנתניה",
+        "מירושלים",
+        "מי"
+      ],
+      "correct": "מנתניה",
+      "matching_pair": "לא, היא מנתניה. ↔ لا، هي من نتانيا."
+    }
+  },
+  {
+    "id": "L1_025",
+    "level": "beginner",
+    "category": "greetings",
+    "hebrew": "שלום, מי את?",
+    "arabic": "مرحبًا، من أنتِ؟",
+    "transliteration": "shalom, mi at?",
+    "phonetic_breakdown": [
+      "שלום",
+      "מי",
+      "את"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to greet a female person and ask who she is.",
+    "source_transcript": "07_at-mora.txt",
+    "approved_responses": [
+      {
+        "student_says": "שלום, מי את?",
+        "expected_hebrew": "שלום, מי את?",
+        "response_hebrew": "אני [שם].",
+        "response_arabic": "أنا [اسم].",
+        "teaching_note": "שלום تعني مرحبًا، ו־את للمؤنث."
+      }
+    ],
+    "related_vocabulary": [
+      "שלום",
+      "מי",
+      "את"
+    ],
+    "common_mistakes": [
+      "استخدام אתה بدل את عند مخاطبة أنثى."
+    ],
+    "game_usage": {
+      "fill_in_blank": "שלום, מי ____?",
+      "options": [
+        "את",
+        "אתה",
+        "אני"
+      ],
+      "correct": "את",
+      "matching_pair": "שלום, מי את? ↔ مرحبًا، من أنتِ؟"
+    }
+  },
+  {
+    "id": "L1_026",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "אני אמירה.",
+    "arabic": "أنا أميرة.",
+    "transliteration": "ani amira.",
+    "phonetic_breakdown": [
+      "אני",
+      "אמירה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used by a student to introduce herself by name.",
+    "source_transcript": "07_at-mora.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני אמירה.",
+        "expected_hebrew": "אני אמירה.",
+        "response_hebrew": "שלום אמירה.",
+        "response_arabic": "مرحبًا أميرة.",
+        "teaching_note": "قالب التعريف: אני + שם."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "אמירה"
+    ],
+    "common_mistakes": [
+      "نسيان كلمة אני قبل الاسم."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ אמירה.",
+      "options": [
+        "אני",
+        "מי",
+        "את"
+      ],
+      "correct": "אני",
+      "matching_pair": "אני אמירה. ↔ أنا أميرة."
+    }
+  },
+  {
+    "id": "L1_027",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "אני שירין.",
+    "arabic": "أنا شيرين.",
+    "transliteration": "ani shirin.",
+    "phonetic_breakdown": [
+      "אני",
+      "שירין"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used by a student to introduce herself by name.",
+    "source_transcript": "07_at-mora.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני שירין.",
+        "expected_hebrew": "אני שירין.",
+        "response_hebrew": "שלום שירין.",
+        "response_arabic": "مرحبًا شيرين.",
+        "teaching_note": "أنا + الاسم = אני + שם."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "שירין"
+    ],
+    "common_mistakes": [
+      "نسيان كلمة אני قبل الاسم."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ שירין.",
+      "options": [
+        "אני",
+        "מי",
+        "את"
+      ],
+      "correct": "אני",
+      "matching_pair": "אני שירין. ↔ أنا شيرين."
+    }
+  },
+  {
+    "id": "L1_028",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "את מורה?",
+    "arabic": "هل أنتِ معلمة؟",
+    "transliteration": "at mora?",
+    "phonetic_breakdown": [
+      "את",
+      "מורה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to ask a female person if she is a teacher.",
+    "source_transcript": "07_at-mora.txt",
+    "approved_responses": [
+      {
+        "student_says": "את מורה?",
+        "expected_hebrew": "את מורה?",
+        "response_hebrew": "כן, אני מורה.",
+        "response_arabic": "نعم، أنا معلمة.",
+        "teaching_note": "في العبرية السؤال ممكن يكون بدون كلمة هل."
+      }
+    ],
+    "related_vocabulary": [
+      "את",
+      "מורה",
+      "אני"
+    ],
+    "common_mistakes": [
+      "استخدام אתה بدل את مع المؤنث."
+    ],
+    "game_usage": {
+      "fill_in_blank": "את ____?",
+      "options": [
+        "מורה",
+        "מי",
+        "אתה"
+      ],
+      "correct": "מורה",
+      "matching_pair": "את מורה? ↔ هل أنتِ معلمة؟"
+    }
+  },
+  {
+    "id": "L1_029",
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "לא, אני לא מורה.",
+    "arabic": "لا، أنا لست معلمة.",
+    "transliteration": "lo, ani lo mora.",
+    "phonetic_breakdown": [
+      "לא",
+      "אני",
+      "לא",
+      "מורה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to answer negatively and say that you are not a teacher.",
+    "source_transcript": "07_at-mora.txt",
+    "approved_responses": [
+      {
+        "student_says": "לא, אני לא מורה.",
+        "expected_hebrew": "לא, אני לא מורה.",
+        "response_hebrew": "בסדר.",
+        "response_arabic": "حسنًا.",
+        "teaching_note": "לא تعني لا أو ليس/لست حسب الجملة."
+      }
+    ],
+    "related_vocabulary": [
+      "לא",
+      "אני",
+      "מורה"
+    ],
+    "common_mistakes": [
+      "نسيان لا الثانية في אני לא מורה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "לא, אני לא ____.",
+      "options": [
+        "מורה",
+        "מי",
+        "את"
+      ],
+      "correct": "מורה",
+      "matching_pair": "אני לא מורה. ↔ أنا لست معلمة."
+    }
+  },
+  {
+    "id": "L1_030",
+    "level": "beginner",
+    "category": "family",
+    "hebrew": "אני אמא של איה.",
+    "arabic": "أنا أم آية.",
+    "transliteration": "ani ima shel aya.",
+    "phonetic_breakdown": [
+      "אני",
+      "אמא",
+      "של",
+      "איה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to describe a family relationship.",
+    "source_transcript": "07_at-mora.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני אמא של איה.",
+        "expected_hebrew": "אני אמא של איה.",
+        "response_hebrew": "שלום, אמא של איה.",
+        "response_arabic": "مرحبًا، أم آية.",
+        "teaching_note": "אמא של تعني أمّ لـ."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "אמא",
+      "של",
+      "איה"
+    ],
+    "common_mistakes": [
+      "الخلط بين אמא و מורה بسبب السياق."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני אמא של ____.",
+      "options": [
+        "איה",
+        "מי",
+        "את"
+      ],
+      "correct": "איה",
+      "matching_pair": "אני אמא של איה. ↔ أنا أم آية."
+    }
+  },
+  {
+    "id": "L1_031",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "שלום, אני רוצה בבקשה שקשוקה",
+    "arabic": "مرحبًا، أريد شَكشوكة من فضلك.",
+    "transliteration": "shalom, ani rotza bevakasha shakshuka",
+    "phonetic_breakdown": [
+      "שלום",
+      "אני",
+      "רוצה",
+      "בבקשה",
+      "שקשוקה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to order shakshuka politely in a restaurant.",
+    "source_transcript": "15_bemisada-shel-said.txt",
+    "approved_responses": [
+      {
+        "student_says": "שלום, אני רוצה בבקשה שקשוקה",
+        "expected_hebrew": "שלום, אני רוצה בבקשה שקשוקה",
+        "response_hebrew": "בבקשה.",
+        "response_arabic": "تفضلي.",
+        "teaching_note": "בבקשה تجعل الطلب مؤدبًا."
+      }
+    ],
+    "related_vocabulary": [
+      "שלום",
+      "אני",
+      "רוצה",
+      "בבקשה",
+      "שקשוקה"
+    ],
+    "common_mistakes": [
+      "نسيان בבקשה عند الطلب بأدب."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני רוצה בבקשה ____",
+      "options": [
+        "שקשוקה",
+        "חלב",
+        "מלח"
+      ],
+      "correct": "שקשוקה",
+      "matching_pair": "שקשוקה ↔ شكشوكة"
+    }
+  },
+  {
+    "id": "L1_032",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "את רוצה גם סלט?",
+    "arabic": "هل تريدين أيضًا سلطة؟",
+    "transliteration": "at rotza gam salat?",
+    "phonetic_breakdown": [
+      "את",
+      "רוצה",
+      "גם",
+      "סלט"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used by a waiter to ask a female customer if she also wants salad.",
+    "source_transcript": "15_bemisada-shel-said.txt",
+    "approved_responses": [
+      {
+        "student_says": "את רוצה גם סלט?",
+        "expected_hebrew": "את רוצה גם סלט?",
+        "response_hebrew": "כן.",
+        "response_arabic": "نعم.",
+        "teaching_note": "גם تعني أيضًا."
+      }
+    ],
+    "related_vocabulary": [
+      "את",
+      "רוצה",
+      "גם",
+      "סלט"
+    ],
+    "common_mistakes": [
+      "الخلط بين רוצה للمؤنث والسياق المذكر."
+    ],
+    "game_usage": {
+      "fill_in_blank": "את רוצה גם ____?",
+      "options": [
+        "סלט",
+        "קפה",
+        "חלב"
+      ],
+      "correct": "סלט",
+      "matching_pair": "סלט ↔ سلطة"
+    }
+  },
+  {
+    "id": "L1_033",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "כן, עם קצת מלח והרבה לימון",
+    "arabic": "نعم، مع قليل من الملح وكثير من الليمون.",
+    "transliteration": "ken, im ktzat melach ve-harbe limon",
+    "phonetic_breakdown": [
+      "כן",
+      "עם",
+      "קצת",
+      "מלח",
+      "והרבה",
+      "לימון"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to describe how the customer wants the salad.",
+    "source_transcript": "15_bemisada-shel-said.txt",
+    "approved_responses": [
+      {
+        "student_says": "כן, עם קצת מלח והרבה לימון",
+        "expected_hebrew": "כן, עם קצת מלח והרבה לימון",
+        "response_hebrew": "בסדר.",
+        "response_arabic": "حسنًا.",
+        "teaching_note": "קצת تعني قليل، הרבה تعني كثير."
+      }
+    ],
+    "related_vocabulary": [
+      "כן",
+      "עם",
+      "קצת",
+      "מלח",
+      "הרבה",
+      "לימון"
+    ],
+    "common_mistakes": [
+      "الخلط بين קצת و הרבה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "עם קצת מלח והרבה ____",
+      "options": [
+        "לימון",
+        "קפה",
+        "חלב"
+      ],
+      "correct": "לימון",
+      "matching_pair": "לימון ↔ ليمون"
+    }
+  },
+  {
+    "id": "L1_034",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "אוקיי, ומה את שותה?",
+    "arabic": "حسنًا، وماذا تشربين؟",
+    "transliteration": "okay, ve-ma at shota?",
+    "phonetic_breakdown": [
+      "אוקיי",
+      "ומה",
+      "את",
+      "שותה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to ask a female customer what she is drinking.",
+    "source_transcript": "15_bemisada-shel-said.txt",
+    "approved_responses": [
+      {
+        "student_says": "אוקיי, ומה את שותה?",
+        "expected_hebrew": "אוקיי, ומה את שותה?",
+        "response_hebrew": "קפה.",
+        "response_arabic": "قهوة.",
+        "teaching_note": "שותה تعني يشرب/تشرب حسب السياق."
+      }
+    ],
+    "related_vocabulary": [
+      "אוקיי",
+      "מה",
+      "את",
+      "שותה"
+    ],
+    "common_mistakes": [
+      "نسيان و في ומה بمعنى وماذا."
+    ],
+    "game_usage": {
+      "fill_in_blank": "ומה את ____?",
+      "options": [
+        "שותה",
+        "רוצה",
+        "גרה"
+      ],
+      "correct": "שותה",
+      "matching_pair": "שותה ↔ تشرب"
+    }
+  },
+  {
+    "id": "L1_035",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "קפה",
+    "arabic": "قهوة.",
+    "transliteration": "kafe",
+    "phonetic_breakdown": [
+      "קפה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used as a short answer when ordering a drink.",
+    "source_transcript": "15_bemisada-shel-said.txt",
+    "approved_responses": [
+      {
+        "student_says": "קפה",
+        "expected_hebrew": "קפה",
+        "response_hebrew": "קפה עם חלב או בלי חלב?",
+        "response_arabic": "قهوة مع حليب أم بدون حليب؟",
+        "teaching_note": "קפה تعني قهوة."
+      }
+    ],
+    "related_vocabulary": [
+      "קפה"
+    ],
+    "common_mistakes": [
+      "نطق קפה مثل الكاف العربية الثقيلة."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____",
+      "options": [
+        "קפה",
+        "סלט",
+        "מלח"
+      ],
+      "correct": "קפה",
+      "matching_pair": "קפה ↔ قهوة"
+    }
+  },
+  {
+    "id": "L1_036",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "את רוצה קפה עם חלב או בלי חלב?",
+    "arabic": "هل تريدين قهوة مع حليب أم بدون حليب؟",
+    "transliteration": "at rotza kafe im chalav o bli chalav?",
+    "phonetic_breakdown": [
+      "את",
+      "רוצה",
+      "קפה",
+      "עם",
+      "חלב",
+      "או",
+      "בלי",
+      "חלב"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to ask whether the customer wants coffee with or without milk.",
+    "source_transcript": "15_bemisada-shel-said.txt",
+    "approved_responses": [
+      {
+        "student_says": "את רוצה קפה עם חלב או בלי חלב?",
+        "expected_hebrew": "את רוצה קפה עם חלב או בלי חלב?",
+        "response_hebrew": "בלי חלב.",
+        "response_arabic": "بدون حليب.",
+        "teaching_note": "עם تعني مع، בלי تعني بدون."
+      }
+    ],
+    "related_vocabulary": [
+      "קפה",
+      "עם",
+      "חלב",
+      "או",
+      "בלי"
+    ],
+    "common_mistakes": [
+      "الخلط بين עם و בלי."
+    ],
+    "game_usage": {
+      "fill_in_blank": "עם חלב או ____ חלב?",
+      "options": [
+        "בלי",
+        "עם",
+        "גם"
+      ],
+      "correct": "בלי",
+      "matching_pair": "בלי חלב ↔ بدون حليب"
+    }
+  },
+  {
+    "id": "L1_037",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "בלי חלב",
+    "arabic": "بدون حليب.",
+    "transliteration": "bli chalav",
+    "phonetic_breakdown": [
+      "בלי",
+      "חלב"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to order coffee without milk.",
+    "source_transcript": "15_bemisada-shel-said.txt",
+    "approved_responses": [
+      {
+        "student_says": "בלי חלב",
+        "expected_hebrew": "בלי חלב",
+        "response_hebrew": "אוקיי.",
+        "response_arabic": "حسنًا.",
+        "teaching_note": "בלי تعني بدون."
+      }
+    ],
+    "related_vocabulary": [
+      "בלי",
+      "חלב"
+    ],
+    "common_mistakes": [
+      "استخدام עם بدل בלי."
+    ],
+    "game_usage": {
+      "fill_in_blank": "בלי ____",
+      "options": [
+        "חלב",
+        "קפה",
+        "סלט"
+      ],
+      "correct": "חלב",
+      "matching_pair": "בלי חלב ↔ بدون حليب"
+    }
+  },
+  {
+    "id": "L1_038",
+    "level": "beginner",
+    "category": "greetings",
+    "hebrew": "תודה",
+    "arabic": "شكرًا.",
+    "transliteration": "toda",
+    "phonetic_breakdown": [
+      "תודה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to say thank you.",
+    "source_transcript": "15_bemisada-shel-said.txt",
+    "approved_responses": [
+      {
+        "student_says": "תודה",
+        "expected_hebrew": "תודה",
+        "response_hebrew": "בבקשה",
+        "response_arabic": "عفوًا.",
+        "teaching_note": "תודה تعني شكرًا، בבקשה تعني عفوًا أو من فضلك."
+      }
+    ],
+    "related_vocabulary": [
+      "תודה",
+      "בבקשה"
+    ],
+    "common_mistakes": [
+      "الخلط بين תודה و בבקשה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____",
+      "options": [
+        "תודה",
+        "קפה",
+        "חלב"
+      ],
+      "correct": "תודה",
+      "matching_pair": "תודה ↔ شكرًا"
+    }
+  },
+  {
+    "id": "L1_039",
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "כמה עולה אבטיח?",
+    "arabic": "كم سعر البطيخة؟",
+    "transliteration": "kama ole avatiah?",
+    "phonetic_breakdown": [
+      "כמה",
+      "עולה",
+      "אבטיח"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to ask the price of a watermelon.",
+    "source_transcript": "33_kama-ole-haavatiach.txt",
+    "approved_responses": [
+      {
+        "student_says": "כמה עולה אבטיח?",
+        "expected_hebrew": "כמה עולה אבטיח?",
+        "response_hebrew": "שקל וחצי לקילו.",
+        "response_arabic": "شيكل ونصف للكيلو.",
+        "teaching_note": "כמה עולה تستخدم للسؤال عن السعر."
+      }
+    ],
+    "related_vocabulary": [
+      "כמה",
+      "עולה",
+      "אבטיח"
+    ],
+    "common_mistakes": [
+      "استخدام מה بدل כמה عند السؤال عن السعر."
+    ],
+    "game_usage": {
+      "fill_in_blank": "כמה עולה ____?",
+      "options": [
+        "אבטיח",
+        "קפה",
+        "חלב"
+      ],
+      "correct": "אבטיח",
+      "matching_pair": "אבטיח ↔ بطيخ"
+    }
+  },
+  {
+    "id": "L1_040",
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "אבטיח אדום?",
+    "arabic": "بطيخ أحمر؟",
+    "transliteration": "avatiah adom?",
+    "phonetic_breakdown": [
+      "אבטיח",
+      "אדום"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to ask if the watermelon is red.",
+    "source_transcript": "33_kama-ole-haavatiach.txt",
+    "approved_responses": [
+      {
+        "student_says": "אבטיח אדום?",
+        "expected_hebrew": "אבטיח אדום?",
+        "response_hebrew": "בטח. אדום ומתוק.",
+        "response_arabic": "أكيد. أحمر وحلو.",
+        "teaching_note": "אדום تعني أحمر."
+      }
+    ],
+    "related_vocabulary": [
+      "אבטיח",
+      "אדום"
+    ],
+    "common_mistakes": [
+      "الخلط بين אדום و מתוק."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אבטיח ____?",
+      "options": [
+        "אדום",
+        "גדולים",
+        "שני"
+      ],
+      "correct": "אדום",
+      "matching_pair": "אדום ↔ أحمر"
+    }
+  },
+  {
+    "id": "L1_041",
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "בטח. אדום ומתוק.",
+    "arabic": "أكيد. أحمر وحلو.",
+    "transliteration": "betah. adom ve-matok.",
+    "phonetic_breakdown": [
+      "בטח",
+      "אדום",
+      "ומתוק"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used by a seller to describe the watermelon.",
+    "source_transcript": "33_kama-ole-haavatiach.txt",
+    "approved_responses": [
+      {
+        "student_says": "בטח. אדום ומתוק.",
+        "expected_hebrew": "בטח. אדום ומתוק.",
+        "response_hebrew": "יופי.",
+        "response_arabic": "جميل.",
+        "teaching_note": "ו في ומתוק تعني و."
+      }
+    ],
+    "related_vocabulary": [
+      "בטח",
+      "אדום",
+      "מתוק"
+    ],
+    "common_mistakes": [
+      "نسيان ו في ומתוק."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אדום ו____.",
+      "options": [
+        "מתוק",
+        "חלב",
+        "קפה"
+      ],
+      "correct": "מתוק",
+      "matching_pair": "מתוק ↔ حلو"
+    }
+  },
+  {
+    "id": "L1_042",
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "כמה זה עולה?",
+    "arabic": "كم سعر هذا؟",
+    "transliteration": "kama ze ole?",
+    "phonetic_breakdown": [
+      "כמה",
+      "זה",
+      "עולה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to ask how much something costs.",
+    "source_transcript": "33_kama-ole-haavatiach.txt",
+    "approved_responses": [
+      {
+        "student_says": "כמה זה עולה?",
+        "expected_hebrew": "כמה זה עולה?",
+        "response_hebrew": "שקל וחצי לקילו.",
+        "response_arabic": "شيكل ونصف للكيلو.",
+        "teaching_note": "זה تعني هذا."
+      }
+    ],
+    "related_vocabulary": [
+      "כמה",
+      "זה",
+      "עולה"
+    ],
+    "common_mistakes": [
+      "نسيان كلمة זה في السؤال."
+    ],
+    "game_usage": {
+      "fill_in_blank": "כמה זה ____?",
+      "options": [
+        "עולה",
+        "רוצה",
+        "שותה"
+      ],
+      "correct": "עולה",
+      "matching_pair": "כמה זה עולה? ↔ كم سعر هذا؟"
+    }
+  },
+  {
+    "id": "L1_043",
+    "level": "beginner",
+    "category": "numbers",
+    "hebrew": "שקל וחצי לקילו.",
+    "arabic": "شيكل ونصف للكيلو.",
+    "transliteration": "shekel va-hetzi le-kilo.",
+    "phonetic_breakdown": [
+      "שקל",
+      "וחצי",
+      "לקילו"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to state the price per kilogram.",
+    "source_transcript": "33_kama-ole-haavatiach.txt",
+    "approved_responses": [
+      {
+        "student_says": "שקל וחצי לקילו.",
+        "expected_hebrew": "שקל וחצי לקילו.",
+        "response_hebrew": "בסדר.",
+        "response_arabic": "حسنًا.",
+        "teaching_note": "וחצי تعني ونصف."
+      }
+    ],
+    "related_vocabulary": [
+      "שקל",
+      "חצי",
+      "קילו"
+    ],
+    "common_mistakes": [
+      "الخلط بين שקל واحد و שקל וחצי."
+    ],
+    "game_usage": {
+      "fill_in_blank": "שקל ____ לקילו.",
+      "options": [
+        "וחצי",
+        "קפה",
+        "אדום"
+      ],
+      "correct": "וחצי",
+      "matching_pair": "שקל וחצי ↔ شيكل ونصف"
+    }
+  },
+  {
+    "id": "L1_044",
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "אני רוצה שני אבטיחים גדולים, בבקשה.",
+    "arabic": "أريد بطيختين كبيرتين، من فضلك.",
+    "transliteration": "ani rotze shnei avatihim gdolim, bevakasha.",
+    "phonetic_breakdown": [
+      "אני",
+      "רוצה",
+      "שני",
+      "אבטיחים",
+      "גדולים",
+      "בבקשה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to politely ask for two large watermelons.",
+    "source_transcript": "33_kama-ole-haavatiach.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני רוצה שני אבטיחים גדולים, בבקשה.",
+        "expected_hebrew": "אני רוצה שני אבטיחים גדולים, בבקשה.",
+        "response_hebrew": "הנה אבטיחים גדולים ויפים.",
+        "response_arabic": "تفضل بطيخ كبير وجميل.",
+        "teaching_note": "שני تعني اثنين للمذكر، و־בבקשה تجعل الطلب مؤدبًا."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "רוצה",
+      "שני",
+      "אבטיחים",
+      "גדולים",
+      "בבקשה"
+    ],
+    "common_mistakes": [
+      "نسيان صيغة الجمع אבטיחים."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני רוצה שני ____ גדולים, בבקשה.",
+      "options": [
+        "אבטיחים",
+        "קפה",
+        "חלב"
+      ],
+      "correct": "אבטיחים",
+      "matching_pair": "שני אבטיחים ↔ بطيختان"
+    }
+  },
+  {
+    "id": "L1_045",
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "תודה רבה.",
+    "arabic": "شكرًا جزيلًا.",
+    "transliteration": "toda raba.",
+    "phonetic_breakdown": [
+      "תודה",
+      "רבה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to say thank you very much.",
+    "source_transcript": "33_kama-ole-haavatiach.txt",
+    "approved_responses": [
+      {
+        "student_says": "תודה רבה.",
+        "expected_hebrew": "תודה רבה.",
+        "response_hebrew": "בבקשה.",
+        "response_arabic": "عفوًا.",
+        "teaching_note": "תודה רבה أقوى من תודה فقط."
+      }
+    ],
+    "related_vocabulary": [
+      "תודה",
+      "רבה",
+      "בבקשה"
+    ],
+    "common_mistakes": [
+      "الخلط بين תודה و תודה רבה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "תודה ____.",
+      "options": [
+        "רבה",
+        "קפה",
+        "חלב"
+      ],
+      "correct": "רבה",
+      "matching_pair": "תודה רבה ↔ شكرًا جزيلًا"
+    }
+  },
+  {
+    "id": "L1_046",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "שלום, יש חומוס בפיטה?",
+    "arabic": "مرحبًا، هل يوجد حمص في بيتا؟",
+    "transliteration": "shalom, yesh hummus be-pita?",
+    "phonetic_breakdown": [
+      "שלום",
+      "יש",
+      "חומוס",
+      "בפיטה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to ask if hummus in pita is available.",
+    "source_transcript": "16_bekafeteria-shel-hauniversita.txt",
+    "approved_responses": [
+      {
+        "student_says": "שלום, יש חומוס בפיטה?",
+        "expected_hebrew": "שלום, יש חומוס בפיטה?",
+        "response_hebrew": "אין פיטות.",
+        "response_arabic": "لا يوجد بيتا.",
+        "teaching_note": "יש تعني يوجد."
+      }
+    ],
+    "related_vocabulary": [
+      "שלום",
+      "יש",
+      "חומוס",
+      "פיטה"
+    ],
+    "common_mistakes": [
+      "الخلط بين יש و אין."
+    ],
+    "game_usage": {
+      "fill_in_blank": "שלום, יש חומוס ____?",
+      "options": [
+        "בפיטה",
+        "בקפה",
+        "בחלב"
+      ],
+      "correct": "בפיטה",
+      "matching_pair": "יש חומוס בפיטה? ↔ هل يوجد حمص في بيتا؟"
+    }
+  },
+  {
+    "id": "L1_047",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "אין פיטות.",
+    "arabic": "لا يوجد بيتا.",
+    "transliteration": "ein pitot.",
+    "phonetic_breakdown": [
+      "אין",
+      "פיטות"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to say that there are no pitas.",
+    "source_transcript": "16_bekafeteria-shel-hauniversita.txt",
+    "approved_responses": [
+      {
+        "student_says": "אין פיטות.",
+        "expected_hebrew": "אין פיטות.",
+        "response_hebrew": "יש סנדוויץ'ים ועוגות.",
+        "response_arabic": "يوجد سندويشات وكعك.",
+        "teaching_note": "אין تعني لا يوجد."
+      }
+    ],
+    "related_vocabulary": [
+      "אין",
+      "פיטות"
+    ],
+    "common_mistakes": [
+      "استخدام יש بدل אין."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ פיטות.",
+      "options": [
+        "אין",
+        "יש",
+        "אני"
+      ],
+      "correct": "אין",
+      "matching_pair": "אין ↔ لا يوجد"
+    }
+  },
+  {
+    "id": "L1_048",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "יש סנדוויץ'ים ועוגות.",
+    "arabic": "يوجد سندويشات وكعك.",
+    "transliteration": "yesh sandwichim ve-ugot.",
+    "phonetic_breakdown": [
+      "יש",
+      "סנדוויץ'ים",
+      "ועוגות"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to list available food items.",
+    "source_transcript": "16_bekafeteria-shel-hauniversita.txt",
+    "approved_responses": [
+      {
+        "student_says": "יש סנדוויץ'ים ועוגות.",
+        "expected_hebrew": "יש סנדוויץ'ים ועוגות.",
+        "response_hebrew": "בסדר.",
+        "response_arabic": "حسنًا.",
+        "teaching_note": "ו في ועוגות تعني و."
+      }
+    ],
+    "related_vocabulary": [
+      "יש",
+      "סנדוויץ'ים",
+      "עוגות"
+    ],
+    "common_mistakes": [
+      "نسيان ו في ועוגות."
+    ],
+    "game_usage": {
+      "fill_in_blank": "יש סנדוויץ'ים ו____.",
+      "options": [
+        "עוגות",
+        "חלב",
+        "פיטות"
+      ],
+      "correct": "עוגות",
+      "matching_pair": "עוגות ↔ كعك"
+    }
+  },
+  {
+    "id": "L1_049",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "יש סנדוויץ' עם גבינה?",
+    "arabic": "هل يوجد سندويش مع جبنة؟",
+    "transliteration": "yesh sandwich im gvina?",
+    "phonetic_breakdown": [
+      "יש",
+      "סנדוויץ'",
+      "עם",
+      "גבינה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to ask if there is a cheese sandwich.",
+    "source_transcript": "16_bekafeteria-shel-hauniversita.txt",
+    "approved_responses": [
+      {
+        "student_says": "יש סנדוויץ' עם גבינה?",
+        "expected_hebrew": "יש סנדוויץ' עם גבינה?",
+        "response_hebrew": "לא.",
+        "response_arabic": "لا.",
+        "teaching_note": "עם تعني مع."
+      }
+    ],
+    "related_vocabulary": [
+      "יש",
+      "סנדוויץ'",
+      "עם",
+      "גבינה"
+    ],
+    "common_mistakes": [
+      "نسيان עם عند قول مع جبنة."
+    ],
+    "game_usage": {
+      "fill_in_blank": "יש סנדוויץ' עם ____?",
+      "options": [
+        "גבינה",
+        "קפה",
+        "לימון"
+      ],
+      "correct": "גבינה",
+      "matching_pair": "גבינה ↔ جبنة"
+    }
+  },
+  {
+    "id": "L1_050",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "אני רוצה סנדוויץ' עם טונה.",
+    "arabic": "أريد سندويش مع تونة.",
+    "transliteration": "ani rotza sandwich im tuna.",
+    "phonetic_breakdown": [
+      "אני",
+      "רוצה",
+      "סנדוויץ'",
+      "עם",
+      "טונה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to order a tuna sandwich.",
+    "source_transcript": "16_bekafeteria-shel-hauniversita.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני רוצה סנדוויץ' עם טונה.",
+        "expected_hebrew": "אני רוצה סנדוויץ' עם טונה.",
+        "response_hebrew": "בבקשה.",
+        "response_arabic": "تفضلي.",
+        "teaching_note": "רוצה تعني أريد/تريد حسب السياق."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "רוצה",
+      "סנדוויץ'",
+      "טונה"
+    ],
+    "common_mistakes": [
+      "نسيان كلمة עם قبل טונה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני רוצה סנדוויץ' עם ____.",
+      "options": [
+        "טונה",
+        "חלב",
+        "קפה"
+      ],
+      "correct": "טונה",
+      "matching_pair": "טונה ↔ تونة"
+    }
+  },
+  {
+    "id": "L1_051",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "קצת סלט, לא הרבה.",
+    "arabic": "قليل من السلطة، ليس كثيرًا.",
+    "transliteration": "ktzat salat, lo harbe.",
+    "phonetic_breakdown": [
+      "קצת",
+      "סלט",
+      "לא",
+      "הרבה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to ask for a small amount of salad.",
+    "source_transcript": "16_bekafeteria-shel-hauniversita.txt",
+    "approved_responses": [
+      {
+        "student_says": "קצת סלט, לא הרבה.",
+        "expected_hebrew": "קצת סלט, לא הרבה.",
+        "response_hebrew": "בסדר.",
+        "response_arabic": "حسنًا.",
+        "teaching_note": "קצת تعني قليل، הרבה تعني كثير."
+      }
+    ],
+    "related_vocabulary": [
+      "קצת",
+      "סלט",
+      "לא",
+      "הרבה"
+    ],
+    "common_mistakes": [
+      "الخلط بين קצת و הרבה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "קצת סלט, לא ____.",
+      "options": [
+        "הרבה",
+        "חלב",
+        "קפה"
+      ],
+      "correct": "הרבה",
+      "matching_pair": "קצת ↔ قليل"
+    }
+  },
+  {
+    "id": "L1_052",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "את רוצה עם חריף או בלי חריף?",
+    "arabic": "هل تريدين مع حار أم بدون حار؟",
+    "transliteration": "at rotza im harif o bli harif?",
+    "phonetic_breakdown": [
+      "את",
+      "רוצה",
+      "עם",
+      "חריף",
+      "או",
+      "בלי",
+      "חריף"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to ask if a female customer wants spicy food or not.",
+    "source_transcript": "16_bekafeteria-shel-hauniversita.txt",
+    "approved_responses": [
+      {
+        "student_says": "את רוצה עם חריף או בלי חריף?",
+        "expected_hebrew": "את רוצה עם חריף או בלי חריף?",
+        "response_hebrew": "אני רוצה הרבה חריף.",
+        "response_arabic": "أريد كثيرًا من الحار.",
+        "teaching_note": "עם تعني مع، בלי تعني بدون، או تعني أو."
+      }
+    ],
+    "related_vocabulary": [
+      "את",
+      "רוצה",
+      "עם",
+      "בלי",
+      "חריף"
+    ],
+    "common_mistakes": [
+      "الخلط بين עם و בלי."
+    ],
+    "game_usage": {
+      "fill_in_blank": "עם חריף או ____ חריף?",
+      "options": [
+        "בלי",
+        "עם",
+        "גם"
+      ],
+      "correct": "בלי",
+      "matching_pair": "בלי חריף ↔ بدون حار"
+    }
+  },
+  {
+    "id": "L1_053",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "אני רוצה הרבה חריף.",
+    "arabic": "أريد كثيرًا من الحار.",
+    "transliteration": "ani rotza harbe harif.",
+    "phonetic_breakdown": [
+      "אני",
+      "רוצה",
+      "הרבה",
+      "חריף"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to ask for a lot of spicy sauce or spicy flavor.",
+    "source_transcript": "16_bekafeteria-shel-hauniversita.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני רוצה הרבה חריף.",
+        "expected_hebrew": "אני רוצה הרבה חריף.",
+        "response_hebrew": "בבקשה.",
+        "response_arabic": "تفضلي.",
+        "teaching_note": "הרבה تعني كثير."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "רוצה",
+      "הרבה",
+      "חריף"
+    ],
+    "common_mistakes": [
+      "استخدام קצת بدل הרבה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני רוצה הרבה ____.",
+      "options": [
+        "חריף",
+        "חלב",
+        "קפה"
+      ],
+      "correct": "חריף",
+      "matching_pair": "חריף ↔ حار"
+    }
+  },
+  {
+    "id": "L1_054",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "יש בשכונה מסעדה חדשה גדולה ויפה.",
+    "arabic": "يوجد في الحي مطعم جديد كبير وجميل.",
+    "transliteration": "yesh ba-shchuna misada chadasha gdola ve-yafa.",
+    "phonetic_breakdown": [
+      "יש",
+      "בשכונה",
+      "מסעדה",
+      "חדשה",
+      "גדולה",
+      "ויפה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to describe a new restaurant in the neighborhood.",
+    "source_transcript": "20_hamisada-hahadasha.txt",
+    "approved_responses": [
+      {
+        "student_says": "יש בשכונה מסעדה חדשה גדולה ויפה.",
+        "expected_hebrew": "יש בשכונה מסעדה חדשה גדולה ויפה.",
+        "response_hebrew": "נכון, המסעדה חדשה.",
+        "response_arabic": "صحيح، المطعم جديد.",
+        "teaching_note": "חדשה, גדולה, יפה كلها صفات مؤنثة لأنها تصف מסעדה."
+      }
+    ],
+    "related_vocabulary": [
+      "יש",
+      "שכונה",
+      "מסעדה",
+      "חדשה",
+      "גדולה",
+      "יפה"
+    ],
+    "common_mistakes": [
+      "استخدام חדש بدل חדשה مع מסעדה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "יש בשכונה מסעדה ____.",
+      "options": [
+        "חדשה",
+        "חדש",
+        "חדשים"
+      ],
+      "correct": "חדשה",
+      "matching_pair": "מסעדה חדשה ↔ مطعم جديد"
+    }
+  },
+  {
+    "id": "L1_055",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "אבל אין הרבה אנשים.",
+    "arabic": "لكن لا يوجد الكثير من الناس.",
+    "transliteration": "aval ein harbe anashim.",
+    "phonetic_breakdown": [
+      "אבל",
+      "אין",
+      "הרבה",
+      "אנשים"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say that there are not many people.",
+    "source_transcript": "20_hamisada-hahadasha.txt",
+    "approved_responses": [
+      {
+        "student_says": "אבל אין הרבה אנשים.",
+        "expected_hebrew": "אבל אין הרבה אנשים.",
+        "response_hebrew": "נכון, אין הרבה אנשים.",
+        "response_arabic": "صحيح، لا يوجد الكثير من الناس.",
+        "teaching_note": "אבל تعني لكن، אין تعني لا يوجد."
+      }
+    ],
+    "related_vocabulary": [
+      "אבל",
+      "אין",
+      "הרבה",
+      "אנשים"
+    ],
+    "common_mistakes": [
+      "الخلط بين יש ו אין."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אבל אין הרבה ____.",
+      "options": [
+        "אנשים",
+        "קפה",
+        "חלב"
+      ],
+      "correct": "אנשים",
+      "matching_pair": "אין הרבה אנשים ↔ لا يوجد الكثير من الناس"
+    }
+  },
+  {
+    "id": "L1_056",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "סמר ואיברהים יושבים במסעדה החדשה.",
+    "arabic": "سمر وإبراهيم يجلسان في المطعم الجديد.",
+    "transliteration": "samar ve-ibrahim yoshvim ba-misada ha-chadasha.",
+    "phonetic_breakdown": [
+      "סמר",
+      "ואיברהים",
+      "יושבים",
+      "במסעדה",
+      "החדשה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to describe people sitting in the new restaurant.",
+    "source_transcript": "20_hamisada-hahadasha.txt",
+    "approved_responses": [
+      {
+        "student_says": "סמר ואיברהים יושבים במסעדה החדשה.",
+        "expected_hebrew": "סמר ואיברהים יושבים במסעדה החדשה.",
+        "response_hebrew": "יפה.",
+        "response_arabic": "جيد.",
+        "teaching_note": "יושבים تعني يجلسون/يجلسان."
+      }
+    ],
+    "related_vocabulary": [
+      "סמר",
+      "איברהים",
+      "יושבים",
+      "במסעדה",
+      "חדשה"
+    ],
+    "common_mistakes": [
+      "نسيان ו في ואיברהים بمعنى وإبراهيم."
+    ],
+    "game_usage": {
+      "fill_in_blank": "סמר ואיברהים ____ במסעדה החדשה.",
+      "options": [
+        "יושבים",
+        "שותים",
+        "רוצים"
+      ],
+      "correct": "יושבים",
+      "matching_pair": "יושבים ↔ يجلسون"
+    }
+  },
+  {
+    "id": "L1_057",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "הם אוכלים דג חריף, מרק בלי מלח,",
+    "arabic": "هم يأكلون سمكًا حارًا، وشوربة بدون ملح.",
+    "transliteration": "hem ochlim dag harif, marak bli melach.",
+    "phonetic_breakdown": [
+      "הם",
+      "אוכלים",
+      "דג",
+      "חריף",
+      "מרק",
+      "בלי",
+      "מלח"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to describe what people are eating.",
+    "source_transcript": "20_hamisada-hahadasha.txt",
+    "approved_responses": [
+      {
+        "student_says": "הם אוכלים דג חריף, מרק בלי מלח,",
+        "expected_hebrew": "הם אוכלים דג חריף, מרק בלי מלח,",
+        "response_hebrew": "נכון.",
+        "response_arabic": "صحيح.",
+        "teaching_note": "הם אוכלים تعني هم يأكلون، בלי تعني بدون."
+      }
+    ],
+    "related_vocabulary": [
+      "הם",
+      "אוכלים",
+      "דג",
+      "חריף",
+      "מרק",
+      "מלח"
+    ],
+    "common_mistakes": [
+      "الخلط بين עם מלח و בלי מלח."
+    ],
+    "game_usage": {
+      "fill_in_blank": "מרק בלי ____",
+      "options": [
+        "מלח",
+        "קפה",
+        "שולחן"
+      ],
+      "correct": "מלח",
+      "matching_pair": "בלי מלח ↔ بدون ملح"
+    }
+  },
+  {
+    "id": "L1_058",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "אין פרחים, אין תמונות, אבל יש אוכל טעים.",
+    "arabic": "لا توجد أزهار، لا توجد صور، لكن يوجد طعام لذيذ.",
+    "transliteration": "ein prachim, ein tmunot, aval yesh ochel taim.",
+    "phonetic_breakdown": [
+      "אין",
+      "פרחים",
+      "אין",
+      "תמונות",
+      "אבל",
+      "יש",
+      "אוכל",
+      "טעים"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to contrast missing decorations with good food.",
+    "source_transcript": "20_hamisada-hahadasha.txt",
+    "approved_responses": [
+      {
+        "student_says": "אין פרחים, אין תמונות, אבל יש אוכל טעים.",
+        "expected_hebrew": "אין פרחים, אין תמונות, אבל יש אוכל טעים.",
+        "response_hebrew": "יפה מאוד.",
+        "response_arabic": "جيد جدًا.",
+        "teaching_note": "الجملة تقارن بين אין و יש."
+      }
+    ],
+    "related_vocabulary": [
+      "אין",
+      "פרחים",
+      "תמונות",
+      "אבל",
+      "יש",
+      "אוכל",
+      "טעים"
+    ],
+    "common_mistakes": [
+      "نسيان أن אבל تعني لكن."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אבל יש אוכל ____.",
+      "options": [
+        "טעים",
+        "חדש",
+        "גדולים"
+      ],
+      "correct": "טעים",
+      "matching_pair": "אוכל טעים ↔ طعام لذيذ"
+    }
+  },
+  {
+    "id": "L1_059",
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "אין פרחים, אין תמונות, אבל יש אוכל טעים.",
+    "arabic": "لا توجد أزهار، لا توجد صور، لكن يوجد طعام لذيذ.",
+    "transliteration": "ein prachim, ein tmunot, aval yesh ochel taim.",
+    "phonetic_breakdown": [
+      "אין",
+      "פרחים",
+      "אין",
+      "תמונות",
+      "אבל",
+      "יש",
+      "אוכל",
+      "טעים"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to practice the contrast between there is and there is not.",
+    "source_transcript": "20_hamisada-hahadasha.txt",
+    "approved_responses": [
+      {
+        "student_says": "אין פרחים, אין תמונות, אבל יש אוכל טעים.",
+        "expected_hebrew": "אין פרחים, אין תמונות, אבל יש אוכל טעים.",
+        "response_hebrew": "נכון.",
+        "response_arabic": "صحيح.",
+        "teaching_note": "אין = لا يوجد، יש = يوجد."
+      }
+    ],
+    "related_vocabulary": [
+      "אין",
+      "יש",
+      "אוכל",
+      "טעים"
+    ],
+    "common_mistakes": [
+      "الخلط بين אין و יש."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אין פרחים, אין תמונות, אבל ____ אוכל טעים.",
+      "options": [
+        "יש",
+        "אין",
+        "מי"
+      ],
+      "correct": "יש",
+      "matching_pair": "יש אוכל ↔ يوجد طعام"
+    }
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "מה יש בתיק של רנה?",
+    "arabic": "ماذا يوجد في حقيبة رِنا؟",
+    "transliteration": "ma yesh ba-tik shel rena?",
+    "phonetic_breakdown": [
+      "מה",
+      "יש",
+      "בתיק",
+      "של",
+      "רנה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to ask what is inside Rena's bag.",
+    "source_transcript": "21_ma-yesh-batik.txt",
+    "approved_responses": [
+      {
+        "student_says": "מה יש בתיק של רנה?",
+        "expected_hebrew": "מה יש בתיק של רנה?",
+        "response_hebrew": "בתיק של רנה יש [דברים].",
+        "response_arabic": "في حقيبة رِنا يوجد [أشياء].",
+        "teaching_note": "מה יש تعني ماذا يوجد، و־בתיק של تعني في حقيبة."
+      }
+    ],
+    "related_vocabulary": [
+      "מה",
+      "יש",
+      "בתיק",
+      "של",
+      "רנה"
+    ],
+    "common_mistakes": [
+      "الخلط بين יש לי و יש בתיק."
+    ],
+    "game_usage": {
+      "fill_in_blank": "מה יש ____ של רנה?",
+      "options": [
+        "בתיק",
+        "בבית",
+        "בקפה"
+      ],
+      "correct": "בתיק",
+      "matching_pair": "מה יש בתיק? ↔ ماذا يوجد في الحقيبة؟"
+    },
+    "id": "L1_060"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "רנה נוסעת לטיול.",
+    "arabic": "رِنا تسافر إلى رحلة.",
+    "transliteration": "rena nosa'at le-tiyul.",
+    "phonetic_breakdown": [
+      "רנה",
+      "נוסעת",
+      "לטיול"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say that Rena is going on a trip.",
+    "source_transcript": "21_ma-yesh-batik.txt",
+    "approved_responses": [
+      {
+        "student_says": "רנה נוסעת לטיול.",
+        "expected_hebrew": "רנה נוסעת לטיול.",
+        "response_hebrew": "יפה, רנה נוסעת לטיול.",
+        "response_arabic": "جيد، رِنا تذهب إلى رحلة.",
+        "teaching_note": "נוסעת تستخدم للمؤنث."
+      }
+    ],
+    "related_vocabulary": [
+      "רנה",
+      "נוסעת",
+      "טיול"
+    ],
+    "common_mistakes": [
+      "استخدام נוסע بدل נוסעת مع اسم مؤنث."
+    ],
+    "game_usage": {
+      "fill_in_blank": "רנה ____ לטיול.",
+      "options": [
+        "נוסעת",
+        "נוסע",
+        "שותה"
+      ],
+      "correct": "נוסעת",
+      "matching_pair": "נוסעת לטיול ↔ تسافر إلى رحلة"
+    },
+    "id": "L1_061"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "בתיק של רנה יש",
+    "arabic": "في حقيبة رِنا يوجد",
+    "transliteration": "ba-tik shel rena yesh",
+    "phonetic_breakdown": [
+      "בתיק",
+      "של",
+      "רנה",
+      "יש"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used as the beginning of a sentence listing what is in Rena's bag.",
+    "source_transcript": "21_ma-yesh-batik.txt",
+    "approved_responses": [
+      {
+        "student_says": "בתיק של רנה יש",
+        "expected_hebrew": "בתיק של רנה יש",
+        "response_hebrew": "בתיק של רנה יש אוכל ומים.",
+        "response_arabic": "في حقيبة رِنا يوجد طعام وماء.",
+        "teaching_note": "יש تستخدم لقول يوجد."
+      }
+    ],
+    "related_vocabulary": [
+      "בתיק",
+      "של",
+      "רנה",
+      "יש"
+    ],
+    "common_mistakes": [
+      "نسيان של عند قول حقيبة رِنا."
+    ],
+    "game_usage": {
+      "fill_in_blank": "בתיק של רנה ____",
+      "options": [
+        "יש",
+        "אין",
+        "מי"
+      ],
+      "correct": "יש",
+      "matching_pair": "יש ↔ يوجد"
+    },
+    "id": "L1_062"
+  },
+  {
+    "level": "beginner",
+    "category": "numbers",
+    "hebrew": "שישה בקבוקי מים,",
+    "arabic": "ست زجاجات ماء،",
+    "transliteration": "shisha bakbukei mayim",
+    "phonetic_breakdown": [
+      "שישה",
+      "בקבוקי",
+      "מים"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to count six bottles of water.",
+    "source_transcript": "21_ma-yesh-batik.txt",
+    "approved_responses": [
+      {
+        "student_says": "שישה בקבוקי מים,",
+        "expected_hebrew": "שישה בקבוקי מים,",
+        "response_hebrew": "נכון, שישה בקבוקי מים.",
+        "response_arabic": "صحيح، ست زجاجات ماء.",
+        "teaching_note": "שישה تعني ستة للمذكر."
+      }
+    ],
+    "related_vocabulary": [
+      "שישה",
+      "בקבוקי",
+      "מים"
+    ],
+    "common_mistakes": [
+      "الخلط بين שישה و שש."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ בקבוקי מים",
+      "options": [
+        "שישה",
+        "שלוש",
+        "תשע"
+      ],
+      "correct": "שישה",
+      "matching_pair": "שישה ↔ ستة"
+    },
+    "id": "L1_063"
+  },
+  {
+    "level": "beginner",
+    "category": "numbers",
+    "hebrew": "תשע פיטות,",
+    "arabic": "تسع خبزات بيتا،",
+    "transliteration": "tesha pitot",
+    "phonetic_breakdown": [
+      "תשע",
+      "פיטות"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to count nine pitas.",
+    "source_transcript": "21_ma-yesh-batik.txt",
+    "approved_responses": [
+      {
+        "student_says": "תשע פיטות,",
+        "expected_hebrew": "תשע פיטות,",
+        "response_hebrew": "נכון, תשע פיטות.",
+        "response_arabic": "صحيح، تسع بيتات.",
+        "teaching_note": "תשע تعني تسعة/تسع حسب الاسم."
+      }
+    ],
+    "related_vocabulary": [
+      "תשע",
+      "פיטות"
+    ],
+    "common_mistakes": [
+      "الخلط بين תשע و תשעה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ פיטות",
+      "options": [
+        "תשע",
+        "שבע",
+        "עשר"
+      ],
+      "correct": "תשע",
+      "matching_pair": "תשע ↔ تسع"
+    },
+    "id": "L1_064"
+  },
+  {
+    "level": "beginner",
+    "category": "numbers",
+    "hebrew": "שבע בננות,",
+    "arabic": "سبع موزات،",
+    "transliteration": "sheva bananot",
+    "phonetic_breakdown": [
+      "שבע",
+      "בננות"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to count seven bananas.",
+    "source_transcript": "21_ma-yesh-batik.txt",
+    "approved_responses": [
+      {
+        "student_says": "שבע בננות,",
+        "expected_hebrew": "שבע בננות,",
+        "response_hebrew": "נכון, שבע בננות.",
+        "response_arabic": "صحيح، سبع موزات.",
+        "teaching_note": "בננות تعني موزات."
+      }
+    ],
+    "related_vocabulary": [
+      "שבע",
+      "בננות"
+    ],
+    "common_mistakes": [
+      "نسيان صيغة الجمع בננות."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ בננות",
+      "options": [
+        "שבע",
+        "שישה",
+        "שלוש"
+      ],
+      "correct": "שבע",
+      "matching_pair": "בננות ↔ موزات"
+    },
+    "id": "L1_065"
+  },
+  {
+    "level": "beginner",
+    "category": "numbers",
+    "hebrew": "ושלוש עוגות.",
+    "arabic": "وثلاث كعكات.",
+    "transliteration": "ve-shalosh ugot.",
+    "phonetic_breakdown": [
+      "ושלוש",
+      "עוגות"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to count three cakes at the end of a list.",
+    "source_transcript": "21_ma-yesh-batik.txt",
+    "approved_responses": [
+      {
+        "student_says": "ושלוש עוגות.",
+        "expected_hebrew": "ושלוש עוגות.",
+        "response_hebrew": "נכון, שלוש עוגות.",
+        "response_arabic": "صحيح، ثلاث كعكات.",
+        "teaching_note": "ו في ושלוש تعني و."
+      }
+    ],
+    "related_vocabulary": [
+      "שלוש",
+      "עוגות"
+    ],
+    "common_mistakes": [
+      "نسيان ו في ושלוש عند نهاية القائمة."
+    ],
+    "game_usage": {
+      "fill_in_blank": "ו____ עוגות.",
+      "options": [
+        "שלוש",
+        "שבע",
+        "תשע"
+      ],
+      "correct": "שלוש",
+      "matching_pair": "שלוש עוגות ↔ ثلاث كعكات"
+    },
+    "id": "L1_066"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "יש לי, אין לי.",
+    "arabic": "عندي، ليس عندي.",
+    "transliteration": "yesh li, ein li.",
+    "phonetic_breakdown": [
+      "יש",
+      "לי",
+      "אין",
+      "לי"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to practice saying I have and I do not have.",
+    "source_transcript": "22_yesh-li-ein-li.txt",
+    "approved_responses": [
+      {
+        "student_says": "יש לי, אין לי.",
+        "expected_hebrew": "יש לי, אין לי.",
+        "response_hebrew": "נכון. יש לי / אין לי.",
+        "response_arabic": "صحيح. عندي / ليس عندي.",
+        "teaching_note": "יש לי تعني عندي، אין לי تعني ليس عندي."
+      }
+    ],
+    "related_vocabulary": [
+      "יש",
+      "לי",
+      "אין"
+    ],
+    "common_mistakes": [
+      "الخلط بين יש לי و אין לי."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ לי, אין לי.",
+      "options": [
+        "יש",
+        "מי",
+        "את"
+      ],
+      "correct": "יש",
+      "matching_pair": "יש לי ↔ عندي"
+    },
+    "id": "L1_067"
+  },
+  {
+    "level": "beginner",
+    "category": "family",
+    "hebrew": "יש לי שלושה ילדים. שני בנים ובת אחת.",
+    "arabic": "عندي ثلاثة أولاد. ولدان وبنت واحدة.",
+    "transliteration": "yesh li shlosha yeladim. shnei banim u-bat achat.",
+    "phonetic_breakdown": [
+      "יש",
+      "לי",
+      "שלושה",
+      "ילדים",
+      "שני",
+      "בנים",
+      "ובת",
+      "אחת"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to describe how many children someone has.",
+    "source_transcript": "22_yesh-li-ein-li.txt",
+    "approved_responses": [
+      {
+        "student_says": "יש לי שלושה ילדים. שני בנים ובת אחת.",
+        "expected_hebrew": "יש לי שלושה ילדים. שני בנים ובת אחת.",
+        "response_hebrew": "יפה מאוד.",
+        "response_arabic": "جيد جدًا.",
+        "teaching_note": "ילדים تعني أولاد/أطفال، בנים أولاد، בת بنت."
+      }
+    ],
+    "related_vocabulary": [
+      "שלושה",
+      "ילדים",
+      "שני",
+      "בנים",
+      "בת",
+      "אחת"
+    ],
+    "common_mistakes": [
+      "الخلط بين שני للمذكر و שתי للمؤنث."
+    ],
+    "game_usage": {
+      "fill_in_blank": "יש לי שלושה ____.",
+      "options": [
+        "ילדים",
+        "אחים",
+        "אחיות"
+      ],
+      "correct": "ילדים",
+      "matching_pair": "שלושה ילדים ↔ ثلاثة أولاد"
+    },
+    "id": "L1_068"
+  },
+  {
+    "level": "beginner",
+    "category": "family",
+    "hebrew": "יש לי ארבעה אחים ושתי אחיות.",
+    "arabic": "عندي أربعة إخوة وأختان.",
+    "transliteration": "yesh li arba'a achim u-shtei achayot.",
+    "phonetic_breakdown": [
+      "יש",
+      "לי",
+      "ארבעה",
+      "אחים",
+      "ושתי",
+      "אחיות"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to describe brothers and sisters.",
+    "source_transcript": "22_yesh-li-ein-li.txt",
+    "approved_responses": [
+      {
+        "student_says": "יש לי ארבעה אחים ושתי אחיות.",
+        "expected_hebrew": "יש לי ארבעה אחים ושתי אחיות.",
+        "response_hebrew": "נכון.",
+        "response_arabic": "صحيح.",
+        "teaching_note": "אחים إخوة، אחיות أخوات."
+      }
+    ],
+    "related_vocabulary": [
+      "ארבעה",
+      "אחים",
+      "שתי",
+      "אחיות"
+    ],
+    "common_mistakes": [
+      "الخلط بين אחים و אחיות."
+    ],
+    "game_usage": {
+      "fill_in_blank": "יש לי ארבעה אחים ו____ אחיות.",
+      "options": [
+        "שתי",
+        "שני",
+        "שלושה"
+      ],
+      "correct": "שתי",
+      "matching_pair": "שתי אחיות ↔ أختان"
+    },
+    "id": "L1_069"
+  },
+  {
+    "level": "beginner",
+    "category": "family",
+    "hebrew": "יש לי חמישה בנים ושישה אחים.",
+    "arabic": "عندي خمسة أولاد وستة إخوة.",
+    "transliteration": "yesh li chamisha banim ve-shisha achim.",
+    "phonetic_breakdown": [
+      "יש",
+      "לי",
+      "חמישה",
+      "בנים",
+      "ושישה",
+      "אחים"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to describe family members using numbers.",
+    "source_transcript": "22_yesh-li-ein-li.txt",
+    "approved_responses": [
+      {
+        "student_says": "יש לי חמישה בנים ושישה אחים.",
+        "expected_hebrew": "יש לי חמישה בנים ושישה אחים.",
+        "response_hebrew": "בסדר.",
+        "response_arabic": "حسنًا.",
+        "teaching_note": "חמישה تعني خمسة، שישה تعني ستة."
+      }
+    ],
+    "related_vocabulary": [
+      "חמישה",
+      "בנים",
+      "שישה",
+      "אחים"
+    ],
+    "common_mistakes": [
+      "نسيان ו في ושישה بمعنى وستة."
+    ],
+    "game_usage": {
+      "fill_in_blank": "יש לי חמישה בנים ו____ אחים.",
+      "options": [
+        "שישה",
+        "שתי",
+        "אחת"
+      ],
+      "correct": "שישה",
+      "matching_pair": "שישה אחים ↔ ستة إخوة"
+    },
+    "id": "L1_070"
+  },
+  {
+    "level": "beginner",
+    "category": "family",
+    "hebrew": "אין לי בנות ואין לי אחיות.",
+    "arabic": "ليس عندي بنات وليس عندي أخوات.",
+    "transliteration": "ein li banot ve-ein li achayot.",
+    "phonetic_breakdown": [
+      "אין",
+      "לי",
+      "בנות",
+      "ואין",
+      "לי",
+      "אחיות"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say that someone does not have daughters or sisters.",
+    "source_transcript": "22_yesh-li-ein-li.txt",
+    "approved_responses": [
+      {
+        "student_says": "אין לי בנות ואין לי אחיות.",
+        "expected_hebrew": "אין לי בנות ואין לי אחיות.",
+        "response_hebrew": "נכון.",
+        "response_arabic": "صحيح.",
+        "teaching_note": "אין לי تعني ليس عندي."
+      }
+    ],
+    "related_vocabulary": [
+      "אין",
+      "לי",
+      "בנות",
+      "אחיות"
+    ],
+    "common_mistakes": [
+      "استخدام יש לי بدل אין לי."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אין לי בנות ואין לי ____.",
+      "options": [
+        "אחיות",
+        "בנים",
+        "אחים"
+      ],
+      "correct": "אחיות",
+      "matching_pair": "אין לי ↔ ليس عندي"
+    },
+    "id": "L1_071"
+  },
+  {
+    "level": "beginner",
+    "category": "family",
+    "hebrew": "אני רוצה גם בנות.",
+    "arabic": "أريد أيضًا بنات.",
+    "transliteration": "ani rotze gam banot.",
+    "phonetic_breakdown": [
+      "אני",
+      "רוצה",
+      "גם",
+      "בנות"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say that someone also wants daughters.",
+    "source_transcript": "22_yesh-li-ein-li.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני רוצה גם בנות.",
+        "expected_hebrew": "אני רוצה גם בנות.",
+        "response_hebrew": "בסדר.",
+        "response_arabic": "حسنًا.",
+        "teaching_note": "גם تعني أيضًا."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "רוצה",
+      "גם",
+      "בנות"
+    ],
+    "common_mistakes": [
+      "نسيان גם عند معنى أيضًا."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני רוצה גם ____.",
+      "options": [
+        "בנות",
+        "אחים",
+        "מים"
+      ],
+      "correct": "בנות",
+      "matching_pair": "בנות ↔ بنات"
+    },
+    "id": "L1_072"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "אני מחפשת דירה.",
+    "arabic": "أنا أبحث عن شقة.",
+    "transliteration": "ani mekhapeset dira.",
+    "phonetic_breakdown": [
+      "אני",
+      "מחפשת",
+      "דירה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used by a female speaker to say she is looking for an apartment.",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני מחפשת דירה.",
+        "expected_hebrew": "אני מחפשת דירה.",
+        "response_hebrew": "איזו דירה את מחפשת?",
+        "response_arabic": "أي شقة تبحثين عنها؟",
+        "teaching_note": "מחפשת تستخدم للمتحدثة المؤنثة."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "מחפשת",
+      "דירה"
+    ],
+    "common_mistakes": [
+      "استخدام מחפש بدل מחפשת مع مؤنث."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני מחפשת ____.",
+      "options": [
+        "דירה",
+        "קפה",
+        "סלט"
+      ],
+      "correct": "דירה",
+      "matching_pair": "דירה ↔ شقة"
+    },
+    "id": "L1_073"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "את מחפשת דירה קטנה או גדולה?",
+    "arabic": "هل تبحثين عن شقة صغيرة أم كبيرة؟",
+    "transliteration": "at mekhapeset dira ktana o gdola?",
+    "phonetic_breakdown": [
+      "את",
+      "מחפשת",
+      "דירה",
+      "קטנה",
+      "או",
+      "גדולה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to ask what kind of apartment a female person is looking for.",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "approved_responses": [
+      {
+        "student_says": "את מחפשת דירה קטנה או גדולה?",
+        "expected_hebrew": "את מחפשת דירה קטנה או גדולה?",
+        "response_hebrew": "אני מחפשת דירה גדולה ויפה.",
+        "response_arabic": "أنا أبحث عن شقة كبيرة وجميلة.",
+        "teaching_note": "או تعني أو."
+      }
+    ],
+    "related_vocabulary": [
+      "את",
+      "מחפשת",
+      "דירה",
+      "קטנה",
+      "גדולה"
+    ],
+    "common_mistakes": [
+      "الخلط بين קטנה و גדולה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "דירה קטנה או ____?",
+      "options": [
+        "גדולה",
+        "חדש",
+        "ישן"
+      ],
+      "correct": "גדולה",
+      "matching_pair": "קטנה ↔ صغيرة"
+    },
+    "id": "L1_074"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "אני מחפשת דירה גדולה ויפה.",
+    "arabic": "أنا أبحث عن شقة كبيرة وجميلة.",
+    "transliteration": "ani mekhapeset dira gdola ve-yafa.",
+    "phonetic_breakdown": [
+      "אני",
+      "מחפשת",
+      "דירה",
+      "גדולה",
+      "ויפה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to describe the apartment someone is looking for.",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני מחפשת דירה גדולה ויפה.",
+        "expected_hebrew": "אני מחפשת דירה גדולה ויפה.",
+        "response_hebrew": "יש דירה טובה ברחוב הנביאים.",
+        "response_arabic": "يوجد شقة جيدة في شارع الأنبياء.",
+        "teaching_note": "גדולה ויפה هما صفتان مؤنثتان لأن דירה مؤنثة."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "מחפשת",
+      "דירה",
+      "גדולה",
+      "יפה"
+    ],
+    "common_mistakes": [
+      "استخدام גדול بدل גדולה مع דירה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "דירה גדולה ו____.",
+      "options": [
+        "יפה",
+        "יפים",
+        "חדש"
+      ],
+      "correct": "יפה",
+      "matching_pair": "דירה גדולה ↔ شقة كبيرة"
+    },
+    "id": "L1_075"
+  },
+  {
+    "level": "beginner",
+    "category": "directions",
+    "hebrew": "יש דירה טובה ברחוב הנביאים.",
+    "arabic": "يوجد شقة جيدة في شارع الأنبياء.",
+    "transliteration": "yesh dira tova be-rehov ha-neviim.",
+    "phonetic_breakdown": [
+      "יש",
+      "דירה",
+      "טובה",
+      "ברחוב",
+      "הנביאים"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to say where an apartment is located.",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "approved_responses": [
+      {
+        "student_says": "יש דירה טובה ברחוב הנביאים.",
+        "expected_hebrew": "יש דירה טובה ברחוב הנביאים.",
+        "response_hebrew": "כמה חדרים יש בדירה?",
+        "response_arabic": "كم غرفة يوجد في الشقة؟",
+        "teaching_note": "ברחוב تعني في شارع."
+      }
+    ],
+    "related_vocabulary": [
+      "יש",
+      "דירה",
+      "טובה",
+      "רחוב",
+      "הנביאים"
+    ],
+    "common_mistakes": [
+      "نسيان ב في ברחוב."
+    ],
+    "game_usage": {
+      "fill_in_blank": "יש דירה טובה ____ הנביאים.",
+      "options": [
+        "ברחוב",
+        "בבית",
+        "בקפה"
+      ],
+      "correct": "ברחוב",
+      "matching_pair": "רחוב ↔ شارع"
+    },
+    "id": "L1_076"
+  },
+  {
+    "level": "beginner",
+    "category": "numbers",
+    "hebrew": "כמה חדרים יש בדירה?",
+    "arabic": "كم غرفة يوجد في الشقة؟",
+    "transliteration": "kama chadarim yesh ba-dira?",
+    "phonetic_breakdown": [
+      "כמה",
+      "חדרים",
+      "יש",
+      "בדירה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to ask how many rooms are in an apartment.",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "approved_responses": [
+      {
+        "student_says": "כמה חדרים יש בדירה?",
+        "expected_hebrew": "כמה חדרים יש בדירה?",
+        "response_hebrew": "שלושה חדרים.",
+        "response_arabic": "ثلاث غرف.",
+        "teaching_note": "כמה تعني كم."
+      }
+    ],
+    "related_vocabulary": [
+      "כמה",
+      "חדרים",
+      "יש",
+      "בדירה"
+    ],
+    "common_mistakes": [
+      "استخدام מה بدل כמה عند السؤال عن العدد."
+    ],
+    "game_usage": {
+      "fill_in_blank": "כמה ____ יש בדירה?",
+      "options": [
+        "חדרים",
+        "קפה",
+        "סלט"
+      ],
+      "correct": "חדרים",
+      "matching_pair": "חדרים ↔ غرف"
+    },
+    "id": "L1_077"
+  },
+  {
+    "level": "beginner",
+    "category": "numbers",
+    "hebrew": "שלושה חדרים.",
+    "arabic": "ثلاث غرف.",
+    "transliteration": "shlosha chadarim.",
+    "phonetic_breakdown": [
+      "שלושה",
+      "חדרים"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say that there are three rooms.",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "approved_responses": [
+      {
+        "student_says": "שלושה חדרים.",
+        "expected_hebrew": "שלושה חדרים.",
+        "response_hebrew": "נכון, שלושה חדרים.",
+        "response_arabic": "صحيح، ثلاث غرف.",
+        "teaching_note": "שלושה تستخدم مع اسم مذكر مثل חדרים."
+      }
+    ],
+    "related_vocabulary": [
+      "שלושה",
+      "חדרים"
+    ],
+    "common_mistakes": [
+      "الخلط بين שלושה و שלוש."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ חדרים.",
+      "options": [
+        "שלושה",
+        "שלוש",
+        "שתיים"
+      ],
+      "correct": "שלושה",
+      "matching_pair": "שלושה ↔ ثلاثة"
+    },
+    "id": "L1_078"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "אין גינה, אבל יש מרפסת גדולה.",
+    "arabic": "لا توجد حديقة، لكن توجد شرفة كبيرة.",
+    "transliteration": "ein gina, aval yesh mirpeset gdola.",
+    "phonetic_breakdown": [
+      "אין",
+      "גינה",
+      "אבל",
+      "יש",
+      "מרפסת",
+      "גדולה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to describe what an apartment has and does not have.",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "approved_responses": [
+      {
+        "student_says": "אין גינה, אבל יש מרפסת גדולה.",
+        "expected_hebrew": "אין גינה, אבל יש מרפסת גדולה.",
+        "response_hebrew": "בסדר.",
+        "response_arabic": "حسنًا.",
+        "teaching_note": "אין = لا يوجد، אבל = لكن، יש = يوجد."
+      }
+    ],
+    "related_vocabulary": [
+      "אין",
+      "גינה",
+      "אבל",
+      "יש",
+      "מרפסת",
+      "גדולה"
+    ],
+    "common_mistakes": [
+      "الخلط بين יש ו אין."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אין גינה, אבל יש ____ גדולה.",
+      "options": [
+        "מרפסת",
+        "קפה",
+        "חלב"
+      ],
+      "correct": "מרפסת",
+      "matching_pair": "מרפסת ↔ شرفة"
+    },
+    "id": "L1_079"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "יש מזגן חדש בסלון.",
+    "arabic": "يوجد مكيف جديد في الصالون.",
+    "transliteration": "yesh mazgan chadash ba-salon.",
+    "phonetic_breakdown": [
+      "יש",
+      "מזגן",
+      "חדש",
+      "בסלון"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say that there is a new air conditioner in the living room.",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "approved_responses": [
+      {
+        "student_says": "יש מזגן חדש בסלון.",
+        "expected_hebrew": "יש מזגן חדש בסלון.",
+        "response_hebrew": "טוב.",
+        "response_arabic": "جيد.",
+        "teaching_note": "מזגן تعني مكيف، סלון تعني صالون."
+      }
+    ],
+    "related_vocabulary": [
+      "יש",
+      "מזגן",
+      "חדש",
+      "בסלון"
+    ],
+    "common_mistakes": [
+      "نسيان ב في בסלון."
+    ],
+    "game_usage": {
+      "fill_in_blank": "יש מזגן חדש ____.",
+      "options": [
+        "בסלון",
+        "בקפה",
+        "בשוק"
+      ],
+      "correct": "בסלון",
+      "matching_pair": "מזגן ↔ مكيف"
+    },
+    "id": "L1_080"
+  },
+  {
+    "level": "beginner",
+    "category": "numbers",
+    "hebrew": "וארבעה כיסאות.",
+    "arabic": "وأربعة كراسٍ.",
+    "transliteration": "ve-arba'a kisot.",
+    "phonetic_breakdown": [
+      "וארבעה",
+      "כיסאות"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to count four chairs.",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "approved_responses": [
+      {
+        "student_says": "וארבעה כיסאות.",
+        "expected_hebrew": "וארבעה כיסאות.",
+        "response_hebrew": "נכון.",
+        "response_arabic": "صحيح.",
+        "teaching_note": "ו في וארבעה تعني و."
+      }
+    ],
+    "related_vocabulary": [
+      "ארבעה",
+      "כיסאות"
+    ],
+    "common_mistakes": [
+      "الخلط بين ארבעה و ארבע."
+    ],
+    "game_usage": {
+      "fill_in_blank": "ו____ כיסאות.",
+      "options": [
+        "ארבעה",
+        "ארבע",
+        "שתי"
+      ],
+      "correct": "ארבעה",
+      "matching_pair": "כיסאות ↔ كراسي"
+    },
+    "id": "L1_081"
+  },
+  {
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "שלושת אלפים שקלים.",
+    "arabic": "ثلاثة آلاف شيكل.",
+    "transliteration": "shloshet alafim shkalim.",
+    "phonetic_breakdown": [
+      "שלושת",
+      "אלפים",
+      "שקלים"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to state the apartment price.",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "approved_responses": [
+      {
+        "student_says": "שלושת אלפים שקלים.",
+        "expected_hebrew": "שלושת אלפים שקלים.",
+        "response_hebrew": "זה לא יקר.",
+        "response_arabic": "هذا ليس غاليًا.",
+        "teaching_note": "שקלים تعني شواكل."
+      }
+    ],
+    "related_vocabulary": [
+      "שלושת",
+      "אלפים",
+      "שקלים"
+    ],
+    "common_mistakes": [
+      "الخلط بين שקל و שקלים."
+    ],
+    "game_usage": {
+      "fill_in_blank": "שלושת אלפים ____.",
+      "options": [
+        "שקלים",
+        "חדרים",
+        "בננות"
+      ],
+      "correct": "שקלים",
+      "matching_pair": "שקלים ↔ شواكل"
+    },
+    "id": "L1_082"
+  },
+  {
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "שלום, אני רוצה סלט, בבקשה.",
+    "arabic": "مرحبًا، أريد سلطة من فضلك.",
+    "transliteration": "shalom, ani rotza salat, bevakasha.",
+    "phonetic_breakdown": [
+      "שלום",
+      "אני",
+      "רוצה",
+      "סלט",
+      "בבקשה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to politely order a salad in a café.",
+    "source_transcript": "25_bebeit-kafe.txt",
+    "approved_responses": [
+      {
+        "student_says": "שלום, אני רוצה סלט, בבקשה.",
+        "expected_hebrew": "שלום, אני רוצה סלט, בבקשה.",
+        "response_hebrew": "איזה סלט?",
+        "response_arabic": "أي سلطة؟",
+        "teaching_note": "בבקשה تستخدم للطلب بأدب."
+      }
+    ],
+    "related_vocabulary": [
+      "שלום",
+      "אני",
+      "רוצה",
+      "סלט",
+      "בבקשה"
+    ],
+    "common_mistakes": [
+      "نسيان בבקשה في الطلب المؤدب."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני רוצה ____, בבקשה.",
+      "options": [
+        "סלט",
+        "תה",
+        "עוגה"
+      ],
+      "correct": "סלט",
+      "matching_pair": "סלט ↔ سلطة"
+    },
+    "id": "L1_083"
+  },
+  {
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "איזה סלט?",
+    "arabic": "أي سلطة؟",
+    "transliteration": "eize salat?",
+    "phonetic_breakdown": [
+      "איזה",
+      "סלט"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to ask what kind of salad the customer wants.",
+    "source_transcript": "25_bebeit-kafe.txt",
+    "approved_responses": [
+      {
+        "student_says": "איזה סלט?",
+        "expected_hebrew": "איזה סלט?",
+        "response_hebrew": "סלט טונה.",
+        "response_arabic": "سلطة تونة.",
+        "teaching_note": "איזה تعني أي/أي نوع."
+      }
+    ],
+    "related_vocabulary": [
+      "איזה",
+      "סלט"
+    ],
+    "common_mistakes": [
+      "الخلط بين איזה و אילו."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ סלט?",
+      "options": [
+        "איזה",
+        "מי",
+        "איפה"
+      ],
+      "correct": "איזה",
+      "matching_pair": "איזה ↔ أي"
+    },
+    "id": "L1_084"
+  },
+  {
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "סלט טונה.",
+    "arabic": "سلطة تونة.",
+    "transliteration": "salat tuna.",
+    "phonetic_breakdown": [
+      "סלט",
+      "טונה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to order or name tuna salad.",
+    "source_transcript": "25_bebeit-kafe.txt",
+    "approved_responses": [
+      {
+        "student_says": "סלט טונה.",
+        "expected_hebrew": "סלט טונה.",
+        "response_hebrew": "בסדר.",
+        "response_arabic": "حسنًا.",
+        "teaching_note": "סלט טונה تعني سلطة تونة."
+      }
+    ],
+    "related_vocabulary": [
+      "סלט",
+      "טונה"
+    ],
+    "common_mistakes": [
+      "تبديل ترتيب الكلمات مع العربية؛ بالعبرية نقول סלט טונה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "סלט ____.",
+      "options": [
+        "טונה",
+        "תה",
+        "בצל"
+      ],
+      "correct": "טונה",
+      "matching_pair": "סלט טונה ↔ سلطة تونة"
+    },
+    "id": "L1_085"
+  },
+  {
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "וגם חביתה עם ירקות.",
+    "arabic": "وأيضًا عجة مع خضار.",
+    "transliteration": "ve-gam chavita im yerakot.",
+    "phonetic_breakdown": [
+      "וגם",
+      "חביתה",
+      "עם",
+      "ירקות"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to add an omelet with vegetables to an order.",
+    "source_transcript": "25_bebeit-kafe.txt",
+    "approved_responses": [
+      {
+        "student_says": "וגם חביתה עם ירקות.",
+        "expected_hebrew": "וגם חביתה עם ירקות.",
+        "response_hebrew": "אילו ירקות את רוצה בחביתה?",
+        "response_arabic": "أي خضار تريدين في العجة؟",
+        "teaching_note": "וגם تعني وأيضًا، עם تعني مع."
+      }
+    ],
+    "related_vocabulary": [
+      "וגם",
+      "חביתה",
+      "עם",
+      "ירקות"
+    ],
+    "common_mistakes": [
+      "نسيان ו في וגם."
+    ],
+    "game_usage": {
+      "fill_in_blank": "חביתה עם ____.",
+      "options": [
+        "ירקות",
+        "תה",
+        "עוגה"
+      ],
+      "correct": "ירקות",
+      "matching_pair": "ירקות ↔ خضار"
+    },
+    "id": "L1_086"
+  },
+  {
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "אילו ירקות את רוצה בחביתה?",
+    "arabic": "أي خضار تريدين في العجة؟",
+    "transliteration": "eilu yerakot at rotza ba-chavita?",
+    "phonetic_breakdown": [
+      "אילו",
+      "ירקות",
+      "את",
+      "רוצה",
+      "בחביתה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to ask what vegetables a female customer wants in the omelet.",
+    "source_transcript": "25_bebeit-kafe.txt",
+    "approved_responses": [
+      {
+        "student_says": "אילו ירקות את רוצה בחביתה?",
+        "expected_hebrew": "אילו ירקות את רוצה בחביתה?",
+        "response_hebrew": "בצל ועגבנייה.",
+        "response_arabic": "بصل وبندورة.",
+        "teaching_note": "אילו تستخدم غالبًا مع الجمع."
+      }
+    ],
+    "related_vocabulary": [
+      "אילו",
+      "ירקות",
+      "את",
+      "רוצה",
+      "חביתה"
+    ],
+    "common_mistakes": [
+      "الخلط بين אילו للجمع و איזה للمفرد."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אילו ____ את רוצה בחביתה?",
+      "options": [
+        "ירקות",
+        "סלט",
+        "תה"
+      ],
+      "correct": "ירקות",
+      "matching_pair": "אילו ירקות ↔ أي خضار"
+    },
+    "id": "L1_087"
+  },
+  {
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "בצל ועגבנייה.",
+    "arabic": "بصل وبندورة.",
+    "transliteration": "batzal ve-agvaniya.",
+    "phonetic_breakdown": [
+      "בצל",
+      "ועגבנייה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to specify onion and tomato.",
+    "source_transcript": "25_bebeit-kafe.txt",
+    "approved_responses": [
+      {
+        "student_says": "בצל ועגבנייה.",
+        "expected_hebrew": "בצל ועגבנייה.",
+        "response_hebrew": "בסדר.",
+        "response_arabic": "حسنًا.",
+        "teaching_note": "ו في ועגבנייה تعني و."
+      }
+    ],
+    "related_vocabulary": [
+      "בצל",
+      "עגבנייה"
+    ],
+    "common_mistakes": [
+      "نسيان و في ועגבנייה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "בצל ו____.",
+      "options": [
+        "עגבנייה",
+        "תה",
+        "עוגה"
+      ],
+      "correct": "עגבנייה",
+      "matching_pair": "בצל ↔ بصل"
+    },
+    "id": "L1_088"
+  },
+  {
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "ומה את שותה? קפה או תה?",
+    "arabic": "وماذا تشربين؟ قهوة أم شاي؟",
+    "transliteration": "ve-ma at shota? kafe o te?",
+    "phonetic_breakdown": [
+      "ומה",
+      "את",
+      "שותה",
+      "קפה",
+      "או",
+      "תה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to ask what a female customer is drinking: coffee or tea.",
+    "source_transcript": "25_bebeit-kafe.txt",
+    "approved_responses": [
+      {
+        "student_says": "ומה את שותה? קפה או תה?",
+        "expected_hebrew": "ומה את שותה? קפה או תה?",
+        "response_hebrew": "אני רוצה תה.",
+        "response_arabic": "أريد شايًا.",
+        "teaching_note": "או تعني أو."
+      }
+    ],
+    "related_vocabulary": [
+      "מה",
+      "שותה",
+      "קפה",
+      "או",
+      "תה"
+    ],
+    "common_mistakes": [
+      "الخلط بين קפה و תה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "קפה או ____?",
+      "options": [
+        "תה",
+        "סלט",
+        "בצל"
+      ],
+      "correct": "תה",
+      "matching_pair": "תה ↔ شاي"
+    },
+    "id": "L1_089"
+  },
+  {
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "אני רוצה תה.",
+    "arabic": "أريد شايًا.",
+    "transliteration": "ani rotza te.",
+    "phonetic_breakdown": [
+      "אני",
+      "רוצה",
+      "תה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to order tea.",
+    "source_transcript": "25_bebeit-kafe.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני רוצה תה.",
+        "expected_hebrew": "אני רוצה תה.",
+        "response_hebrew": "איזה תה יש?",
+        "response_arabic": "أي شاي يوجد؟",
+        "teaching_note": "תה تعني شاي."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "רוצה",
+      "תה"
+    ],
+    "common_mistakes": [
+      "نطق תה كأنه te وليس tea بالإنجليزية."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני רוצה ____.",
+      "options": [
+        "תה",
+        "בצל",
+        "עוגה"
+      ],
+      "correct": "תה",
+      "matching_pair": "תה ↔ شاي"
+    },
+    "id": "L1_090"
+  },
+  {
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "אני רוצה תה נענה, בבקשה.",
+    "arabic": "أريد شاي نعنع، من فضلك.",
+    "transliteration": "ani rotza te nana, bevakasha.",
+    "phonetic_breakdown": [
+      "אני",
+      "רוצה",
+      "תה",
+      "נענה",
+      "בבקשה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to order mint tea politely.",
+    "source_transcript": "25_bebeit-kafe.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני רוצה תה נענה, בבקשה.",
+        "expected_hebrew": "אני רוצה תה נענה, בבקשה.",
+        "response_hebrew": "בבקשה.",
+        "response_arabic": "تفضلي.",
+        "teaching_note": "תה נענה تعني شاي نعنع."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "רוצה",
+      "תה",
+      "נענה",
+      "בבקשה"
+    ],
+    "common_mistakes": [
+      "نسيان בבקשה في الطلب المؤدب."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני רוצה תה ____, בבקשה.",
+      "options": [
+        "נענה",
+        "טונה",
+        "בצל"
+      ],
+      "correct": "נענה",
+      "matching_pair": "תה נענה ↔ شاي نعنع"
+    },
+    "id": "L1_091"
+  },
+  {
+    "level": "beginner",
+    "category": "food_restaurant",
+    "hebrew": "עוגת צ'וקולד. תודה.",
+    "arabic": "كعكة شوكولاتة. شكرًا.",
+    "transliteration": "ugat shokolad. toda.",
+    "phonetic_breakdown": [
+      "עוגת",
+      "צ'וקולד",
+      "תודה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to order chocolate cake and say thank you.",
+    "source_transcript": "25_bebeit-kafe.txt",
+    "approved_responses": [
+      {
+        "student_says": "עוגת צ'וקולד. תודה.",
+        "expected_hebrew": "עוגת צ'וקולד. תודה.",
+        "response_hebrew": "בבקשה.",
+        "response_arabic": "عفوًا.",
+        "teaching_note": "עוגת צ'וקולד تعني كعكة شوكولاتة."
+      }
+    ],
+    "related_vocabulary": [
+      "עוגת",
+      "צ'וקולד",
+      "תודה"
+    ],
+    "common_mistakes": [
+      "الخلط بين עוגה و עוגת في تركيب الإضافة."
+    ],
+    "game_usage": {
+      "fill_in_blank": "עוגת ____. תודה.",
+      "options": [
+        "צ'וקולד",
+        "תה",
+        "סלט"
+      ],
+      "correct": "צ'וקולד",
+      "matching_pair": "עוגת צ'וקולד ↔ كعكة شوكولاتة"
+    },
+    "id": "L1_092"
+  },
+  {
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "שלום, יש לכם חולצות לילדים קטנים?",
+    "arabic": "مرحبًا، هل لديكم قمصان/بلوزات للأطفال الصغار؟",
+    "transliteration": "shalom, yesh lachem chultzot le-yeladim ktanim?",
+    "phonetic_breakdown": [
+      "שלום",
+      "יש",
+      "לכם",
+      "חולצות",
+      "לילדים",
+      "קטנים"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used in a clothing store to ask if they have shirts for small children.",
+    "source_transcript": "28_behanut-habgadim.txt",
+    "approved_responses": [
+      {
+        "student_says": "שלום, יש לכם חולצות לילדים קטנים?",
+        "expected_hebrew": "שלום, יש לכם חולצות לילדים קטנים?",
+        "response_hebrew": "כן, יש לנו.",
+        "response_arabic": "نعم، لدينا.",
+        "teaching_note": "יש לכם تعني هل لديكم، و־יש לנו تعني لدينا."
+      }
+    ],
+    "related_vocabulary": [
+      "שלום",
+      "יש",
+      "לכם",
+      "חולצות",
+      "ילדים",
+      "קטנים"
+    ],
+    "common_mistakes": [
+      "الخلط بين יש לכם و יש לנו."
+    ],
+    "game_usage": {
+      "fill_in_blank": "יש לכם חולצות לילדים ____?",
+      "options": [
+        "קטנים",
+        "גדולים",
+        "טעימים"
+      ],
+      "correct": "קטנים",
+      "matching_pair": "ילדים קטנים ↔ أطفال صغار"
+    },
+    "id": "L1_093"
+  },
+  {
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "כן, יש לנו.",
+    "arabic": "نعم، لدينا.",
+    "transliteration": "ken, yesh lanu.",
+    "phonetic_breakdown": [
+      "כן",
+      "יש",
+      "לנו"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used by a seller to say that the item is available.",
+    "source_transcript": "28_behanut-habgadim.txt",
+    "approved_responses": [
+      {
+        "student_says": "כן, יש לנו.",
+        "expected_hebrew": "כן, יש לנו.",
+        "response_hebrew": "הנה, שם יש הרבה חולצות.",
+        "response_arabic": "تفضل، هناك يوجد الكثير من القمصان.",
+        "teaching_note": "יש לנו تعني لدينا."
+      }
+    ],
+    "related_vocabulary": [
+      "כן",
+      "יש",
+      "לנו"
+    ],
+    "common_mistakes": [
+      "استخدام לי بدل לנו."
+    ],
+    "game_usage": {
+      "fill_in_blank": "כן, יש ____.",
+      "options": [
+        "לנו",
+        "לי",
+        "לך"
+      ],
+      "correct": "לנו",
+      "matching_pair": "יש לנו ↔ لدينا"
+    },
+    "id": "L1_094"
+  },
+  {
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "הנה, שם יש הרבה חולצות.",
+    "arabic": "تفضل/ها هي، هناك يوجد الكثير من القمصان.",
+    "transliteration": "hine, sham yesh harbe chultzot.",
+    "phonetic_breakdown": [
+      "הנה",
+      "שם",
+      "יש",
+      "הרבה",
+      "חולצות"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used by a seller to point to where many shirts are.",
+    "source_transcript": "28_behanut-habgadim.txt",
+    "approved_responses": [
+      {
+        "student_says": "הנה, שם יש הרבה חולצות.",
+        "expected_hebrew": "הנה, שם יש הרבה חולצות.",
+        "response_hebrew": "תודה.",
+        "response_arabic": "شكرًا.",
+        "teaching_note": "שם تعني هناك، הרבה تعني كثير."
+      }
+    ],
+    "related_vocabulary": [
+      "הנה",
+      "שם",
+      "יש",
+      "הרבה",
+      "חולצות"
+    ],
+    "common_mistakes": [
+      "الخلط بين פה و שם."
+    ],
+    "game_usage": {
+      "fill_in_blank": "שם יש הרבה ____.",
+      "options": [
+        "חולצות",
+        "קפה",
+        "חלב"
+      ],
+      "correct": "חולצות",
+      "matching_pair": "חולצות ↔ قمصان"
+    },
+    "id": "L1_095"
+  },
+  {
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "החולצות יפות. כמה זה עולה?",
+    "arabic": "القمصان جميلة. كم سعر هذا؟",
+    "transliteration": "ha-chultzot yafot. kama ze ole?",
+    "phonetic_breakdown": [
+      "החולצות",
+      "יפות",
+      "כמה",
+      "זה",
+      "עולה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to compliment the shirts and ask the price.",
+    "source_transcript": "28_behanut-habgadim.txt",
+    "approved_responses": [
+      {
+        "student_says": "החולצות יפות. כמה זה עולה?",
+        "expected_hebrew": "החולצות יפות. כמה זה עולה?",
+        "response_hebrew": "כל חולצה ב-15 שקלים.",
+        "response_arabic": "كل قميص بـ 15 شيكل.",
+        "teaching_note": "יפות هي صفة جمع مؤنث لأن חולצות جمع مؤنث."
+      }
+    ],
+    "related_vocabulary": [
+      "החולצות",
+      "יפות",
+      "כמה",
+      "עולה"
+    ],
+    "common_mistakes": [
+      "استخدام יפים بدل יפות مع חולצות."
+    ],
+    "game_usage": {
+      "fill_in_blank": "החולצות ____.",
+      "options": [
+        "יפות",
+        "יפים",
+        "יפה"
+      ],
+      "correct": "יפות",
+      "matching_pair": "יפות ↔ جميلات"
+    },
+    "id": "L1_096"
+  },
+  {
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "יש היום מבצע. כל חולצה ב-15 שקלים.",
+    "arabic": "يوجد اليوم تخفيض. كل قميص بـ 15 شيكل.",
+    "transliteration": "yesh hayom mivtza. kol chultza be-chamesh-esre shkalim.",
+    "phonetic_breakdown": [
+      "יש",
+      "היום",
+      "מבצע",
+      "כל",
+      "חולצה",
+      "ב-15",
+      "שקלים"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used by a seller to explain a sale price.",
+    "source_transcript": "28_behanut-habgadim.txt",
+    "approved_responses": [
+      {
+        "student_says": "יש היום מבצע. כל חולצה ב-15 שקלים.",
+        "expected_hebrew": "יש היום מבצע. כל חולצה ב-15 שקלים.",
+        "response_hebrew": "זה באמת לא יקר.",
+        "response_arabic": "هذا فعلًا ليس غاليًا.",
+        "teaching_note": "מבצע يعني عرض/تخفيض."
+      }
+    ],
+    "related_vocabulary": [
+      "יש",
+      "היום",
+      "מבצע",
+      "כל",
+      "חולצה",
+      "שקלים"
+    ],
+    "common_mistakes": [
+      "الخلط بين שקל و שקלים."
+    ],
+    "game_usage": {
+      "fill_in_blank": "יש היום ____.",
+      "options": [
+        "מבצע",
+        "סלט",
+        "מזגן"
+      ],
+      "correct": "מבצע",
+      "matching_pair": "מבצע ↔ تخفيض"
+    },
+    "id": "L1_097"
+  },
+  {
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "זה באמת לא יקר. אני רוצה חמש חולצות בבקשה.",
+    "arabic": "هذا فعلًا ليس غاليًا. أريد خمس قمصان من فضلك.",
+    "transliteration": "ze be'emet lo yakar. ani rotze chamesh chultzot bevakasha.",
+    "phonetic_breakdown": [
+      "זה",
+      "באמת",
+      "לא",
+      "יקר",
+      "אני",
+      "רוצה",
+      "חמש",
+      "חולצות",
+      "בבקשה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to say the price is not expensive and ask for five shirts.",
+    "source_transcript": "28_behanut-habgadim.txt",
+    "approved_responses": [
+      {
+        "student_says": "זה באמת לא יקר. אני רוצה חמש חולצות בבקשה.",
+        "expected_hebrew": "זה באמת לא יקר. אני רוצה חמש חולצות בבקשה.",
+        "response_hebrew": "בבקשה. הנה החולצות.",
+        "response_arabic": "تفضل. هذه القمصان.",
+        "teaching_note": "לא יקר تعني ليس غاليًا، חמש تعني خمسة/خمس."
+      }
+    ],
+    "related_vocabulary": [
+      "זה",
+      "באמת",
+      "לא",
+      "יקר",
+      "חמש",
+      "חולצות"
+    ],
+    "common_mistakes": [
+      "الخلط بين יקר و זול."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני רוצה חמש ____ בבקשה.",
+      "options": [
+        "חולצות",
+        "פיטות",
+        "עוגות"
+      ],
+      "correct": "חולצות",
+      "matching_pair": "חמש חולצות ↔ خمس قمصان"
+    },
+    "id": "L1_098"
+  },
+  {
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "בבקשה. הנה החולצות.",
+    "arabic": "تفضل. هذه القمصان.",
+    "transliteration": "bevakasha. hine ha-chultzot.",
+    "phonetic_breakdown": [
+      "בבקשה",
+      "הנה",
+      "החולצות"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used by a seller when giving the shirts to the customer.",
+    "source_transcript": "28_behanut-habgadim.txt",
+    "approved_responses": [
+      {
+        "student_says": "בבקשה. הנה החולצות.",
+        "expected_hebrew": "בבקשה. הנה החולצות.",
+        "response_hebrew": "תודה רבה.",
+        "response_arabic": "شكرًا جزيلًا.",
+        "teaching_note": "הנה تعني ها هي/تفضل حسب السياق."
+      }
+    ],
+    "related_vocabulary": [
+      "בבקשה",
+      "הנה",
+      "החולצות"
+    ],
+    "common_mistakes": [
+      "الخلط بين בבקשה كـ تفضل و בבקשה كـ من فضلك."
+    ],
+    "game_usage": {
+      "fill_in_blank": "בבקשה. הנה ____.",
+      "options": [
+        "החולצות",
+        "הקפה",
+        "הדירה"
+      ],
+      "correct": "החולצות",
+      "matching_pair": "הנה החולצות ↔ هذه القمصان"
+    },
+    "id": "L1_099"
+  },
+  {
+    "level": "beginner",
+    "category": "directions",
+    "hebrew": "איפה הדואר?",
+    "arabic": "أين البريد؟",
+    "transliteration": "eifo ha-doar?",
+    "phonetic_breakdown": [
+      "איפה",
+      "הדואר"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to ask where the post office is.",
+    "source_transcript": "35_eifo-hadoar.txt",
+    "approved_responses": [
+      {
+        "student_says": "איפה הדואר?",
+        "expected_hebrew": "איפה הדואר?",
+        "response_hebrew": "הדואר שם.",
+        "response_arabic": "البريد هناك.",
+        "teaching_note": "איפה تعني أين."
+      }
+    ],
+    "related_vocabulary": [
+      "איפה",
+      "הדואר"
+    ],
+    "common_mistakes": [
+      "نسيان ה التعريف في הדואר."
+    ],
+    "game_usage": {
+      "fill_in_blank": "איפה ____?",
+      "options": [
+        "הדואר",
+        "הקפה",
+        "החלב"
+      ],
+      "correct": "הדואר",
+      "matching_pair": "איפה הדואר? ↔ أين البريد؟"
+    },
+    "id": "L1_100"
+  },
+  {
+    "level": "beginner",
+    "category": "directions",
+    "hebrew": "איה הולכת לדואר.",
+    "arabic": "آية تذهب إلى البريد.",
+    "transliteration": "aya holechet la-doar.",
+    "phonetic_breakdown": [
+      "איה",
+      "הולכת",
+      "לדואר"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say that Aya is going to the post office.",
+    "source_transcript": "35_eifo-hadoar.txt",
+    "approved_responses": [
+      {
+        "student_says": "איה הולכת לדואר.",
+        "expected_hebrew": "איה הולכת לדואר.",
+        "response_hebrew": "נכון, איה הולכת לדואר.",
+        "response_arabic": "صحيح، آية تذهب إلى البريد.",
+        "teaching_note": "הולכת تستخدم للمؤنث."
+      }
+    ],
+    "related_vocabulary": [
+      "איה",
+      "הולכת",
+      "דואר"
+    ],
+    "common_mistakes": [
+      "استخدام הולך بدل הולכת مع مؤنث."
+    ],
+    "game_usage": {
+      "fill_in_blank": "איה ____ לדואר.",
+      "options": [
+        "הולכת",
+        "הולך",
+        "שותה"
+      ],
+      "correct": "הולכת",
+      "matching_pair": "הולכת ↔ تذهب"
+    },
+    "id": "L1_101"
+  },
+  {
+    "level": "beginner",
+    "category": "directions",
+    "hebrew": "איך אני מגיעה לדואר?",
+    "arabic": "كيف أصل إلى البريد؟",
+    "transliteration": "eich ani magia la-doar?",
+    "phonetic_breakdown": [
+      "איך",
+      "אני",
+      "מגיעה",
+      "לדואר"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used by a female speaker to ask how to get to the post office.",
+    "source_transcript": "35_eifo-hadoar.txt",
+    "approved_responses": [
+      {
+        "student_says": "איך אני מגיעה לדואר?",
+        "expected_hebrew": "איך אני מגיעה לדואר?",
+        "response_hebrew": "את הולכת ישר.",
+        "response_arabic": "تذهبين بشكل مستقيم.",
+        "teaching_note": "איך تعني كيف، מגיעה تستخدم للمؤنث."
+      }
+    ],
+    "related_vocabulary": [
+      "איך",
+      "אני",
+      "מגיעה",
+      "דואר"
+    ],
+    "common_mistakes": [
+      "استخدام מגיע بدل מגיעה مع متحدثة مؤنثة."
+    ],
+    "game_usage": {
+      "fill_in_blank": "איך אני ____ לדואר?",
+      "options": [
+        "מגיעה",
+        "רוצה",
+        "שותה"
+      ],
+      "correct": "מגיעה",
+      "matching_pair": "איך אני מגיעה? ↔ كيف أصل؟"
+    },
+    "id": "L1_102"
+  },
+  {
+    "level": "beginner",
+    "category": "directions",
+    "hebrew": "את הולכת ישר ישר.",
+    "arabic": "تذهبين مستقيمًا مستقيمًا.",
+    "transliteration": "at holechet yashar yashar.",
+    "phonetic_breakdown": [
+      "את",
+      "הולכת",
+      "ישר",
+      "ישר"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to give directions to a female person: go straight.",
+    "source_transcript": "35_eifo-hadoar.txt",
+    "approved_responses": [
+      {
+        "student_says": "את הולכת ישר ישר.",
+        "expected_hebrew": "את הולכת ישר ישר.",
+        "response_hebrew": "בסדר.",
+        "response_arabic": "حسنًا.",
+        "teaching_note": "ישר تعني مستقيم."
+      }
+    ],
+    "related_vocabulary": [
+      "את",
+      "הולכת",
+      "ישר"
+    ],
+    "common_mistakes": [
+      "الخلط بين ישר و ימינה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "את הולכת ____ ישר.",
+      "options": [
+        "ישר",
+        "שמאלה",
+        "ימינה"
+      ],
+      "correct": "ישר",
+      "matching_pair": "ישר ↔ مستقيم"
+    },
+    "id": "L1_103"
+  },
+  {
+    "level": "beginner",
+    "category": "directions",
+    "hebrew": "ליד החנות הכל למשפחה, את פונה שמאלה.",
+    "arabic": "بجانب متجر كل شيء للعائلة، تنعطفين يسارًا.",
+    "transliteration": "leyad ha-chanut hakol la-mishpacha, at pona smola.",
+    "phonetic_breakdown": [
+      "ליד",
+      "החנות",
+      "הכל",
+      "למשפחה",
+      "את",
+      "פונה",
+      "שמאלה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to give a left-turn direction near a store.",
+    "source_transcript": "35_eifo-hadoar.txt",
+    "approved_responses": [
+      {
+        "student_says": "ליד החנות הכל למשפחה, את פונה שמאלה.",
+        "expected_hebrew": "ליד החנות הכל למשפחה, את פונה שמאלה.",
+        "response_hebrew": "נכון, פונה שמאלה.",
+        "response_arabic": "صحيح، تنعطف يسارًا.",
+        "teaching_note": "ליד تعني بجانب، שמאלה تعني يسارًا."
+      }
+    ],
+    "related_vocabulary": [
+      "ליד",
+      "חנות",
+      "משפחה",
+      "פונה",
+      "שמאלה"
+    ],
+    "common_mistakes": [
+      "الخلط بين שמאלה و ימינה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "את פונה ____.",
+      "options": [
+        "שמאלה",
+        "ימינה",
+        "ישר"
+      ],
+      "correct": "שמאלה",
+      "matching_pair": "שמאלה ↔ يسارًا"
+    },
+    "id": "L1_104"
+  },
+  {
+    "level": "beginner",
+    "category": "directions",
+    "hebrew": "ואחר כך, ליד הבנק, את פונה ימינה.",
+    "arabic": "وبعد ذلك، بجانب البنك، تنعطفين يمينًا.",
+    "transliteration": "ve-achar kach, leyad ha-bank, at pona yamina.",
+    "phonetic_breakdown": [
+      "ואחר",
+      "כך",
+      "ליד",
+      "הבנק",
+      "את",
+      "פונה",
+      "ימינה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to give a right-turn direction near the bank.",
+    "source_transcript": "35_eifo-hadoar.txt",
+    "approved_responses": [
+      {
+        "student_says": "ואחר כך, ליד הבנק, את פונה ימינה.",
+        "expected_hebrew": "ואחר כך, ליד הבנק, את פונה ימינה.",
+        "response_hebrew": "נכון, פונה ימינה.",
+        "response_arabic": "صحيح، تنعطف يمينًا.",
+        "teaching_note": "אחר כך تعني بعد ذلك، ימינה تعني يمينًا."
+      }
+    ],
+    "related_vocabulary": [
+      "אחר כך",
+      "ליד",
+      "בנק",
+      "פונה",
+      "ימינה"
+    ],
+    "common_mistakes": [
+      "الخلط بين ימינה و שמאלה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "את פונה ____.",
+      "options": [
+        "ימינה",
+        "שמאלה",
+        "קפה"
+      ],
+      "correct": "ימינה",
+      "matching_pair": "ימינה ↔ يمينًا"
+    },
+    "id": "L1_105"
+  },
+  {
+    "level": "beginner",
+    "category": "directions",
+    "hebrew": "שם הדואר.",
+    "arabic": "هناك البريد.",
+    "transliteration": "sham ha-doar.",
+    "phonetic_breakdown": [
+      "שם",
+      "הדואר"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to say that the post office is there.",
+    "source_transcript": "35_eifo-hadoar.txt",
+    "approved_responses": [
+      {
+        "student_says": "שם הדואר.",
+        "expected_hebrew": "שם הדואר.",
+        "response_hebrew": "תודה.",
+        "response_arabic": "شكرًا.",
+        "teaching_note": "שם تعني هناك."
+      }
+    ],
+    "related_vocabulary": [
+      "שם",
+      "הדואר"
+    ],
+    "common_mistakes": [
+      "الخلط بين שם و פה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ הדואר.",
+      "options": [
+        "שם",
+        "מי",
+        "מה"
+      ],
+      "correct": "שם",
+      "matching_pair": "שם ↔ هناك"
+    },
+    "id": "L1_106"
+  },
+  {
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "מי אלה? אלה דן ונור. הם מירושלים.",
+    "arabic": "من هؤلاء؟ هؤلاء دان ونور. هم من القدس.",
+    "transliteration": "mi ele? ele dan ve-nur. hem mi-yerushalayim.",
+    "phonetic_breakdown": [
+      "מי",
+      "אלה",
+      "אלה",
+      "דן",
+      "ונור",
+      "הם",
+      "מירושלים"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to ask and answer who several people are.",
+    "source_transcript": "08_mi-ele.txt",
+    "approved_responses": [
+      {
+        "student_says": "מי אלה? אלה דן ונור. הם מירושלים.",
+        "expected_hebrew": "מי אלה? אלה דן ונור. הם מירושלים.",
+        "response_hebrew": "נכון, הם מירושלים.",
+        "response_arabic": "صحيح، هم من القدس.",
+        "teaching_note": "אלה تستخدم للجمع، הם تعني هم."
+      }
+    ],
+    "related_vocabulary": [
+      "מי",
+      "אלה",
+      "הם",
+      "מירושלים"
+    ],
+    "common_mistakes": [
+      "استخدام זה بدل אלה للجمع."
+    ],
+    "game_usage": {
+      "fill_in_blank": "מי אלה? ____ דן ונור.",
+      "options": [
+        "אלה",
+        "זה",
+        "זאת"
+      ],
+      "correct": "אלה",
+      "matching_pair": "אלה ↔ هؤلاء"
+    },
+    "id": "L1_107"
+  },
+  {
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "מי אלה? אלה אנה ושרה. גם הן מירושלים.",
+    "arabic": "من هؤلاء؟ هؤلاء آنا وسارة. هن أيضًا من القدس.",
+    "transliteration": "mi ele? ele ana ve-sara. gam hen mi-yerushalayim.",
+    "phonetic_breakdown": [
+      "מי",
+      "אלה",
+      "אלה",
+      "אנה",
+      "ושרה",
+      "גם",
+      "הן",
+      "מירושלים"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to identify several female people and say where they are from.",
+    "source_transcript": "08_mi-ele.txt",
+    "approved_responses": [
+      {
+        "student_says": "מי אלה? אלה אנה ושרה. גם הן מירושלים.",
+        "expected_hebrew": "מי אלה? אלה אנה ושרה. גם הן מירושלים.",
+        "response_hebrew": "יפה מאוד.",
+        "response_arabic": "جيد جدًا.",
+        "teaching_note": "הן تعني هن، גם تعني أيضًا."
+      }
+    ],
+    "related_vocabulary": [
+      "מי",
+      "אלה",
+      "גם",
+      "הן",
+      "מירושלים"
+    ],
+    "common_mistakes": [
+      "الخلط بين הם و הן."
+    ],
+    "game_usage": {
+      "fill_in_blank": "גם ____ מירושלים.",
+      "options": [
+        "הן",
+        "הם",
+        "הוא"
+      ],
+      "correct": "הן",
+      "matching_pair": "הן ↔ هن"
+    },
+    "id": "L1_108"
+  },
+  {
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "אתה מורה?",
+    "arabic": "هل أنتَ معلم؟",
+    "transliteration": "ata more?",
+    "phonetic_breakdown": [
+      "אתה",
+      "מורה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to ask a male person if he is a teacher.",
+    "source_transcript": "09_dialogim-shonim-ata-more.txt",
+    "approved_responses": [
+      {
+        "student_says": "אתה מורה?",
+        "expected_hebrew": "אתה מורה?",
+        "response_hebrew": "לא, אני לא מורה.",
+        "response_arabic": "لا، أنا لست معلمًا.",
+        "teaching_note": "אתה تستخدم للمذكر."
+      }
+    ],
+    "related_vocabulary": [
+      "אתה",
+      "מורה"
+    ],
+    "common_mistakes": [
+      "الخلط بين אתה و את."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ מורה?",
+      "options": [
+        "אתה",
+        "את",
+        "אני"
+      ],
+      "correct": "אתה",
+      "matching_pair": "אתה ↔ أنتَ"
+    },
+    "id": "L1_109"
+  },
+  {
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "לא, אני לא מורה. הוא מורה.",
+    "arabic": "لا، أنا لست معلمًا. هو معلم.",
+    "transliteration": "lo, ani lo more. hu more.",
+    "phonetic_breakdown": [
+      "לא",
+      "אני",
+      "לא",
+      "מורה",
+      "הוא",
+      "מורה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say that I am not a teacher, but he is a teacher.",
+    "source_transcript": "09_dialogim-shonim-ata-more.txt",
+    "approved_responses": [
+      {
+        "student_says": "לא, אני לא מורה. הוא מורה.",
+        "expected_hebrew": "לא, אני לא מורה. הוא מורה.",
+        "response_hebrew": "נכון.",
+        "response_arabic": "صحيح.",
+        "teaching_note": "אני לא means I am not, הוא means he."
+      }
+    ],
+    "related_vocabulary": [
+      "לא",
+      "אני",
+      "מורה",
+      "הוא"
+    ],
+    "common_mistakes": [
+      "نسيان לא الثانية في אני לא מורה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני לא מורה. ____ מורה.",
+      "options": [
+        "הוא",
+        "היא",
+        "את"
+      ],
+      "correct": "הוא",
+      "matching_pair": "הוא ↔ هو"
+    },
+    "id": "L1_110"
+  },
+  {
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "אנחנו מירושלים, ואתה?",
+    "arabic": "نحن من القدس، وأنتَ؟",
+    "transliteration": "anachnu mi-yerushalayim, ve-ata?",
+    "phonetic_breakdown": [
+      "אנחנו",
+      "מירושלים",
+      "ואתה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say where we are from and ask the other male person.",
+    "source_transcript": "10_dialogim-shonim-aten-yerushalayim.txt",
+    "approved_responses": [
+      {
+        "student_says": "אנחנו מירושלים, ואתה?",
+        "expected_hebrew": "אנחנו מירושלים, ואתה?",
+        "response_hebrew": "אני מתל אביב.",
+        "response_arabic": "أنا من تل أبيب.",
+        "teaching_note": "אנחנו تعني نحن، ואתה تعني وأنتَ."
+      }
+    ],
+    "related_vocabulary": [
+      "אנחנו",
+      "מירושלים",
+      "ואתה"
+    ],
+    "common_mistakes": [
+      "الخلط بين אנחנו و אני."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ מירושלים, ואתה?",
+      "options": [
+        "אנחנו",
+        "אני",
+        "את"
+      ],
+      "correct": "אנחנו",
+      "matching_pair": "אנחנו ↔ نحن"
+    },
+    "id": "L1_111"
+  },
+  {
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "אני מתל אביב.",
+    "arabic": "أنا من تل أبيب.",
+    "transliteration": "ani mi-tel aviv.",
+    "phonetic_breakdown": [
+      "אני",
+      "מתל",
+      "אביב"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to say that I am from Tel Aviv.",
+    "source_transcript": "10_dialogim-shonim-aten-yerushalayim.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני מתל אביב.",
+        "expected_hebrew": "אני מתל אביב.",
+        "response_hebrew": "יפה.",
+        "response_arabic": "جيد.",
+        "teaching_note": "מـ تعني من."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "מתל אביב"
+    ],
+    "common_mistakes": [
+      "نسيان מ في מתל אביב."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני ____ אביב.",
+      "options": [
+        "מתל",
+        "בתל",
+        "לתל"
+      ],
+      "correct": "מתל",
+      "matching_pair": "מתל אביב ↔ من تل أبيب"
+    },
+    "id": "L1_112"
+  },
+  {
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "אלה אמין ואייד.",
+    "arabic": "هؤلاء أمين وأيِد.",
+    "transliteration": "ele amin ve-ayed.",
+    "phonetic_breakdown": [
+      "אלה",
+      "אמין",
+      "ואייד"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to identify two people by name.",
+    "source_transcript": "11_dialogim-shonim-mi-ele.txt",
+    "approved_responses": [
+      {
+        "student_says": "אלה אמין ואייד.",
+        "expected_hebrew": "אלה אמין ואייד.",
+        "response_hebrew": "נכון.",
+        "response_arabic": "صحيح.",
+        "teaching_note": "אלה تعني هؤلاء."
+      }
+    ],
+    "related_vocabulary": [
+      "אלה",
+      "אמין",
+      "אייד"
+    ],
+    "common_mistakes": [
+      "استخدام זה بدل אלה عند الحديث عن أكثر من شخص."
+    ],
+    "game_usage": {
+      "fill_in_blank": "____ אמין ואייד.",
+      "options": [
+        "אלה",
+        "זה",
+        "זאת"
+      ],
+      "correct": "אלה",
+      "matching_pair": "אלה ↔ هؤلاء"
+    },
+    "id": "L1_113"
+  },
+  {
+    "level": "beginner",
+    "category": "family",
+    "hebrew": "לא, הם הילדים של המורה מורד.",
+    "arabic": "لا، هم أولاد المعلم مراد.",
+    "transliteration": "lo, hem ha-yeladim shel ha-more murad.",
+    "phonetic_breakdown": [
+      "לא",
+      "הם",
+      "הילדים",
+      "של",
+      "המורה",
+      "מורד"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to describe whose children they are.",
+    "source_transcript": "11_dialogim-shonim-mi-ele.txt",
+    "approved_responses": [
+      {
+        "student_says": "לא, הם הילדים של המורה מורד.",
+        "expected_hebrew": "לא, הם הילדים של המורה מורד.",
+        "response_hebrew": "נכון.",
+        "response_arabic": "صحيح.",
+        "teaching_note": "של تعني لـ/تبع."
+      }
+    ],
+    "related_vocabulary": [
+      "לא",
+      "הם",
+      "הילדים",
+      "של",
+      "המורה"
+    ],
+    "common_mistakes": [
+      "نسيان של عند التعبير عن الملكية."
+    ],
+    "game_usage": {
+      "fill_in_blank": "הם הילדים ____ המורה.",
+      "options": [
+        "של",
+        "עם",
+        "בלי"
+      ],
+      "correct": "של",
+      "matching_pair": "של ↔ لـ / تبع"
+    },
+    "id": "L1_114"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "אתה גר בתל אביב?",
+    "arabic": "هل أنتَ تسكن في تل أبيب؟",
+    "transliteration": "ata gar be-tel aviv?",
+    "phonetic_breakdown": [
+      "אתה",
+      "גר",
+      "בתל",
+      "אביב"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to ask a male person if he lives in Tel Aviv.",
+    "source_transcript": "12_ata-gar.txt",
+    "approved_responses": [
+      {
+        "student_says": "אתה גר בתל אביב?",
+        "expected_hebrew": "אתה גר בתל אביב?",
+        "response_hebrew": "כן, אני גר בתל אביב.",
+        "response_arabic": "نعم، أنا أسكن في تل أبيب.",
+        "teaching_note": "גר للمذكر."
+      }
+    ],
+    "related_vocabulary": [
+      "אתה",
+      "גר",
+      "בתל אביב"
+    ],
+    "common_mistakes": [
+      "استخدام גרה بدل גר مع مذكر."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אתה גר ____ אביב?",
+      "options": [
+        "בתל",
+        "מתל",
+        "לתל"
+      ],
+      "correct": "בתל",
+      "matching_pair": "גר ב ↔ يسكن في"
+    },
+    "id": "L1_115"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "כן, אני גר בתל אביב.",
+    "arabic": "نعم، أنا أسكن في تل أبيب.",
+    "transliteration": "ken, ani gar be-tel aviv.",
+    "phonetic_breakdown": [
+      "כן",
+      "אני",
+      "גר",
+      "בתל",
+      "אביב"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used by a male speaker to say he lives in Tel Aviv.",
+    "source_transcript": "12_ata-gar.txt",
+    "approved_responses": [
+      {
+        "student_says": "כן, אני גר בתל אביב.",
+        "expected_hebrew": "כן, אני גר בתל אביב.",
+        "response_hebrew": "יפה.",
+        "response_arabic": "جيد.",
+        "teaching_note": "כן تعني نعم."
+      }
+    ],
+    "related_vocabulary": [
+      "כן",
+      "אני",
+      "גר",
+      "בתל אביב"
+    ],
+    "common_mistakes": [
+      "نسيان ב في בתל אביב."
+    ],
+    "game_usage": {
+      "fill_in_blank": "כן, אני ____ בתל אביב.",
+      "options": [
+        "גר",
+        "גרה",
+        "שותה"
+      ],
+      "correct": "גר",
+      "matching_pair": "אני גר ↔ أنا أسكن"
+    },
+    "id": "L1_116"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "הוא גר בפקעין.",
+    "arabic": "هو يسكن في البقيعة.",
+    "transliteration": "hu gar be-peki'in.",
+    "phonetic_breakdown": [
+      "הוא",
+      "גר",
+      "בפקעין"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say where a male person lives.",
+    "source_transcript": "12_ata-gar.txt",
+    "approved_responses": [
+      {
+        "student_says": "הוא גר בפקעין.",
+        "expected_hebrew": "הוא גר בפקעין.",
+        "response_hebrew": "נכון.",
+        "response_arabic": "صحيح.",
+        "teaching_note": "הוא גר means he lives."
+      }
+    ],
+    "related_vocabulary": [
+      "הוא",
+      "גר",
+      "בפקעין"
+    ],
+    "common_mistakes": [
+      "الخلط بين הוא גר و היא גרה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "הוא ____ בפקעין.",
+      "options": [
+        "גר",
+        "גרה",
+        "גרים"
+      ],
+      "correct": "גר",
+      "matching_pair": "הוא גר ↔ هو يسكن"
+    },
+    "id": "L1_117"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "אנחנו גרים בבית ספפה.",
+    "arabic": "نحن نسكن في بيت صفافا.",
+    "transliteration": "anachnu garim be-beit safafa.",
+    "phonetic_breakdown": [
+      "אנחנו",
+      "גרים",
+      "בבית",
+      "ספפה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say where we live.",
+    "source_transcript": "12_ata-gar.txt",
+    "approved_responses": [
+      {
+        "student_says": "אנחנו גרים בבית ספפה.",
+        "expected_hebrew": "אנחנו גרים בבית ספפה.",
+        "response_hebrew": "יפה.",
+        "response_arabic": "جيد.",
+        "teaching_note": "גרים تستخدم للجمع."
+      }
+    ],
+    "related_vocabulary": [
+      "אנחנו",
+      "גרים",
+      "בבית ספפה"
+    ],
+    "common_mistakes": [
+      "استخدام גר بدل גרים مع نحن."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אנחנו ____ בבית ספפה.",
+      "options": [
+        "גרים",
+        "גר",
+        "גרה"
+      ],
+      "correct": "גרים",
+      "matching_pair": "אנחנו גרים ↔ نحن نسكن"
+    },
+    "id": "L1_118"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "עידו גר בתל אביב. הוא מדבר עברית.",
+    "arabic": "عيدو يسكن في تل أبيب. هو يتحدث العبرية.",
+    "transliteration": "ido gar be-tel aviv. hu medaber ivrit.",
+    "phonetic_breakdown": [
+      "עידו",
+      "גר",
+      "בתל",
+      "אביב",
+      "הוא",
+      "מדבר",
+      "עברית"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to say where Ido lives and what language he speaks.",
+    "source_transcript": "13_ido-gar-betel-aviv.txt",
+    "approved_responses": [
+      {
+        "student_says": "עידו גר בתל אביב. הוא מדבר עברית.",
+        "expected_hebrew": "עידו גר בתל אביב. הוא מדבר עברית.",
+        "response_hebrew": "נכון.",
+        "response_arabic": "صحيح.",
+        "teaching_note": "מדבר تستخدم للمذكر: يتحدث."
+      }
+    ],
+    "related_vocabulary": [
+      "גר",
+      "בתל אביב",
+      "מדבר",
+      "עברית"
+    ],
+    "common_mistakes": [
+      "الخلط بين מדבר للمذكر و מדברת للمؤنث."
+    ],
+    "game_usage": {
+      "fill_in_blank": "הוא מדבר ____.",
+      "options": [
+        "עברית",
+        "קפה",
+        "דירה"
+      ],
+      "correct": "עברית",
+      "matching_pair": "עברית ↔ العبرية"
+    },
+    "id": "L1_119"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "מוסה גר בירושלים. הוא מדבר ערבית ועברית.",
+    "arabic": "موسى يسكن في القدس. هو يتحدث العربية والعبرية.",
+    "transliteration": "musa gar bi-yerushalayim. hu medaber aravit ve-ivrit.",
+    "phonetic_breakdown": [
+      "מוסה",
+      "גר",
+      "בירושלים",
+      "הוא",
+      "מדבר",
+      "ערבית",
+      "ועברית"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to say where Musa lives and which languages he speaks.",
+    "source_transcript": "13_ido-gar-betel-aviv.txt",
+    "approved_responses": [
+      {
+        "student_says": "מוסה גר בירושלים. הוא מדבר ערבית ועברית.",
+        "expected_hebrew": "מוסה גר בירושלים. הוא מדבר ערבית ועברית.",
+        "response_hebrew": "יפה מאוד.",
+        "response_arabic": "جيد جدًا.",
+        "teaching_note": "ערבית ועברית means Arabic and Hebrew."
+      }
+    ],
+    "related_vocabulary": [
+      "גר",
+      "בירושלים",
+      "מדבר",
+      "ערבית",
+      "עברית"
+    ],
+    "common_mistakes": [
+      "نسيان ו في ועברית."
+    ],
+    "game_usage": {
+      "fill_in_blank": "הוא מדבר ערבית ו____.",
+      "options": [
+        "עברית",
+        "אנגלית",
+        "רוסית"
+      ],
+      "correct": "עברית",
+      "matching_pair": "ערבית ↔ العربية"
+    },
+    "id": "L1_120"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "אני גר בחיפה. אני סטודנט באוניברסיטה.",
+    "arabic": "أنا أسكن في حيفا. أنا طالب في الجامعة.",
+    "transliteration": "ani gar be-haifa. ani student ba-universita.",
+    "phonetic_breakdown": [
+      "אני",
+      "גר",
+      "בחיפה",
+      "אני",
+      "סטודנט",
+      "באוניברסיטה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used by a male speaker to say where he lives and that he is a university student.",
+    "source_transcript": "14_ali-gar-behaifa.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני גר בחיפה. אני סטודנט באוניברסיטה.",
+        "expected_hebrew": "אני גר בחיפה. אני סטודנט באוניברסיטה.",
+        "response_hebrew": "יפה.",
+        "response_arabic": "جيد.",
+        "teaching_note": "סטודנט באוניברסיטה means university student."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "גר",
+      "בחיפה",
+      "סטודנט",
+      "אוניברסיטה"
+    ],
+    "common_mistakes": [
+      "استخدام גרה بدل גר مع متحدث مذكر."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני ____ בחיפה.",
+      "options": [
+        "גר",
+        "גרה",
+        "גרים"
+      ],
+      "correct": "גר",
+      "matching_pair": "סטודנט ↔ طالب جامعي"
+    },
+    "id": "L1_121"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "אני לא עובד. אני לומד הרבה, גם בבוקר וגם בערב.",
+    "arabic": "أنا لا أعمل. أنا أدرس كثيرًا، في الصباح وأيضًا في المساء.",
+    "transliteration": "ani lo oved. ani lomed harbe, gam ba-boker ve-gam ba-erev.",
+    "phonetic_breakdown": [
+      "אני",
+      "לא",
+      "עובד",
+      "אני",
+      "לומד",
+      "הרבה",
+      "גם",
+      "בבוקר",
+      "וגם",
+      "בערב"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used by a male speaker to talk about studying and not working.",
+    "source_transcript": "14_ali-gar-behaifa.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני לא עובד. אני לומד הרבה, גם בבוקר וגם בערב.",
+        "expected_hebrew": "אני לא עובד. אני לומד הרבה, גם בבוקר וגם בערב.",
+        "response_hebrew": "נכון.",
+        "response_arabic": "صحيح.",
+        "teaching_note": "עובד means works, לומד means studies."
+      }
+    ],
+    "related_vocabulary": [
+      "עובד",
+      "לומד",
+      "הרבה",
+      "בבוקר",
+      "בערב"
+    ],
+    "common_mistakes": [
+      "الخلط بين עובד و לומד."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני לא עובד. אני ____ הרבה.",
+      "options": [
+        "לומד",
+        "שותה",
+        "פונה"
+      ],
+      "correct": "לומד",
+      "matching_pair": "לומד ↔ يدرس"
+    },
+    "id": "L1_122"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "אני גרה בירושלים, ואני מורה באוניברסיטה. אני עובדת הרבה.",
+    "arabic": "أنا أسكن في القدس، وأنا معلمة في الجامعة. أنا أعمل كثيرًا.",
+    "transliteration": "ani gara bi-yerushalayim, ve-ani mora ba-universita. ani ovedet harbe.",
+    "phonetic_breakdown": [
+      "אני",
+      "גרה",
+      "בירושלים",
+      "ואני",
+      "מורה",
+      "באוניברסיטה",
+      "אני",
+      "עובדת",
+      "הרבה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used by a female speaker to say where she lives and works.",
+    "source_transcript": "14_ali-gar-behaifa.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני גרה בירושלים, ואני מורה באוניברסיטה. אני עובדת הרבה.",
+        "expected_hebrew": "אני גרה בירושלים, ואני מורה באוניברסיטה. אני עובדת הרבה.",
+        "response_hebrew": "יפה מאוד.",
+        "response_arabic": "جيد جدًا.",
+        "teaching_note": "גרה ועובדת تستخدمان للمؤنث."
+      }
+    ],
+    "related_vocabulary": [
+      "גרה",
+      "בירושלים",
+      "מורה",
+      "אוניברסיטה",
+      "עובדת"
+    ],
+    "common_mistakes": [
+      "استخدام גר بدل גרה مع متحدثة مؤنثة."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני ____ בירושלים.",
+      "options": [
+        "גרה",
+        "גר",
+        "גרים"
+      ],
+      "correct": "גרה",
+      "matching_pair": "עובדת ↔ تعمل"
+    },
+    "id": "L1_123"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "מה הם עושים?",
+    "arabic": "ماذا يفعلون؟",
+    "transliteration": "ma hem osim?",
+    "phonetic_breakdown": [
+      "מה",
+      "הם",
+      "עושים"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to ask what they are doing.",
+    "source_transcript": "17_ma-hem-osim.txt",
+    "approved_responses": [
+      {
+        "student_says": "מה הם עושים?",
+        "expected_hebrew": "מה הם עושים?",
+        "response_hebrew": "הם [פועל].",
+        "response_arabic": "هم [فعل].",
+        "teaching_note": "הם تعني هم، עושים تعني يفعلون."
+      }
+    ],
+    "related_vocabulary": [
+      "מה",
+      "הם",
+      "עושים"
+    ],
+    "common_mistakes": [
+      "الخلط بين עושה للمفرد و עושים للجمع."
+    ],
+    "game_usage": {
+      "fill_in_blank": "מה הם ____?",
+      "options": [
+        "עושים",
+        "עושה",
+        "רוצה"
+      ],
+      "correct": "עושים",
+      "matching_pair": "עושים ↔ يفعلون"
+    },
+    "id": "L1_124"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "יסמין כותבת אימייל לעביר.",
+    "arabic": "ياسمين تكتب إيميل لعبير.",
+    "transliteration": "yasmin kotevet email le-abir.",
+    "phonetic_breakdown": [
+      "יסמין",
+      "כותבת",
+      "אימייל",
+      "לעביר"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to describe a female person writing an email.",
+    "source_transcript": "17_ma-hem-osim.txt",
+    "approved_responses": [
+      {
+        "student_says": "יסמין כותבת אימייל לעביר.",
+        "expected_hebrew": "יסמין כותבת אימייל לעביר.",
+        "response_hebrew": "נכון, יסמין כותבת אימייל.",
+        "response_arabic": "صحيح، ياسمين تكتب إيميل.",
+        "teaching_note": "כותבת تستخدم للمؤنث."
+      }
+    ],
+    "related_vocabulary": [
+      "יסמין",
+      "כותבת",
+      "אימייל",
+      "לעביר"
+    ],
+    "common_mistakes": [
+      "استخدام כותב بدل כותבת مع اسم مؤنث."
+    ],
+    "game_usage": {
+      "fill_in_blank": "יסמין ____ אימייל.",
+      "options": [
+        "כותבת",
+        "כותב",
+        "קורא"
+      ],
+      "correct": "כותבת",
+      "matching_pair": "כותבת ↔ تكتب"
+    },
+    "id": "L1_125"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "סוזן ושירין הולכות לשוק.",
+    "arabic": "سوزان وشيرين تذهبان إلى السوق.",
+    "transliteration": "suzan ve-shirin holchot la-shuk.",
+    "phonetic_breakdown": [
+      "סוזן",
+      "ושירין",
+      "הולכות",
+      "לשוק"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say that two female people are going to the market.",
+    "source_transcript": "17_ma-hem-osim.txt",
+    "approved_responses": [
+      {
+        "student_says": "סוזן ושירין הולכות לשוק.",
+        "expected_hebrew": "סוזן ושירין הולכות לשוק.",
+        "response_hebrew": "יפה.",
+        "response_arabic": "جيد.",
+        "teaching_note": "הולכות تستخدم لجمع مؤنث."
+      }
+    ],
+    "related_vocabulary": [
+      "סוזן",
+      "שירין",
+      "הולכות",
+      "שוק"
+    ],
+    "common_mistakes": [
+      "استخدام הולכים بدل הולכות لجمع مؤنث."
+    ],
+    "game_usage": {
+      "fill_in_blank": "סוזן ושירין ____ לשוק.",
+      "options": [
+        "הולכות",
+        "הולכים",
+        "הולכת"
+      ],
+      "correct": "הולכות",
+      "matching_pair": "הולכות ↔ يذهبن"
+    },
+    "id": "L1_126"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "היי, רהף. איפה את?",
+    "arabic": "مرحبًا رهف. أين أنتِ؟",
+    "transliteration": "hai, rahaf. eifo at?",
+    "phonetic_breakdown": [
+      "היי",
+      "רהף",
+      "איפה",
+      "את"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to greet Rahaf and ask where she is.",
+    "source_transcript": "18_ratza-veratza.txt",
+    "approved_responses": [
+      {
+        "student_says": "היי, רהף. איפה את?",
+        "expected_hebrew": "היי, רהף. איפה את?",
+        "response_hebrew": "אני בעבודה.",
+        "response_arabic": "أنا في العمل.",
+        "teaching_note": "איפה تعني أين."
+      }
+    ],
+    "related_vocabulary": [
+      "היי",
+      "איפה",
+      "את"
+    ],
+    "common_mistakes": [
+      "استخدام אתה بدل את للمؤنث."
+    ],
+    "game_usage": {
+      "fill_in_blank": "איפה ____?",
+      "options": [
+        "את",
+        "אתה",
+        "אני"
+      ],
+      "correct": "את",
+      "matching_pair": "איפה את? ↔ أين أنتِ؟"
+    },
+    "id": "L1_127"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "אני בעבודה. איפה את?",
+    "arabic": "أنا في العمل. أين أنتِ؟",
+    "transliteration": "ani ba-avoda. eifo at?",
+    "phonetic_breakdown": [
+      "אני",
+      "בעבודה",
+      "איפה",
+      "את"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say where you are and ask where the other female person is.",
+    "source_transcript": "18_ratza-veratza.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני בעבודה. איפה את?",
+        "expected_hebrew": "אני בעבודה. איפה את?",
+        "response_hebrew": "אני ברחוב יפו.",
+        "response_arabic": "أنا في شارع يافا.",
+        "teaching_note": "בעבודה تعني في العمل."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "בעבודה",
+      "איפה",
+      "את"
+    ],
+    "common_mistakes": [
+      "نسيان ב في בעבודה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני ____.",
+      "options": [
+        "בעבודה",
+        "קפה",
+        "סלט"
+      ],
+      "correct": "בעבודה",
+      "matching_pair": "בעבודה ↔ في العمل"
+    },
+    "id": "L1_128"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "אני ברחוב יפו עם דנה.",
+    "arabic": "أنا في شارع يافا مع دانا.",
+    "transliteration": "ani be-rechov yafo im dana.",
+    "phonetic_breakdown": [
+      "אני",
+      "ברחוב",
+      "יפו",
+      "עם",
+      "דנה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say where you are and who you are with.",
+    "source_transcript": "18_ratza-veratza.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני ברחוב יפו עם דנה.",
+        "expected_hebrew": "אני ברחוב יפו עם דנה.",
+        "response_hebrew": "יפה.",
+        "response_arabic": "جيد.",
+        "teaching_note": "עם تعني مع، ברחוב تعني في شارع."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "ברחוב",
+      "יפו",
+      "עם"
+    ],
+    "common_mistakes": [
+      "نسيان ב في ברחוב."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני ברחוב יפו ____ דנה.",
+      "options": [
+        "עם",
+        "בלי",
+        "או"
+      ],
+      "correct": "עם",
+      "matching_pair": "עם ↔ مع"
+    },
+    "id": "L1_129"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "אנחנו שותות קפה. את באה?",
+    "arabic": "نحن نشرب قهوة. هل تأتين؟",
+    "transliteration": "anachnu shotot kafe. at ba'a?",
+    "phonetic_breakdown": [
+      "אנחנו",
+      "שותות",
+      "קפה",
+      "את",
+      "באה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used by female speakers to invite someone to join for coffee.",
+    "source_transcript": "18_ratza-veratza.txt",
+    "approved_responses": [
+      {
+        "student_says": "אנחנו שותות קפה. את באה?",
+        "expected_hebrew": "אנחנו שותות קפה. את באה?",
+        "response_hebrew": "אני רוצה, אבל...",
+        "response_arabic": "أريد، لكن...",
+        "teaching_note": "שותות تستخدم لجمع مؤنث."
+      }
+    ],
+    "related_vocabulary": [
+      "אנחנו",
+      "שותות",
+      "קפה",
+      "באה"
+    ],
+    "common_mistakes": [
+      "استخدام שותים بدل שותות لجمع مؤنث."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אנחנו ____ קפה.",
+      "options": [
+        "שותות",
+        "שותים",
+        "שותה"
+      ],
+      "correct": "שותות",
+      "matching_pair": "שותות ↔ يشربن"
+    },
+    "id": "L1_130"
+  },
+  {
+    "level": "beginner",
+    "category": "numbers",
+    "hebrew": "היא נוסעת לעבודה באוטובוס מספר ארבע.",
+    "arabic": "هي تسافر إلى العمل بالباص رقم أربعة.",
+    "transliteration": "hi nosa'at la-avoda be-otobus mispar arba.",
+    "phonetic_breakdown": [
+      "היא",
+      "נוסעת",
+      "לעבודה",
+      "באוטובוס",
+      "מספר",
+      "ארבע"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to describe taking bus number four to work.",
+    "source_transcript": "19_tirgul-misparim.txt",
+    "approved_responses": [
+      {
+        "student_says": "היא נוסעת לעבודה באוטובוס מספר ארבע.",
+        "expected_hebrew": "היא נוסעת לעבודה באוטובוס מספר ארבע.",
+        "response_hebrew": "נכון.",
+        "response_arabic": "صحيح.",
+        "teaching_note": "מספר ארבע تعني رقم أربعة."
+      }
+    ],
+    "related_vocabulary": [
+      "נוסעת",
+      "עבודה",
+      "אוטובוס",
+      "מספר",
+      "ארבע"
+    ],
+    "common_mistakes": [
+      "الخلط بين ארבע و ארבעה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אוטובוס מספר ____.",
+      "options": [
+        "ארבע",
+        "שבע",
+        "עשר"
+      ],
+      "correct": "ארבע",
+      "matching_pair": "מספר ארבע ↔ رقم أربعة"
+    },
+    "id": "L1_131"
+  },
+  {
+    "level": "beginner",
+    "category": "numbers",
+    "hebrew": "מהעבודה חאולה נוסעת באוטובוס מספר שבע לשיעור עברית באוניברסיטה.",
+    "arabic": "من العمل تسافر خولة بالباص رقم سبعة إلى درس العبرية في الجامعة.",
+    "transliteration": "me-ha-avoda chawla nosa'at be-otobus mispar sheva le-shiur ivrit ba-universita.",
+    "phonetic_breakdown": [
+      "מהעבודה",
+      "חאולה",
+      "נוסעת",
+      "באוטובוס",
+      "מספר",
+      "שבע",
+      "לשיעור",
+      "עברית",
+      "באוניברסיטה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to describe a route using bus number seven.",
+    "source_transcript": "19_tirgul-misparim.txt",
+    "approved_responses": [
+      {
+        "student_says": "מהעבודה חאולה נוסעת באוטובוס מספר שבע לשיעור עברית באוניברסיטה.",
+        "expected_hebrew": "מהעבודה חאולה נוסעת באוטובוס מספר שבע לשיעור עברית באוניברסיטה.",
+        "response_hebrew": "יפה.",
+        "response_arabic": "جيد.",
+        "teaching_note": "מספר שבע تعني رقم سبعة."
+      }
+    ],
+    "related_vocabulary": [
+      "עבודה",
+      "אוטובוס",
+      "מספר",
+      "שבע",
+      "שיעור"
+    ],
+    "common_mistakes": [
+      "نسيان מ في מהעבודה بمعنى من العمل."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אוטובוס מספר ____.",
+      "options": [
+        "שבע",
+        "ארבע",
+        "עשר"
+      ],
+      "correct": "שבע",
+      "matching_pair": "שבע ↔ سبعة"
+    },
+    "id": "L1_132"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "כל יום נרמין קמה בשעה שש.",
+    "arabic": "كل يوم نيرمين تستيقظ الساعة السادسة.",
+    "transliteration": "kol yom narmin kama be-sha'a shesh.",
+    "phonetic_breakdown": [
+      "כל",
+      "יום",
+      "נרמין",
+      "קמה",
+      "בשעה",
+      "שש"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to describe a daily routine.",
+    "source_transcript": "24_hayom-shel-narmin.txt",
+    "approved_responses": [
+      {
+        "student_says": "כל יום נרמין קמה בשעה שש.",
+        "expected_hebrew": "כל יום נרמין קמה בשעה שש.",
+        "response_hebrew": "נכון.",
+        "response_arabic": "صحيح.",
+        "teaching_note": "כל יום تعني كل يوم، קמה تستخدم للمؤنث."
+      }
+    ],
+    "related_vocabulary": [
+      "כל",
+      "יום",
+      "קמה",
+      "שעה",
+      "שש"
+    ],
+    "common_mistakes": [
+      "استخدام קם بدل קמה مع مؤنث."
+    ],
+    "game_usage": {
+      "fill_in_blank": "נרמין קמה בשעה ____.",
+      "options": [
+        "שש",
+        "קפה",
+        "שוק"
+      ],
+      "correct": "שש",
+      "matching_pair": "שש ↔ ستة"
+    },
+    "id": "L1_133"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "בשעה שש ורבע היא שותה קפה ואוכלת סלט.",
+    "arabic": "في الساعة السادسة والربع هي تشرب قهوة وتأكل سلطة.",
+    "transliteration": "be-sha'a shesh va-reva hi shota kafe ve-ochelet salat.",
+    "phonetic_breakdown": [
+      "בשעה",
+      "שש",
+      "ורבע",
+      "היא",
+      "שותה",
+      "קפה",
+      "ואוכלת",
+      "סלט"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to describe a morning routine with time.",
+    "source_transcript": "24_hayom-shel-narmin.txt",
+    "approved_responses": [
+      {
+        "student_says": "בשעה שש ורבע היא שותה קפה ואוכלת סלט.",
+        "expected_hebrew": "בשעה שש ורבע היא שותה קפה ואוכלת סלט.",
+        "response_hebrew": "יפה מאוד.",
+        "response_arabic": "جيد جدًا.",
+        "teaching_note": "ורבע تعني والربع."
+      }
+    ],
+    "related_vocabulary": [
+      "שעה",
+      "שש",
+      "רבע",
+      "שותה",
+      "אוכלת"
+    ],
+    "common_mistakes": [
+      "الخلط بين שש و שש ורבע."
+    ],
+    "game_usage": {
+      "fill_in_blank": "בשעה שש ו____.",
+      "options": [
+        "רבע",
+        "חצי",
+        "קפה"
+      ],
+      "correct": "רבע",
+      "matching_pair": "רבע ↔ ربع"
+    },
+    "id": "L1_134"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "נרמין עובדת בבית חולים. היא רופאה.",
+    "arabic": "نيرمين تعمل في مستشفى. هي طبيبة.",
+    "transliteration": "narmin ovedet be-beit cholim. hi rof'a.",
+    "phonetic_breakdown": [
+      "נרמין",
+      "עובדת",
+      "בבית",
+      "חולים",
+      "היא",
+      "רופאה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say where Narmin works and that she is a doctor.",
+    "source_transcript": "24_hayom-shel-narmin.txt",
+    "approved_responses": [
+      {
+        "student_says": "נרמין עובדת בבית חולים. היא רופאה.",
+        "expected_hebrew": "נרמין עובדת בבית חולים. היא רופאה.",
+        "response_hebrew": "נכון.",
+        "response_arabic": "صحيح.",
+        "teaching_note": "רופאה تستخدم للمؤنث."
+      }
+    ],
+    "related_vocabulary": [
+      "עובדת",
+      "בית חולים",
+      "רופאה"
+    ],
+    "common_mistakes": [
+      "استخدام רופא بدل רופאה مع أنثى."
+    ],
+    "game_usage": {
+      "fill_in_blank": "היא ____.",
+      "options": [
+        "רופאה",
+        "רופא",
+        "מורה"
+      ],
+      "correct": "רופאה",
+      "matching_pair": "רופאה ↔ طبيبة"
+    },
+    "id": "L1_135"
+  },
+  {
+    "level": "beginner",
+    "category": "family",
+    "hebrew": "סבתא ג'מילה לא עובדת, אבל תמיד אין לה זמן.",
+    "arabic": "الجدة جميلة لا تعمل، لكن دائمًا ليس لديها وقت.",
+    "transliteration": "savta jamila lo ovedet, aval tamid ein la zman.",
+    "phonetic_breakdown": [
+      "סבתא",
+      "ג'מילה",
+      "לא",
+      "עובדת",
+      "אבל",
+      "תמיד",
+      "אין",
+      "לה",
+      "זמן"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to describe Grandma Jamila's busy life.",
+    "source_transcript": "26_savta-jamila.txt",
+    "approved_responses": [
+      {
+        "student_says": "סבתא ג'מילה לא עובדת, אבל תמיד אין לה זמן.",
+        "expected_hebrew": "סבתא ג'מילה לא עובדת, אבל תמיד אין לה זמן.",
+        "response_hebrew": "נכון.",
+        "response_arabic": "صحيح.",
+        "teaching_note": "אין לה זמן تعني ليس لديها وقت."
+      }
+    ],
+    "related_vocabulary": [
+      "סבתא",
+      "עובדת",
+      "אבל",
+      "תמיד",
+      "זמן"
+    ],
+    "common_mistakes": [
+      "الخلط بين אין לי و אין לה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "תמיד אין לה ____.",
+      "options": [
+        "זמן",
+        "קפה",
+        "שוק"
+      ],
+      "correct": "זמן",
+      "matching_pair": "זמן ↔ وقت"
+    },
+    "id": "L1_136"
+  },
+  {
+    "level": "beginner",
+    "category": "family",
+    "hebrew": "ביום שישי בערב כל המשפחה בבית של ג'מילה.",
+    "arabic": "مساء يوم الجمعة كل العائلة في بيت جميلة.",
+    "transliteration": "be-yom shishi ba-erev kol ha-mishpacha ba-bayit shel jamila.",
+    "phonetic_breakdown": [
+      "ביום",
+      "שישי",
+      "בערב",
+      "כל",
+      "המשפחה",
+      "בבית",
+      "של",
+      "ג'מילה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to describe a family gathering on Friday evening.",
+    "source_transcript": "26_savta-jamila.txt",
+    "approved_responses": [
+      {
+        "student_says": "ביום שישי בערב כל המשפחה בבית של ג'מילה.",
+        "expected_hebrew": "ביום שישי בערב כל המשפחה בבית של ג'מילה.",
+        "response_hebrew": "יפה.",
+        "response_arabic": "جيد.",
+        "teaching_note": "כל המשפחה تعني كل العائلة."
+      }
+    ],
+    "related_vocabulary": [
+      "יום שישי",
+      "בערב",
+      "משפחה",
+      "בית"
+    ],
+    "common_mistakes": [
+      "نسيان של في בית של ג'מילה."
+    ],
+    "game_usage": {
+      "fill_in_blank": "כל ____ בבית של ג'מילה.",
+      "options": [
+        "המשפחה",
+        "הקפה",
+        "הדואר"
+      ],
+      "correct": "המשפחה",
+      "matching_pair": "משפחה ↔ عائلة"
+    },
+    "id": "L1_137"
+  },
+  {
+    "level": "beginner",
+    "category": "greetings",
+    "hebrew": "היי, עלי. מה שלומך?",
+    "arabic": "مرحبًا علي. كيف حالك؟",
+    "transliteration": "hai, ali. ma shlomcha?",
+    "phonetic_breakdown": [
+      "היי",
+      "עלי",
+      "מה",
+      "שלומך"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to greet Ali and ask how he is.",
+    "source_transcript": "27_batelefon.txt",
+    "approved_responses": [
+      {
+        "student_says": "היי, עלי. מה שלומך?",
+        "expected_hebrew": "היי, עלי. מה שלומך?",
+        "response_hebrew": "הכל טוב.",
+        "response_arabic": "كل شيء جيد.",
+        "teaching_note": "מה שלומך means how are you."
+      }
+    ],
+    "related_vocabulary": [
+      "היי",
+      "מה",
+      "שלומך"
+    ],
+    "common_mistakes": [
+      "نسيان ך في שלומך."
+    ],
+    "game_usage": {
+      "fill_in_blank": "מה ____?",
+      "options": [
+        "שלומך",
+        "קפה",
+        "שוק"
+      ],
+      "correct": "שלומך",
+      "matching_pair": "מה שלומך? ↔ كيف حالك؟"
+    },
+    "id": "L1_138"
+  },
+  {
+    "level": "beginner",
+    "category": "greetings",
+    "hebrew": "הכל טוב. ואתה?",
+    "arabic": "كل شيء جيد. وأنتَ؟",
+    "transliteration": "hakol tov. ve-ata?",
+    "phonetic_breakdown": [
+      "הכל",
+      "טוב",
+      "ואתה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to answer how are you and ask back.",
+    "source_transcript": "27_batelefon.txt",
+    "approved_responses": [
+      {
+        "student_says": "הכל טוב. ואתה?",
+        "expected_hebrew": "הכל טוב. ואתה?",
+        "response_hebrew": "הכל בסדר.",
+        "response_arabic": "كل شيء بخير.",
+        "teaching_note": "ואתה means and you, masculine."
+      }
+    ],
+    "related_vocabulary": [
+      "הכל",
+      "טוב",
+      "ואתה"
+    ],
+    "common_mistakes": [
+      "استخدام ואת بدل ואתה مع مذكر."
+    ],
+    "game_usage": {
+      "fill_in_blank": "הכל טוב. ____?",
+      "options": [
+        "ואתה",
+        "ואת",
+        "אני"
+      ],
+      "correct": "ואתה",
+      "matching_pair": "הכל טוב ↔ كل شيء جيد"
+    },
+    "id": "L1_139"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "אני הולך עכשיו לים. אתה בא?",
+    "arabic": "أنا ذاهب الآن إلى البحر. هل تأتي؟",
+    "transliteration": "ani holech achshav la-yam. ata ba?",
+    "phonetic_breakdown": [
+      "אני",
+      "הולך",
+      "עכשיו",
+      "לים",
+      "אתה",
+      "בא"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to invite a male friend to go to the sea.",
+    "source_transcript": "27_batelefon.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני הולך עכשיו לים. אתה בא?",
+        "expected_hebrew": "אני הולך עכשיו לים. אתה בא?",
+        "response_hebrew": "אני רוצה.",
+        "response_arabic": "أريد.",
+        "teaching_note": "הולך للمذكر، עכשיו تعني الآن."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "הולך",
+      "עכשיו",
+      "ים",
+      "בא"
+    ],
+    "common_mistakes": [
+      "استخدام הולכת بدل הולך مع مذكر."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני הולך עכשיו ____.",
+      "options": [
+        "לים",
+        "לקפה",
+        "לחלב"
+      ],
+      "correct": "לים",
+      "matching_pair": "ים ↔ بحر"
+    },
+    "id": "L1_140"
+  },
+  {
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "רהף רוצה בגדים חדשים.",
+    "arabic": "رهف تريد ملابس جديدة.",
+    "transliteration": "rahaf rotza bgadim chadashim.",
+    "phonetic_breakdown": [
+      "רהף",
+      "רוצה",
+      "בגדים",
+      "חדשים"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say that Rahaf wants new clothes.",
+    "source_transcript": "29_rahaf-rotza-bgadim-hadashim.txt",
+    "approved_responses": [
+      {
+        "student_says": "רהף רוצה בגדים חדשים.",
+        "expected_hebrew": "רהף רוצה בגדים חדשים.",
+        "response_hebrew": "אילו בגדים היא רוצה?",
+        "response_arabic": "أي ملابس تريد؟",
+        "teaching_note": "בגדים חדשים تعني ملابس جديدة."
+      }
+    ],
+    "related_vocabulary": [
+      "רהף",
+      "רוצה",
+      "בגדים",
+      "חדשים"
+    ],
+    "common_mistakes": [
+      "نسيان صيغة الجمع في חדשים."
+    ],
+    "game_usage": {
+      "fill_in_blank": "רהף רוצה בגדים ____.",
+      "options": [
+        "חדשים",
+        "חדש",
+        "חדשה"
+      ],
+      "correct": "חדשים",
+      "matching_pair": "בגדים חדשים ↔ ملابس جديدة"
+    },
+    "id": "L1_141"
+  },
+  {
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "אבל אין לי חולצה ורודה.",
+    "arabic": "لكن ليس لدي قميص وردي.",
+    "transliteration": "aval ein li chultza veruda.",
+    "phonetic_breakdown": [
+      "אבל",
+      "אין",
+      "לי",
+      "חולצה",
+      "ורודה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say that the speaker does not have a pink shirt.",
+    "source_transcript": "29_rahaf-rotza-bgadim-hadashim.txt",
+    "approved_responses": [
+      {
+        "student_says": "אבל אין לי חולצה ורודה.",
+        "expected_hebrew": "אבל אין לי חולצה ורודה.",
+        "response_hebrew": "אני רוצה חולצה ורודה.",
+        "response_arabic": "أريد قميصًا ورديًا.",
+        "teaching_note": "אין לי تعني ليس لدي."
+      }
+    ],
+    "related_vocabulary": [
+      "אבל",
+      "אין",
+      "לי",
+      "חולצה",
+      "ורודה"
+    ],
+    "common_mistakes": [
+      "الخلط بين יש לי و אין לי."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אין לי חולצה ____.",
+      "options": [
+        "ורודה",
+        "לבנה",
+        "כחולה"
+      ],
+      "correct": "ורודה",
+      "matching_pair": "ורודה ↔ وردية"
+    },
+    "id": "L1_142"
+  },
+  {
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "אני רוצה חולצה ורודה וגם סוודר.",
+    "arabic": "أريد قميصًا ورديًا وأيضًا كنزة.",
+    "transliteration": "ani rotza chultza veruda ve-gam sveder.",
+    "phonetic_breakdown": [
+      "אני",
+      "רוצה",
+      "חולצה",
+      "ורודה",
+      "וגם",
+      "סוודר"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to ask for a pink shirt and also a sweater.",
+    "source_transcript": "29_rahaf-rotza-bgadim-hadashim.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני רוצה חולצה ורודה וגם סוודר.",
+        "expected_hebrew": "אני רוצה חולצה ורודה וגם סוודר.",
+        "response_hebrew": "איזה סוודר?",
+        "response_arabic": "أي كنزة؟",
+        "teaching_note": "וגם تعني وأيضًا."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "רוצה",
+      "חולצה",
+      "ורודה",
+      "סוודר"
+    ],
+    "common_mistakes": [
+      "نسيان ו في וגם."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני רוצה חולצה ורודה וגם ____.",
+      "options": [
+        "סוודר",
+        "קפה",
+        "שוק"
+      ],
+      "correct": "סוודר",
+      "matching_pair": "סוודר ↔ كنزة"
+    },
+    "id": "L1_143"
+  },
+  {
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "היי סוזן, איפה את?",
+    "arabic": "مرحبًا سوزان، أين أنتِ؟",
+    "transliteration": "hai suzan, eifo at?",
+    "phonetic_breakdown": [
+      "היי",
+      "סוזן",
+      "איפה",
+      "את"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to greet Susan and ask where she is.",
+    "source_transcript": "30_lama-bashuk.txt",
+    "approved_responses": [
+      {
+        "student_says": "היי סוזן, איפה את?",
+        "expected_hebrew": "היי סוזן, איפה את?",
+        "response_hebrew": "אני בשוק.",
+        "response_arabic": "أنا في السوق.",
+        "teaching_note": "איפה את تعني أين أنتِ."
+      }
+    ],
+    "related_vocabulary": [
+      "היי",
+      "סוזן",
+      "איפה",
+      "את"
+    ],
+    "common_mistakes": [
+      "استخدام אתה بدل את للمؤنث."
+    ],
+    "game_usage": {
+      "fill_in_blank": "היי סוזן, איפה ____?",
+      "options": [
+        "את",
+        "אתה",
+        "אני"
+      ],
+      "correct": "את",
+      "matching_pair": "איפה את? ↔ أين أنتِ؟"
+    },
+    "id": "L1_144"
+  },
+  {
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "אני בשוק. קונה אוכל.",
+    "arabic": "أنا في السوق. أشتري طعامًا.",
+    "transliteration": "ani ba-shuk. kona ochel.",
+    "phonetic_breakdown": [
+      "אני",
+      "בשוק",
+      "קונה",
+      "אוכל"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say that the speaker is at the market buying food.",
+    "source_transcript": "30_lama-bashuk.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני בשוק. קונה אוכל.",
+        "expected_hebrew": "אני בשוק. קונה אוכל.",
+        "response_hebrew": "למה את קונה בשוק?",
+        "response_arabic": "لماذا تشترين في السوق؟",
+        "teaching_note": "בשוק تعني في السوق، קונה تعني يشتري/تشتري."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "בשוק",
+      "קונה",
+      "אוכל"
+    ],
+    "common_mistakes": [
+      "نسيان ב في בשוק."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני בשוק. קונה ____.",
+      "options": [
+        "אוכל",
+        "דואר",
+        "דירה"
+      ],
+      "correct": "אוכל",
+      "matching_pair": "בשוק ↔ في السوق"
+    },
+    "id": "L1_145"
+  },
+  {
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "אני לא אוהבת רעש.",
+    "arabic": "أنا لا أحب الضجة.",
+    "transliteration": "ani lo ohevet ra'ash.",
+    "phonetic_breakdown": [
+      "אני",
+      "לא",
+      "אוהבת",
+      "רעש"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used by a female speaker to say she does not like noise.",
+    "source_transcript": "30_lama-bashuk.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני לא אוהבת רעש.",
+        "expected_hebrew": "אני לא אוהבת רעש.",
+        "response_hebrew": "בסדר.",
+        "response_arabic": "حسنًا.",
+        "teaching_note": "אוהבת تستخدم للمؤنث."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "לא",
+      "אוהבת",
+      "רעש"
+    ],
+    "common_mistakes": [
+      "استخدام אוהב بدل אוהבת مع متحدثة مؤنثة."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני לא אוהבת ____.",
+      "options": [
+        "רעש",
+        "קפה",
+        "תה"
+      ],
+      "correct": "רעש",
+      "matching_pair": "רעש ↔ ضجة"
+    },
+    "id": "L1_146"
+  },
+  {
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "סליחה? כמה עולה קילו בשר?",
+    "arabic": "عفوًا؟ كم سعر كيلو لحم؟",
+    "transliteration": "slicha? kama ole kilo basar?",
+    "phonetic_breakdown": [
+      "סליחה",
+      "כמה",
+      "עולה",
+      "קילו",
+      "בשר"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to ask the price of one kilogram of meat.",
+    "source_transcript": "31_habasar-hatari.txt",
+    "approved_responses": [
+      {
+        "student_says": "סליחה? כמה עולה קילו בשר?",
+        "expected_hebrew": "סליחה? כמה עולה קילו בשר?",
+        "response_hebrew": "20 שקלים.",
+        "response_arabic": "20 شيكل.",
+        "teaching_note": "כמה עולה تستخدم للسؤال عن السعر."
+      }
+    ],
+    "related_vocabulary": [
+      "סליחה",
+      "כמה",
+      "עולה",
+      "קילו",
+      "בשר"
+    ],
+    "common_mistakes": [
+      "استخدام מה بدل כמה عند السؤال عن السعر."
+    ],
+    "game_usage": {
+      "fill_in_blank": "כמה עולה קילו ____?",
+      "options": [
+        "בשר",
+        "קפה",
+        "תה"
+      ],
+      "correct": "בשר",
+      "matching_pair": "בשר ↔ لحم"
+    },
+    "id": "L1_147"
+  },
+  {
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "כן, אנחנו מביאים בשר טרי כל יום.",
+    "arabic": "نعم، نحن نحضر لحمًا طازجًا كل يوم.",
+    "transliteration": "ken, anachnu mevi'im basar tari kol yom.",
+    "phonetic_breakdown": [
+      "כן",
+      "אנחנו",
+      "מביאים",
+      "בשר",
+      "טרי",
+      "כל",
+      "יום"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used by a seller to say they bring fresh meat every day.",
+    "source_transcript": "31_habasar-hatari.txt",
+    "approved_responses": [
+      {
+        "student_says": "כן, אנחנו מביאים בשר טרי כל יום.",
+        "expected_hebrew": "כן, אנחנו מביאים בשר טרי כל יום.",
+        "response_hebrew": "יופי.",
+        "response_arabic": "جميل.",
+        "teaching_note": "טרי تعني طازج."
+      }
+    ],
+    "related_vocabulary": [
+      "כן",
+      "אנחנו",
+      "מביאים",
+      "בשר",
+      "טרי"
+    ],
+    "common_mistakes": [
+      "الخلط بين טרי و ישן."
+    ],
+    "game_usage": {
+      "fill_in_blank": "בשר ____ כל יום.",
+      "options": [
+        "טרי",
+        "ירוק",
+        "יקר"
+      ],
+      "correct": "טרי",
+      "matching_pair": "טרי ↔ طازج"
+    },
+    "id": "L1_148"
+  },
+  {
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "אני רוצה קילו וחצי בשר, בבקשה.",
+    "arabic": "أريد كيلو ونصف لحم، من فضلك.",
+    "transliteration": "ani rotze kilo va-chetzi basar, bevakasha.",
+    "phonetic_breakdown": [
+      "אני",
+      "רוצה",
+      "קילו",
+      "וחצי",
+      "בשר",
+      "בבקשה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to order one and a half kilograms of meat.",
+    "source_transcript": "31_habasar-hatari.txt",
+    "approved_responses": [
+      {
+        "student_says": "אני רוצה קילו וחצי בשר, בבקשה.",
+        "expected_hebrew": "אני רוצה קילו וחצי בשר, בבקשה.",
+        "response_hebrew": "בבקשה.",
+        "response_arabic": "تفضل.",
+        "teaching_note": "קילו וחצי تعني كيلو ونصف."
+      }
+    ],
+    "related_vocabulary": [
+      "אני",
+      "רוצה",
+      "קילו",
+      "חצי",
+      "בשר"
+    ],
+    "common_mistakes": [
+      "نسيان בבקשה في الطلب المؤدب."
+    ],
+    "game_usage": {
+      "fill_in_blank": "קילו וחצי ____.",
+      "options": [
+        "בשר",
+        "קפה",
+        "חלב"
+      ],
+      "correct": "בשר",
+      "matching_pair": "קילו וחצי ↔ كيلو ونصف"
+    },
+    "id": "L1_149"
+  },
+  {
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "כמה עולות העגבניות?",
+    "arabic": "كم سعر البندورة؟",
+    "transliteration": "kama olot ha-agvaniyot?",
+    "phonetic_breakdown": [
+      "כמה",
+      "עולות",
+      "העגבניות"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to ask the price of tomatoes.",
+    "source_transcript": "32_haagvaniyot-yerukot.txt",
+    "approved_responses": [
+      {
+        "student_says": "כמה עולות העגבניות?",
+        "expected_hebrew": "כמה עולות העגבניות?",
+        "response_hebrew": "שבעה שקלים לקילו.",
+        "response_arabic": "سبعة شواكل للكيلو.",
+        "teaching_note": "עולות تستخدم هنا لأن העגבניות جمع مؤنث."
+      }
+    ],
+    "related_vocabulary": [
+      "כמה",
+      "עולות",
+      "עגבניות"
+    ],
+    "common_mistakes": [
+      "استخدام עולה بدل עולות مع جمع مؤنث."
+    ],
+    "game_usage": {
+      "fill_in_blank": "כמה ____ העגבניות?",
+      "options": [
+        "עולות",
+        "עולה",
+        "רוצה"
+      ],
+      "correct": "עולות",
+      "matching_pair": "עגבניות ↔ بندورة"
+    },
+    "id": "L1_150"
+  },
+  {
+    "level": "beginner",
+    "category": "shopping_market",
+    "hebrew": "אבל אני רוצה עגבניות אדומות היום. אני עושה שקשוקה.",
+    "arabic": "لكنني أريد بندورة حمراء اليوم. أنا أعمل شكشوكة.",
+    "transliteration": "aval ani rotza agvaniyot adumot hayom. ani ose shakshuka.",
+    "phonetic_breakdown": [
+      "אבל",
+      "אני",
+      "רוצה",
+      "עגבניות",
+      "אדומות",
+      "היום",
+      "אני",
+      "עושה",
+      "שקשוקה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to explain that the speaker needs red tomatoes today for shakshuka.",
+    "source_transcript": "32_haagvaniyot-yerukot.txt",
+    "approved_responses": [
+      {
+        "student_says": "אבל אני רוצה עגבניות אדומות היום. אני עושה שקשוקה.",
+        "expected_hebrew": "אבל אני רוצה עגבניות אדומות היום. אני עושה שקשוקה.",
+        "response_hebrew": "אולי יש עגבניות אדומות במקום אחר.",
+        "response_arabic": "ربما يوجد بندورة حمراء في مكان آخر.",
+        "teaching_note": "אדומות صفة جمع مؤنث."
+      }
+    ],
+    "related_vocabulary": [
+      "אבל",
+      "רוצה",
+      "עגבניות",
+      "אדומות",
+      "שקשוקה"
+    ],
+    "common_mistakes": [
+      "استخدام אדום بدل אדומות مع עגבניות."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני רוצה עגבניות ____ היום.",
+      "options": [
+        "אדומות",
+        "אדום",
+        "אדומה"
+      ],
+      "correct": "אדומות",
+      "matching_pair": "אדומות ↔ حمراء"
+    },
+    "id": "L1_151"
+  },
+  {
+    "level": "beginner",
+    "category": "daily_life",
+    "hebrew": "רמי גר ברס אל עמוד.",
+    "arabic": "رامي يسكن في رأس العامود.",
+    "transliteration": "rami gar be-ras al-amud.",
+    "phonetic_breakdown": [
+      "רמי",
+      "גר",
+      "ברס",
+      "אל",
+      "עמוד"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say where Rami lives.",
+    "source_transcript": "34_rami-gar.txt",
+    "approved_responses": [
+      {
+        "student_says": "רמי גר ברס אל עמוד.",
+        "expected_hebrew": "רמי גר ברס אל עמוד.",
+        "response_hebrew": "נכון.",
+        "response_arabic": "صحيح.",
+        "teaching_note": "גר ב means lives in."
+      }
+    ],
+    "related_vocabulary": [
+      "רמי",
+      "גר",
+      "רס אל עמוד"
+    ],
+    "common_mistakes": [
+      "نسيان ב قبل اسم المكان."
+    ],
+    "game_usage": {
+      "fill_in_blank": "רמי ____ ברס אל עמוד.",
+      "options": [
+        "גר",
+        "גרה",
+        "גרים"
+      ],
+      "correct": "גר",
+      "matching_pair": "גר ↔ يسكن"
+    },
+    "id": "L1_152"
+  },
+  {
+    "level": "beginner",
+    "category": "directions",
+    "hebrew": "הוא לומד פילוסופיה באוניברסיטה בהר הצופים.",
+    "arabic": "هو يدرس فلسفة في الجامعة في جبل المشارف.",
+    "transliteration": "hu lomed filosofia ba-universita be-har ha-tzofim.",
+    "phonetic_breakdown": [
+      "הוא",
+      "לומד",
+      "פילוסופיה",
+      "באוניברסיטה",
+      "בהר",
+      "הצופים"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to say what and where someone studies.",
+    "source_transcript": "34_rami-gar.txt",
+    "approved_responses": [
+      {
+        "student_says": "הוא לומד פילוסופיה באוניברסיטה בהר הצופים.",
+        "expected_hebrew": "הוא לומד פילוסופיה באוניברסיטה בהר הצופים.",
+        "response_hebrew": "יפה.",
+        "response_arabic": "جيد.",
+        "teaching_note": "לומד means studies."
+      }
+    ],
+    "related_vocabulary": [
+      "הוא",
+      "לומד",
+      "פילוסופיה",
+      "אוניברסיטה"
+    ],
+    "common_mistakes": [
+      "الخلط بين לומד و עובד."
+    ],
+    "game_usage": {
+      "fill_in_blank": "הוא לומד ____.",
+      "options": [
+        "פילוסופיה",
+        "קפה",
+        "בשר"
+      ],
+      "correct": "פילוסופיה",
+      "matching_pair": "פילוסופיה ↔ فلسفة"
+    },
+    "id": "L1_153"
+  },
+  {
+    "level": "beginner",
+    "category": "directions",
+    "hebrew": "היא נוסעת שלוש תחנות ויורדת בתחנה של גבעת המבטר.",
+    "arabic": "هي تسافر ثلاث محطات وتنزل في محطة جفعات همفتار.",
+    "transliteration": "hi nosa'at shalosh tachanot ve-yoredet ba-tachana shel giv'at ha-mivtar.",
+    "phonetic_breakdown": [
+      "היא",
+      "נוסעת",
+      "שלוש",
+      "תחנות",
+      "ויורדת",
+      "בתחנה",
+      "של",
+      "גבעת",
+      "המבטר"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 3,
+    "context_usage": "Used to describe a route with three stops.",
+    "source_transcript": "34_rami-gar.txt",
+    "approved_responses": [
+      {
+        "student_says": "היא נוסעת שלוש תחנות ויורדת בתחנה של גבעת המבטר.",
+        "expected_hebrew": "היא נוסעת שלוש תחנות ויורדת בתחנה של גבעת המבטר.",
+        "response_hebrew": "נכון.",
+        "response_arabic": "صحيح.",
+        "teaching_note": "תחנות تعني محطات، יורדת تعني تنزل."
+      }
+    ],
+    "related_vocabulary": [
+      "נוסעת",
+      "שלוש",
+      "תחנות",
+      "יורדת",
+      "תחנה"
+    ],
+    "common_mistakes": [
+      "الخلط بين עולה و יורדת."
+    ],
+    "game_usage": {
+      "fill_in_blank": "היא נוסעת שלוש ____.",
+      "options": [
+        "תחנות",
+        "שקלים",
+        "עגבניות"
+      ],
+      "correct": "תחנות",
+      "matching_pair": "תחנות ↔ محطات"
+    },
+    "id": "L1_154"
+  },
+  {
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "יונתן ותמר באוניברסיטה בירושלים.",
+    "arabic": "يوناتان وتمار في الجامعة في القدس.",
+    "transliteration": "yonatan ve-tamar ba-universita bi-yerushalayim.",
+    "phonetic_breakdown": [
+      "יונתן",
+      "ותמר",
+      "באוניברסיטה",
+      "בירושלים"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used as a scene title about Jonathan and Tamar at the university in Jerusalem.",
+    "source_transcript": "05_yonatan-ve-tamar-bauniversita.txt",
+    "approved_responses": [
+      {
+        "student_says": "יונתן ותמר באוניברסיטה בירושלים.",
+        "expected_hebrew": "יונתן ותמר באוניברסיטה בירושלים.",
+        "response_hebrew": "נכון, הם באוניברסיטה בירושלים.",
+        "response_arabic": "صحيح، هم في الجامعة في القدس.",
+        "teaching_note": "באוניברסיטה تعني في الجامعة، בירושלים تعني في القدس."
+      }
+    ],
+    "related_vocabulary": [
+      "יונתן",
+      "תמר",
+      "אוניברסיטה",
+      "ירושלים"
+    ],
+    "common_mistakes": [
+      "نسيان ב في באוניברסיטה أو בירושלים."
+    ],
+    "game_usage": {
+      "fill_in_blank": "יונתן ותמר באוניברסיטה ____.",
+      "options": [
+        "בירושלים",
+        "בשוק",
+        "בדואר"
+      ],
+      "correct": "בירושלים",
+      "matching_pair": "באוניברסיטה בירושלים ↔ في الجامعة في القدس"
+    },
+    "id": "L1_155"
+  },
+  {
+    "level": "beginner",
+    "category": "greetings",
+    "hebrew": "היי, אני יונתן.",
+    "arabic": "مرحبًا، أنا يوناتان.",
+    "transliteration": "hai, ani yonatan.",
+    "phonetic_breakdown": [
+      "היי",
+      "אני",
+      "יונתן"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to greet someone and introduce yourself by name.",
+    "source_transcript": "05_yonatan-ve-tamar-bauniversita.txt",
+    "approved_responses": [
+      {
+        "student_says": "היי, אני יונתן.",
+        "expected_hebrew": "היי, אני יונתן.",
+        "response_hebrew": "היי יונתן.",
+        "response_arabic": "مرحبًا يوناتان.",
+        "teaching_note": "אני + שם is the basic self-introduction pattern."
+      }
+    ],
+    "related_vocabulary": [
+      "היי",
+      "אני",
+      "יונתן"
+    ],
+    "common_mistakes": [
+      "نسيان كلمة אני قبل الاسم."
+    ],
+    "game_usage": {
+      "fill_in_blank": "היי, אני ____.",
+      "options": [
+        "יונתן",
+        "תמר",
+        "מורה"
+      ],
+      "correct": "יונתן",
+      "matching_pair": "אני יונתן ↔ أنا يوناتان"
+    },
+    "id": "L1_156"
+  },
+  {
+    "level": "beginner",
+    "category": "greetings",
+    "hebrew": "היי, אני תמר.",
+    "arabic": "مرحبًا، أنا تمار.",
+    "transliteration": "hai, ani tamar.",
+    "phonetic_breakdown": [
+      "היי",
+      "אני",
+      "תמר"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to greet someone and introduce yourself by name.",
+    "source_transcript": "05_yonatan-ve-tamar-bauniversita.txt",
+    "approved_responses": [
+      {
+        "student_says": "היי, אני תמר.",
+        "expected_hebrew": "היי, אני תמר.",
+        "response_hebrew": "היי תמר.",
+        "response_arabic": "مرحبًا تمار.",
+        "teaching_note": "אני תמר means I am Tamar."
+      }
+    ],
+    "related_vocabulary": [
+      "היי",
+      "אני",
+      "תמר"
+    ],
+    "common_mistakes": [
+      "نسيان كلمة אני قبل الاسم."
+    ],
+    "game_usage": {
+      "fill_in_blank": "היי, אני ____.",
+      "options": [
+        "תמר",
+        "יונתן",
+        "תלמיד"
+      ],
+      "correct": "תמר",
+      "matching_pair": "אני תמר ↔ أنا تمار"
+    },
+    "id": "L1_157"
+  },
+  {
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "אתה מורה?",
+    "arabic": "هل أنتَ معلم؟",
+    "transliteration": "ata more?",
+    "phonetic_breakdown": [
+      "אתה",
+      "מורה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to ask a male person if he is a teacher.",
+    "source_transcript": "05_yonatan-ve-tamar-bauniversita.txt",
+    "approved_responses": [
+      {
+        "student_says": "אתה מורה?",
+        "expected_hebrew": "אתה מורה?",
+        "response_hebrew": "לא, אני לא מורה, אני תלמיד.",
+        "response_arabic": "لا، أنا لست معلمًا، أنا طالب.",
+        "teaching_note": "אתה is used when speaking to a male person."
+      }
+    ],
+    "related_vocabulary": [
+      "אתה",
+      "מורה"
+    ],
+    "common_mistakes": [
+      "الخلط بين אתה و את."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אתה ____?",
+      "options": [
+        "מורה",
+        "תלמיד",
+        "מירושלים"
+      ],
+      "correct": "מורה",
+      "matching_pair": "מורה ↔ معلم"
+    },
+    "id": "L1_158"
+  },
+  {
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "לא, אני לא מורה, אני תלמיד.",
+    "arabic": "لا، أنا لست معلمًا، أنا طالب.",
+    "transliteration": "lo, ani lo more, ani talmid.",
+    "phonetic_breakdown": [
+      "לא",
+      "אני",
+      "לא",
+      "מורה",
+      "אני",
+      "תלמיד"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say that I am not a teacher, I am a student.",
+    "source_transcript": "05_yonatan-ve-tamar-bauniversita.txt",
+    "approved_responses": [
+      {
+        "student_says": "לא, אני לא מורה, אני תלמיד.",
+        "expected_hebrew": "לא, אני לא מורה, אני תלמיד.",
+        "response_hebrew": "גם אני תלמיד.",
+        "response_arabic": "أنا أيضًا طالب.",
+        "teaching_note": "אני לא means I am not."
+      }
+    ],
+    "related_vocabulary": [
+      "לא",
+      "אני",
+      "מורה",
+      "תלמיד"
+    ],
+    "common_mistakes": [
+      "نسيان לא في جملة النفي."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני לא מורה, אני ____.",
+      "options": [
+        "תלמיד",
+        "מורה",
+        "ירושלים"
+      ],
+      "correct": "תלמיד",
+      "matching_pair": "תלמיד ↔ طالب"
+    },
+    "id": "L1_159"
+  },
+  {
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "גם אני תלמיד.",
+    "arabic": "أنا أيضًا طالب.",
+    "transliteration": "gam ani talmid.",
+    "phonetic_breakdown": [
+      "גם",
+      "אני",
+      "תלמיד"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to say that I am also a student.",
+    "source_transcript": "05_yonatan-ve-tamar-bauniversita.txt",
+    "approved_responses": [
+      {
+        "student_says": "גם אני תלמיד.",
+        "expected_hebrew": "גם אני תלמיד.",
+        "response_hebrew": "יפה.",
+        "response_arabic": "جيد.",
+        "teaching_note": "גם means also."
+      }
+    ],
+    "related_vocabulary": [
+      "גם",
+      "אני",
+      "תלמיד"
+    ],
+    "common_mistakes": [
+      "وضع גם في مكان غير مناسب داخل الجملة."
+    ],
+    "game_usage": {
+      "fill_in_blank": "גם אני ____.",
+      "options": [
+        "תלמיד",
+        "מורה",
+        "מאשדוד"
+      ],
+      "correct": "תלמיד",
+      "matching_pair": "גם ↔ أيضًا"
+    },
+    "id": "L1_160"
+  },
+  {
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "אתה מירושלים?",
+    "arabic": "هل أنتَ من القدس؟",
+    "transliteration": "ata mi-yerushalayim?",
+    "phonetic_breakdown": [
+      "אתה",
+      "מירושלים"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to ask a male person if he is from Jerusalem.",
+    "source_transcript": "05_yonatan-ve-tamar-bauniversita.txt",
+    "approved_responses": [
+      {
+        "student_says": "אתה מירושלים?",
+        "expected_hebrew": "אתה מירושלים?",
+        "response_hebrew": "לא, אני מאשדוד.",
+        "response_arabic": "لا، أنا من أشدود.",
+        "teaching_note": "מ־ means from."
+      }
+    ],
+    "related_vocabulary": [
+      "אתה",
+      "מירושלים",
+      "ירושלים"
+    ],
+    "common_mistakes": [
+      "نسيان מ في מירושלים."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אתה ____?",
+      "options": [
+        "מירושלים",
+        "בירושלים",
+        "לירושלים"
+      ],
+      "correct": "מירושלים",
+      "matching_pair": "מירושלים ↔ من القدس"
+    },
+    "id": "L1_161"
+  },
+  {
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "לא, אני מאשדוד.",
+    "arabic": "لا، أنا من أشدود.",
+    "transliteration": "lo, ani me-ashdod.",
+    "phonetic_breakdown": [
+      "לא",
+      "אני",
+      "מאשדוד"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 1,
+    "context_usage": "Used to say that I am from Ashdod.",
+    "source_transcript": "05_yonatan-ve-tamar-bauniversita.txt",
+    "approved_responses": [
+      {
+        "student_says": "לא, אני מאשדוד.",
+        "expected_hebrew": "לא, אני מאשדוד.",
+        "response_hebrew": "בסדר.",
+        "response_arabic": "حسنًا.",
+        "teaching_note": "מאשדוד means from Ashdod."
+      }
+    ],
+    "related_vocabulary": [
+      "לא",
+      "אני",
+      "מאשדוד"
+    ],
+    "common_mistakes": [
+      "نسيان מ عند قول من أشدود."
+    ],
+    "game_usage": {
+      "fill_in_blank": "אני ____.",
+      "options": [
+        "מאשדוד",
+        "בירושלים",
+        "תלמיד"
+      ],
+      "correct": "מאשדוד",
+      "matching_pair": "מאשדוד ↔ من أشدود"
+    },
+    "id": "L1_162"
+  },
+  {
+    "level": "beginner",
+    "category": "introductions",
+    "hebrew": "גם אני לא מירושלים, אני מרמלה.",
+    "arabic": "أنا أيضًا لست من القدس، أنا من الرملة.",
+    "transliteration": "gam ani lo mi-yerushalayim, ani mi-ramla.",
+    "phonetic_breakdown": [
+      "גם",
+      "אני",
+      "לא",
+      "מירושלים",
+      "אני",
+      "מרמלה"
+    ],
+    "audio_reference": "audio_pending",
+    "difficulty_score": 2,
+    "context_usage": "Used to say that I am also not from Jerusalem, I am from Ramla.",
+    "source_transcript": "05_yonatan-ve-tamar-bauniversita.txt",
+    "approved_responses": [
+      {
+        "student_says": "גם אני לא מירושלים, אני מרמלה.",
+        "expected_hebrew": "גם אני לא מירושלים, אני מרמלה.",
+        "response_hebrew": "יפה מאוד.",
+        "response_arabic": "جيد جدًا.",
+        "teaching_note": "גם אני לא means I am also not."
+      }
+    ],
+    "related_vocabulary": [
+      "גם",
+      "אני",
+      "לא",
+      "מירושלים",
+      "מרמלה"
+    ],
+    "common_mistakes": [
+      "نسيان לא في الجملة المنفية."
+    ],
+    "game_usage": {
+      "fill_in_blank": "גם אני לא מירושלים, אני ____.",
+      "options": [
+        "מרמלה",
+        "מאשדוד",
+        "תלמיד"
+      ],
+      "correct": "מרמלה",
+      "matching_pair": "מרמלה ↔ من الرملة"
+    },
+    "id": "L1_163"
+  }
+]
