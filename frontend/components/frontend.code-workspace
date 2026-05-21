@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "../../Documents/kehila2026-lisan/frontend"
+		},
+		{
+			"path": "."
+		},
+		{
+			"path": "../../Documents/kehila2026-lisan/backend"
+		},
+		{
+			"path": "../../Documents/kehila2026-lisan/ai-service"
+		},
+		{
+			"path": "../../Documents/kehila2026-lisan/docs"
+		},
+		{
+			"path": "../../Documents/kehila2026-lisan/.github"
+		}
+	],
+	"settings": {}
+}
