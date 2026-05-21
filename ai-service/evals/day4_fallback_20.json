@@ -1,0 +1,18 @@
+[
+  {"message": "", "expectedReason": "EMPTY_MESSAGE"},
+  {"message": "   ", "expectedReason": "EMPTY_MESSAGE"},
+  {"message": "\n\t", "expectedReason": "EMPTY_MESSAGE"},
+  {"message": "Hello", "expectedReason": "MIXED_LANGUAGE"},
+  {"message": "hello world", "expectedReason": "MIXED_LANGUAGE"},
+  {"message": "مرحبا", "expectedReason": "MIXED_LANGUAGE"},
+  {"message": "שלום hello", "expectedReason": "MIXED_LANGUAGE"},
+  {"message": "שלום مرحبا", "expectedReason": "MIXED_LANGUAGE"},
+  {"message": "ترجم לי hello", "expectedReason": "MIXED_LANGUAGE"},
+  {"message": "12345", "expectedReason": "OUT_OF_SCOPE"},
+  {"message": "!@#$%^&*()", "expectedReason": "OUT_OF_SCOPE"},
+  {"message": "😀🎉🔥", "expectedReason": "OUT_OF_SCOPE"},
+  {"message": "פוליטיקה וכלכלה עולמית", "expectedReason": "OUT_OF_SCOPE"},
+  {"message": "מקרו כלכלה ופילוסופיה מודרנית", "expectedReason": "OUT_OF_SCOPE"},
+  {"message": "אני רוצה לדבר על בירוקרטיה ממשלתית מורכבת", "expectedReason": "OUT_OF_SCOPE"},
+  {"message": "שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום", "expectedReason": "MESSAGE_TOO_LONG"}
+]

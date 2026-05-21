@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "question": "מי את?",
+    "category": "introductions",
+    "expected_behavior": "answer_from_curriculum"
+  },
+  {
+    "id": 2,
+    "question": "מאיפה את?",
+    "category": "introductions",
+    "expected_behavior": "answer_from_curriculum"
+  },
+  {
+    "id": 3,
+    "question": "אני רוצה קפה",
+    "category": "food_restaurant",
+    "expected_behavior": "answer_from_curriculum"
+  },
+  {
+    "id": 4,
+    "question": "כמה זה עולה?",
+    "category": "shopping",
+    "expected_behavior": "answer_from_curriculum"
+  },
+  {
+    "id": 5,
+    "question": "איפה הדואר?",
+    "category": "directions",
+    "expected_behavior": "answer_from_curriculum"
+  },
+  {
+    "id": 6,
+    "question": "מה שלומך?",
+    "category": "greetings",
+    "expected_behavior": "answer_from_curriculum"
+  },
+  {
+    "id": 7,
+    "question": "אני לא מבינה",
+    "category": "general",
+    "expected_behavior": "answer_from_curriculum"
+  },
+  {
+    "id": 8,
+    "question": "תסביר לי בבקשה",
+    "category": "out_of_vocabulary",
+    "expected_behavior": "fallback"
+  },
+  {
+    "id": 9,
+    "question": "What does שלום mean?",
+    "category": "english_input",
+    "expected_behavior": "fallback"
+  },
+  {
+    "id": 10,
+    "question": "أنا تلميذة",
+    "category": "arabic_input",
+    "expected_behavior": "fallback"
+  }
+]

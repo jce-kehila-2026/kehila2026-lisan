@@ -1,0 +1,63 @@
+# Day 3 Prompt V2 Evaluation
+
+## Summary
+- Questions: 50
+- Average HTTP latency: 3.08 ms
+- P95 HTTP latency: 4.0 ms
+- Short answers: 50/50
+- No leakage: 50/50
+- No extra explanation: 50/50
+- Clear fallback text: 50/50
+- Arabic only when requested: 50/50
+
+## Results
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=8
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=4
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=4
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=3
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=2
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=5
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=4
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=3
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=2
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=2
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=4
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=3
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=4
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=2
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=2
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=4
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=3
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=3
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=3
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=2
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=4
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=4
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=4
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=2
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=2
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=2
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=3
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=3
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=3
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=3
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=2
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=2
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=4
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=3
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=4
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=2
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=2
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=3
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=3
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=4
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=3
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=2
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=2
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=4
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=3
+- status=200 routerHit=True cacheHit=True short=True fallback=None httpLatencyMs=4
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=2
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=2
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=3
+- status=200 routerHit=True cacheHit=False short=True fallback=None httpLatencyMs=3

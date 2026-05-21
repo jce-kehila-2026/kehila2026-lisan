@@ -1,0 +1,210 @@
+{
+  "summary": {
+    "run_date": "2026-05-12",
+    "provider": "gemini",
+    "model": "gemini-2.5-flash-lite",
+    "transcript_source": "txt:C:\\Users\\mshar\\Desktop\\lisan\\kehila2026-lisan\\ai-service\\data\\transcripts\\A1",
+    "transcript_count": 35,
+    "chunk_count": 100,
+    "approved_vocabulary_size": 527,
+    "average_latency_seconds": 4.8285,
+    "p95_latency_seconds": 8.808389999999996,
+    "best_latency_seconds": 0.0,
+    "worst_latency_seconds": 10.6893,
+    "total_cost_usd": 0.0020445,
+    "average_cost_per_exchange_usd": 0.00020444999999999998,
+    "estimated_1000_daily_cost_usd": 0.20445,
+    "estimated_50x10_daily_cost_usd": 0.102225,
+    "estimated_monthly_cost_usd": 3.06675,
+    "vocabulary_leak_count": 0
+  },
+  "results": [
+    {
+      "id": 1,
+      "category": "introductions",
+      "question": "מי את?",
+      "answer": "שלום, אני עמל.",
+      "latency_seconds": 6.2915,
+      "input_tokens": 2470,
+      "output_tokens": 7,
+      "estimated_cost_usd": 0.0002498,
+      "context_chunk_ids": [
+        "t31-c1",
+        "t24-c1",
+        "t12-c1",
+        "t8-c2",
+        "t8-c3"
+      ],
+      "used_approved_vocabulary_only": true,
+      "verdict": "Good",
+      "notes": "Responded within curriculum and vocabulary constraints."
+    },
+    {
+      "id": 2,
+      "category": "introductions",
+      "question": "מאיפה את?",
+      "answer": "אני לא יודע את זה עדיין",
+      "latency_seconds": 4.8423,
+      "input_tokens": 2517,
+      "output_tokens": 9,
+      "estimated_cost_usd": 0.0002553,
+      "context_chunk_ids": [
+        "t8-c2",
+        "t8-c3",
+        "t27-c3",
+        "t5-c1",
+        "t7-c1"
+      ],
+      "used_approved_vocabulary_only": true,
+      "verdict": "Acceptable",
+      "notes": "Safe fallback, but the curriculum may support a richer answer."
+    },
+    {
+      "id": 3,
+      "category": "food_restaurant",
+      "question": "אני רוצה קפה",
+      "answer": "בסדר. קפה אחד.",
+      "latency_seconds": 5.7115,
+      "input_tokens": 2560,
+      "output_tokens": 15,
+      "estimated_cost_usd": 0.000262,
+      "context_chunk_ids": [
+        "t8-c2",
+        "t16-c3",
+        "t19-c2",
+        "t13-c1",
+        "t8-c3"
+      ],
+      "used_approved_vocabulary_only": true,
+      "verdict": "Good",
+      "notes": "Responded within curriculum and vocabulary constraints."
+    },
+    {
+      "id": 4,
+      "category": "shopping",
+      "question": "כמה זה עולה?",
+      "answer": "שקל וחצי לקילו.",
+      "latency_seconds": 10.6893,
+      "input_tokens": 2508,
+      "output_tokens": 7,
+      "estimated_cost_usd": 0.0002536,
+      "context_chunk_ids": [
+        "t14-c6",
+        "t19-c2",
+        "t19-c1",
+        "t25-c2",
+        "t25-c1"
+      ],
+      "used_approved_vocabulary_only": true,
+      "verdict": "Good",
+      "notes": "Responded within curriculum and vocabulary constraints."
+    },
+    {
+      "id": 5,
+      "category": "directions",
+      "question": "איפה הדואר?",
+      "answer": "הדואר ליד החנות.",
+      "latency_seconds": 3.9814,
+      "input_tokens": 2464,
+      "output_tokens": 8,
+      "estimated_cost_usd": 0.0002496,
+      "context_chunk_ids": [
+        "t27-c1",
+        "t27-c3",
+        "t8-c1",
+        "t2-c2",
+        "t18-c2"
+      ],
+      "used_approved_vocabulary_only": true,
+      "verdict": "Good",
+      "notes": "Responded within curriculum and vocabulary constraints."
+    },
+    {
+      "id": 6,
+      "category": "greetings",
+      "question": "מה שלומך?",
+      "answer": "הכל בסדר. תודה.",
+      "latency_seconds": 4.8258,
+      "input_tokens": 2399,
+      "output_tokens": 8,
+      "estimated_cost_usd": 0.0002431,
+      "context_chunk_ids": [
+        "t18-c1",
+        "t8-c2",
+        "t7-c1",
+        "t11-c1"
+      ],
+      "used_approved_vocabulary_only": true,
+      "verdict": "Good",
+      "notes": "Responded within curriculum and vocabulary constraints."
+    },
+    {
+      "id": 7,
+      "category": "general",
+      "question": "אני לא מבינה",
+      "answer": "אני לא יודע את זה עדיין",
+      "latency_seconds": 6.5095,
+      "input_tokens": 2629,
+      "output_tokens": 23,
+      "estimated_cost_usd": 0.0002721,
+      "context_chunk_ids": [
+        "t4-c1",
+        "t19-c2",
+        "t23-c2",
+        "t4-c4",
+        "t4-c2"
+      ],
+      "used_approved_vocabulary_only": true,
+      "verdict": "Acceptable",
+      "notes": "Safe fallback, but the curriculum may support a richer answer."
+    },
+    {
+      "id": 8,
+      "category": "out_of_vocabulary",
+      "question": "תסביר לי בבקשה",
+      "answer": "אני לא יודע את זה עדיין",
+      "latency_seconds": 5.4337,
+      "input_tokens": 2554,
+      "output_tokens": 9,
+      "estimated_cost_usd": 0.000259,
+      "context_chunk_ids": [
+        "t19-c2",
+        "t13-c1",
+        "t20-c2",
+        "t13-c2",
+        "t5-c1"
+      ],
+      "used_approved_vocabulary_only": true,
+      "verdict": "Good",
+      "notes": "Correctly refused out-of-scope input."
+    },
+    {
+      "id": 9,
+      "category": "english_input",
+      "question": "What does שלום mean?",
+      "answer": "אני לא יודע את זה עדיין",
+      "latency_seconds": 0.0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "estimated_cost_usd": 0.0,
+      "context_chunk_ids": [],
+      "used_approved_vocabulary_only": true,
+      "verdict": "Good",
+      "notes": "Correctly refused out-of-scope input."
+    },
+    {
+      "id": 10,
+      "category": "arabic_input",
+      "question": "أنا تلميذة",
+      "answer": "אני לא יודע את זה עדיין",
+      "latency_seconds": 0.0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "estimated_cost_usd": 0.0,
+      "context_chunk_ids": [],
+      "used_approved_vocabulary_only": true,
+      "verdict": "Good",
+      "notes": "Correctly refused out-of-scope input."
+    }
+  ]
+}
