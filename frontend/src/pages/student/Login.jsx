@@ -7,7 +7,7 @@ import LoginShell from '../../components/LoginShell.jsx';
 import Button from '../../components/ui/Button.jsx';
 import Input from '../../components/ui/Input.jsx';
 import useLoginForm from '../../hooks/useLoginForm.js';
-import { login, storeSession } from '../../services/auth.js';
+import { getLandingPathForRole, login, storeSession } from '../../services/auth.js';
 
 function StudentLogin() {
   const { t } = useTranslation();
@@ -31,7 +31,7 @@ function StudentLogin() {
     try {
       const session = await login(form.values);
       storeSession(session);
-      navigate('/home', { replace: true });
+      navigate(getLandingPathForRole(session.user?.role), { replace: true });
     } catch (error) {
       setServerError(t(error.message || 'genericLoginError'));
     } finally {

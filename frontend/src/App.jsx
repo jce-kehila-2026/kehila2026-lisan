@@ -1,10 +1,21 @@
+import Chatbot from './pages/Chatbot.jsx';
 import React from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import ProtectedRoute from './routes/ProtectedRoute.jsx';
-import ExistingPlaceholderPage from '../components/src/pages/PlaceholderPage.jsx';
+import ExistingPlaceholderPage from './pages/PlaceholderPage.jsx';
+import MorePage from './pages/MorePage.jsx';
+import ProfilePage from './pages/ProfilePage.jsx';
+import ScenarioChat from './pages/ScenarioChat.jsx';
 import AdminDashboard from './pages/admin/Dashboard.jsx';
+import AdminLogin from './pages/admin/Login.jsx';
+import AdminConversations from './pages/admin/Conversations.jsx';
+import AdminNotifications from './pages/admin/Notifications.jsx';
+import AdminProgress from './pages/admin/Progress.jsx';
+import AdminStudents from './pages/admin/Students.jsx';
+import AdminWords from './pages/admin/Words.jsx';
 import ForgotAccess from './pages/ForgotAccess.jsx';
 import HomePage from './pages/home/HomePage.jsx';
+import TeacherHome from './pages/home/TeacherHome.jsx';
 import StudentLogin from './pages/student/Login.jsx';
 
 function App() {
@@ -14,12 +25,20 @@ function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<StudentLogin />} />
         <Route path="/forgot-access" element={<ForgotAccess />} />
-        <Route path="/admin/login" element={<Navigate to="/login" replace />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
         <Route
           path="/home"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute role="student">
               <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/dashboard"
+          element={
+            <ProtectedRoute role="teacher">
+              <TeacherHome />
             </ProtectedRoute>
           }
         />
@@ -51,7 +70,7 @@ function App() {
           path="/profile"
           element={
             <ProtectedRoute role={['student', 'teacher']}>
-              <ExistingPlaceholderPage titleKey="profile" />
+              <ProfilePage />
             </ProtectedRoute>
           }
         />
@@ -59,7 +78,15 @@ function App() {
           path="/chatbot"
           element={
             <ProtectedRoute role={['student', 'teacher']}>
-              <ExistingPlaceholderPage titleKey="chatbot" />
+              <Chatbot />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/scenario/:id"
+          element={
+            <ProtectedRoute role={['student', 'teacher']}>
+              <ScenarioChat />
             </ProtectedRoute>
           }
         />
@@ -67,7 +94,7 @@ function App() {
           path="/more"
           element={
             <ProtectedRoute role={['student', 'teacher']}>
-              <ExistingPlaceholderPage titleKey="more" />
+              <MorePage />
             </ProtectedRoute>
           }
         />
@@ -132,6 +159,46 @@ function App() {
           element={
             <ProtectedRoute role="admin">
               <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/students"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminStudents />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/conversations"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminConversations />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/words"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminWords />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/progress"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminProgress />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/notifications"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminNotifications />
             </ProtectedRoute>
           }
         />

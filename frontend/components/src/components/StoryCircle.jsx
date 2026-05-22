@@ -8,7 +8,7 @@ function StoryCircle({ story }) {
 
   return (
     <Link
-      to={`/story/${story.id}`}
+      to={`/scenario/${story.id}`}
       className="group flex w-24 shrink-0 flex-col items-center gap-2 text-center focus:outline-none"
       aria-label={`${t('openStory')}: ${t(story.titleKey)}`}
     >
