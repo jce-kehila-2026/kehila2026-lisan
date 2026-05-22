@@ -1,17 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import {
-  Bell,
-  Copy,
-  Heart,
-  HelpCircle,
-  MessageCircle,
-  Search,
-  Send,
-  Settings,
-  Share2,
-  Star,
-  Trash2,
-} from 'lucide-react';
+import { Heart, MessageCircle, Search, Settings, Share2, Star, Trash2, UsersRound } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import BottomNav from '../components/BottomNav.jsx';
@@ -20,45 +8,41 @@ import PageHeader from '../components/PageHeader.jsx';
 const labels = {
   he: {
     title: 'עוד',
-    subtitle: 'כלים קטנים לשיחה, חזרה ושמירה',
+    subtitle: 'היסטוריית שיחות, מילים שמורות וקיצורים שימושיים',
     chatHistory: 'היסטוריית שיחות',
     search: 'חיפוש שיחות',
     continueChat: 'המשך שיחה',
     favorite: 'מועדף',
     delete: 'מחיקה',
-    savedTitle: 'הודעות שמורות ומילים מועדפות',
-    shareTitle: 'שיתוף שיחה',
-    copy: 'העתקת טקסט',
-    nativeShare: 'שיתוף',
-    whatsapp: 'WhatsApp',
-    shareFallback: 'אם השיתוף לא נתמך, אפשר להעתיק את הטקסט ולשלוח ידנית.',
+    share: 'שיתוף',
     copied: 'הועתק',
-    notifications: 'התראות',
-    notificationsText: 'תזכורות עדינות לתרגול עברית.',
-    help: 'עזרה / אודות',
-    helpText: 'ליסאן עוזרת לתרגל עברית בצורה רגועה וברורה.',
+    savedTitle: 'מילים שמורות',
+    friendsChat: 'שיחה עם חברות',
+    friendsChatText: 'בחירת חברות לתרגול משותף',
+    teacherChat: 'שיחה עם המורה',
+    teacherChatText: 'פתיחת שיחה עם המורה',
+    teacherChatStarted: 'פתיחת שיחה עם המורה',
     settings: 'קיצור להגדרות',
+    settingsText: 'שפה, תצוגה, גודל טקסט והעדפות אישיות.',
   },
   ar: {
     title: 'المزيد',
-    subtitle: 'أدوات صغيرة للمحادثة والمراجعة والحفظ',
+    subtitle: 'سجل المحادثات، كلمات محفوظة واختصارات مفيدة',
     chatHistory: 'سجل المحادثات',
     search: 'بحث في المحادثات',
     continueChat: 'متابعة المحادثة',
     favorite: 'مفضلة',
     delete: 'حذف',
-    savedTitle: 'رسائل محفوظة وكلمات مفضلة',
-    shareTitle: 'مشاركة محادثة',
-    copy: 'نسخ النص',
-    nativeShare: 'مشاركة',
-    whatsapp: 'WhatsApp',
-    shareFallback: 'إذا لم تكن المشاركة مدعومة، انسخي النص وأرسليه يدويًا.',
+    share: 'مشاركة',
     copied: 'تم النسخ',
-    notifications: 'الإشعارات',
-    notificationsText: 'تذكيرات لطيفة للتدرب على العبرية.',
-    help: 'مساعدة / حول',
-    helpText: 'لسان يساعدك على التدرّب على العبرية بهدوء ووضوح.',
-    settings: 'اختصار الإعدادات',
+    savedTitle: 'كلمات محفوظة',
+    friendsChat: 'محادثة مع الصديقات',
+    friendsChatText: 'اختيار صديقات للتدريب المشترك',
+    teacherChat: 'محادثة مع المعلمة',
+    teacherChatText: 'فتح محادثة مع المعلمة',
+    teacherChatStarted: 'فتح محادثة مع المعلمة',
+    settings: 'اختصار للإعدادات',
+    settingsText: 'اللغة، العرض، حجم النص والتفضيلات.',
   },
 };
 
@@ -87,14 +71,14 @@ const mockConversations = [
 ];
 
 const savedWords = ['שלום', 'תודה', 'סליחה', 'כמה זה עולה?', 'אני צריכה עזרה'];
-const mockShareText = 'ליסאן - תרגול שיחה: שלום, מה כואב לך היום? אני רוצה לתרגל עברית.';
 
 function MorePage() {
   const { i18n } = useTranslation();
   const text = labels[i18n.language === 'he' ? 'he' : 'ar'];
   const [query, setQuery] = useState('');
   const [conversations, setConversations] = useState(mockConversations);
-  const [shareStatus, setShareStatus] = useState(text.shareFallback);
+  const [shareStatus, setShareStatus] = useState('');
+  const [teacherChatStarted, setTeacherChatStarted] = useState(false);
 
   const filteredConversations = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -108,9 +92,7 @@ function MorePage() {
   const toggleFavorite = (id) => {
     setConversations((currentConversations) =>
       currentConversations.map((conversation) =>
-        conversation.id === id
-          ? { ...conversation, favorite: !conversation.favorite }
-          : conversation,
+        conversation.id === id ? { ...conversation, favorite: !conversation.favorite } : conversation,
       ),
     );
   };
@@ -121,33 +103,31 @@ function MorePage() {
     );
   };
 
-  const copyConversation = async () => {
+  const shareConversation = async (conversation) => {
+    const shareText = `ליסאן - ${conversation.title}: ${conversation.preview}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ text: shareText, title: 'Lisan' });
+        setShareStatus(text.share);
+        return;
+      } catch {
+        setShareStatus('');
+      }
+    }
+
     try {
-      await navigator.clipboard.writeText(mockShareText);
+      await navigator.clipboard.writeText(shareText);
       setShareStatus(text.copied);
     } catch {
-      setShareStatus(text.shareFallback);
-    }
-  };
-
-  const shareConversation = async () => {
-    if (!navigator.share) {
-      setShareStatus(text.shareFallback);
-      return;
-    }
-
-    try {
-      await navigator.share({ text: mockShareText, title: 'Lisan' });
-      setShareStatus(text.nativeShare);
-    } catch {
-      setShareStatus(text.shareFallback);
+      setShareStatus(shareText);
     }
   };
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8">
       <div className="relative mx-auto min-h-[calc(100vh-2.5rem)] max-w-xl pb-28 sm:min-h-[780px]" dir="rtl">
-        <PageHeader showLogout />
+        <PageHeader showBack />
 
         <section className="mt-6 rounded-3xl bg-white p-5 shadow-card sm:p-6">
           <p className="text-sm font-semibold text-violet-700">{text.title}</p>
@@ -189,12 +169,17 @@ function MorePage() {
                   />
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <Link
-                    to="/chatbot"
-                    className="rounded-full bg-violet-600 px-4 py-2 text-xs font-bold text-white"
-                  >
+                  <Link to="/chatbot" className="rounded-full bg-violet-600 px-4 py-2 text-xs font-bold text-white">
                     {text.continueChat}
                   </Link>
+                  <button
+                    type="button"
+                    onClick={() => shareConversation(conversation)}
+                    className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-xs font-bold text-violet-700"
+                  >
+                    <Share2 className="h-4 w-4" aria-hidden="true" />
+                    {text.share}
+                  </button>
                   <button
                     type="button"
                     onClick={() => toggleFavorite(conversation.id)}
@@ -228,62 +213,49 @@ function MorePage() {
           </div>
         </section>
 
-        <section className="mt-5 rounded-3xl bg-white p-5 shadow-card sm:p-6">
-          <div className="flex items-center gap-3">
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-50 text-violet-700">
-              <Share2 className="h-6 w-6" aria-hidden="true" />
-            </span>
-            <h2 className="text-xl font-bold text-slate-900">{text.shareTitle}</h2>
-          </div>
-          <p className="mt-3 rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">{mockShareText}</p>
-          <div className="mt-4 grid gap-2 sm:grid-cols-3">
-            <button type="button" onClick={copyConversation} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-violet-600 px-4 py-3 text-sm font-bold text-white">
-              <Copy className="h-4 w-4" aria-hidden="true" />
-              {text.copy}
-            </button>
-            <button type="button" onClick={shareConversation} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-violet-50 px-4 py-3 text-sm font-bold text-violet-700">
-              <Send className="h-4 w-4" aria-hidden="true" />
-              {text.nativeShare}
-            </button>
-            <a
-              href={`https://wa.me/?text=${encodeURIComponent(mockShareText)}`}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center justify-center rounded-2xl bg-green-50 px-4 py-3 text-sm font-bold text-green-700"
-            >
-              {text.whatsapp}
-            </a>
-          </div>
-          <p className="mt-3 text-xs font-semibold text-slate-500">{shareStatus}</p>
-        </section>
-
         <section className="mt-5 grid gap-3">
-          {[
-            { title: text.notifications, body: text.notificationsText, icon: Bell },
-            { title: text.help, body: text.helpText, icon: HelpCircle },
-          ].map((item) => {
-            const Icon = item.icon;
-            return (
-              <article key={item.title} className="rounded-3xl bg-white p-5 shadow-card">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-50 text-violet-700">
-                    <Icon className="h-6 w-6" aria-hidden="true" />
-                  </span>
-                  <div>
-                    <h2 className="font-bold text-slate-900">{item.title}</h2>
-                    <p className="mt-1 text-sm leading-6 text-slate-600">{item.body}</p>
-                  </div>
-                </div>
-              </article>
-            );
-          })}
+          <Link to="/shared-chat" className="flex items-center gap-3 rounded-3xl bg-white p-5 shadow-card">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-50 text-violet-700">
+              <UsersRound className="h-6 w-6" aria-hidden="true" />
+            </span>
+            <div>
+              <h2 className="font-bold text-slate-900">{text.friendsChat}</h2>
+              <p className="mt-1 text-sm leading-6 text-slate-600">{text.friendsChatText}</p>
+            </div>
+          </Link>
+
+          <button
+            type="button"
+            onClick={() => setTeacherChatStarted(true)}
+            className="flex w-full items-center gap-3 rounded-3xl bg-white p-5 text-right shadow-card"
+          >
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-50 text-violet-700">
+              <MessageCircle className="h-6 w-6" aria-hidden="true" />
+            </span>
+            <span>
+              <span className="block font-bold text-slate-900">{text.teacherChat}</span>
+              <span className="mt-1 block text-sm leading-6 text-slate-600">{text.teacherChatText}</span>
+            </span>
+          </button>
+
+          {teacherChatStarted ? (
+            <div className="rounded-2xl bg-violet-50 p-4 text-sm font-semibold leading-6 text-violet-700">
+              {text.teacherChatStarted}
+            </div>
+          ) : null}
+
           <Link to="/profile" className="flex items-center gap-3 rounded-3xl bg-white p-5 shadow-card">
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-50 text-violet-700">
               <Settings className="h-6 w-6" aria-hidden="true" />
             </span>
-            <span className="font-bold text-slate-900">{text.settings}</span>
+            <div>
+              <h2 className="font-bold text-slate-900">{text.settings}</h2>
+              <p className="mt-1 text-sm leading-6 text-slate-600">{text.settingsText}</p>
+            </div>
           </Link>
         </section>
+
+        {shareStatus ? <p className="mt-3 text-center text-xs font-semibold text-slate-500">{shareStatus}</p> : null}
 
         <BottomNav />
       </div>

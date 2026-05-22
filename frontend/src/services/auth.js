@@ -13,18 +13,14 @@ const mockUsers = {
   },
 };
 
-const inferRoleFromAccount = (email = '') => {
+const getRoleFromUsername = (email = '') => {
   const normalized = email.trim().toLowerCase();
 
-  if (normalized.includes('admin')) {
-    return 'admin';
+  if (normalized === 'student' || normalized === 'teacher' || normalized === 'admin') {
+    return normalized;
   }
 
-  if (normalized.includes('teacher')) {
-    return 'teacher';
-  }
-
-  return 'student';
+  return null;
 };
 
 export const getLandingPathForRole = (role) => {
@@ -38,19 +34,25 @@ export const login = async ({ email, password }) => {
     throw new Error('invalidCredentials');
   }
 
-  const inferredRole = inferRoleFromAccount(email);
-  const session = mockUsers[inferredRole];
+  const role = getRoleFromUsername(email);
+
+  if (!role) {
+    throw new Error('unknownUser');
+  }
+
+  const session = mockUsers[role];
 
   return {
     ...session,
     user: {
       ...session.user,
-      name: email || session.user.name,
+      name: session.user.name,
     },
   };
 };
 
 export const storeSession = ({ token, user }) => {
+  logout();
   localStorage.setItem('lisan-token', token);
   localStorage.setItem('lisan-user', JSON.stringify(user));
 };

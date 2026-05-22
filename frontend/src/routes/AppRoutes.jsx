@@ -1,11 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Login from '../pages/Login.jsx';
 import Home from '../pages/Home.jsx';
 import PlaceholderPage from '../pages/PlaceholderPage.jsx';
 import Chatbot from '../pages/Chatbot.jsx';
 import MorePage from '../pages/MorePage.jsx';
 import ProfilePage from '../pages/ProfilePage.jsx';
 import ScenarioChat from '../pages/ScenarioChat.jsx';
+import SharedChat from '../pages/SharedChat.jsx';
+import TeacherMore from '../pages/teacher/More.jsx';
 import AdminDashboard from '../pages/admin/Dashboard.jsx';
 import AdminLogin from '../pages/admin/Login.jsx';
 import AdminConversations from '../pages/admin/Conversations.jsx';
@@ -14,14 +15,28 @@ import AdminProgress from '../pages/admin/Progress.jsx';
 import AdminStudents from '../pages/admin/Students.jsx';
 import AdminWords from '../pages/admin/Words.jsx';
 import TeacherHome from '../pages/home/TeacherHome.jsx';
+import TeacherLogin from '../pages/teacher/Login.jsx';
+import StudentLogin from '../pages/student/Login.jsx';
 import ProtectedRoute from './ProtectedRoute.jsx';
+import { getStoredUser } from '../services/auth.js';
+
+function MoreByRole() {
+  const user = getStoredUser();
+
+  if (user?.role === 'teacher') {
+    return <TeacherMore />;
+  }
+
+  return <MorePage />;
+}
 
 function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<StudentLogin />} />
         <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/teacher/login" element={<TeacherLogin />} />
         <Route
           path="/home"
           element={
@@ -44,7 +59,22 @@ function AppRoutes() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/chatbot" element={<Chatbot />} />
         <Route path="/scenario/:id" element={<ScenarioChat />} />
-        <Route path="/more" element={<MorePage />} />
+        <Route
+          path="/more"
+          element={
+            <ProtectedRoute role={['student', 'teacher']}>
+              <MoreByRole />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/shared-chat"
+          element={
+            <ProtectedRoute role="student">
+              <SharedChat />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/admin/dashboard"
           element={
@@ -93,7 +123,7 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
-        <Route path="*" element={<Navigate to="/home" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   );

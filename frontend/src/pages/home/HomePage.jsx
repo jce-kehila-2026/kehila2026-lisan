@@ -1,8 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import ExistingStudentHome from '../../../components/src/pages/Home.jsx';
+import ExistingStudentHome from '../Home.jsx';
 import { getStoredUser } from '../../services/auth.js';
-import TeacherHome from './TeacherHome.jsx';
 
 function HomePage() {
   const user = getStoredUser();

@@ -1,11 +1,13 @@
 import Chatbot from './pages/Chatbot.jsx';
-import React from 'react';
-import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
 import ProtectedRoute from './routes/ProtectedRoute.jsx';
 import ExistingPlaceholderPage from './pages/PlaceholderPage.jsx';
 import MorePage from './pages/MorePage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import ScenarioChat from './pages/ScenarioChat.jsx';
+import SharedChat from './pages/SharedChat.jsx';
+import TeacherMore from './pages/teacher/More.jsx';
 import AdminDashboard from './pages/admin/Dashboard.jsx';
 import AdminLogin from './pages/admin/Login.jsx';
 import AdminConversations from './pages/admin/Conversations.jsx';
@@ -17,15 +19,64 @@ import ForgotAccess from './pages/ForgotAccess.jsx';
 import HomePage from './pages/home/HomePage.jsx';
 import TeacherHome from './pages/home/TeacherHome.jsx';
 import StudentLogin from './pages/student/Login.jsx';
+import TeacherLogin from './pages/teacher/Login.jsx';
+import { getStoredUser } from './services/auth.js';
+
+function MoreByRole() {
+  const user = getStoredUser();
+
+  if (user?.role === 'teacher') {
+    return <TeacherMore />;
+  }
+
+  return <MorePage />;
+}
+
+function StudentPreferenceSync() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const applyPreferences = () => {
+      const user = getStoredUser();
+      const isStudent = user?.role === 'student';
+      let preferences = {};
+
+      try {
+        preferences = JSON.parse(localStorage.getItem('lisan-student-preferences') || '{}');
+      } catch {
+        preferences = {};
+      }
+
+      document.documentElement.classList.toggle('lisan-student-dark', isStudent && preferences.theme === 'dark');
+      document.documentElement.classList.toggle(
+        'lisan-student-large-text',
+        isStudent && preferences.textSize === 'large',
+      );
+    };
+
+    applyPreferences();
+    window.addEventListener('storage', applyPreferences);
+    window.addEventListener('lisan-student-preferences-changed', applyPreferences);
+
+    return () => {
+      window.removeEventListener('storage', applyPreferences);
+      window.removeEventListener('lisan-student-preferences-changed', applyPreferences);
+    };
+  }, [location.pathname]);
+
+  return null;
+}
 
 function App() {
   return (
     <Router>
+      <StudentPreferenceSync />
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<StudentLogin />} />
         <Route path="/forgot-access" element={<ForgotAccess />} />
         <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/teacher/login" element={<TeacherLogin />} />
         <Route
           path="/home"
           element={
@@ -94,7 +145,15 @@ function App() {
           path="/more"
           element={
             <ProtectedRoute role={['student', 'teacher']}>
-              <MorePage />
+              <MoreByRole />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/shared-chat"
+          element={
+            <ProtectedRoute role="student">
+              <SharedChat />
             </ProtectedRoute>
           }
         />

@@ -6,60 +6,94 @@ import {
   ClipboardList,
   GraduationCap,
   LayoutDashboard,
+  Link2,
   MessageSquareText,
   Users,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../components/ui/Button.jsx';
+import {
+  adminReviewNotifications,
+  adminStudentsSeed,
+  adminTeachersSeed,
+} from '../../data/adminMockData.js';
 import { getStoredUser, logout } from '../../services/auth.js';
 
 const overviewStats = [
-  { title: 'סך התלמידות', value: '128', detail: '12 פעילות השבוע', icon: Users },
-  { title: 'ממתין לבדיקה', value: '18', detail: 'שיחות ומילים לבדיקה', icon: ClipboardList },
-  { title: 'התראות חדשות', value: '7', detail: 'דורשות תשומת לב', icon: Bell },
-  { title: 'מורות פעילות', value: '9', detail: 'מחוברות למערכת', icon: GraduationCap },
+  {
+    title: 'תלמידות',
+    value: adminStudentsSeed.length,
+    detail: 'תלמידות דמו בניהול',
+    icon: Users,
+  },
+  {
+    title: 'מורות',
+    value: adminTeachersSeed.length,
+    detail: 'מורות פעילות בדמו',
+    icon: GraduationCap,
+  },
+  {
+    title: 'שיוכים',
+    value: adminStudentsSeed.filter((student) => student.teacherId).length,
+    detail: 'תלמידות משויכות למורות',
+    icon: Link2,
+  },
+  {
+    title: 'ממתין לבדיקה',
+    value: adminReviewNotifications.length,
+    detail: 'מילים ושיחות בלבד',
+    icon: Bell,
+  },
 ];
 
 const dashboardSections = [
   {
     title: 'ניהול תלמידות',
-    subtitle: 'חיפוש, הוספה, עריכה ומעקב אחר פרטי תלמידות',
-    detail: 'כניסה למסך ניהול תלמידות עם טבלה, חיפוש ופעולות ניהול.',
-    meta: 'ניהול מלא',
+    subtitle: 'הוספה, עריכה, מחיקה, השהיה ושיוך למורות',
+    detail: 'טבלת תלמידות עם רמות א1, א2, ב1, ב2, ג ופעולות ניהול מלאות.',
+    meta: 'תלמידות',
     icon: Users,
     to: '/admin/students',
   },
   {
-    title: 'בדיקת שיחות',
-    subtitle: 'סקירת שיחות לימודיות לפני אישור או דחייה',
-    detail: '18 שיחות ממתינות לבדיקה, לצד שיחות שאושרו או נדחו.',
+    title: 'ניהול מורות',
+    subtitle: 'מורות, כיתות, רמות לימוד ושיוך תלמידות',
+    detail: 'כרטיסי מורות עם עריכה, מחיקה ושיוך תלמידות בדמו מקומי.',
+    meta: 'מורות',
+    icon: GraduationCap,
+    to: '/admin/progress',
+  },
+  {
+    title: 'התראות סקירת תוכן',
+    subtitle: 'מילים חדשות ושיחות חדשות שממתינות לבדיקה',
+    detail: 'רשימת התראות פשוטה למנהלת, ללא הודעות טכניות או שגיאות מערכת.',
     meta: 'סקירה',
+    icon: Bell,
+    to: '/admin/notifications',
+  },
+  {
+    title: 'בדיקת שיחות',
+    subtitle: 'סקירת שיחות לימודיות שממתינות לבדיקה',
+    detail: 'רשימת שיחות חדשות לבדיקה לפני שימוש רחב במערכת.',
+    meta: 'שיחות',
     icon: MessageSquareText,
     to: '/admin/conversations',
   },
   {
     title: 'בדיקת מילים',
-    subtitle: 'אישור מילים חדשות וסיווג לפי רמות למידה',
-    detail: '22 מילים ממתינות לאישור ולסיווג רמה.',
-    meta: 'סקירה',
+    subtitle: 'סקירת מילים חדשות וסיווג לפי רמות לימוד',
+    detail: 'ניהול מילים שממתינות לבדיקה ושיוך לרמות א1, א2, ב1, ב2, ג.',
+    meta: 'מילים',
     icon: BookOpenCheck,
     to: '/admin/words',
   },
   {
     title: 'מעקב התקדמות',
-    subtitle: 'מעקב אחר פעילות, תוצאות משחקים והתקדמות תלמידות',
-    detail: 'תצוגה מרוכזת של פעילות למידה ותוצאות תרגול.',
+    subtitle: 'מבט על פעילות תלמידות, רמות ושיוכים',
+    detail: 'מעקב דמו אחרי התקדמות תלמידות וקשרי למידה מול המורות.',
     meta: 'מעקב',
-    icon: GraduationCap,
+    icon: ClipboardList,
     to: '/admin/progress',
-  },
-  {
-    title: 'לוח התראות',
-    subtitle: 'התראות מערכת, בקשות בדיקה ועדכונים אחרונים',
-    detail: '7 התראות חדשות ממתינות לטיפול.',
-    meta: 'התראות',
-    icon: Bell,
-    to: '/admin/notifications',
   },
 ];
 
@@ -82,23 +116,12 @@ function OverviewCard({ stat }) {
 
 function DashboardSection({ navigate, section }) {
   const Icon = section.icon;
-  const isClickable = Boolean(section.to);
-  const Wrapper = isClickable ? 'button' : 'article';
-  const interactiveProps = isClickable
-    ? {
-        type: 'button',
-        onClick: () => navigate(section.to),
-      }
-    : {};
 
   return (
-    <Wrapper
-      {...interactiveProps}
-      className={`group flex h-full flex-col rounded-[1.75rem] border border-violet-100/70 bg-white/95 p-5 text-right shadow-card transition duration-200 sm:p-6 ${
-        isClickable
-          ? 'cursor-pointer hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2'
-          : ''
-      }`}
+    <button
+      type="button"
+      onClick={() => navigate(section.to)}
+      className="group flex h-full flex-col rounded-[1.75rem] border border-violet-100/70 bg-white/95 p-5 text-right shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:p-6"
     >
       <div className="flex items-start gap-4">
         <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-700 transition group-hover:bg-violet-600 group-hover:text-white">
@@ -117,13 +140,11 @@ function DashboardSection({ navigate, section }) {
 
       <div className="mt-5 flex flex-1 items-end justify-between gap-3 rounded-2xl bg-slate-50/80 px-4 py-3">
         <p className="text-sm font-semibold leading-6 text-slate-600">{section.detail}</p>
-        {isClickable ? (
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-violet-700 shadow-sm transition group-hover:bg-violet-600 group-hover:text-white">
-            <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-          </span>
-        ) : null}
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-violet-700 shadow-sm transition group-hover:bg-violet-600 group-hover:text-white">
+          <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+        </span>
       </div>
-    </Wrapper>
+    </button>
   );
 }
 
@@ -159,12 +180,13 @@ function AdminDashboard() {
                 לוח בקרה לניהול מערכת ליסאן
               </h1>
               <p className="mt-3 text-sm font-semibold leading-7 text-slate-600 sm:text-base">
-                מבט מהיר על תלמידות, בדיקות, התראות ופעילות למידה. המסך בנוי כמרכז שליטה נקי שמוכן להתרחב לחיבורי נתונים נוספים.
+                ניהול תלמידות, מורות, שיוכים והתראות סקירת תוכן. כל הנתונים בעמודי הניהול הם
+                דמו מקומי בצד הלקוח.
               </p>
             </div>
             <div className="rounded-2xl border border-violet-100 bg-violet-50 px-4 py-3 text-right">
               <p className="text-xs font-black text-violet-700">מצב מערכת</p>
-              <p className="mt-1 text-sm font-bold text-slate-700">המערכת פעילה ומוכנה לניהול</p>
+              <p className="mt-1 text-sm font-bold text-slate-700">דמו פעיל ללא חיבור לשרת</p>
             </div>
           </div>
 
