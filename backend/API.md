@@ -15,8 +15,21 @@ http://localhost:3000/api
 | `/api/health` | GET | Server health check | No | ✅ |
 | `/api/auth/login` | POST | User login | No | ✅ |
 | `/api/users/me` | GET | Get current user profile | Yes | ✅ |
-| `/api/evaluation/context` | GET | Get evaluation context for speaking assessment | No | ✅ |
-| `/api/evaluation/attempts` | POST | Save student speaking attempt and AI evaluation | No | ✅ |
+| `/api/admin/users` | GET | Get all users | Admin | ✅ |
+| `/api/admin/users` | POST | Create new user | Admin | ✅ |
+| `/api/admin/users/:id` | PUT | Update user | Admin | ✅ |
+| `/api/admin/users/:id` | DELETE | Delete user | Admin | ✅ |
+| `/api/transcripts` | GET | Get all transcripts | No | ✅ |
+| `/api/transcripts/level/:level` | GET | Get transcripts by level | No | ✅ |
+| `/api/transcripts/search?q=&level=` | GET | Search transcripts | No | ✅ |
+| `/api/evaluation/context` | GET | Get evaluation context | No | ✅ |
+| `/api/evaluation/attempts` | POST | Save student attempt | No | ✅ |
+| `/api/chats` | POST | Create chat session | Yes | ✅ |
+| `/api/chats/my` | GET | Get my chat sessions | Yes | ✅ |
+| `/api/chats/:chatId` | GET | Get chat by ID | Yes | ✅ |
+| `/api/chats/:chatId/messages` | POST | Add message to chat | Yes | ✅ |
+| `/api/progress/me` | GET | Get my progress | Yes | ✅ |
+| `/api/progress/me/attempts` | GET | Get my attempts | Yes | ✅ |
 
 ---
 
@@ -53,7 +66,7 @@ http://localhost:3000/api
 
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token": "jwt-token-here",
   "user": {
     "id": "abc123",
     "name": "Test User",
@@ -111,7 +124,7 @@ Authorization: Bearer <token>
   "email": "student@test.com",
   "role": "student",
   "language": "ar",
-  "level": "beginner"
+  "level": "A1"
 }
 ```
 
@@ -124,8 +137,6 @@ Authorization: Bearer <token>
   "error": "No token provided"
 }
 ```
-
-or
 
 ```json
 {
@@ -143,7 +154,226 @@ or
 
 ---
 
-## 4. Get Evaluation Context
+## 4. Admin Users
+
+Admin endpoints require a valid JWT token with role `admin`.
+
+### 4.1 Get All Users
+
+**GET** `/api/admin/users`
+
+### Headers
+
+```text
+Authorization: Bearer <admin-token>
+```
+
+### Success Response (200)
+
+```json
+{
+  "success": true,
+  "users": [
+    {
+      "id": "abc123",
+      "email": "student@test.com",
+      "name": "Test Student",
+      "role": "student",
+      "level": "A1",
+      "language": "ar",
+      "isActive": true,
+      "createdAt": null,
+      "lastLoginAt": null
+    }
+  ]
+}
+```
+
+---
+
+### 4.2 Create User
+
+**POST** `/api/admin/users`
+
+### Headers
+
+```text
+Authorization: Bearer <admin-token>
+```
+
+### Request Body
+
+```json
+{
+  "email": "newstudent@test.com",
+  "password": "Test1234!",
+  "name": "New Student",
+  "role": "student",
+  "level": "A1",
+  "language": "ar"
+}
+```
+
+### Success Response (201)
+
+```json
+{
+  "success": true,
+  "user": {
+    "id": "abc123",
+    "email": "newstudent@test.com",
+    "name": "New Student",
+    "role": "student",
+    "level": "A1",
+    "language": "ar",
+    "isActive": true
+  }
+}
+```
+
+### Error Responses
+
+```json
+{
+  "success": false,
+  "error": "User already exists",
+  "code": "USER_ALREADY_EXISTS"
+}
+```
+
+---
+
+### 4.3 Update User
+
+**PUT** `/api/admin/users/:id`
+
+### Headers
+
+```text
+Authorization: Bearer <admin-token>
+```
+
+### Request Body
+
+```json
+{
+  "level": "A2",
+  "language": "ar",
+  "isActive": true
+}
+```
+
+### Success Response (200)
+
+```json
+{
+  "success": true,
+  "message": "User updated successfully"
+}
+```
+
+---
+
+### 4.4 Delete User
+
+**DELETE** `/api/admin/users/:id`
+
+### Headers
+
+```text
+Authorization: Bearer <admin-token>
+```
+
+### Success Response (200)
+
+```json
+{
+  "success": true,
+  "message": "User deleted successfully"
+}
+```
+
+---
+
+## 5. Transcripts
+
+### 5.1 Get All Transcripts
+
+**GET** `/api/transcripts`
+
+### Success Response (200)
+
+```json
+[
+  {
+    "id": "abc123",
+    "level": "A1",
+    "fileName": "Copy of 1. מי אני.txt",
+    "text": "Hebrew transcript text...",
+    "language": "he",
+    "source": "lisan_curriculum"
+  }
+]
+```
+
+---
+
+### 5.2 Get Transcripts By Level
+
+**GET** `/api/transcripts/level/:level`
+
+Example:
+
+```text
+GET /api/transcripts/level/A1
+```
+
+### Success Response (200)
+
+```json
+[
+  {
+    "id": "abc123",
+    "level": "A1",
+    "fileName": "Copy of 1. מי אני.txt",
+    "text": "Hebrew transcript text..."
+  }
+]
+```
+
+---
+
+### 5.3 Search Transcripts
+
+**GET** `/api/transcripts/search?q=ירושלים`
+
+Optional level filter:
+
+```text
+GET /api/transcripts/search?q=ירושלים&level=A1
+```
+
+### Success Response (200)
+
+```json
+{
+  "query": "ירושלים",
+  "level": "A1",
+  "count": 2,
+  "results": [
+    {
+      "id": "abc123",
+      "level": "A1",
+      "fileName": "example.txt",
+      "text": "..."
+    }
+  ]
+}
+```
+
+---
+
+## 6. Evaluation Context
 
 **GET** `/api/evaluation/context`
 
@@ -259,7 +489,7 @@ GET /api/evaluation/context?userId=test_user&activityId=a1_booking_appointment&t
 
 ---
 
-## 5. Save Student Attempt
+## 7. Save Student Attempt
 
 **POST** `/api/evaluation/attempts`
 
@@ -336,6 +566,214 @@ Saves a student speaking attempt after STT recognition and AI evaluation.
 
 ---
 
+## 8. Chat History
+
+All chat endpoints require a valid JWT token.
+
+### 8.1 Create Chat
+
+**POST** `/api/chats`
+
+### Headers
+
+```text
+Authorization: Bearer <token>
+```
+
+### Request Body
+
+```json
+{
+  "title": "Restaurant Practice",
+  "level": "A1"
+}
+```
+
+### Success Response (201)
+
+```json
+{
+  "success": true,
+  "chat": {
+    "id": "chat123",
+    "userId": "user123",
+    "title": "Restaurant Practice",
+    "level": "A1",
+    "messages": []
+  }
+}
+```
+
+---
+
+### 8.2 Get My Chats
+
+**GET** `/api/chats/my`
+
+### Headers
+
+```text
+Authorization: Bearer <token>
+```
+
+### Success Response (200)
+
+```json
+{
+  "success": true,
+  "chats": [
+    {
+      "id": "chat123",
+      "userId": "user123",
+      "title": "Restaurant Practice",
+      "level": "A1",
+      "messagesCount": 2
+    }
+  ]
+}
+```
+
+---
+
+### 8.3 Get Chat By ID
+
+**GET** `/api/chats/:chatId`
+
+### Headers
+
+```text
+Authorization: Bearer <token>
+```
+
+### Success Response (200)
+
+```json
+{
+  "success": true,
+  "chat": {
+    "id": "chat123",
+    "userId": "user123",
+    "title": "Restaurant Practice",
+    "level": "A1",
+    "messages": [
+      {
+        "sender": "user",
+        "text": "אני רוצה מים",
+        "createdAt": "2026-05-22T07:17:58.918Z"
+      },
+      {
+        "sender": "ai",
+        "text": "יפה מאוד. אפשר גם להגיד: אני רוצה כוס מים.",
+        "createdAt": "2026-05-22T07:18:13.743Z"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 8.4 Add Message To Chat
+
+**POST** `/api/chats/:chatId/messages`
+
+### Headers
+
+```text
+Authorization: Bearer <token>
+```
+
+### Request Body
+
+```json
+{
+  "sender": "user",
+  "text": "שלום"
+}
+```
+
+Allowed senders:
+
+```text
+user
+ai
+```
+
+### Success Response (201)
+
+```json
+{
+  "success": true,
+  "message": {
+    "sender": "user",
+    "text": "שלום",
+    "createdAt": "2026-05-22T07:05:42.914Z"
+  }
+}
+```
+
+---
+
+## 9. Student Progress
+
+All progress endpoints require a valid JWT token.
+
+### 9.1 Get My Progress
+
+**GET** `/api/progress/me`
+
+### Headers
+
+```text
+Authorization: Bearer <token>
+```
+
+### Success Response (200)
+
+```json
+{
+  "success": true,
+  "progress": {
+    "userId": "user123",
+    "name": "Test student",
+    "role": "student",
+    "level": "A2",
+    "totalAttempts": 0,
+    "correctMeaningCount": 0,
+    "totalChats": 3,
+    "pronunciationUsage": {
+      "monthlyLimit": 30,
+      "usedThisMonth": 0
+    },
+    "accuracy": 0
+  }
+}
+```
+
+---
+
+### 9.2 Get My Attempts
+
+**GET** `/api/progress/me/attempts`
+
+### Headers
+
+```text
+Authorization: Bearer <token>
+```
+
+### Success Response (200)
+
+```json
+{
+  "success": true,
+  "count": 0,
+  "attempts": []
+}
+```
+
+---
+
 ## Example cURL Commands
 
 ### Health Check
@@ -356,6 +794,38 @@ curl -X POST http://localhost:3000/api/auth/login \
 
 ```bash
 curl http://localhost:3000/api/users/me \
+-H "Authorization: Bearer <token>"
+```
+
+### Get All Users Admin
+
+```bash
+curl http://localhost:3000/api/admin/users \
+-H "Authorization: Bearer <admin-token>"
+```
+
+### Create Chat
+
+```bash
+curl -X POST http://localhost:3000/api/chats \
+-H "Authorization: Bearer <token>" \
+-H "Content-Type: application/json" \
+-d '{"title":"Restaurant Practice","level":"A1"}'
+```
+
+### Add Chat Message
+
+```bash
+curl -X POST http://localhost:3000/api/chats/<chatId>/messages \
+-H "Authorization: Bearer <token>" \
+-H "Content-Type: application/json" \
+-d '{"sender":"user","text":"שלום"}'
+```
+
+### Get Progress
+
+```bash
+curl http://localhost:3000/api/progress/me \
 -H "Authorization: Bearer <token>"
 ```
 
