@@ -1,42 +1,43 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   ArrowRight,
-  Eye,
+  Ban,
   Pencil,
   Plus,
   RefreshCw,
   Search,
   Trash2,
+  UserCheck,
   UserPlus,
   Users,
   X,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../components/ui/Button.jsx';
+import { adminLevels } from '../../data/adminMockData.js';
 import {
   createStudent,
   deleteStudent,
-  getStudent,
   getStudents,
+  getTeachers,
+  toggleStudentSuspension,
   updateStudent,
 } from '../../services/adminApi.js';
 import { logout } from '../../services/auth.js';
 
 const emptyForm = {
   email: '',
-  level: 'Beginner',
+  level: 'א1',
   name: '',
   password: '',
+  teacherId: 'teacher_001',
 };
 
-const levelLabels = {
-  Beginner: 'מתחילה',
-  Intermediate: 'בינונית',
-  Advanced: 'מתקדמת',
-};
+const fieldClass =
+  'rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold outline-none transition focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-100';
 
-function getLevelLabel(level) {
-  return levelLabels[level] || level || 'לא צוין';
+function teacherName(teachers, teacherId) {
+  return teachers.find((teacher) => teacher.id === teacherId)?.name || 'לא שויכה';
 }
 
 function Modal({ children, onClose, title, description }) {
@@ -59,7 +60,7 @@ function Modal({ children, onClose, title, description }) {
             type="button"
             onClick={onClose}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-50 text-slate-600 transition hover:bg-violet-50 hover:text-violet-700"
-            aria-label="סגירת חלון"
+            aria-label="סגירה"
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -79,7 +80,7 @@ function Field({ children, label }) {
   );
 }
 
-function StudentForm({ initialValue, mode, onCancel, onSubmit, saving }) {
+function StudentForm({ initialValue, mode, onCancel, onSubmit, saving, teachers }) {
   const [form, setForm] = useState(initialValue);
   const isEdit = mode === 'edit';
 
@@ -96,23 +97,10 @@ function StudentForm({ initialValue, mode, onCancel, onSubmit, saving }) {
     <form className="mt-5 grid gap-4" onSubmit={submitForm}>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="שם התלמידה">
-          <input
-            value={form.name}
-            onChange={setField('name')}
-            className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold outline-none transition focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-100"
-            placeholder="לדוגמה: ליאן"
-            required
-          />
+          <input value={form.name} onChange={setField('name')} className={fieldClass} required />
         </Field>
         <Field label="אימייל">
-          <input
-            type="email"
-            value={form.email}
-            onChange={setField('email')}
-            className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold outline-none transition focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-100"
-            placeholder="student@example.com"
-            required
-          />
+          <input type="email" value={form.email} onChange={setField('email')} className={fieldClass} required />
         </Field>
       </div>
 
@@ -123,21 +111,28 @@ function StudentForm({ initialValue, mode, onCancel, onSubmit, saving }) {
               type="password"
               value={form.password}
               onChange={setField('password')}
-              className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold outline-none transition focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-100"
-              placeholder="לפחות 6 תווים"
+              className={fieldClass}
               required
             />
           </Field>
         ) : null}
         <Field label="רמת לימוד">
-          <select
-            value={form.level}
-            onChange={setField('level')}
-            className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold outline-none transition focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-100"
-          >
-            <option value="Beginner">מתחילה</option>
-            <option value="Intermediate">בינונית</option>
-            <option value="Advanced">מתקדמת</option>
+          <select value={form.level} onChange={setField('level')} className={fieldClass}>
+            {adminLevels.map((level) => (
+              <option key={level} value={level}>
+                {level}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="מורה משויכת">
+          <select value={form.teacherId} onChange={setField('teacherId')} className={fieldClass}>
+            <option value="">לא שויכה</option>
+            {teachers.map((teacher) => (
+              <option key={teacher.id} value={teacher.id}>
+                {teacher.name}
+              </option>
+            ))}
           </select>
         </Field>
       </div>
@@ -180,7 +175,9 @@ function ActionButton({ children, label, onClick, tone = 'violet' }) {
   const toneClass =
     tone === 'danger'
       ? 'hover:bg-red-50 hover:text-red-700'
-      : 'hover:bg-violet-50 hover:text-violet-700';
+      : tone === 'warning'
+        ? 'hover:bg-amber-50 hover:text-amber-700'
+        : 'hover:bg-violet-50 hover:text-violet-700';
 
   return (
     <button
@@ -198,6 +195,7 @@ function ActionButton({ children, label, onClick, tone = 'violet' }) {
 function Students() {
   const navigate = useNavigate();
   const [students, setStudents] = useState([]);
+  const [teachers, setTeachers] = useState([]);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -206,13 +204,14 @@ function Students() {
   const [modal, setModal] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
 
-  const loadStudents = async () => {
+  const loadData = async () => {
     setLoading(true);
     setError('');
 
     try {
-      const data = await getStudents();
-      setStudents(data.students || []);
+      const [studentsData, teachersData] = await Promise.all([getStudents(), getTeachers()]);
+      setStudents(studentsData.students || []);
+      setTeachers(teachersData.teachers || []);
     } catch (requestError) {
       setError(requestError.message);
     } finally {
@@ -221,7 +220,7 @@ function Students() {
   };
 
   useEffect(() => {
-    loadStudents();
+    loadData();
   }, []);
 
   const filteredStudents = useMemo(() => {
@@ -229,9 +228,11 @@ function Students() {
     if (!normalizedQuery) return students;
 
     return students.filter((student) =>
-      `${student.name} ${student.email} ${student.level}`.toLowerCase().includes(normalizedQuery),
+      `${student.name} ${student.email} ${student.level} ${teacherName(teachers, student.teacherId)}`
+        .toLowerCase()
+        .includes(normalizedQuery),
     );
-  }, [query, students]);
+  }, [query, students, teachers]);
 
   const closeModal = () => {
     setModal(null);
@@ -265,12 +266,12 @@ function Students() {
     setError('');
 
     try {
-      const payload = {
+      const data = await updateStudent(selectedStudent.id, {
         email: form.email,
         level: form.level,
         name: form.name,
-      };
-      const data = await updateStudent(selectedStudent.id, payload);
+        teacherId: form.teacherId,
+      });
       setStudents((current) =>
         current.map((student) => (student.id === data.student.id ? data.student : student)),
       );
@@ -299,16 +300,17 @@ function Students() {
     }
   };
 
-  const viewProfile = async (student) => {
+  const toggleSuspend = async (student) => {
     setError('');
-    setModal('profile');
 
     try {
-      const data = await getStudent(student.id);
-      setSelectedStudent(data.student);
+      const data = await toggleStudentSuspension(student.id);
+      setStudents((current) =>
+        current.map((item) => (item.id === data.student.id ? data.student : item)),
+      );
+      setSuccess(data.student.status === 'suspended' ? 'התלמידה הושהתה' : 'התלמידה הוחזרה לפעילות');
     } catch (requestError) {
       setError(requestError.message);
-      setSelectedStudent(student);
     }
   };
 
@@ -335,28 +337,14 @@ function Students() {
         </header>
 
         <section className="mt-6 overflow-hidden rounded-[2rem] border border-white/70 bg-white/95 p-5 shadow-card sm:p-7">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="inline-flex items-center gap-2 text-sm font-black text-violet-700">
-                <Users className="h-4 w-4" aria-hidden="true" />
-                ניהול תלמידות
-              </p>
-              <h1 className="mt-2 text-2xl font-black text-slate-950 sm:text-4xl">
-                תלמידות במערכת
-              </h1>
-              <p className="mt-3 max-w-2xl text-sm font-semibold leading-7 text-slate-600 sm:text-base">
-                חיפוש, רענון, הוספה, עריכה ומחיקה של תלמידות דרך חיבור השרת הקיים. שגיאות בקשה נשארות גלויות כדי לשקף את מצב החיבור האמיתי.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={openAddModal}
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-violet-600 px-5 py-3 text-sm font-black text-white shadow-button transition hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
-            >
-              <UserPlus className="h-5 w-5" aria-hidden="true" />
-              הוספת תלמידה
-            </button>
-          </div>
+          <p className="inline-flex items-center gap-2 text-sm font-black text-violet-700">
+            <Users className="h-4 w-4" aria-hidden="true" />
+            ניהול תלמידות
+          </p>
+          <h1 className="mt-2 text-2xl font-black text-slate-950 sm:text-4xl">תלמידות במערכת</h1>
+          <p className="mt-3 max-w-2xl text-sm font-semibold leading-7 text-slate-600 sm:text-base">
+            ניהול תלמידות בדמו מקומי: רמות, שיוך למורות, עריכה, מחיקה והשהיה ללא חיבור לשרת.
+          </p>
         </section>
 
         <section className="mt-5 rounded-[2rem] border border-white/70 bg-white/95 p-5 shadow-card sm:p-6">
@@ -366,14 +354,14 @@ function Students() {
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="חיפוש לפי שם, אימייל או רמה"
+                placeholder="חיפוש לפי שם, אימייל, רמה או מורה"
                 className="min-w-0 flex-1 bg-transparent text-sm font-semibold outline-none placeholder:text-slate-400"
               />
             </label>
             <div className="flex flex-col gap-2 sm:flex-row">
               <button
                 type="button"
-                onClick={loadStudents}
+                onClick={loadData}
                 disabled={loading}
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-violet-50 px-4 text-sm font-black text-violet-700 transition hover:bg-violet-100 disabled:cursor-not-allowed disabled:opacity-60"
               >
@@ -383,10 +371,10 @@ function Students() {
               <button
                 type="button"
                 onClick={openAddModal}
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-slate-900 px-4 text-sm font-black text-white transition hover:bg-slate-800"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-violet-600 px-5 py-3 text-sm font-black text-white shadow-button transition hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
               >
-                <Plus className="h-4 w-4" aria-hidden="true" />
-                תלמידה חדשה
+                <UserPlus className="h-5 w-5" aria-hidden="true" />
+                הוספת תלמידה
               </button>
             </div>
           </div>
@@ -395,32 +383,29 @@ function Students() {
           {success ? <StatusMessage type="success">{success}</StatusMessage> : null}
 
           <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-slate-100 bg-white">
-            <div className="hidden grid-cols-[1.2fr_1.5fr_0.8fr_1fr] gap-3 bg-violet-50 px-4 py-3 text-xs font-black text-violet-700 md:grid">
+            <div className="hidden grid-cols-[1fr_1.25fr_0.6fr_1fr_0.7fr_1.1fr] gap-3 bg-violet-50 px-4 py-3 text-xs font-black text-violet-700 md:grid">
               <span>שם</span>
               <span>אימייל</span>
               <span>רמה</span>
+              <span>מורה</span>
+              <span>סטטוס</span>
               <span>פעולות</span>
             </div>
 
             {loading ? (
-              <div className="p-8 text-center text-sm font-black text-slate-500">
-                טוענת תלמידות...
-              </div>
+              <div className="p-8 text-center text-sm font-black text-slate-500">טוענת תלמידות...</div>
             ) : filteredStudents.length === 0 ? (
               <div className="grid justify-items-center gap-3 p-8 text-center">
                 <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-50 text-violet-700">
                   <Users className="h-7 w-7" aria-hidden="true" />
                 </span>
                 <h2 className="text-base font-black text-slate-900">לא נמצאו תלמידות</h2>
-                <p className="max-w-md text-sm font-semibold leading-6 text-slate-500">
-                  נסי לשנות את החיפוש או להוסיף תלמידה חדשה. אם קיימת שגיאת שרת, היא תוצג מעל הטבלה.
-                </p>
               </div>
             ) : (
               filteredStudents.map((student) => (
                 <div
                   key={student.id}
-                  className="grid gap-3 border-t border-slate-100 px-4 py-4 text-sm transition hover:bg-violet-50/30 md:grid-cols-[1.2fr_1.5fr_0.8fr_1fr] md:items-center"
+                  className="grid gap-3 border-t border-slate-100 px-4 py-4 text-sm transition hover:bg-violet-50/30 md:grid-cols-[1fr_1.25fr_0.6fr_1fr_0.7fr_1.1fr] md:items-center"
                 >
                   <div>
                     <span className="mb-1 block text-xs font-black text-slate-400 md:hidden">שם</span>
@@ -433,15 +418,28 @@ function Students() {
                   <div>
                     <span className="mb-1 block text-xs font-black text-slate-400 md:hidden">רמה</span>
                     <span className="inline-flex rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-700">
-                      {getLevelLabel(student.level)}
+                      {student.level}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="mb-1 block text-xs font-black text-slate-400 md:hidden">מורה</span>
+                    <span className="font-semibold text-slate-600">{teacherName(teachers, student.teacherId)}</span>
+                  </div>
+                  <div>
+                    <span className="mb-1 block text-xs font-black text-slate-400 md:hidden">סטטוס</span>
+                    <span
+                      className={`inline-flex rounded-full px-3 py-1 text-xs font-black ${
+                        student.status === 'suspended'
+                          ? 'bg-amber-50 text-amber-700'
+                          : 'bg-green-50 text-green-700'
+                      }`}
+                    >
+                      {student.status === 'suspended' ? 'מושהית' : 'פעילה'}
                     </span>
                   </div>
                   <div>
                     <span className="mb-1 block text-xs font-black text-slate-400 md:hidden">פעולות</span>
                     <span className="flex flex-wrap gap-2">
-                      <ActionButton label="צפייה בפרופיל" onClick={() => viewProfile(student)}>
-                        <Eye className="h-4 w-4" aria-hidden="true" />
-                      </ActionButton>
                       <ActionButton
                         label="עריכת תלמידה"
                         onClick={() => {
@@ -450,6 +448,13 @@ function Students() {
                         }}
                       >
                         <Pencil className="h-4 w-4" aria-hidden="true" />
+                      </ActionButton>
+                      <ActionButton label="השהיה או החזרה" tone="warning" onClick={() => toggleSuspend(student)}>
+                        {student.status === 'suspended' ? (
+                          <UserCheck className="h-4 w-4" aria-hidden="true" />
+                        ) : (
+                          <Ban className="h-4 w-4" aria-hidden="true" />
+                        )}
                       </ActionButton>
                       <ActionButton
                         label="מחיקת תלמידה"
@@ -471,33 +476,27 @@ function Students() {
       </div>
 
       {modal === 'add' ? (
-        <Modal
-          title="הוספת תלמידה"
-          description="מילוי הפרטים ישלח בקשת יצירה לשרת. אם החיבור נכשל, הודעת השגיאה תישאר גלויה."
-          onClose={closeModal}
-        >
+        <Modal title="הוספת תלמידה" description="יצירת תלמידת דמו בצד הלקוח בלבד." onClose={closeModal}>
           <StudentForm
             initialValue={emptyForm}
             mode="add"
             onCancel={closeModal}
             onSubmit={submitCreate}
             saving={saving}
+            teachers={teachers}
           />
         </Modal>
       ) : null}
 
       {modal === 'edit' && selectedStudent ? (
-        <Modal
-          title="עריכת תלמידה"
-          description="עדכון שם, אימייל ורמת לימוד דרך בקשת עדכון לשרת."
-          onClose={closeModal}
-        >
+        <Modal title="עריכת תלמידה" description="עדכון שם, אימייל, רמה ושיוך למורה." onClose={closeModal}>
           <StudentForm
             initialValue={{ ...emptyForm, ...selectedStudent, password: '' }}
             mode="edit"
             onCancel={closeModal}
             onSubmit={submitEdit}
             saving={saving}
+            teachers={teachers}
           />
         </Modal>
       ) : null}
@@ -505,7 +504,7 @@ function Students() {
       {modal === 'delete' && selectedStudent ? (
         <Modal title="מחיקת תלמידה" onClose={closeModal}>
           <div className="mt-5 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-bold leading-7 text-red-700">
-            למחוק את {selectedStudent.name}? פעולה זו תשלח בקשת מחיקה לשרת.
+            למחוק את {selectedStudent.name}? הפעולה מתבצעת בדמו המקומי בלבד.
           </div>
           <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button
@@ -524,30 +523,6 @@ function Students() {
               {saving ? 'מוחקת...' : 'מחיקה'}
             </button>
           </div>
-        </Modal>
-      ) : null}
-
-      {modal === 'profile' ? (
-        <Modal title="פרופיל תלמידה" onClose={closeModal}>
-          {selectedStudent ? (
-            <div className="mt-5 grid gap-3 rounded-2xl border border-violet-100 bg-violet-50/60 p-4 text-sm font-semibold text-slate-700">
-              <p>
-                <strong className="font-black text-slate-950">שם:</strong> {selectedStudent.name}
-              </p>
-              <p>
-                <strong className="font-black text-slate-950">אימייל:</strong> {selectedStudent.email}
-              </p>
-              <p>
-                <strong className="font-black text-slate-950">רמה:</strong>{' '}
-                {getLevelLabel(selectedStudent.level)}
-              </p>
-              <p>
-                <strong className="font-black text-slate-950">מזהה:</strong> {selectedStudent.id}
-              </p>
-            </div>
-          ) : (
-            <div className="mt-5 text-sm font-black text-slate-500">טוענת פרופיל...</div>
-          )}
         </Modal>
       ) : null}
     </main>

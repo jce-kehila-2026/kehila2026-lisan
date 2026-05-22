@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut } from 'lucide-react';
+import { ArrowRight, LogOut } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import LanguageToggle from './LanguageToggle.jsx';
 import Logo from './Logo.jsx';
 
-function PageHeader({ showLogout = false }) {
+function PageHeader({ backTo, showBack = false, showLogout = false }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -14,6 +14,25 @@ function PageHeader({ showLogout = false }) {
       <Logo />
       <div className="flex items-center gap-3">
         <LanguageToggle />
+        {showBack ? (
+          <button
+            type="button"
+            onClick={() => {
+              if (backTo) {
+                navigate(backTo);
+              } else if (window.history.length > 1) {
+                navigate(-1);
+              } else {
+                navigate('/home');
+              }
+            }}
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+            aria-label="חזרה"
+            title="חזרה"
+          >
+            <ArrowRight className="h-5 w-5" aria-hidden="true" />
+          </button>
+        ) : null}
         {showLogout ? (
           <button
             type="button"

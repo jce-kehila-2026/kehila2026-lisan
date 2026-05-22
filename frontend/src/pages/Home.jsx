@@ -1,4 +1,6 @@
+import React from 'react';
 import {
+  ArrowLeft,
   BookOpen,
   Gamepad2,
   Headphones,
@@ -8,6 +10,7 @@ import {
   Quote,
   Sparkles,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import BottomNav from '../components/BottomNav.jsx';
 import FeatureCard from '../components/FeatureCard.jsx';
@@ -15,8 +18,8 @@ import PageHeader from '../components/PageHeader.jsx';
 import StoryCarousel from '../components/StoryCarousel.jsx';
 
 const student = {
-  name: 'ليان',
-  level: 'Beginner',
+  name: 'ליאן',
+  level: 'א1',
   progress: 45,
 };
 
@@ -34,7 +37,7 @@ function Home() {
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8">
-      <div className="relative mx-auto min-h-[calc(100vh-2.5rem)] max-w-xl pb-28 sm:min-h-[780px]">
+      <div className="relative mx-auto min-h-[calc(100vh-2.5rem)] max-w-xl pb-28 sm:min-h-[780px]" dir="rtl">
         <PageHeader showLogout />
 
         <section className="mt-6 rounded-3xl bg-white p-5 shadow-card sm:p-6">
@@ -48,9 +51,7 @@ function Home() {
             </div>
             <div className="rounded-2xl bg-violet-50 px-4 py-3 text-center">
               <p className="text-xs font-semibold text-slate-500">{t('level')}</p>
-              <p className="mt-1 whitespace-nowrap text-sm font-bold text-violet-700">
-                {t('studentLevelBeginner')}
-              </p>
+              <p className="mt-1 whitespace-nowrap text-sm font-bold text-violet-700">{student.level}</p>
             </div>
           </div>
 
@@ -77,6 +78,28 @@ function Home() {
             descriptionKey="gamesDescription"
             actionKey="openGames"
           />
+
+          <Link
+            to="/shared-chat"
+            className="group block rounded-3xl border border-slate-100 bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:p-6"
+            aria-label="שיחה עם חברות"
+          >
+            <div className="flex items-center gap-4">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-700 transition group-hover:bg-violet-600 group-hover:text-white">
+                <MessageCircle className="h-8 w-8" aria-hidden="true" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-xl font-bold text-slate-900">שיחה עם חברות</h2>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  בחרי חברות לתרגול משותף ומהיר
+                </p>
+              </div>
+              <div className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-50 text-violet-700 sm:flex">
+                <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+              </div>
+            </div>
+          </Link>
+
           <FeatureCard
             to="/links"
             icon={LinkIcon}

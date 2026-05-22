@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import LanguageSwitcher from '../../components/LanguageSwitcher.jsx';
@@ -9,7 +8,7 @@ import Input from '../../components/ui/Input.jsx';
 import useLoginForm from '../../hooks/useLoginForm.js';
 import { getLandingPathForRole, login, storeSession } from '../../services/auth.js';
 
-function AdminLogin() {
+function TeacherLogin() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const form = useLoginForm();
@@ -39,11 +38,11 @@ function AdminLogin() {
   };
 
   return (
-    <LoginShell title={t('adminLoginTitle')}>
+    <LoginShell title={t('teacherLoginTitle')}>
       <form className="login-form" onSubmit={handleSubmit} noValidate>
         <Input
-          id="admin-email"
-          label={t('username')}
+          id="teacher-email"
+          label={t('email')}
           type="text"
           autoComplete="username"
           value={form.values.email}
@@ -52,7 +51,7 @@ function AdminLogin() {
           error={form.touched.email ? form.errors.email : ''}
         />
         <Input
-          id="admin-password"
+          id="teacher-password"
           label={t('password')}
           type="password"
           autoComplete="current-password"
@@ -77,4 +76,4 @@ function AdminLogin() {
   );
 }
 
-export default AdminLogin;
+export default TeacherLogin;

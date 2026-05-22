@@ -55,6 +55,65 @@ body {
   font-size: var(--text-body);
 }
 
+.lisan-student-dark body {
+  color: #f8fafc;
+  background: #020617;
+}
+
+.lisan-student-dark main {
+  color: #f8fafc !important;
+  background: linear-gradient(180deg, #020617 0%, #111827 52%, #1e1b4b 100%) !important;
+}
+
+.lisan-student-dark .bg-white,
+.lisan-student-dark .bg-white\/95 {
+  color: #f8fafc !important;
+  background-color: #111827 !important;
+}
+
+.lisan-student-dark .bg-slate-50,
+.lisan-student-dark .bg-slate-100,
+.lisan-student-dark .bg-violet-50,
+.lisan-student-dark .bg-violet-50\/40,
+.lisan-student-dark .bg-violet-50\/70 {
+  background-color: #1f2937 !important;
+}
+
+.lisan-student-dark .text-slate-950,
+.lisan-student-dark .text-slate-900,
+.lisan-student-dark .text-slate-800 {
+  color: #f8fafc !important;
+}
+
+.lisan-student-dark .text-slate-700,
+.lisan-student-dark .text-slate-600,
+.lisan-student-dark .text-slate-500 {
+  color: #cbd5e1 !important;
+}
+
+.lisan-student-dark input,
+.lisan-student-dark textarea {
+  color: #f8fafc;
+}
+
+.lisan-student-dark input::placeholder,
+.lisan-student-dark textarea::placeholder {
+  color: #94a3b8;
+}
+
+.lisan-student-large-text body {
+  font-size: 1.1rem;
+}
+
+.lisan-student-large-text main p,
+.lisan-student-large-text main span,
+.lisan-student-large-text main a,
+.lisan-student-large-text main button,
+.lisan-student-large-text main input,
+.lisan-student-large-text main textarea {
+  font-size: 1.08rem !important;
+}
+
 button,
 input {
   font: inherit;
@@ -164,6 +223,7 @@ a {
 
 .ui-field__label {
   font-weight: 500;
+  text-align: start;
 }
 
 .ui-field__control {
@@ -254,9 +314,10 @@ a {
 .login-screen {
   display: grid;
   min-height: 100vh;
-  grid-template-columns: minmax(360px, 45fr) minmax(420px, 55fr);
+  grid-template-columns: minmax(340px, 46fr) minmax(360px, 54fr);
   grid-template-areas: "panel art";
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .login-art {
@@ -265,7 +326,7 @@ a {
   grid-area: art;
   min-height: 100vh;
   place-items: center;
-  padding: var(--space-6);
+  padding: clamp(16px, 2.4vw, 32px);
   color: white;
   background:
     radial-gradient(circle at 58% 46%, rgba(255, 236, 178, 0.34), transparent 16%),
@@ -275,8 +336,9 @@ a {
 
 .login-art__image {
   width: 100%;
-  height: 100%;
-  min-height: 100vh;
+  height: min(82vh, 680px);
+  min-height: 360px;
+  max-height: 680px;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-medium);
   object-fit: cover;
@@ -372,6 +434,7 @@ a {
 
 .login-panel__inner {
   width: min(100%, 390px);
+  min-width: 0;
 }
 
 .lisan-logo {
@@ -392,14 +455,20 @@ a {
 .login-form {
   display: grid;
   gap: var(--space-6);
+  width: 100%;
+  min-width: 0;
 }
 
 .forgot-link,
 .login-helper {
+  display: block;
+  width: 100%;
   margin: calc(var(--space-2) * -1) 0 0;
   color: #8758b5;
+  direction: rtl;
   font-size: var(--text-caption);
-  text-align: end;
+  justify-self: stretch;
+  text-align: right;
   text-decoration: none;
 }
 
@@ -412,7 +481,8 @@ a {
 }
 
 .login-helper {
-  text-align: center;
+  justify-self: stretch;
+  text-align: right;
 }
 
 .recovery-copy {
@@ -596,7 +666,8 @@ a {
     min-height: 100vh;
     padding: 10px;
     gap: 8px;
-    overflow: visible;
+    overflow-x: hidden;
+    overflow-y: auto;
     background: white;
   }
 
@@ -662,6 +733,7 @@ a {
   }
 
   .ui-button--lg {
+    width: 100%;
     min-height: 46px;
     font-size: 1.25rem;
   }
@@ -675,6 +747,7 @@ a {
   .login-helper {
     margin: 0;
     font-size: 0.9rem;
+    text-align: right;
   }
 
   .feature-grid {
@@ -683,14 +756,20 @@ a {
 }
 
 @media (max-width: 520px) {
+  .login-screen {
+    padding: 0;
+    gap: 0;
+  }
+
   .login-art {
-    min-height: 180px;
+    min-height: 0;
+    display: none;
   }
 
   .login-art__image {
-    height: 170px;
-    min-height: 170px;
-    max-height: 170px;
+    height: 0;
+    min-height: 0;
+    max-height: 0;
     object-position: center 40%;
   }
 
@@ -715,10 +794,18 @@ a {
 
   .login-panel {
     min-height: auto;
-    padding-top: 0;
+    width: 100%;
+    padding: var(--space-4);
   }
 
   .login-panel__inner {
+    width: 100%;
+  }
+
+  .login-form,
+  .ui-field,
+  .ui-field__control,
+  .ui-button--lg {
     width: 100%;
   }
 

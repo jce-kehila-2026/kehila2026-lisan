@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Bell,
   Clock,
@@ -15,6 +15,8 @@ import { useTranslation } from 'react-i18next';
 import BottomNav from '../components/BottomNav.jsx';
 import PageHeader from '../components/PageHeader.jsx';
 import { getStoredUser } from '../services/auth.js';
+
+const preferenceStorageKey = 'lisan-student-preferences';
 
 const labels = {
   he: {
@@ -38,16 +40,14 @@ const labels = {
     slow: 'איטי',
     normal: 'רגיל',
     notifications: 'התראות',
-    notificationsOn: 'פעיל',
-    notificationsOff: 'כבוי',
   },
   ar: {
     title: 'الملف الشخصي',
-    subtitle: 'ملخص التدريب وتفضيلات التعلّم',
+    subtitle: 'ملخص التدريب وتفضيلات التعلم',
     level: 'المستوى',
     dailyProgress: 'تقدم اليوم',
     totalChats: 'إجمالي المحادثات',
-    learnedWords: 'كلمات تعلّمتها',
+    learnedWords: 'كلمات تعلمتها',
     streakDays: 'أيام متتالية',
     practiceMinutes: 'دقائق تدريب',
     settings: 'الإعدادات',
@@ -62,8 +62,6 @@ const labels = {
     slow: 'بطيئة',
     normal: 'عادية',
     notifications: 'الإشعارات',
-    notificationsOn: 'مفعّلة',
-    notificationsOff: 'متوقفة',
   },
 };
 
@@ -73,6 +71,25 @@ const stats = [
   { key: 'streakDays', value: '7', icon: Flame },
   { key: 'practiceMinutes', value: '240', icon: Clock },
 ];
+
+const getStoredPreferences = () => {
+  try {
+    const saved = JSON.parse(localStorage.getItem(preferenceStorageKey) || '{}');
+    return {
+      theme: saved.theme === 'dark' ? 'dark' : 'light',
+      textSize: saved.textSize === 'large' ? 'large' : 'regular',
+      voiceSpeed: saved.voiceSpeed === 'slow' ? 'slow' : 'normal',
+      notifications: saved.notifications === false ? false : true,
+    };
+  } catch {
+    return {
+      theme: 'light',
+      textSize: 'regular',
+      voiceSpeed: 'normal',
+      notifications: true,
+    };
+  }
+};
 
 function SegmentedControl({ options, value, onChange }) {
   return (
@@ -97,30 +114,55 @@ function ProfilePage() {
   const { i18n, t } = useTranslation();
   const text = labels[i18n.language === 'he' ? 'he' : 'ar'];
   const user = getStoredUser();
-  const [theme, setTheme] = useState('light');
-  const [textSize, setTextSize] = useState('regular');
-  const [voiceSpeed, setVoiceSpeed] = useState('normal');
-  const [notifications, setNotifications] = useState(true);
+  const storedPreferences = useMemo(getStoredPreferences, []);
+  const [theme, setTheme] = useState(storedPreferences.theme);
+  const [textSize, setTextSize] = useState(storedPreferences.textSize);
+  const [voiceSpeed, setVoiceSpeed] = useState(storedPreferences.voiceSpeed);
+  const [notifications, setNotifications] = useState(storedPreferences.notifications);
+  const isDark = theme === 'dark';
+  const isLargeText = textSize === 'large';
+
+  useEffect(() => {
+    localStorage.setItem(
+      preferenceStorageKey,
+      JSON.stringify({
+        theme,
+        textSize,
+        voiceSpeed,
+        notifications,
+      }),
+    );
+    window.dispatchEvent(new Event('lisan-student-preferences-changed'));
+  }, [notifications, textSize, theme, voiceSpeed]);
+
+  const pageClass = isDark
+    ? 'min-h-screen bg-slate-950 px-4 py-5 text-slate-100 sm:px-6 sm:py-8'
+    : 'min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8';
+  const surfaceClass = isDark ? 'bg-slate-900 text-slate-100 shadow-card' : 'bg-white text-slate-900 shadow-card';
+  const panelClass = isDark ? 'border-slate-700 bg-slate-800' : 'border-slate-100 bg-slate-50';
+  const mutedTextClass = isDark ? 'text-slate-300' : 'text-slate-600';
+  const headingTextClass = isDark ? 'text-white' : 'text-slate-950';
+  const textScaleClass = isLargeText
+    ? '[&_button]:!text-base [&_input]:!text-base [&_p]:!text-base [&_span]:!text-base [&_textarea]:!text-base'
+    : '';
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8">
-      <div className="relative mx-auto min-h-[calc(100vh-2.5rem)] max-w-xl pb-28 sm:min-h-[780px]" dir="rtl">
-        <PageHeader showLogout />
+    <main className={pageClass}>
+      <div className={`relative mx-auto min-h-[calc(100vh-2.5rem)] max-w-xl pb-28 sm:min-h-[780px] ${textScaleClass}`} dir="rtl">
+        <PageHeader showBack />
 
-        <section className="mt-6 rounded-3xl bg-white p-5 shadow-card sm:p-6">
+        <section className={`mt-6 rounded-3xl p-5 sm:p-6 ${surfaceClass}`}>
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-sm font-semibold text-violet-700">{text.title}</p>
-              <h1 className="mt-2 text-2xl font-bold leading-tight text-slate-950 sm:text-3xl">
+              <h1 className={`mt-2 text-2xl font-bold leading-tight sm:text-3xl ${headingTextClass}`}>
                 {user?.name || 'ליאן'}
               </h1>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{text.subtitle}</p>
+              <p className={`mt-3 text-sm leading-6 ${mutedTextClass}`}>{text.subtitle}</p>
             </div>
             <div className="rounded-2xl bg-violet-50 px-4 py-3 text-center">
               <p className="text-xs font-semibold text-slate-500">{text.level}</p>
-              <p className="mt-1 whitespace-nowrap text-sm font-bold text-violet-700">
-                {t('studentLevelBeginner')}
-              </p>
+              <p className="mt-1 whitespace-nowrap text-sm font-bold text-violet-700">א1</p>
             </div>
           </div>
 
@@ -139,28 +181,30 @@ function ProfilePage() {
           {stats.map((stat) => {
             const Icon = stat.icon;
             return (
-              <article key={stat.key} className="rounded-3xl bg-white p-4 shadow-card">
+              <article key={stat.key} className={`rounded-3xl p-4 ${surfaceClass}`}>
                 <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 via-pink-400 to-amber-300 text-white">
                   <Icon className="h-5 w-5" aria-hidden="true" />
                 </span>
-                <p className="mt-4 text-2xl font-bold text-slate-950">{stat.value}</p>
-                <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">{text[stat.key]}</p>
+                <p className={`mt-4 text-2xl font-bold ${headingTextClass}`}>{stat.value}</p>
+                <p className={`mt-1 text-xs font-semibold leading-5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  {text[stat.key]}
+                </p>
               </article>
             );
           })}
         </section>
 
-        <section className="mt-5 rounded-3xl bg-white p-5 shadow-card sm:p-6">
+        <section className={`mt-5 rounded-3xl p-5 sm:p-6 ${surfaceClass}`}>
           <div className="flex items-center gap-3">
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-50 text-violet-700">
               <SlidersHorizontal className="h-6 w-6" aria-hidden="true" />
             </span>
-            <h2 className="text-xl font-bold text-slate-900">{text.settings}</h2>
+            <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{text.settings}</h2>
           </div>
 
           <div className="mt-5 grid gap-5">
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-              <div className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-800">
+            <div className={`rounded-2xl border p-4 ${panelClass}`}>
+              <div className={`mb-3 flex items-center gap-2 text-sm font-bold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
                 <Languages className="h-5 w-5 text-violet-700" aria-hidden="true" />
                 {text.language}
               </div>
@@ -174,9 +218,9 @@ function ProfilePage() {
               />
             </div>
 
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-              <div className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-800">
-                {theme === 'light' ? <Sun className="h-5 w-5 text-violet-700" /> : <Moon className="h-5 w-5 text-violet-700" />}
+            <div className={`rounded-2xl border p-4 ${panelClass}`}>
+              <div className={`mb-3 flex items-center gap-2 text-sm font-bold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
+                {isDark ? <Moon className="h-5 w-5 text-violet-700" /> : <Sun className="h-5 w-5 text-violet-700" />}
                 {text.theme}
               </div>
               <SegmentedControl
@@ -189,8 +233,8 @@ function ProfilePage() {
               />
             </div>
 
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-              <div className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-800">
+            <div className={`rounded-2xl border p-4 ${panelClass}`}>
+              <div className={`mb-3 flex items-center gap-2 text-sm font-bold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
                 <Type className="h-5 w-5 text-violet-700" aria-hidden="true" />
                 {text.textSize}
               </div>
@@ -204,8 +248,8 @@ function ProfilePage() {
               />
             </div>
 
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-              <div className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-800">
+            <div className={`rounded-2xl border p-4 ${panelClass}`}>
+              <div className={`mb-3 flex items-center gap-2 text-sm font-bold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
                 <Volume2 className="h-5 w-5 text-violet-700" aria-hidden="true" />
                 {text.voiceSpeed}
               </div>
@@ -219,8 +263,8 @@ function ProfilePage() {
               />
             </div>
 
-            <div className="flex items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-slate-50 p-4">
-              <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
+            <div className={`flex items-center justify-between gap-4 rounded-2xl border p-4 ${panelClass}`}>
+              <div className={`flex items-center gap-2 text-sm font-bold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
                 <Bell className="h-5 w-5 text-violet-700" aria-hidden="true" />
                 {text.notifications}
               </div>

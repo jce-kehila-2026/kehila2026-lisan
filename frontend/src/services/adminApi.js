@@ -1,63 +1,103 @@
-const getAdminHeaders = () => {
-  const token = localStorage.getItem('lisan-token');
+import { adminStudentsSeed, adminTeachersSeed } from '../data/adminMockData.js';
 
-  return {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`,
-  };
-};
+let students = adminStudentsSeed.map((student) => ({ ...student }));
+let teachers = adminTeachersSeed.map((teacher) => ({ ...teacher }));
 
-const parseResponse = async (response) => {
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Request failed');
-  }
-
-  return data;
-};
+const wait = () => new Promise((resolve) => window.setTimeout(resolve, 120));
 
 export const getStudents = async () => {
-  const response = await fetch('/api/admin/students', {
-    headers: getAdminHeaders(),
-  });
-
-  return parseResponse(response);
+  await wait();
+  return { students: students.map((student) => ({ ...student })) };
 };
 
 export const getStudent = async (id) => {
-  const response = await fetch(`/api/admin/students/${id}`, {
-    headers: getAdminHeaders(),
-  });
+  await wait();
+  const student = students.find((item) => item.id === id);
 
-  return parseResponse(response);
+  if (!student) {
+    throw new Error('התלמידה לא נמצאה');
+  }
+
+  return { student: { ...student } };
 };
 
 export const createStudent = async (student) => {
-  const response = await fetch('/api/admin/students', {
-    method: 'POST',
-    headers: getAdminHeaders(),
-    body: JSON.stringify(student),
-  });
+  await wait();
+  const exists = students.some((item) => item.email.toLowerCase() === student.email.toLowerCase());
 
-  return parseResponse(response);
+  if (exists) {
+    throw new Error('כבר קיימת תלמידה עם האימייל הזה');
+  }
+
+  const nextStudent = {
+    id: `student_${Date.now()}`,
+    status: 'active',
+    teacherId: 'teacher_001',
+    ...student,
+  };
+
+  students = [nextStudent, ...students];
+  return { student: { ...nextStudent } };
 };
 
 export const updateStudent = async (id, student) => {
-  const response = await fetch(`/api/admin/students/${id}`, {
-    method: 'PUT',
-    headers: getAdminHeaders(),
-    body: JSON.stringify(student),
-  });
+  await wait();
+  const exists = students.some((item) => item.id === id);
 
-  return parseResponse(response);
+  if (!exists) {
+    throw new Error('התלמידה לא נמצאה');
+  }
+
+  students = students.map((item) => (item.id === id ? { ...item, ...student } : item));
+  return { student: { ...students.find((item) => item.id === id) } };
 };
 
 export const deleteStudent = async (id) => {
-  const response = await fetch(`/api/admin/students/${id}`, {
-    method: 'DELETE',
-    headers: getAdminHeaders(),
-  });
+  await wait();
+  students = students.filter((student) => student.id !== id);
+  return { success: true };
+};
 
-  return parseResponse(response);
+export const toggleStudentSuspension = async (id) => {
+  await wait();
+  const student = students.find((item) => item.id === id);
+
+  if (!student) {
+    throw new Error('התלמידה לא נמצאה');
+  }
+
+  const status = student.status === 'suspended' ? 'active' : 'suspended';
+  students = students.map((item) => (item.id === id ? { ...item, status } : item));
+  return { student: { ...student, status } };
+};
+
+export const getTeachers = async () => {
+  await wait();
+  return { teachers: teachers.map((teacher) => ({ ...teacher })) };
+};
+
+export const updateTeacher = async (id, teacher) => {
+  await wait();
+  teachers = teachers.map((item) => (item.id === id ? { ...item, ...teacher } : item));
+  return { teacher: { ...teachers.find((item) => item.id === id) } };
+};
+
+export const deleteTeacher = async (id) => {
+  await wait();
+  teachers = teachers.filter((teacher) => teacher.id !== id);
+  students = students.map((student) =>
+    student.teacherId === id ? { ...student, teacherId: '' } : student,
+  );
+  return { success: true };
+};
+
+export const assignStudentsToTeacher = async (teacherId, studentIds) => {
+  await wait();
+  students = students.map((student) =>
+    studentIds.includes(student.id) ? { ...student, teacherId } : student,
+  );
+  return {
+    teacher: { ...teachers.find((teacher) => teacher.id === teacherId) },
+    students: students.map((student) => ({ ...student })),
+  };
 };

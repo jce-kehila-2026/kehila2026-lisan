@@ -45,8 +45,8 @@ function StudentLogin() {
         <Input
           id="student-email"
           label={t('username')}
-          type="email"
-          autoComplete="email"
+          type="text"
+          autoComplete="username"
           value={form.values.email}
           onChange={form.setValue('email')}
           onBlur={form.markTouched('email')}

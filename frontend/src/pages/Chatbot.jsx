@@ -50,7 +50,7 @@ function Chatbot({
       translate="no"
     >
       <div className="mx-auto max-w-2xl">
-        <PageHeader showLogout />
+        <PageHeader showBack backTo="/home" />
 
         <section className="mt-6 flex min-h-[calc(100vh-9rem)] flex-col rounded-3xl bg-white p-5 shadow-card sm:p-6">
           <div>

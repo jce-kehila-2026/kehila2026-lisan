@@ -5,21 +5,30 @@ import Button from '../components/Button.jsx';
 import Input from '../components/Input.jsx';
 import LanguageToggle from '../components/LanguageToggle.jsx';
 import Logo from '../components/Logo.jsx';
+import { getLandingPathForRole, login, storeSession } from '../services/auth.js';
 
 function Login() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
-    window.setTimeout(() => {
+
+    try {
+      setError('');
+      const session = await login({ email, password });
+      storeSession(session);
+      navigate(getLandingPathForRole(session.user?.role), { replace: true });
+    } catch (loginError) {
+      setError(t(loginError.message || 'genericLoginError'));
+    } finally {
       setLoading(false);
-      navigate('/home');
-    }, 500);
+    }
   };
 
   return (
@@ -40,7 +49,7 @@ function Login() {
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
             <Input
               id="email"
-              label={t('email')}
+              label={t('username')}
               type="text"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
@@ -57,6 +66,7 @@ function Login() {
             <Button type="submit" loading={loading} className="w-full">
               {loading ? t('loading') : t('loginButton')}
             </Button>
+            {error ? <p className="text-sm font-semibold text-red-600">{error}</p> : null}
           </form>
         </section>
       </div>
