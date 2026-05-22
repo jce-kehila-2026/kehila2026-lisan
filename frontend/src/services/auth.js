@@ -1,5 +1,3 @@
-const API_URL = '/api/auth/login';
-
 const mockUsers = {
   student: {
     token: 'mock-student-token',
@@ -22,52 +20,34 @@ const inferRoleFromAccount = (email = '') => {
     return 'admin';
   }
 
-  if (normalized.includes('teacher') || normalized.includes('more') || normalized.includes('מורה')) {
+  if (normalized.includes('teacher')) {
     return 'teacher';
   }
 
   return 'student';
 };
 
+export const getLandingPathForRole = (role) => {
+  if (role === 'admin') return '/admin/dashboard';
+  if (role === 'teacher') return '/teacher/dashboard';
+  return '/home';
+};
+
 export const login = async ({ email, password }) => {
-  const inferredRole = inferRoleFromAccount(email);
-
-  try {
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: email, password }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || data.success === false) {
-      throw new Error(data.error || 'invalidCredentials');
-    }
-
-    const backendRole = data.user?.role;
-
-    return {
-      token: data.token,
-      user: {
-        ...data.user,
-        name: data.user?.name || email,
-        role: backendRole && backendRole !== 'student' ? backendRole : inferredRole,
-      },
-    };
-  } catch (error) {
-    if (error.message !== 'invalidCredentials') {
-      return {
-        ...mockUsers[inferredRole],
-        user: {
-          ...mockUsers[inferredRole].user,
-          name: email || mockUsers[inferredRole].user.name,
-        },
-      };
-    }
-
-    throw error;
+  if (password !== '123456') {
+    throw new Error('invalidCredentials');
   }
+
+  const inferredRole = inferRoleFromAccount(email);
+  const session = mockUsers[inferredRole];
+
+  return {
+    ...session,
+    user: {
+      ...session.user,
+      name: email || session.user.name,
+    },
+  };
 };
 
 export const storeSession = ({ token, user }) => {

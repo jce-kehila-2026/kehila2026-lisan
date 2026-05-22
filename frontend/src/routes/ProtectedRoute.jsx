@@ -2,6 +2,13 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { getStoredUser } from '../services/auth.js';
 
+const getRedirectPath = (role) => {
+  if (role === 'admin') return '/admin/dashboard';
+  if (role === 'teacher') return '/teacher/dashboard';
+  if (role === 'student') return '/home';
+  return '/login';
+};
+
 function ProtectedRoute({ children, role }) {
   const token = localStorage.getItem('lisan-token');
   const user = getStoredUser();
@@ -11,8 +18,12 @@ function ProtectedRoute({ children, role }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles.length > 0 && user?.role && !allowedRoles.includes(user.role)) {
-    return <Navigate to={user.role === 'admin' ? '/admin/dashboard' : '/home'} replace />;
+  if (allowedRoles.length > 0 && !user?.role) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+    return <Navigate to={getRedirectPath(user.role)} replace />;
   }
 
   return children;

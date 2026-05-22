@@ -1,43 +1,34 @@
-import { useRef } from 'react';
 import React from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import StoryCircle from './StoryCircle.jsx';
 
-function StoryCarousel({ stories }) {
+function StoryCarousel({ actionsSlot, stories }) {
   const { t } = useTranslation();
   const scrollerRef = useRef(null);
 
-  const scrollByStories = (direction) => {
+  useEffect(() => {
     const scroller = scrollerRef.current;
-    if (!scroller) return;
-    scroller.scrollBy({ left: direction * -260, behavior: 'smooth' });
-  };
+    if (!scroller) return undefined;
+
+    const intervalId = window.setInterval(() => {
+      const nextLeft = scroller.scrollLeft - 104;
+      const isAtEnd = Math.abs(scroller.scrollLeft) + scroller.clientWidth >= scroller.scrollWidth - 8;
+
+      scroller.scrollTo({
+        left: isAtEnd ? 0 : nextLeft,
+        behavior: 'smooth',
+      });
+    }, 3600);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
 
   return (
     <section className="rounded-3xl border border-slate-100 bg-white p-4 shadow-card sm:p-5">
       <div className="mb-4 flex items-center justify-between gap-3">
         <h2 className="text-base font-bold text-slate-900">{t('storiesTitle')}</h2>
-        <div className="hidden items-center gap-2 sm:flex">
-          <button
-            type="button"
-            onClick={() => scrollByStories(-1)}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-violet-50 hover:text-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500"
-            aria-label={t('previousStories')}
-            title={t('previousStories')}
-          >
-            <ChevronRight className="h-5 w-5" aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollByStories(1)}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-violet-50 hover:text-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500"
-            aria-label={t('nextStories')}
-            title={t('nextStories')}
-          >
-            <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-          </button>
-        </div>
+        {actionsSlot}
       </div>
       <div
         ref={scrollerRef}
