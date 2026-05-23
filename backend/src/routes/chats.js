@@ -30,4 +30,22 @@ router.post(
   chatController.addMessage
 );
 
+router.delete(
+  '/:chatId',
+  requireAuth,
+  chatController.deleteChat
+);
+
+router.delete(
+  '/:chatId',
+  requireAuth,
+  chatController.deleteChat
+);
+
+router.post(
+  '/:chatId/ai-message',
+  requireAuth,
+  chatController.sendAiMessage
+);
+
 module.exports = router;

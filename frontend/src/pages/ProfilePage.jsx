@@ -14,7 +14,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import BottomNav from '../components/BottomNav.jsx';
 import PageHeader from '../components/PageHeader.jsx';
-import { getStoredUser } from '../services/auth.js';
+import { getCurrentUser, getStoredToken, getStoredUser } from '../services/auth.js';
 
 const preferenceStorageKey = 'lisan-student-preferences';
 
@@ -25,9 +25,9 @@ const labels = {
     level: 'רמה',
     dailyProgress: 'התקדמות היום',
     totalChats: 'סה״כ שיחות',
-    learnedWords: 'מילים שנלמדו',
-    streakDays: 'ימי רצף',
-    practiceMinutes: 'דקות תרגול',
+    learnedWords: 'תשובות נכונות',
+    streakDays: 'סה״כ ניסיונות',
+    practiceMinutes: 'בדיקות הגייה',
     settings: 'הגדרות',
     language: 'שפה',
     theme: 'מצב תצוגה',
@@ -47,9 +47,9 @@ const labels = {
     level: 'المستوى',
     dailyProgress: 'تقدم اليوم',
     totalChats: 'إجمالي المحادثات',
-    learnedWords: 'كلمات تعلمتها',
-    streakDays: 'أيام متتالية',
-    practiceMinutes: 'دقائق تدريب',
+    learnedWords: 'إجابات صحيحة',
+    streakDays: 'إجمالي المحاولات',
+    practiceMinutes: 'فحوصات النطق',
     settings: 'الإعدادات',
     language: 'اللغة',
     theme: 'وضع العرض',
@@ -64,13 +64,6 @@ const labels = {
     notifications: 'الإشعارات',
   },
 };
-
-const stats = [
-  { key: 'totalChats', value: '18', icon: MessageCircle },
-  { key: 'learnedWords', value: '64', icon: Languages },
-  { key: 'streakDays', value: '7', icon: Flame },
-  { key: 'practiceMinutes', value: '240', icon: Clock },
-];
 
 const getStoredPreferences = () => {
   try {
@@ -113,14 +106,56 @@ function SegmentedControl({ options, value, onChange }) {
 function ProfilePage() {
   const { i18n, t } = useTranslation();
   const text = labels[i18n.language === 'he' ? 'he' : 'ar'];
-  const user = getStoredUser();
+
+  const storedUser = getStoredUser();
+  const [user, setUser] = useState(storedUser);
+  const [progress, setProgress] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const storedPreferences = useMemo(getStoredPreferences, []);
   const [theme, setTheme] = useState(storedPreferences.theme);
   const [textSize, setTextSize] = useState(storedPreferences.textSize);
   const [voiceSpeed, setVoiceSpeed] = useState(storedPreferences.voiceSpeed);
   const [notifications, setNotifications] = useState(storedPreferences.notifications);
+
   const isDark = theme === 'dark';
   const isLargeText = textSize === 'large';
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const token = getStoredToken();
+
+        if (!token) {
+          setLoading(false);
+          return;
+        }
+
+        const currentUser = await getCurrentUser();
+
+        const response = await fetch('http://localhost:3000/api/progress/me', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const progressData = await response.json();
+
+        if (!response.ok) {
+          throw new Error(progressData.error || 'Failed to load progress');
+        }
+
+        setUser(currentUser);
+        setProgress(progressData.progress);
+      } catch (error) {
+        console.error('Failed to load profile:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProfile();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(
@@ -135,13 +170,38 @@ function ProfilePage() {
     window.dispatchEvent(new Event('lisan-student-preferences-changed'));
   }, [notifications, textSize, theme, voiceSpeed]);
 
+  const stats = [
+    {
+      key: 'totalChats',
+      value: progress?.totalChats ?? 0,
+      icon: MessageCircle,
+    },
+    {
+      key: 'learnedWords',
+      value: progress?.correctMeaningCount ?? 0,
+      icon: Languages,
+    },
+    {
+      key: 'streakDays',
+      value: progress?.totalAttempts ?? 0,
+      icon: Flame,
+    },
+    {
+      key: 'practiceMinutes',
+      value: progress?.pronunciationUsage?.usedThisMonth ?? 0,
+      icon: Clock,
+    },
+  ];
+
   const pageClass = isDark
     ? 'min-h-screen bg-slate-950 px-4 py-5 text-slate-100 sm:px-6 sm:py-8'
     : 'min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8';
+
   const surfaceClass = isDark ? 'bg-slate-900 text-slate-100 shadow-card' : 'bg-white text-slate-900 shadow-card';
   const panelClass = isDark ? 'border-slate-700 bg-slate-800' : 'border-slate-100 bg-slate-50';
   const mutedTextClass = isDark ? 'text-slate-300' : 'text-slate-600';
   const headingTextClass = isDark ? 'text-white' : 'text-slate-950';
+
   const textScaleClass = isLargeText
     ? '[&_button]:!text-base [&_input]:!text-base [&_p]:!text-base [&_span]:!text-base [&_textarea]:!text-base'
     : '';
@@ -156,23 +216,33 @@ function ProfilePage() {
             <div>
               <p className="text-sm font-semibold text-violet-700">{text.title}</p>
               <h1 className={`mt-2 text-2xl font-bold leading-tight sm:text-3xl ${headingTextClass}`}>
-                {user?.name || 'ליאן'}
+                {user?.name || 'Lisan Student'}
               </h1>
-              <p className={`mt-3 text-sm leading-6 ${mutedTextClass}`}>{text.subtitle}</p>
+              <p className={`mt-3 text-sm leading-6 ${mutedTextClass}`}>
+                {loading ? 'Loading...' : text.subtitle}
+              </p>
             </div>
+
             <div className="rounded-2xl bg-violet-50 px-4 py-3 text-center">
               <p className="text-xs font-semibold text-slate-500">{text.level}</p>
-              <p className="mt-1 whitespace-nowrap text-sm font-bold text-violet-700">א1</p>
+              <p className="mt-1 whitespace-nowrap text-sm font-bold text-violet-700">
+                {user?.level || 'A1'}
+              </p>
             </div>
           </div>
 
           <div className="mt-5 rounded-2xl border border-violet-100 bg-violet-50/70 p-4">
             <div className="flex items-center justify-between">
               <span className="text-sm font-bold text-slate-800">{text.dailyProgress}</span>
-              <span className="text-sm font-bold text-violet-700">45%</span>
+              <span className="text-sm font-bold text-violet-700">
+                {progress?.accuracy ?? 0}%
+              </span>
             </div>
             <div className="mt-3 h-3 overflow-hidden rounded-full bg-white">
-              <div className="h-full rounded-full bg-violet-600" style={{ width: '45%' }} />
+              <div
+                className="h-full rounded-full bg-violet-600"
+                style={{ width: `${progress?.accuracy ?? 0}%` }}
+              />
             </div>
           </div>
         </section>
