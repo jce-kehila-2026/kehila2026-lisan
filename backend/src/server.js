@@ -12,6 +12,9 @@ const evaluationRoutes = require('./routes/evaluation');
 const adminRoutes = require('./routes/admin');
 const chatRoutes = require('./routes/chats');
 const progressRoutes = require('./routes/progress');
+const teacherRoutes = require('./routes/teacher');
+const sharedChatsRoutes = require('./routes/sharedChats');
+const notificationsRoutes = require('./routes/notifications');
 
 require('./config/firebase');
 
@@ -55,6 +58,9 @@ app.use('/api/evaluation', evaluationRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/chats', chatRoutes);
 app.use('/api/progress', progressRoutes);
+app.use('/api/teacher', teacherRoutes);
+app.use('/api/shared-chats', sharedChatsRoutes);
+app.use('/api/notifications', notificationsRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

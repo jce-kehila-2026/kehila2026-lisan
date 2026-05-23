@@ -7,6 +7,7 @@ import MorePage from './pages/MorePage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import ScenarioChat from './pages/ScenarioChat.jsx';
 import SharedChat from './pages/SharedChat.jsx';
+import SharedChatRoom from './pages/SharedChatRoom.jsx';
 import TeacherMore from './pages/teacher/More.jsx';
 import AdminDashboard from './pages/admin/Dashboard.jsx';
 import AdminLogin from './pages/admin/Login.jsx';
@@ -21,6 +22,7 @@ import TeacherHome from './pages/home/TeacherHome.jsx';
 import StudentLogin from './pages/student/Login.jsx';
 import TeacherLogin from './pages/teacher/Login.jsx';
 import { getStoredUser } from './services/auth.js';
+
 
 function MoreByRole() {
   const user = getStoredUser();
@@ -154,6 +156,14 @@ function App() {
           element={
             <ProtectedRoute role="student">
               <SharedChat />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/shared-chat/:id"
+          element={
+            <ProtectedRoute role={['student', 'teacher']}>
+              <SharedChatRoom />
             </ProtectedRoute>
           }
         />

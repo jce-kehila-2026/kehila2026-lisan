@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, LogOut } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+
 import LanguageToggle from './LanguageToggle.jsx';
 import Logo from './Logo.jsx';
 
@@ -11,9 +12,19 @@ function PageHeader({ backTo, showBack = false, showLogout = false }) {
 
   return (
     <header className="flex items-center justify-between gap-4">
-      <Logo />
+      <button
+        type="button"
+        onClick={() => navigate('/home')}
+        className="rounded-2xl transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+        aria-label="דף הבית"
+        title="דף הבית"
+      >
+        <Logo />
+      </button>
+
       <div className="flex items-center gap-3">
         <LanguageToggle />
+
         {showBack ? (
           <button
             type="button"
@@ -33,6 +44,7 @@ function PageHeader({ backTo, showBack = false, showLogout = false }) {
             <ArrowRight className="h-5 w-5" aria-hidden="true" />
           </button>
         ) : null}
+
         {showLogout ? (
           <button
             type="button"

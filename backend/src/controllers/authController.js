@@ -6,14 +6,12 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // 1) Validate input
     if (!email || !password) {
       return res.status(400).json({
         error: 'Email and password are required'
       });
     }
 
-    // 2) Find user by email in Firestore
     const userSnapshot = await db
       .collection('users')
       .where('email', '==', email)
@@ -30,7 +28,6 @@ exports.login = async (req, res) => {
     const user = userDoc.data();
     const uid = userDoc.id;
 
-    // 3) Check if account is locked
     const now = new Date();
 
     if (user.lockedUntil && user.lockedUntil.toDate() > now) {
@@ -40,10 +37,8 @@ exports.login = async (req, res) => {
       });
     }
 
-    // 4) Compare password
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
 
-    // 5) Wrong password
     if (!isPasswordValid) {
       const failedAttempts = (user.failedLoginAttempts || 0) + 1;
 
@@ -53,32 +48,25 @@ exports.login = async (req, res) => {
 
       if (failedAttempts >= 5) {
         const lockedUntil = new Date(Date.now() + 10 * 60 * 1000);
-
         updateData.lockedUntil = admin.firestore.Timestamp.fromDate(lockedUntil);
       }
 
       await db.collection('users').doc(uid).update(updateData);
 
-      if (failedAttempts >= 5) {
-        return res.status(423).json({
-          error: 'Account is locked',
-          unlockAt: updateData.lockedUntil.toDate().toISOString()
-        });
-      }
-
-      return res.status(401).json({
-        error: 'Invalid credentials'
+      return res.status(failedAttempts >= 5 ? 423 : 401).json({
+        error: failedAttempts >= 5 ? 'Account is locked' : 'Invalid credentials',
+        ...(failedAttempts >= 5
+          ? { unlockAt: updateData.lockedUntil.toDate().toISOString() }
+          : {})
       });
     }
 
-    // 6) Correct password: reset failed attempts and update login time
     await db.collection('users').doc(uid).update({
       failedLoginAttempts: 0,
       lockedUntil: null,
       lastLoginAt: admin.firestore.FieldValue.serverTimestamp()
     });
 
-    // 7) Generate JWT
     const token = jwt.sign(
       {
         uid,
@@ -90,14 +78,18 @@ exports.login = async (req, res) => {
       }
     );
 
-    // 8) Return response
     return res.status(200).json({
       token,
       user: {
         id: uid,
-        name: user.name,
-        role: user.role,
-        language: user.language
+        uid,
+        name: user.name || '',
+        email: user.email || '',
+        role: user.role || '',
+        language: user.language || 'ar',
+        level: user.level || '',
+        teacherId: user.teacherId || '',
+        teacherIds: Array.isArray(user.teacherIds) ? user.teacherIds : []
       }
     });
   } catch (error) {

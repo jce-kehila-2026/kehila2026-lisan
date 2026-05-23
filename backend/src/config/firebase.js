@@ -1,7 +1,13 @@
 const admin = require('firebase-admin');
 const path = require('path');
 
-const serviceAccount = require(path.join(__dirname, '../../privateKey.json'));
+let serviceAccount;
+
+if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+} else {
+  serviceAccount = require(path.join(__dirname, '../../privateKey.json'));
+}
 
 if (!admin.apps.length) {
   admin.initializeApp({

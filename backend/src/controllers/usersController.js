@@ -22,11 +22,14 @@ exports.getMe = async (req, res) => {
 
     return res.status(200).json({
       id: uid,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      language: user.language,
-      level: user.level
+      uid,
+      name: user.name || '',
+      email: user.email || '',
+      role: user.role || '',
+      language: user.language || 'ar',
+      level: user.level || '',
+      teacherId: user.teacherId || '',
+      teacherIds: Array.isArray(user.teacherIds) ? user.teacherIds : []
     });
   } catch (error) {
     console.error('GetMe error:', error);
