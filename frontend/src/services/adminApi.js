@@ -23,6 +23,18 @@ const request = async (path, options = {}) => {
   return data;
 };
 
+const normalizeTeacherIds = (user) => {
+  if (Array.isArray(user.teacherIds)) {
+    return user.teacherIds;
+  }
+
+  if (user.teacherId) {
+    return [user.teacherId];
+  }
+
+  return [];
+};
+
 const mapUserToStudent = (user) => ({
   id: user.id,
   name: user.name || '',
@@ -31,7 +43,7 @@ const mapUserToStudent = (user) => ({
   language: user.language || 'ar',
   role: user.role || 'student',
   status: user.isActive === false ? 'suspended' : 'active',
-  teacherId: user.teacherId || '',
+  teacherIds: normalizeTeacherIds(user),
   lastLoginAt: user.lastLoginAt || null,
   createdAt: user.createdAt || null
 });
@@ -81,7 +93,8 @@ export const createStudent = async (student) => {
       name: student.name,
       role: 'student',
       level: student.level || 'A1',
-      language: student.language || 'ar'
+      language: student.language || 'ar',
+      teacherIds: Array.isArray(student.teacherIds) ? student.teacherIds : []
     })
   });
 
@@ -91,21 +104,30 @@ export const createStudent = async (student) => {
 };
 
 export const updateStudent = async (id, student) => {
+  const body = {
+    name: student.name,
+    email: student.email,
+    level: student.level,
+    language: student.language,
+    teacherIds: Array.isArray(student.teacherIds) ? student.teacherIds : [],
+    isActive: student.status ? student.status !== 'suspended' : undefined
+  };
+
+  if (student.password && student.password.trim() !== '') {
+    body.password = student.password;
+  }
+
   const data = await request(`/admin/users/${id}`, {
     method: 'PUT',
-    body: JSON.stringify({
-      name: student.name,
-      level: student.level,
-      language: student.language,
-      isActive: student.status ? student.status !== 'suspended' : undefined
-    })
+    body: JSON.stringify(body)
   });
 
   return {
     success: data.success,
     student: {
       id,
-      ...student
+      ...student,
+      password: ''
     }
   };
 };
@@ -139,28 +161,36 @@ export const getTeachers = async () => {
   const data = await request('/admin/users');
 
   const teachers = data.users
-    .filter((user) => user.role === 'teacher' || user.role === 'expert')
+    .filter((user) => user.role === 'teacher' || user.role === 'admin')
     .map(mapUserToTeacher);
 
   return { teachers };
 };
 
 export const updateTeacher = async (id, teacher) => {
+  const body = {
+    name: teacher.name,
+    email: teacher.email,
+    role: teacher.role || 'teacher',
+    language: teacher.language,
+    isActive: teacher.status ? teacher.status !== 'suspended' : undefined
+  };
+
+  if (teacher.password && teacher.password.trim() !== '') {
+    body.password = teacher.password;
+  }
+
   const data = await request(`/admin/users/${id}`, {
     method: 'PUT',
-    body: JSON.stringify({
-      name: teacher.name,
-      role: teacher.role || 'teacher',
-      language: teacher.language,
-      isActive: teacher.status ? teacher.status !== 'suspended' : undefined
-    })
+    body: JSON.stringify(body)
   });
 
   return {
     success: data.success,
     teacher: {
       id,
-      ...teacher
+      ...teacher,
+      password: ''
     }
   };
 };
@@ -172,13 +202,90 @@ export const deleteTeacher = async (id) => {
 };
 
 export const assignStudentsToTeacher = async (teacherId, studentIds) => {
-  // Backend teacher-student assignment is not implemented yet.
-  // Keep this function so the UI does not break.
+  const updatedStudents = [];
+
+  for (const studentId of studentIds) {
+    const { student } = await getStudent(studentId);
+
+    const currentTeacherIds = Array.isArray(student.teacherIds)
+      ? student.teacherIds
+      : [];
+
+    const nextTeacherIds = [...new Set([...currentTeacherIds, teacherId])];
+
+    await updateStudent(studentId, {
+      ...student,
+      teacherIds: nextTeacherIds
+    });
+
+    updatedStudents.push({
+      id: studentId,
+      teacherIds: nextTeacherIds
+    });
+  }
+
   return {
     teacher: { id: teacherId },
-    students: studentIds.map((id) => ({
-      id,
-      teacherId
-    }))
+    students: updatedStudents
+  };
+};
+
+export const createTeacher = async (teacher) => {
+  const data = await request('/admin/users', {
+    method: 'POST',
+    body: JSON.stringify({
+      email: teacher.email,
+      password: teacher.password || 'Test1234!',
+      name: teacher.name,
+      role: 'teacher',
+      language: teacher.language || 'ar'
+    })
+  });
+
+  return {
+    teacher: mapUserToTeacher(data.user)
+  };
+};
+
+export const createAdmin = async (admin) => {
+  const data = await request('/admin/users', {
+    method: 'POST',
+    body: JSON.stringify({
+      email: admin.email,
+      password: admin.password || 'Admin1234!',
+      name: admin.name,
+      role: 'admin',
+      language: admin.language || 'ar'
+    })
+  });
+
+  return {
+    admin: {
+      id: data.user.id,
+      name: data.user.name,
+      email: data.user.email,
+      role: data.user.role
+    }
+  };
+};
+
+export const createUser = async (user) => {
+  const data = await request('/admin/users', {
+    method: 'POST',
+    body: JSON.stringify({
+      email: user.email,
+      password: user.password,
+      name: user.name,
+      role: user.role,
+      language: user.language || 'ar',
+      level: user.level || 'A1',
+      teacherIds: Array.isArray(user.teacherIds)
+        ? user.teacherIds
+        : []
+    })
+  });
+
+  return {
+    user: data.user
   };
 };

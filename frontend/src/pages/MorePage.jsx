@@ -9,7 +9,7 @@ import {
   Trash2,
   UsersRound,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import BottomNav from '../components/BottomNav.jsx';
@@ -34,7 +34,7 @@ const labels = {
     friendsChatText: 'בחירת חברות לתרגול משותף',
     teacherChat: 'שיחה עם המורה',
     teacherChatText: 'פתיחת שיחה עם המורה',
-    teacherChatStarted: 'פתיחת שיחה עם המורה',
+    teacherChatStarted: 'פותח שיחה עם המורה...',
     settings: 'קיצור להגדרות',
     settingsText: 'שפה, תצוגה, גודל טקסט והעדפות אישיות.',
     noChats: 'אין שיחות עדיין',
@@ -55,7 +55,7 @@ const labels = {
     friendsChatText: 'اختيار صديقات للتدريب المشترك',
     teacherChat: 'محادثة مع المعلمة',
     teacherChatText: 'فتح محادثة مع المعلمة',
-    teacherChatStarted: 'فتح محادثة مع المعلمة',
+    teacherChatStarted: 'جارٍ فتح المحادثة مع المعلمة...',
     settings: 'اختصار للإعدادات',
     settingsText: 'اللغة، العرض، حجم النص والتفضيلات.',
     noChats: 'لا توجد محادثات بعد',
@@ -72,6 +72,7 @@ const savedWords = [
 
 function MorePage() {
   const { i18n } = useTranslation();
+  const navigate = useNavigate();
 
   const text = labels[i18n.language === 'he' ? 'he' : 'ar'];
 
@@ -79,7 +80,7 @@ function MorePage() {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [shareStatus, setShareStatus] = useState('');
-  const [teacherChatStarted, setTeacherChatStarted] = useState(false);
+  const [teacherChatStarted, setTeacherChatStarted] = useState('');
 
   useEffect(() => {
     const loadChats = async () => {
@@ -91,14 +92,11 @@ function MorePage() {
           return;
         }
 
-        const response = await fetch(
-          `${API_BASE_URL}/chats/my`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        const response = await fetch(`${API_BASE_URL}/chats/my`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        );
+        });
 
         const data = await response.json();
 
@@ -109,9 +107,7 @@ function MorePage() {
         const formattedChats = (data.chats || []).map((chat) => ({
           id: chat.id,
           title: chat.title || 'New Chat',
-          preview:
-            chat.messages?.[0]?.text ||
-            'No messages yet',
+          preview: chat.messages?.[0]?.text || 'No messages yet',
           time: new Date(
             chat.updatedAt?._seconds
               ? chat.updatedAt._seconds * 1000
@@ -150,9 +146,9 @@ function MorePage() {
       currentConversations.map((conversation) =>
         conversation.id === id
           ? {
-            ...conversation,
-            favorite: !conversation.favorite,
-          }
+              ...conversation,
+              favorite: !conversation.favorite,
+            }
           : conversation,
       ),
     );
@@ -208,6 +204,72 @@ function MorePage() {
     }
   };
 
+  const openTeacherChat = async () => {
+    try {
+      const token = getStoredToken();
+
+      if (!token) {
+        return;
+      }
+
+      setTeacherChatStarted(text.teacherChatStarted);
+
+      const usersResponse = await fetch(
+        `${API_BASE_URL}/shared-chats/available-users`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const usersData = await usersResponse.json();
+
+      if (!usersResponse.ok) {
+        throw new Error(usersData.error || 'Failed to load teachers');
+      }
+
+      const teacher = (usersData.users || []).find(
+        (user) => user.role === 'teacher' || user.role === 'expert',
+      );
+
+      if (!teacher) {
+        setTeacherChatStarted(
+          i18n.language === 'he'
+            ? 'לא נמצאה מורה זמינה'
+            : 'لم يتم العثور على معلمة متاحة',
+        );
+        return;
+      }
+
+      const chatResponse = await fetch(`${API_BASE_URL}/shared-chats`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          participantIds: [teacher.id],
+        }),
+      });
+
+      const chatData = await chatResponse.json();
+
+      if (!chatResponse.ok) {
+        throw new Error(chatData.error || 'Failed to create chat');
+      }
+
+      navigate(`/shared-chat/${chatData.chatId}`);
+    } catch (error) {
+      console.error('Failed to open teacher chat:', error);
+      setTeacherChatStarted(
+        i18n.language === 'he'
+          ? 'אירעה שגיאה בפתיחת השיחה'
+          : 'حدث خطأ أثناء فتح المحادثة',
+      );
+    }
+  };
+
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8">
       <div
@@ -229,10 +291,7 @@ function MorePage() {
         <section className="mt-5 rounded-3xl bg-white p-5 shadow-card sm:p-6">
           <div className="flex items-center gap-3">
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 via-pink-400 to-amber-300 text-white">
-              <MessageCircle
-                className="h-6 w-6"
-                aria-hidden="true"
-              />
+              <MessageCircle className="h-6 w-6" aria-hidden="true" />
             </span>
 
             <h2 className="text-xl font-bold text-slate-900">
@@ -241,16 +300,11 @@ function MorePage() {
           </div>
 
           <label className="mt-4 flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-            <Search
-              className="h-5 w-5 text-slate-400"
-              aria-hidden="true"
-            />
+            <Search className="h-5 w-5 text-slate-400" aria-hidden="true" />
 
             <input
               value={query}
-              onChange={(event) =>
-                setQuery(event.target.value)
-              }
+              onChange={(event) => setQuery(event.target.value)}
               placeholder={text.search}
               className="min-w-0 flex-1 bg-transparent text-sm outline-none"
             />
@@ -287,10 +341,11 @@ function MorePage() {
                     </div>
 
                     <Star
-                      className={`h-5 w-5 ${conversation.favorite
-                        ? 'fill-amber-300 text-amber-400'
-                        : 'text-slate-300'
-                        }`}
+                      className={`h-5 w-5 ${
+                        conversation.favorite
+                          ? 'fill-amber-300 text-amber-400'
+                          : 'text-slate-300'
+                      }`}
                       aria-hidden="true"
                     />
                   </div>
@@ -305,43 +360,28 @@ function MorePage() {
 
                     <button
                       type="button"
-                      onClick={() =>
-                        shareConversation(conversation)
-                      }
+                      onClick={() => shareConversation(conversation)}
                       className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-xs font-bold text-violet-700"
                     >
-                      <Share2
-                        className="h-4 w-4"
-                        aria-hidden="true"
-                      />
+                      <Share2 className="h-4 w-4" aria-hidden="true" />
                       {text.share}
                     </button>
 
                     <button
                       type="button"
-                      onClick={() =>
-                        toggleFavorite(conversation.id)
-                      }
+                      onClick={() => toggleFavorite(conversation.id)}
                       className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-xs font-bold text-violet-700"
                     >
-                      <Heart
-                        className="h-4 w-4"
-                        aria-hidden="true"
-                      />
+                      <Heart className="h-4 w-4" aria-hidden="true" />
                       {text.favorite}
                     </button>
 
                     <button
                       type="button"
-                      onClick={() =>
-                        deleteConversation(conversation.id)
-                      }
+                      onClick={() => deleteConversation(conversation.id)}
                       className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-xs font-bold text-slate-600"
                     >
-                      <Trash2
-                        className="h-4 w-4"
-                        aria-hidden="true"
-                      />
+                      <Trash2 className="h-4 w-4" aria-hidden="true" />
                       {text.delete}
                     </button>
                   </div>
@@ -374,10 +414,7 @@ function MorePage() {
             className="flex items-center gap-3 rounded-3xl bg-white p-5 shadow-card"
           >
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-50 text-violet-700">
-              <UsersRound
-                className="h-6 w-6"
-                aria-hidden="true"
-              />
+              <UsersRound className="h-6 w-6" aria-hidden="true" />
             </span>
 
             <div>
@@ -393,14 +430,11 @@ function MorePage() {
 
           <button
             type="button"
-            onClick={() => setTeacherChatStarted(true)}
+            onClick={openTeacherChat}
             className="flex w-full items-center gap-3 rounded-3xl bg-white p-5 text-right shadow-card"
           >
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-50 text-violet-700">
-              <MessageCircle
-                className="h-6 w-6"
-                aria-hidden="true"
-              />
+              <MessageCircle className="h-6 w-6" aria-hidden="true" />
             </span>
 
             <span>
@@ -416,7 +450,7 @@ function MorePage() {
 
           {teacherChatStarted ? (
             <div className="rounded-2xl bg-violet-50 p-4 text-sm font-semibold leading-6 text-violet-700">
-              {text.teacherChatStarted}
+              {teacherChatStarted}
             </div>
           ) : null}
 
@@ -425,10 +459,7 @@ function MorePage() {
             className="flex items-center gap-3 rounded-3xl bg-white p-5 shadow-card"
           >
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-50 text-violet-700">
-              <Settings
-                className="h-6 w-6"
-                aria-hidden="true"
-              />
+              <Settings className="h-6 w-6" aria-hidden="true" />
             </span>
 
             <div>
