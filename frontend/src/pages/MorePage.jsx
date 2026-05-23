@@ -1,9 +1,22 @@
-import React, { useMemo, useState } from 'react';
-import { Heart, MessageCircle, Search, Settings, Share2, Star, Trash2, UsersRound } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  Heart,
+  MessageCircle,
+  Search,
+  Settings,
+  Share2,
+  Star,
+  Trash2,
+  UsersRound,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+
 import BottomNav from '../components/BottomNav.jsx';
 import PageHeader from '../components/PageHeader.jsx';
+import { getStoredToken } from '../services/auth.js';
+
+const API_BASE_URL = 'http://localhost:3000/api';
 
 const labels = {
   he: {
@@ -24,7 +37,9 @@ const labels = {
     teacherChatStarted: 'פתיחת שיחה עם המורה',
     settings: 'קיצור להגדרות',
     settingsText: 'שפה, תצוגה, גודל טקסט והעדפות אישיות.',
+    noChats: 'אין שיחות עדיין',
   },
+
   ar: {
     title: 'المزيد',
     subtitle: 'سجل المحادثات، كلمات محفوظة واختصارات مفيدة',
@@ -43,72 +58,141 @@ const labels = {
     teacherChatStarted: 'فتح محادثة مع المعلمة',
     settings: 'اختصار للإعدادات',
     settingsText: 'اللغة، العرض، حجم النص والتفضيلات.',
+    noChats: 'لا توجد محادثات بعد',
   },
 };
 
-const mockConversations = [
-  {
-    id: 'doctor',
-    title: 'שיחה אצל הרופא',
-    preview: 'שלום, מה כואב לך היום?',
-    time: '21.05.2026 · 09:30',
-    favorite: true,
-  },
-  {
-    id: 'market',
-    title: 'קניות בשוק',
-    preview: 'כמה עולה הלחם?',
-    time: '20.05.2026 · 18:15',
-    favorite: false,
-  },
-  {
-    id: 'bus',
-    title: 'נסיעה באוטובוס',
-    preview: 'איפה התחנה הקרובה?',
-    time: '19.05.2026 · 12:05',
-    favorite: false,
-  },
+const savedWords = [
+  'שלום',
+  'תודה',
+  'סליחה',
+  'כמה זה עולה?',
+  'אני צריכה עזרה',
 ];
-
-const savedWords = ['שלום', 'תודה', 'סליחה', 'כמה זה עולה?', 'אני צריכה עזרה'];
 
 function MorePage() {
   const { i18n } = useTranslation();
+
   const text = labels[i18n.language === 'he' ? 'he' : 'ar'];
+
   const [query, setQuery] = useState('');
-  const [conversations, setConversations] = useState(mockConversations);
+  const [conversations, setConversations] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [shareStatus, setShareStatus] = useState('');
   const [teacherChatStarted, setTeacherChatStarted] = useState(false);
 
+  useEffect(() => {
+    const loadChats = async () => {
+      try {
+        const token = getStoredToken();
+
+        if (!token) {
+          setLoading(false);
+          return;
+        }
+
+        const response = await fetch(
+          `${API_BASE_URL}/chats/my`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to load chats');
+        }
+
+        const formattedChats = (data.chats || []).map((chat) => ({
+          id: chat.id,
+          title: chat.title || 'New Chat',
+          preview:
+            chat.messages?.[0]?.text ||
+            'No messages yet',
+          time: new Date(
+            chat.updatedAt?._seconds
+              ? chat.updatedAt._seconds * 1000
+              : Date.now(),
+          ).toLocaleString(),
+          favorite: false,
+        }));
+
+        setConversations(formattedChats);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadChats();
+  }, []);
+
   const filteredConversations = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-    if (!normalizedQuery) return conversations;
+
+    if (!normalizedQuery) {
+      return conversations;
+    }
 
     return conversations.filter((conversation) =>
-      `${conversation.title} ${conversation.preview}`.toLowerCase().includes(normalizedQuery),
+      `${conversation.title} ${conversation.preview}`
+        .toLowerCase()
+        .includes(normalizedQuery),
     );
   }, [conversations, query]);
 
   const toggleFavorite = (id) => {
     setConversations((currentConversations) =>
       currentConversations.map((conversation) =>
-        conversation.id === id ? { ...conversation, favorite: !conversation.favorite } : conversation,
+        conversation.id === id
+          ? {
+            ...conversation,
+            favorite: !conversation.favorite,
+          }
+          : conversation,
       ),
     );
   };
 
-  const deleteConversation = (id) => {
-    setConversations((currentConversations) =>
-      currentConversations.filter((conversation) => conversation.id !== id),
-    );
+  const deleteConversation = async (id) => {
+    try {
+      const token = getStoredToken();
+
+      const response = await fetch(`${API_BASE_URL}/chats/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to delete chat');
+      }
+
+      setConversations((currentConversations) =>
+        currentConversations.filter((conversation) => conversation.id !== id),
+      );
+    } catch (error) {
+      console.error('Failed to delete chat:', error);
+    }
   };
 
   const shareConversation = async (conversation) => {
-    const shareText = `ליסאן - ${conversation.title}: ${conversation.preview}`;
+    const shareText = `Lisan - ${conversation.title}: ${conversation.preview}`;
 
     if (navigator.share) {
       try {
-        await navigator.share({ text: shareText, title: 'Lisan' });
+        await navigator.share({
+          text: shareText,
+          title: 'Lisan',
+        });
+
         setShareStatus(text.share);
         return;
       } catch {
@@ -126,11 +210,17 @@ function MorePage() {
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8">
-      <div className="relative mx-auto min-h-[calc(100vh-2.5rem)] max-w-xl pb-28 sm:min-h-[780px]" dir="rtl">
+      <div
+        className="relative mx-auto min-h-[calc(100vh-2.5rem)] max-w-xl pb-28 sm:min-h-[780px]"
+        dir="rtl"
+      >
         <PageHeader showBack />
 
         <section className="mt-6 rounded-3xl bg-white p-5 shadow-card sm:p-6">
-          <p className="text-sm font-semibold text-violet-700">{text.title}</p>
+          <p className="text-sm font-semibold text-violet-700">
+            {text.title}
+          </p>
+
           <h1 className="mt-2 text-2xl font-bold leading-tight text-slate-950 sm:text-3xl">
             {text.subtitle}
           </h1>
@@ -139,74 +229,139 @@ function MorePage() {
         <section className="mt-5 rounded-3xl bg-white p-5 shadow-card sm:p-6">
           <div className="flex items-center gap-3">
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 via-pink-400 to-amber-300 text-white">
-              <MessageCircle className="h-6 w-6" aria-hidden="true" />
+              <MessageCircle
+                className="h-6 w-6"
+                aria-hidden="true"
+              />
             </span>
-            <h2 className="text-xl font-bold text-slate-900">{text.chatHistory}</h2>
+
+            <h2 className="text-xl font-bold text-slate-900">
+              {text.chatHistory}
+            </h2>
           </div>
 
           <label className="mt-4 flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-            <Search className="h-5 w-5 text-slate-400" aria-hidden="true" />
+            <Search
+              className="h-5 w-5 text-slate-400"
+              aria-hidden="true"
+            />
+
             <input
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) =>
+                setQuery(event.target.value)
+              }
               placeholder={text.search}
               className="min-w-0 flex-1 bg-transparent text-sm outline-none"
             />
           </label>
 
           <div className="mt-4 grid gap-3">
-            {filteredConversations.map((conversation) => (
-              <article key={conversation.id} className="rounded-2xl border border-slate-100 bg-violet-50/40 p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h3 className="font-bold text-slate-900">{conversation.title}</h3>
-                    <p className="mt-1 text-sm leading-6 text-slate-600">{conversation.preview}</p>
-                    <p className="mt-2 text-xs font-semibold text-slate-500">{conversation.time}</p>
+            {loading ? (
+              <div className="rounded-2xl bg-slate-50 p-4 text-center text-sm text-slate-500">
+                Loading chats...
+              </div>
+            ) : filteredConversations.length === 0 ? (
+              <div className="rounded-2xl bg-slate-50 p-4 text-center text-sm text-slate-500">
+                {text.noChats}
+              </div>
+            ) : (
+              filteredConversations.map((conversation) => (
+                <article
+                  key={conversation.id}
+                  className="rounded-2xl border border-slate-100 bg-violet-50/40 p-4"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h3 className="font-bold text-slate-900">
+                        {conversation.title}
+                      </h3>
+
+                      <p className="mt-1 text-sm leading-6 text-slate-600">
+                        {conversation.preview}
+                      </p>
+
+                      <p className="mt-2 text-xs font-semibold text-slate-500">
+                        {conversation.time}
+                      </p>
+                    </div>
+
+                    <Star
+                      className={`h-5 w-5 ${conversation.favorite
+                        ? 'fill-amber-300 text-amber-400'
+                        : 'text-slate-300'
+                        }`}
+                      aria-hidden="true"
+                    />
                   </div>
-                  <Star
-                    className={`h-5 w-5 ${conversation.favorite ? 'fill-amber-300 text-amber-400' : 'text-slate-300'}`}
-                    aria-hidden="true"
-                  />
-                </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <Link to="/chatbot" className="rounded-full bg-violet-600 px-4 py-2 text-xs font-bold text-white">
-                    {text.continueChat}
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => shareConversation(conversation)}
-                    className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-xs font-bold text-violet-700"
-                  >
-                    <Share2 className="h-4 w-4" aria-hidden="true" />
-                    {text.share}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => toggleFavorite(conversation.id)}
-                    className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-xs font-bold text-violet-700"
-                  >
-                    <Heart className="h-4 w-4" aria-hidden="true" />
-                    {text.favorite}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => deleteConversation(conversation.id)}
-                    className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-xs font-bold text-slate-600"
-                  >
-                    <Trash2 className="h-4 w-4" aria-hidden="true" />
-                    {text.delete}
-                  </button>
-                </div>
-              </article>
-            ))}
+
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Link
+                      to={`/chatbot?chatId=${conversation.id}`}
+                      className="rounded-full bg-violet-600 px-4 py-2 text-xs font-bold text-white"
+                    >
+                      {text.continueChat}
+                    </Link>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        shareConversation(conversation)
+                      }
+                      className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-xs font-bold text-violet-700"
+                    >
+                      <Share2
+                        className="h-4 w-4"
+                        aria-hidden="true"
+                      />
+                      {text.share}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        toggleFavorite(conversation.id)
+                      }
+                      className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-xs font-bold text-violet-700"
+                    >
+                      <Heart
+                        className="h-4 w-4"
+                        aria-hidden="true"
+                      />
+                      {text.favorite}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        deleteConversation(conversation.id)
+                      }
+                      className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-xs font-bold text-slate-600"
+                    >
+                      <Trash2
+                        className="h-4 w-4"
+                        aria-hidden="true"
+                      />
+                      {text.delete}
+                    </button>
+                  </div>
+                </article>
+              ))
+            )}
           </div>
         </section>
 
         <section className="mt-5 rounded-3xl bg-white p-5 shadow-card sm:p-6">
-          <h2 className="text-xl font-bold text-slate-900">{text.savedTitle}</h2>
+          <h2 className="text-xl font-bold text-slate-900">
+            {text.savedTitle}
+          </h2>
+
           <div className="mt-4 flex flex-wrap gap-2">
             {savedWords.map((word) => (
-              <span key={word} className="rounded-full bg-violet-50 px-4 py-2 text-sm font-bold text-violet-700">
+              <span
+                key={word}
+                className="rounded-full bg-violet-50 px-4 py-2 text-sm font-bold text-violet-700"
+              >
                 {word}
               </span>
             ))}
@@ -214,13 +369,25 @@ function MorePage() {
         </section>
 
         <section className="mt-5 grid gap-3">
-          <Link to="/shared-chat" className="flex items-center gap-3 rounded-3xl bg-white p-5 shadow-card">
+          <Link
+            to="/shared-chat"
+            className="flex items-center gap-3 rounded-3xl bg-white p-5 shadow-card"
+          >
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-50 text-violet-700">
-              <UsersRound className="h-6 w-6" aria-hidden="true" />
+              <UsersRound
+                className="h-6 w-6"
+                aria-hidden="true"
+              />
             </span>
+
             <div>
-              <h2 className="font-bold text-slate-900">{text.friendsChat}</h2>
-              <p className="mt-1 text-sm leading-6 text-slate-600">{text.friendsChatText}</p>
+              <h2 className="font-bold text-slate-900">
+                {text.friendsChat}
+              </h2>
+
+              <p className="mt-1 text-sm leading-6 text-slate-600">
+                {text.friendsChatText}
+              </p>
             </div>
           </Link>
 
@@ -230,11 +397,20 @@ function MorePage() {
             className="flex w-full items-center gap-3 rounded-3xl bg-white p-5 text-right shadow-card"
           >
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-50 text-violet-700">
-              <MessageCircle className="h-6 w-6" aria-hidden="true" />
+              <MessageCircle
+                className="h-6 w-6"
+                aria-hidden="true"
+              />
             </span>
+
             <span>
-              <span className="block font-bold text-slate-900">{text.teacherChat}</span>
-              <span className="mt-1 block text-sm leading-6 text-slate-600">{text.teacherChatText}</span>
+              <span className="block font-bold text-slate-900">
+                {text.teacherChat}
+              </span>
+
+              <span className="mt-1 block text-sm leading-6 text-slate-600">
+                {text.teacherChatText}
+              </span>
             </span>
           </button>
 
@@ -244,18 +420,34 @@ function MorePage() {
             </div>
           ) : null}
 
-          <Link to="/profile" className="flex items-center gap-3 rounded-3xl bg-white p-5 shadow-card">
+          <Link
+            to="/profile"
+            className="flex items-center gap-3 rounded-3xl bg-white p-5 shadow-card"
+          >
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-50 text-violet-700">
-              <Settings className="h-6 w-6" aria-hidden="true" />
+              <Settings
+                className="h-6 w-6"
+                aria-hidden="true"
+              />
             </span>
+
             <div>
-              <h2 className="font-bold text-slate-900">{text.settings}</h2>
-              <p className="mt-1 text-sm leading-6 text-slate-600">{text.settingsText}</p>
+              <h2 className="font-bold text-slate-900">
+                {text.settings}
+              </h2>
+
+              <p className="mt-1 text-sm leading-6 text-slate-600">
+                {text.settingsText}
+              </p>
             </div>
           </Link>
         </section>
 
-        {shareStatus ? <p className="mt-3 text-center text-xs font-semibold text-slate-500">{shareStatus}</p> : null}
+        {shareStatus ? (
+          <p className="mt-3 text-center text-xs font-semibold text-slate-500">
+            {shareStatus}
+          </p>
+        ) : null}
 
         <BottomNav />
       </div>

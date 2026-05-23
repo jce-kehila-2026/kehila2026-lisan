@@ -1,4 +1,8 @@
+const axios = require('axios');
+
 const { admin, db } = require('../config/firebase');
+
+const AI_SERVICE_URL = 'http://localhost:8000/api/ai/chat';
 
 exports.createChat = async (req, res) => {
   try {
@@ -23,7 +27,10 @@ exports.createChat = async (req, res) => {
       success: true,
       chat: {
         id: docRef.id,
-        ...chatData,
+        userId,
+        title: chatData.title,
+        level: chatData.level,
+        messages: [],
         startedAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }
@@ -60,6 +67,7 @@ exports.getMyChats = async (req, res) => {
         level: data.level,
         startedAt: data.startedAt || null,
         updatedAt: data.updatedAt || null,
+        messages: data.messages || [],
         messagesCount: data.messages ? data.messages.length : 0
       });
     });
@@ -121,6 +129,97 @@ exports.getChatById = async (req, res) => {
       success: false,
       error: 'Server error',
       code: 'SERVER_ERROR'
+    });
+  }
+};
+
+exports.sendAiMessage = async (req, res) => {
+  try {
+    const userId = req.user.uid;
+
+    const { chatId } = req.params;
+
+    const { text } = req.body;
+
+    if (!text) {
+      return res.status(400).json({
+        success: false,
+        error: 'Text is required',
+        code: 'MISSING_TEXT'
+      });
+    }
+
+    const chatRef = db
+      .collection('chatSessions')
+      .doc(chatId);
+
+    const chatDoc = await chatRef.get();
+
+    if (!chatDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'Chat not found',
+        code: 'CHAT_NOT_FOUND'
+      });
+    }
+
+    const chat = chatDoc.data();
+
+    if (chat.userId !== userId) {
+      return res.status(403).json({
+        success: false,
+        error: 'Access denied',
+        code: 'ACCESS_DENIED'
+      });
+    }
+
+    // حفظ رسالة المستخدم
+    const userMessage = {
+      sender: 'user',
+      text,
+      createdAt: new Date().toISOString()
+    };
+
+    await chatRef.update({
+      messages: admin.firestore.FieldValue.arrayUnion(userMessage),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    // إرسال الرسالة للـ AI service
+    const aiResponse = await axios.post(AI_SERVICE_URL, {
+      message: text,
+      level: chat.level || 'A1',
+      includeArabic: false
+    });
+
+    const aiText =
+      aiResponse.data?.answerHe ||
+      'אני מבין. בוא נמשיך לתרגל.';
+
+    // حفظ رد الـ AI
+    const aiMessage = {
+      sender: 'ai',
+      text: aiText,
+      createdAt: new Date().toISOString()
+    };
+
+    await chatRef.update({
+      messages: admin.firestore.FieldValue.arrayUnion(aiMessage),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    return res.status(200).json({
+      success: true,
+      userMessage,
+      aiMessage
+    });
+  } catch (error) {
+    console.error('AI message error:', error);
+
+    return res.status(500).json({
+      success: false,
+      error: 'AI service failed',
+      code: 'AI_SERVICE_ERROR'
     });
   }
 };
@@ -190,6 +289,52 @@ exports.addMessage = async (req, res) => {
     });
   } catch (error) {
     console.error('Add message error:', error);
+
+    return res.status(500).json({
+      success: false,
+      error: 'Server error',
+      code: 'SERVER_ERROR'
+    });
+  }
+};
+
+exports.deleteChat = async (req, res) => {
+  try {
+    const userId = req.user.uid;
+    const { chatId } = req.params;
+
+    const chatRef = db
+      .collection('chatSessions')
+      .doc(chatId);
+
+    const chatDoc = await chatRef.get();
+
+    if (!chatDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'Chat not found',
+        code: 'CHAT_NOT_FOUND'
+      });
+    }
+
+    const chat = chatDoc.data();
+
+    if (chat.userId !== userId) {
+      return res.status(403).json({
+        success: false,
+        error: 'Access denied',
+        code: 'ACCESS_DENIED'
+      });
+    }
+
+    await chatRef.delete();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Chat deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete chat error:', error);
 
     return res.status(500).json({
       success: false,

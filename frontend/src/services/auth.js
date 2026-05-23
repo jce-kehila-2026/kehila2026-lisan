@@ -1,27 +1,4 @@
-const mockUsers = {
-  student: {
-    token: 'mock-student-token',
-    user: { id: 'student_001', name: 'student', role: 'student' },
-  },
-  teacher: {
-    token: 'mock-teacher-token',
-    user: { id: 'teacher_001', name: 'teacher', role: 'teacher' },
-  },
-  admin: {
-    token: 'mock-admin-token',
-    user: { id: 'admin_001', name: 'admin', role: 'admin' },
-  },
-};
-
-const getRoleFromUsername = (email = '') => {
-  const normalized = email.trim().toLowerCase();
-
-  if (normalized === 'student' || normalized === 'teacher' || normalized === 'admin') {
-    return normalized;
-  }
-
-  return null;
-};
+const API_BASE_URL = 'http://localhost:3000/api';
 
 export const getLandingPathForRole = (role) => {
   if (role === 'admin') return '/admin/dashboard';
@@ -30,31 +7,38 @@ export const getLandingPathForRole = (role) => {
 };
 
 export const login = async ({ email, password }) => {
-  if (password !== '123456') {
-    throw new Error('invalidCredentials');
+  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      email,
+      password
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || 'invalidCredentials');
   }
-
-  const role = getRoleFromUsername(email);
-
-  if (!role) {
-    throw new Error('unknownUser');
-  }
-
-  const session = mockUsers[role];
 
   return {
-    ...session,
-    user: {
-      ...session.user,
-      name: session.user.name,
-    },
+    token: data.token,
+    user: data.user
   };
 };
 
 export const storeSession = ({ token, user }) => {
   logout();
+
   localStorage.setItem('lisan-token', token);
   localStorage.setItem('lisan-user', JSON.stringify(user));
+};
+
+export const getStoredToken = () => {
+  return localStorage.getItem('lisan-token');
 };
 
 export const getStoredUser = () => {
@@ -63,6 +47,31 @@ export const getStoredUser = () => {
   } catch {
     return null;
   }
+};
+
+export const getCurrentUser = async () => {
+  const token = getStoredToken();
+
+  if (!token) {
+    throw new Error('No token found');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/users/me`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || 'Failed to load user');
+  }
+
+  localStorage.setItem('lisan-user', JSON.stringify(data));
+
+  return data;
 };
 
 export const logout = () => {
