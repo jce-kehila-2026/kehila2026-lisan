@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import logging
 from pathlib import Path
 
 from services.chat_cache import (
@@ -9,6 +11,7 @@ from services.chat_cache import (
     get_level_bundle,
     store_exact_cached_response,
 )
+from services.chat_circuit_breaker import provider_circuit
 from services.chat_guardrails import (
     classify_fast_reject,
     count_hebrew_words,
@@ -19,7 +22,10 @@ from services.chat_guardrails import (
     normalize_level,
 )
 from services.chat_provider import (
+    ChatProviderAuthError,
     ChatProviderError,
+    ChatProviderNetworkError,
+    ChatProviderQuotaError,
     ChatProviderTimeoutError,
     call_provider,
     get_configured_provider,
@@ -30,6 +36,8 @@ from services.chat_retrieval import (
 )
 from services.chat_router import route_message
 from services.chat_schemas import ChatRequest, ChatResponse, GuardrailReport
+
+logger = logging.getLogger("lisan.chat")
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 PROMPT_V2_PATH = BASE_DIR / "prompts" / "chat-system-prompt-v2.txt"
@@ -45,6 +53,8 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
     if cached_response is not None:
         cached_response.cacheHit = True
         cached_response.latencyMs = 0
+        cached_response.provider = provider
+        _log_response(cached_response, provider, 0)
         return cached_response
 
     bundle = get_level_bundle(requested_level)
@@ -55,9 +65,11 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
         response = _build_fallback_response(
             level=requested_level,
             model=model,
+            provider=provider,
             fallback_reason=fallback_reason,
         )
         store_exact_cached_response(cache_key, response)
+        _log_response(response, provider, 0)
         return response
 
     routed_response = route_message(
@@ -68,19 +80,24 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
         include_arabic=payload.includeArabic,
     )
     if routed_response is not None:
+        routed_response.provider = provider
         store_exact_cached_response(cache_key, routed_response)
+        _log_response(routed_response, provider, 0)
         return routed_response
 
     if is_clearly_out_of_scope(payload.message, set(bundle.vocab_set), set(bundle.advanced_only_tokens)):
         response = _build_fallback_response(
             level=resolved_level,
             model=model,
+            provider=provider,
             fallback_reason="OUT_OF_SCOPE",
         )
         store_exact_cached_response(cache_key, response)
+        _log_response(response, provider, 0)
         return response
 
     selected_chunks = retrieve_relevant_chunks(payload.message, bundle.chunks, limit=2)
+    chunk_ids = [chunk.chunk_id for chunk in selected_chunks]
     context = render_context(selected_chunks)
     system_message = _build_system_message(
         base_prompt=_load_prompt(),
@@ -89,25 +106,76 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
         include_arabic=payload.includeArabic,
     )
 
+    if not provider_circuit.allow_request():
+        response = _build_fallback_response(
+            level=resolved_level,
+            model=model,
+            provider=provider,
+            fallback_reason="CIRCUIT_OPEN",
+            context_chunk_ids=chunk_ids,
+        )
+        _log_response(response, provider, len(selected_chunks))
+        return response
+
     try:
         provider_result = call_provider(provider, model, system_message, payload.message)
+        provider_circuit.record_success()
     except ChatProviderTimeoutError:
+        provider_circuit.record_failure()
         response = _build_fallback_response(
             level=resolved_level,
             model=model,
+            provider=provider,
             fallback_reason="MODEL_TIMEOUT",
-            context_chunk_ids=[chunk.chunk_id for chunk in selected_chunks],
+            context_chunk_ids=chunk_ids,
         )
         store_exact_cached_response(cache_key, response)
+        _log_response(response, provider, len(selected_chunks))
+        return response
+    except ChatProviderQuotaError:
+        provider_circuit.record_failure()
+        response = _build_fallback_response(
+            level=resolved_level,
+            model=model,
+            provider=provider,
+            fallback_reason="PROVIDER_QUOTA",
+            context_chunk_ids=chunk_ids,
+        )
+        _log_response(response, provider, len(selected_chunks))
+        return response
+    except ChatProviderAuthError:
+        provider_circuit.record_failure()
+        response = _build_fallback_response(
+            level=resolved_level,
+            model=model,
+            provider=provider,
+            fallback_reason="PROVIDER_AUTH",
+            context_chunk_ids=chunk_ids,
+        )
+        _log_response(response, provider, len(selected_chunks))
+        return response
+    except ChatProviderNetworkError:
+        provider_circuit.record_failure()
+        response = _build_fallback_response(
+            level=resolved_level,
+            model=model,
+            provider=provider,
+            fallback_reason="PROVIDER_NETWORK",
+            context_chunk_ids=chunk_ids,
+        )
+        _log_response(response, provider, len(selected_chunks))
         return response
     except ChatProviderError:
+        provider_circuit.record_failure()
         response = _build_fallback_response(
             level=resolved_level,
             model=model,
+            provider=provider,
             fallback_reason="MODEL_ERROR",
-            context_chunk_ids=[chunk.chunk_id for chunk in selected_chunks],
+            context_chunk_ids=chunk_ids,
         )
         store_exact_cached_response(cache_key, response)
+        _log_response(response, provider, len(selected_chunks))
         return response
 
     answer_he, answer_ar = _split_answer(provider_result.answer, payload.includeArabic)
@@ -115,11 +183,13 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
         response = _build_fallback_response(
             level=resolved_level,
             model=model,
+            provider=provider,
             fallback_reason="EMPTY_RESPONSE",
             latency_ms=int(round(provider_result.latency_seconds * 1000)),
-            context_chunk_ids=[chunk.chunk_id for chunk in selected_chunks],
+            context_chunk_ids=chunk_ids,
         )
         store_exact_cached_response(cache_key, response)
+        _log_response(response, provider, len(selected_chunks))
         return response
 
     vocabulary_decision = evaluate_vocabulary(answer_he, build_allowed_vocabulary(bundle, selected_chunks))
@@ -127,12 +197,14 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
         response = _build_fallback_response(
             level=resolved_level,
             model=model,
+            provider=provider,
             fallback_reason=vocabulary_decision.fallback_reason,
             latency_ms=int(round(provider_result.latency_seconds * 1000)),
-            context_chunk_ids=[chunk.chunk_id for chunk in selected_chunks],
+            context_chunk_ids=chunk_ids,
             blocked_tokens=vocabulary_decision.blocked_tokens,
         )
         store_exact_cached_response(cache_key, response)
+        _log_response(response, provider, len(selected_chunks))
         return response
 
     response = ChatResponse(
@@ -142,13 +214,15 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
         fallbackReason=None,
         level=resolved_level,
         model=model,
+        provider=provider,
         latencyMs=int(round(provider_result.latency_seconds * 1000)),
         cacheHit=False,
         routerHit=False,
-        contextChunkIds=[chunk.chunk_id for chunk in selected_chunks],
+        contextChunkIds=chunk_ids,
         guardrail=GuardrailReport(vocabularyLeakage=False, blockedTokens=[]),
     )
     store_exact_cached_response(cache_key, response)
+    _log_response(response, provider, len(selected_chunks))
     return response
 
 
@@ -208,6 +282,7 @@ def _build_fallback_response(
     level: str,
     model: str,
     fallback_reason: str,
+    provider: str | None = None,
     latency_ms: int = 0,
     context_chunk_ids: list[str] | None = None,
     blocked_tokens: list[str] | None = None,
@@ -219,6 +294,7 @@ def _build_fallback_response(
         fallbackReason=fallback_reason,
         level=level,
         model=model,
+        provider=provider,
         latencyMs=latency_ms,
         cacheHit=False,
         routerHit=False,
@@ -227,4 +303,25 @@ def _build_fallback_response(
             vocabularyLeakage=bool(blocked_tokens),
             blockedTokens=blocked_tokens or [],
         ),
+    )
+
+
+def _log_response(response: ChatResponse, provider: str, chunks_count: int = 0) -> None:
+    logger.info(
+        json.dumps(
+            {
+                "event": "chat_response",
+                "provider": provider,
+                "model": response.model,
+                "level": response.level,
+                "latencyMs": response.latencyMs,
+                "fallbackUsed": response.fallbackUsed,
+                "fallbackReason": response.fallbackReason,
+                "cacheHit": response.cacheHit,
+                "routerHit": response.routerHit,
+                "chunksCount": chunks_count,
+                "vocabularyLeakage": response.guardrail.vocabularyLeakage,
+            },
+            ensure_ascii=False,
+        )
     )

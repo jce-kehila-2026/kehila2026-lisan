@@ -21,6 +21,7 @@ class ChatResponse(BaseModel):
     fallbackReason: str | None
     level: str
     model: str
+    provider: str | None = None
     latencyMs: int
     cacheHit: bool = False
     routerHit: bool = False

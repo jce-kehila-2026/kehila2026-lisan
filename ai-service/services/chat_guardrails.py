@@ -13,6 +13,10 @@ FALLBACK_RESPONSES = {
     "MODEL_TIMEOUT": "נסה שוב עם שאלה קצרה.",
     "MODEL_ERROR": "נסה שוב עם שאלה קצרה.",
     "EMPTY_RESPONSE": "נסה שוב עם שאלה קצרה.",
+    "PROVIDER_QUOTA": "נסה שוב עם שאלה קצרה.",
+    "PROVIDER_AUTH": "נסה שוב עם שאלה קצרה.",
+    "PROVIDER_NETWORK": "נסה שוב עם שאלה קצרה.",
+    "CIRCUIT_OPEN": "נסה שוב עוד כמה דקות.",
 }
 HEBREW_WORD_RE = re.compile(r"[\u0590-\u05FF]+(?:['-][\u0590-\u05FF]+)*")
 LATIN_RE = re.compile(r"[A-Za-z]")

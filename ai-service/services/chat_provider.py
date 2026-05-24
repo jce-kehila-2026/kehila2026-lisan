@@ -54,6 +54,21 @@ class ChatProviderTimeoutError(TimeoutError):
     pass
 
 
+class ChatProviderQuotaError(ChatProviderError):
+    """429 / rate-limit / quota exceeded."""
+    pass
+
+
+class ChatProviderAuthError(ChatProviderError):
+    """Invalid or missing API key."""
+    pass
+
+
+class ChatProviderNetworkError(ChatProviderError):
+    """Network connectivity failure."""
+    pass
+
+
 def get_configured_provider() -> tuple[str, str]:
     provider = os.getenv("LLM_PROVIDER", DEFAULT_PROVIDER).strip().lower() or DEFAULT_PROVIDER
     model = os.getenv("LLM_MODEL", DEFAULT_MODEL).strip() or DEFAULT_MODEL
@@ -86,16 +101,28 @@ def call_provider(provider: str, model: str, system_message: str, question: str)
     return payload  # type: ignore[return-value]
 
 
+def _classify_and_raise(exc: Exception) -> None:
+    msg = str(exc).lower()
+    if "timeout" in msg or "timed out" in msg:
+        raise ChatProviderTimeoutError(str(exc)) from exc
+    if "429" in msg or "quota" in msg or "rate limit" in msg or "rate_limit" in msg or "resource_exhausted" in msg:
+        raise ChatProviderQuotaError(str(exc)) from exc
+    if "api key" in msg or "api_key" in msg or "unauthorized" in msg or "401" in msg or "permission" in msg or "invalid key" in msg:
+        raise ChatProviderAuthError(str(exc)) from exc
+    if "connection" in msg or "network" in msg or "dns" in msg or "unreachable" in msg or "refused" in msg:
+        raise ChatProviderNetworkError(str(exc)) from exc
+    raise ChatProviderError(str(exc)) from exc
+
+
 def _call_provider_sync(provider: str, model: str, system_message: str, question: str) -> ProviderResult:
     try:
         return _dispatch_provider_call(provider, model, system_message, question)
-    except ChatProviderError:
+    except (ChatProviderTimeoutError, ChatProviderQuotaError, ChatProviderAuthError, ChatProviderNetworkError):
         raise
+    except ChatProviderError as exc:
+        _classify_and_raise(exc)
     except Exception as exc:
-        lowered_message = str(exc).lower()
-        if "timeout" in lowered_message or "timed out" in lowered_message:
-            raise ChatProviderTimeoutError(str(exc)) from exc
-        raise ChatProviderError(str(exc)) from exc
+        _classify_and_raise(exc)
 
 
 def _dispatch_provider_call(provider: str, model: str, system_message: str, question: str) -> ProviderResult:
@@ -212,8 +239,9 @@ def _call_gemini(model: str, system_message: str, question: str) -> ProviderResu
             )
         except Exception as exc:
             attempt += 1
-            if attempt > max_retries or "429" not in str(exc):
-                raise ChatProviderError(str(exc)) from exc
+            is_quota = "429" in str(exc)
+            if attempt > max_retries or not is_quota:
+                _classify_and_raise(exc)
             retry_delay = _parse_retry_delay_seconds(str(exc)) or max(6.0, base_delay)
             time.sleep(retry_delay)
 
