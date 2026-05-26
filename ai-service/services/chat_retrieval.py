@@ -1,13 +1,20 @@
 from __future__ import annotations
 
+import json
+import math
+import threading
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
 from services.chat_guardrails import hebrew_words, normalize_hebrew_token, normalize_level
+from services.chat_schemas import RetrievalContext
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 TRANSCRIPTS_DIR = BASE_DIR / "data" / "transcripts"
+RAG_CHUNKS_PATH = BASE_DIR / "poc" / "rag-chunks.json"
 DEFAULT_LEVEL = "A1"
+DEFAULT_SIMILARITY_THRESHOLD = 0.7
 
 
 @dataclass
@@ -25,6 +32,104 @@ class Chunk:
     normalized_content: str
     source_tokens: frozenset[str]
     line_count: int
+
+
+@dataclass(frozen=True)
+class SemanticMatch:
+    chunk: Chunk
+    score: float
+
+
+class SemanticRetriever:
+    def __init__(
+        self,
+        embedding_model: str = "local-hash-ngrams",
+        similarity_threshold: float = DEFAULT_SIMILARITY_THRESHOLD,
+    ) -> None:
+        self.model = embedding_model
+        self.similarity_threshold = similarity_threshold
+        self._lock = threading.Lock()
+        self._embeddings: dict[str, dict[str, float]] = {}
+        self._preload_reference_embeddings()
+
+    def retrieve(self, query: str, chunks: list[Chunk], top_k: int = 3) -> list[SemanticMatch]:
+        query_embedding = self.get_embedding(query)
+        query_tokens = _extract_chunk_tokens(query)
+        ranked_matches: list[SemanticMatch] = []
+
+        for chunk in chunks:
+            chunk_embedding = self.get_embedding(chunk.content)
+            similarity = self._score_similarity(
+                query=query,
+                query_embedding=query_embedding,
+                query_tokens=query_tokens,
+                chunk=chunk,
+                chunk_embedding=chunk_embedding,
+            )
+            if similarity >= self.similarity_threshold:
+                ranked_matches.append(SemanticMatch(chunk=chunk, score=similarity))
+
+        ranked_matches.sort(
+            key=lambda match: (match.score, -match.chunk.line_count, match.chunk.chunk_id),
+            reverse=True,
+        )
+        return ranked_matches[:top_k]
+
+    def get_embedding(self, text: str) -> dict[str, float]:
+        normalized_text = _normalize_text(text)
+        if not normalized_text:
+            return {}
+
+        with self._lock:
+            cached = self._embeddings.get(normalized_text)
+            if cached is not None:
+                return cached
+
+        embedding = _build_sparse_embedding(normalized_text)
+        with self._lock:
+            self._embeddings[normalized_text] = embedding
+        return embedding
+
+    def _preload_reference_embeddings(self) -> None:
+        if not RAG_CHUNKS_PATH.exists():
+            return
+
+        try:
+            raw_chunks = json.loads(RAG_CHUNKS_PATH.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return
+
+        for item in raw_chunks:
+            content = str(item.get("content") or "").strip()
+            if not content:
+                continue
+            normalized_content = _normalize_text(content)
+            if not normalized_content:
+                continue
+            with self._lock:
+                if normalized_content not in self._embeddings:
+                    self._embeddings[normalized_content] = _build_sparse_embedding(normalized_content)
+
+    def _score_similarity(
+        self,
+        query: str,
+        query_embedding: dict[str, float],
+        query_tokens: set[str],
+        chunk: Chunk,
+        chunk_embedding: dict[str, float],
+    ) -> float:
+        cosine = cosine_similarity(query_embedding, chunk_embedding)
+        overlap_count = len(query_tokens & chunk.tokens)
+        coverage_ratio = overlap_count / max(1, len(query_tokens))
+        source_overlap_ratio = len(query_tokens & chunk.source_tokens) / max(1, len(query_tokens))
+        phrase_bonus = 1.0 if _normalize_text(query) and _normalize_text(query) in chunk.normalized_content else 0.0
+
+        similarity = (cosine * 0.72) + (coverage_ratio * 0.18) + (source_overlap_ratio * 0.05) + (phrase_bonus * 0.05)
+        if query_tokens and query_tokens.issubset(chunk.tokens):
+            similarity = max(similarity, 0.9)
+        elif overlap_count >= max(1, len(query_tokens) - 1):
+            similarity = max(similarity, 0.76)
+        return min(similarity, 1.0)
 
 
 def resolve_level_path(level: str) -> Path:
@@ -98,9 +203,53 @@ def chunk_transcripts(transcripts: list[Transcript], chunk_size: int = 4, overla
 
 
 def retrieve_relevant_chunks(message: str, chunks: list[Chunk], limit: int = 5) -> list[Chunk]:
+    semantic_matches = SEMANTIC_RETRIEVER.retrieve(message, chunks, top_k=limit)
+    if semantic_matches:
+        return [match.chunk for match in semantic_matches]
+    return _retrieve_keyword_chunks(message, chunks, limit=limit)
+
+
+def render_context(chunks: list[Chunk]) -> str:
+    return "\n\n".join(f"[{chunk.chunk_id}] {chunk.source}\n{chunk.content}" for chunk in chunks)
+
+
+def build_retrieval_context(message: str, chunks: list[Chunk], limit: int = 5) -> RetrievalContext:
+    semantic_matches = SEMANTIC_RETRIEVER.retrieve(message, chunks, top_k=limit)
+    if semantic_matches:
+        selected_chunks = [match.chunk for match in semantic_matches]
+        scores = [round(match.score, 4) for match in semantic_matches]
+    else:
+        selected_chunks = _retrieve_keyword_chunks(message, chunks, limit=limit)
+        scores = [0.0 for _ in selected_chunks]
+
+    return RetrievalContext(
+        chunk_ids=[chunk.chunk_id for chunk in selected_chunks],
+        context_text=render_context(selected_chunks),
+        chunks_count=len(selected_chunks),
+        relevance_scores=scores,
+    )
+
+
+def cosine_similarity(left: dict[str, float], right: dict[str, float]) -> float:
+    if not left or not right:
+        return 0.0
+
+    smaller, larger = (left, right) if len(left) <= len(right) else (right, left)
+    dot_product = sum(value * larger.get(key, 0.0) for key, value in smaller.items())
+    if dot_product <= 0:
+        return 0.0
+
+    left_norm = math.sqrt(sum(value * value for value in left.values()))
+    right_norm = math.sqrt(sum(value * value for value in right.values()))
+    if left_norm == 0 or right_norm == 0:
+        return 0.0
+    return dot_product / (left_norm * right_norm)
+
+
+def _retrieve_keyword_chunks(message: str, chunks: list[Chunk], limit: int = 5) -> list[Chunk]:
     message_tokens = _extract_chunk_tokens(message)
     normalized_message = _normalize_text(message)
-    message_bigrams = _token_bigrams(message_tokens)
+    message_bigrams = _ordered_token_bigrams(message)
     scored_chunks: list[tuple[float, int, int, Chunk]] = []
 
     for chunk in chunks:
@@ -108,7 +257,7 @@ def retrieve_relevant_chunks(message: str, chunks: list[Chunk], limit: int = 5) 
         coverage_score = (overlap_count / max(1, len(message_tokens))) * 10
         exact_phrase_bonus = 100.0 if normalized_message and normalized_message in chunk.normalized_content else 0.0
         all_tokens_bonus = 20.0 if message_tokens and message_tokens.issubset(chunk.tokens) else 0.0
-        bigram_score = len(message_bigrams & _token_bigrams(chunk.tokens)) * 6.0
+        bigram_score = len(message_bigrams & _ordered_token_bigrams(chunk.content)) * 6.0
         source_overlap_score = len(message_tokens & chunk.source_tokens) * 3.0
         short_chunk_bonus = max(0, 5 - chunk.line_count)
         total_score = (
@@ -127,10 +276,6 @@ def retrieve_relevant_chunks(message: str, chunks: list[Chunk], limit: int = 5) 
     if top_chunks:
         return top_chunks
     return chunks[:limit]
-
-
-def render_context(chunks: list[Chunk]) -> str:
-    return "\n\n".join(f"[{chunk.chunk_id}] {chunk.source}\n{chunk.content}" for chunk in chunks)
 
 
 def _extract_chunk_tokens(content: str) -> set[str]:
@@ -161,12 +306,30 @@ def _normalize_text(text: str) -> str:
     ).strip()
 
 
-def _token_bigrams(tokens: set[str]) -> set[tuple[str, str]]:
-    ordered_tokens = sorted(token for token in tokens if token)
+def _ordered_token_bigrams(text: str) -> set[tuple[str, str]]:
+    ordered_tokens = [token for token in _normalize_text(text).split() if token]
     return {
         (ordered_tokens[index], ordered_tokens[index + 1])
         for index in range(len(ordered_tokens) - 1)
     }
+
+
+def _character_trigrams(text: str) -> list[str]:
+    collapsed = _normalize_text(text).replace(" ", "")
+    if len(collapsed) < 3:
+        return [collapsed] if collapsed else []
+    return [collapsed[index : index + 3] for index in range(len(collapsed) - 2)]
+
+
+def _build_sparse_embedding(text: str) -> dict[str, float]:
+    token_counter = Counter(f"tok:{token}" for token in _normalize_text(text).split() if token)
+    trigram_counter = Counter(f"tri:{gram}" for gram in _character_trigrams(text))
+    weighted_counter = Counter()
+    for key, value in token_counter.items():
+        weighted_counter[key] = float(value) * 2.4
+    for key, value in trigram_counter.items():
+        weighted_counter[key] += float(value) * 0.6
+    return dict(weighted_counter)
 
 
 def _pick_diverse_chunks(
@@ -197,3 +360,6 @@ def _pick_diverse_chunks(
         chosen.append(chunk)
 
     return chosen
+
+
+SEMANTIC_RETRIEVER = SemanticRetriever()

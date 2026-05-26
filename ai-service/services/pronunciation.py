@@ -1,14 +1,132 @@
 """
 Pronunciation Assessment Service
-Wraps Azure Speech SDK for Hebrew pronunciation scoring.
+Wraps Azure Speech SDK for Hebrew pronunciation scoring and validates reference
+words against the approved curriculum vocabulary before sending requests.
 """
 
-import azure.cognitiveservices.speech as speechsdk
+from __future__ import annotations
+
+import difflib
+import io
 import json
 import os
-import wave
 import tempfile
-import io
+import wave
+from pathlib import Path
+
+import azure.cognitiveservices.speech as speechsdk
+
+from services.chat_guardrails import hebrew_words, normalize_hebrew_token, normalize_level
+
+BASE_DIR = Path(__file__).resolve().parents[1]
+APPROVED_VOCAB_PATH = BASE_DIR / "poc" / "approved-vocabulary.json"
+DEFAULT_LEVEL = "A1"
+SIMILARITY_THRESHOLD = 0.8
+MAX_SUGGESTIONS = 5
+
+
+class PronunciationValidator:
+    def __init__(self, vocabulary_path: Path = APPROVED_VOCAB_PATH) -> None:
+        self.vocabulary_path = vocabulary_path
+        self.vocabulary_by_level = self._load_approved_vocabulary(vocabulary_path)
+
+    def validate_word(self, word: str, language_level: str) -> dict:
+        normalized_word = normalize_hebrew_token(word)
+        level = normalize_level(language_level)
+        approved_words = self._get_words_for_level(level)
+
+        if not normalized_word:
+            return {
+                "valid": False,
+                "word": normalized_word,
+                "level": level,
+                "feedback": "not_found",
+                "suggestions": [],
+            }
+
+        if normalized_word in approved_words:
+            return {
+                "valid": True,
+                "word": normalized_word,
+                "level": level,
+                "feedback": "exact_match",
+                "suggestions": [],
+            }
+
+        suggestions = self._find_similar_words(normalized_word, approved_words)
+        if suggestions:
+            return {
+                "valid": False,
+                "word": normalized_word,
+                "level": level,
+                "feedback": "similar_match",
+                "suggestions": suggestions,
+            }
+
+        return {
+            "valid": False,
+            "word": normalized_word,
+            "level": level,
+            "feedback": "not_found",
+            "suggestions": [],
+        }
+
+    def validate_reference_text(self, reference_text: str, language_level: str) -> dict:
+        level = normalize_level(language_level)
+        words = [
+            normalize_hebrew_token(token)
+            for token in hebrew_words(reference_text)
+            if normalize_hebrew_token(token)
+        ]
+
+        if not words:
+            return {
+                "valid": False,
+                "level": level,
+                "feedback": "not_found",
+                "words": [],
+                "invalidWords": [],
+            }
+
+        validated_words = [self.validate_word(word, level) for word in words]
+        invalid_words = [item for item in validated_words if not item["valid"]]
+        feedback = "exact_match" if not invalid_words else invalid_words[0]["feedback"]
+        return {
+            "valid": not invalid_words,
+            "level": level,
+            "feedback": feedback,
+            "words": validated_words,
+            "invalidWords": invalid_words,
+        }
+
+    def _load_approved_vocabulary(self, vocabulary_path: Path) -> dict[str, set[str]]:
+        if not vocabulary_path.exists():
+            return {DEFAULT_LEVEL: set()}
+
+        raw_payload = json.loads(vocabulary_path.read_text(encoding="utf-8"))
+        approved_words = raw_payload.get("approved_vocabulary") or []
+        normalized_words = {
+            normalize_hebrew_token(word)
+            for word in approved_words
+            if normalize_hebrew_token(str(word))
+        }
+        return {DEFAULT_LEVEL: normalized_words}
+
+    def _get_words_for_level(self, level: str) -> set[str]:
+        return self.vocabulary_by_level.get(level) or self.vocabulary_by_level.get(DEFAULT_LEVEL, set())
+
+    def _find_similar_words(self, word: str, approved_words: set[str]) -> list[str]:
+        scored_matches: list[tuple[float, str]] = []
+        for candidate in approved_words:
+            similarity = difflib.SequenceMatcher(a=word, b=candidate).ratio()
+            if similarity >= SIMILARITY_THRESHOLD:
+                scored_matches.append((similarity, candidate))
+
+        scored_matches.sort(key=lambda item: (item[0], len(item[1]), item[1]), reverse=True)
+        return [candidate for _, candidate in scored_matches[:MAX_SUGGESTIONS]]
+
+
+VALIDATOR = PronunciationValidator()
 
 
 def _ensure_wav_format(audio_bytes: bytes) -> bytes:
@@ -21,11 +139,9 @@ def _ensure_wav_format(audio_bytes: bytes) -> bytes:
                 sampwidth = w.getsampwidth()
                 framerate = w.getframerate()
 
-        # If already correct format, return as-is
         if n_channels == 1 and sampwidth == 2 and framerate == 16000:
             return audio_bytes
 
-        # Re-encode with correct params
         output = io.BytesIO()
         with wave.open(output, "wb") as w:
             w.setnchannels(1)
@@ -35,46 +151,51 @@ def _ensure_wav_format(audio_bytes: bytes) -> bytes:
         return output.getvalue()
 
     except wave.Error:
-        # Not a valid WAV — return as-is and let Azure report the error
         return audio_bytes
 
 
-def assess_pronunciation(audio_bytes: bytes, reference_text: str) -> dict:
+def validate_pronunciation_reference(word: str, language_level: str) -> dict:
+    return VALIDATOR.validate_word(word, language_level)
+
+
+def assess_pronunciation(audio_bytes: bytes, reference_text: str, language_level: str = DEFAULT_LEVEL) -> dict:
     """
     Score pronunciation of a Hebrew phrase from audio bytes.
 
     Args:
         audio_bytes: WAV file content (16kHz, 16-bit, mono PCM)
-        reference_text: The expected Hebrew text (e.g. "בוקר טוב")
+        reference_text: The expected Hebrew text
+        language_level: Curriculum level to validate against
 
     Returns:
         dict with scores and word-level details, or error info
     """
+    validation = VALIDATOR.validate_reference_text(reference_text, language_level)
+    if not validation["valid"]:
+        return {
+            "success": False,
+            "error": "Reference text contains words outside approved vocabulary",
+            "validation": validation,
+        }
+
     speech_key = os.getenv("AZURE_SPEECH_KEY")
     speech_region = os.getenv("AZURE_SPEECH_REGION")
 
     if not speech_key or not speech_region:
-        return {"success": False, "error": "Azure Speech credentials not configured"}
+        return {"success": False, "error": "Azure Speech credentials not configured", "validation": validation}
 
-    # Validate WAV format
     audio_bytes = _ensure_wav_format(audio_bytes)
 
-    # Write audio bytes to a temp WAV file (SDK needs a file path)
     tmp_path = os.path.join(tempfile.gettempdir(), "lisan_tmp_audio.wav")
     with open(tmp_path, "wb") as f:
         f.write(audio_bytes)
 
     try:
-        # Speech config
-        speech_config = speechsdk.SpeechConfig(
-            subscription=speech_key, region=speech_region
-        )
+        speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=speech_region)
         speech_config.speech_recognition_language = "he-IL"
 
-        # Audio config from file
         audio_config = speechsdk.audio.AudioConfig(filename=tmp_path)
 
-        # Pronunciation assessment config
         pronunciation_config = speechsdk.PronunciationAssessmentConfig(
             reference_text=reference_text,
             grading_system=speechsdk.PronunciationAssessmentGradingSystem.HundredMark,
@@ -82,18 +203,15 @@ def assess_pronunciation(audio_bytes: bytes, reference_text: str) -> dict:
             enable_miscue=True,
         )
 
-        # Recognize
         recognizer = speechsdk.SpeechRecognizer(
             speech_config=speech_config, audio_config=audio_config
         )
         pronunciation_config.apply_to(recognizer)
         result = recognizer.recognize_once()
 
-        # Release resources before cleanup
         del recognizer
         del audio_config
 
-        # Handle result
         if result.reason == speechsdk.ResultReason.RecognizedSpeech:
             pron_result = speechsdk.PronunciationAssessmentResult(result)
 
@@ -107,6 +225,7 @@ def assess_pronunciation(audio_bytes: bytes, reference_text: str) -> dict:
                 "success": True,
                 "recognized_text": result.text,
                 "reference_text": reference_text,
+                "validation": validation,
                 "scores": {
                     "accuracy": round(pron_result.accuracy_score, 1),
                     "fluency": round(pron_result.fluency_score, 1),
@@ -116,22 +235,29 @@ def assess_pronunciation(audio_bytes: bytes, reference_text: str) -> dict:
                 "details": raw_json,
             }
 
-        elif result.reason == speechsdk.ResultReason.NoMatch:
+        if result.reason == speechsdk.ResultReason.NoMatch:
             return {
                 "success": False,
                 "error": "No speech recognized. Check audio quality and format (16kHz, 16-bit, mono WAV).",
+                "validation": validation,
             }
 
-        elif result.reason == speechsdk.ResultReason.Canceled:
+        if result.reason == speechsdk.ResultReason.Canceled:
             cancellation = result.cancellation_details
             return {
                 "success": False,
                 "error": f"Recognition canceled: {cancellation.reason}",
                 "error_details": str(cancellation.error_details),
+                "validation": validation,
             }
 
+        return {
+            "success": False,
+            "error": "Unknown pronunciation assessment result",
+            "validation": validation,
+        }
     finally:
         try:
             os.unlink(tmp_path)
         except PermissionError:
-            pass  # Windows may still lock the file briefly
+            pass

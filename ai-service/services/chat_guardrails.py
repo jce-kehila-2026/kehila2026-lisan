@@ -3,7 +3,9 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
+DEFAULT_LEVEL = "A1"
 DEFAULT_FALLBACK_REASON = "OUT_OF_SCOPE"
+
 FALLBACK_RESPONSES = {
     "EMPTY_MESSAGE": "כתוב שאלה קצרה בעברית.",
     "MIXED_LANGUAGE": "נסה לשאול בעברית פשוטה.",
@@ -18,6 +20,8 @@ FALLBACK_RESPONSES = {
     "PROVIDER_NETWORK": "נסה שוב עם שאלה קצרה.",
     "CIRCUIT_OPEN": "נסה שוב עוד כמה דקות.",
 }
+FALLBACK_CODES = frozenset(FALLBACK_RESPONSES.keys())
+
 HEBREW_WORD_RE = re.compile(r"[\u0590-\u05FF]+(?:['-][\u0590-\u05FF]+)*")
 LATIN_RE = re.compile(r"[A-Za-z]")
 ARABIC_RE = re.compile(r"[\u0600-\u06FF]")
@@ -42,8 +46,8 @@ def normalize_hebrew_token(token: str) -> str:
 
 
 def normalize_level(level: str | None) -> str:
-    normalized = (level or "A1").strip().upper()
-    return normalized or "A1"
+    normalized = (level or DEFAULT_LEVEL).strip().upper()
+    return normalized or DEFAULT_LEVEL
 
 
 def classify_fast_reject(message: str) -> str | None:
@@ -56,9 +60,18 @@ def classify_fast_reject(message: str) -> str | None:
         return "MIXED_LANGUAGE"
     if not hebrew_words(stripped_message):
         return "OUT_OF_SCOPE"
-    if not hebrew_words(stripped_message) and NON_HEBREW_SCRIPT_RE.search(stripped_message):
+    if NON_HEBREW_SCRIPT_RE.search(stripped_message) and not hebrew_words(stripped_message):
         return "OUT_OF_SCOPE"
     return None
+
+
+def enforce_hebrew_only_scope(include_arabic: bool) -> bool:
+    del include_arabic
+    return False
+
+
+def is_precise_fallback_reason(reason: str | None) -> bool:
+    return bool(reason and reason in FALLBACK_CODES)
 
 
 def is_clearly_out_of_scope(
@@ -87,6 +100,7 @@ def find_blocked_tokens(answer: str, vocabulary: list[str]) -> list[str]:
     approved_tokens = set(vocabulary)
     for fallback_text in FALLBACK_RESPONSES.values():
         approved_tokens.update(hebrew_words(fallback_text))
+
     blocked_tokens: list[str] = []
     for token in hebrew_words(answer):
         normalized = normalize_hebrew_token(token)
@@ -105,7 +119,6 @@ def evaluate_vocabulary(answer: str, vocabulary: list[str]) -> GuardrailDecision
 
 
 def is_hebrew_only_answer(answer: str) -> bool:
-    """Model output must be Hebrew text only for the current product scope."""
     stripped_answer = (answer or "").strip()
     if not stripped_answer:
         return False
@@ -123,5 +136,5 @@ def is_short_hebrew_answer(text: str, max_words: int = MAX_HEBREW_WORDS) -> bool
 
 
 def get_fallback_text(reason: str | None) -> str:
-    normalized_reason = reason or DEFAULT_FALLBACK_REASON
+    normalized_reason = reason if is_precise_fallback_reason(reason) else DEFAULT_FALLBACK_REASON
     return FALLBACK_RESPONSES.get(normalized_reason, FALLBACK_RESPONSES[DEFAULT_FALLBACK_REASON])
