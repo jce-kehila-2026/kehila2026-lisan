@@ -237,7 +237,7 @@ class TestNoCrash:
 # ===========================================================================
 
 class TestArabicFlag:
-    """When includeArabic=true, answerAr may be present. When false, must be null."""
+    """Hebrew-only scope: answerAr must stay null even when includeArabic=true."""
 
     def test_arabic_false_returns_null_ar(self):
         r = post_chat("שלום", includeArabic=False)
@@ -248,7 +248,9 @@ class TestArabicFlag:
     def test_arabic_true_returns_200(self):
         r = post_chat("שלום", includeArabic=True)
         assert r.status_code == 200
-        assert_valid_schema(r.json())
+        data = r.json()
+        assert_valid_schema(data)
+        assert data["answerAr"] is None
 
 
 # ===========================================================================

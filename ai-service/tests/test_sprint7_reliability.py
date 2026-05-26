@@ -18,6 +18,7 @@ from __future__ import annotations
 import json
 import logging
 import time
+from contextlib import ExitStack
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -271,10 +272,10 @@ def _engine_patches():
 
 class TestEngineCircuitBreaker:
     def test_circuit_open_returns_fallback(self):
-        with (
-            *_engine_patches(),
-            patch("services.chat_engine.provider_circuit") as mock_circuit,
-        ):
+        with ExitStack() as stack:
+            for patcher in _engine_patches():
+                stack.enter_context(patcher)
+            mock_circuit = stack.enter_context(patch("services.chat_engine.provider_circuit"))
             mock_circuit.allow_request.return_value = False
 
             from services.chat_engine import generate_chat_response
@@ -287,11 +288,11 @@ class TestEngineCircuitBreaker:
             assert response.answerHe == FALLBACK_RESPONSES["CIRCUIT_OPEN"]
 
     def test_quota_error_records_failure(self):
-        with (
-            *_engine_patches(),
-            patch("services.chat_engine.provider_circuit") as mock_circuit,
-            patch("services.chat_engine.call_provider") as mock_call,
-        ):
+        with ExitStack() as stack:
+            for patcher in _engine_patches():
+                stack.enter_context(patcher)
+            mock_circuit = stack.enter_context(patch("services.chat_engine.provider_circuit"))
+            mock_call = stack.enter_context(patch("services.chat_engine.call_provider"))
             mock_circuit.allow_request.return_value = True
             mock_call.side_effect = ChatProviderQuotaError("429 quota")
 
@@ -305,11 +306,11 @@ class TestEngineCircuitBreaker:
             mock_circuit.record_failure.assert_called_once()
 
     def test_auth_error_records_failure(self):
-        with (
-            *_engine_patches(),
-            patch("services.chat_engine.provider_circuit") as mock_circuit,
-            patch("services.chat_engine.call_provider") as mock_call,
-        ):
+        with ExitStack() as stack:
+            for patcher in _engine_patches():
+                stack.enter_context(patcher)
+            mock_circuit = stack.enter_context(patch("services.chat_engine.provider_circuit"))
+            mock_call = stack.enter_context(patch("services.chat_engine.call_provider"))
             mock_circuit.allow_request.return_value = True
             mock_call.side_effect = ChatProviderAuthError("invalid key")
 
@@ -323,11 +324,11 @@ class TestEngineCircuitBreaker:
             mock_circuit.record_failure.assert_called_once()
 
     def test_network_error_records_failure(self):
-        with (
-            *_engine_patches(),
-            patch("services.chat_engine.provider_circuit") as mock_circuit,
-            patch("services.chat_engine.call_provider") as mock_call,
-        ):
+        with ExitStack() as stack:
+            for patcher in _engine_patches():
+                stack.enter_context(patcher)
+            mock_circuit = stack.enter_context(patch("services.chat_engine.provider_circuit"))
+            mock_call = stack.enter_context(patch("services.chat_engine.call_provider"))
             mock_circuit.allow_request.return_value = True
             mock_call.side_effect = ChatProviderNetworkError("connection refused")
 
@@ -343,11 +344,11 @@ class TestEngineCircuitBreaker:
     def test_success_records_success(self):
         from services.chat_provider import ProviderResult
 
-        with (
-            *_engine_patches(),
-            patch("services.chat_engine.provider_circuit") as mock_circuit,
-            patch("services.chat_engine.call_provider") as mock_call,
-        ):
+        with ExitStack() as stack:
+            for patcher in _engine_patches():
+                stack.enter_context(patcher)
+            mock_circuit = stack.enter_context(patch("services.chat_engine.provider_circuit"))
+            mock_call = stack.enter_context(patch("services.chat_engine.call_provider"))
             mock_circuit.allow_request.return_value = True
             mock_call.return_value = ProviderResult(
                 answer="שלום.",
@@ -365,7 +366,7 @@ class TestEngineCircuitBreaker:
 
 
 # ---------------------------------------------------------------------------
-# includeArabic eval scenarios
+# Hebrew-only includeArabic eval scenarios
 # ---------------------------------------------------------------------------
 
 ARABIC_EVAL_CASES = [
@@ -377,20 +378,19 @@ ARABIC_EVAL_CASES = [
 ]
 
 
-class TestIncludeArabicEval:
+class TestHebrewOnlyIncludeArabicEval:
     @pytest.mark.parametrize("message,include_arabic,level", ARABIC_EVAL_CASES)
     @patch("services.chat_engine.call_provider")
     @patch("services.chat_engine.provider_circuit")
-    def test_include_arabic_flag_passed_through(
+    def test_include_arabic_flag_is_ignored(
         self, mock_circuit, mock_call, message, include_arabic, level
     ):
         from services.chat_provider import ProviderResult
 
-        arabic_line = "\n(مرحبا)" if include_arabic else ""
         mock_circuit.allow_request.return_value = True
         mock_circuit.record_success = MagicMock()
         mock_call.return_value = ProviderResult(
-            answer=f"שלום.{arabic_line}",
+            answer="שלום.\n(مرحبا)",
             latency_seconds=0.05,
             input_tokens=10,
             output_tokens=5,
@@ -402,7 +402,4 @@ class TestIncludeArabicEval:
             ChatRequest(message=message, level=level, includeArabic=include_arabic)
         )
         assert response.answerHe is not None and len(response.answerHe) > 0
-        if include_arabic:
-            assert response.answerAr is not None
-        else:
-            assert response.answerAr is None
+        assert response.answerAr is None

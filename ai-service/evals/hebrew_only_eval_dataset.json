@@ -1,0 +1,119 @@
+[
+  {
+    "id": "hebrew_only_valid_001",
+    "category": "valid_hebrew",
+    "message": "שלום",
+    "level": "A1",
+    "includeArabic": true,
+    "expectedBehavior": "answer",
+    "mustFallback": false,
+    "expectedAnswerAr": null,
+    "notes": "Hebrew greeting must stay Hebrew-only even when Arabic is requested."
+  },
+  {
+    "id": "hebrew_only_valid_002",
+    "category": "valid_hebrew",
+    "message": "תודה",
+    "level": "A1",
+    "includeArabic": true,
+    "expectedBehavior": "answer",
+    "mustFallback": false,
+    "expectedAnswerAr": null,
+    "notes": "Router response must not include Arabic."
+  },
+  {
+    "id": "hebrew_only_valid_003",
+    "category": "valid_hebrew",
+    "message": "מה שלומך?",
+    "level": "A1",
+    "includeArabic": true,
+    "expectedBehavior": "answer",
+    "mustFallback": false,
+    "expectedAnswerAr": null,
+    "notes": "Curriculum question must remain Hebrew-only."
+  },
+  {
+    "id": "hebrew_only_arabic_001",
+    "category": "arabic_input",
+    "message": "مرحبا",
+    "level": "A1",
+    "includeArabic": false,
+    "expectedBehavior": "fallback",
+    "mustFallback": true,
+    "expectedFallbackReason": "MIXED_LANGUAGE",
+    "expectedAnswerAr": null,
+    "notes": "Pure Arabic input is rejected for current Hebrew-only scope."
+  },
+  {
+    "id": "hebrew_only_arabic_002",
+    "category": "arabic_input",
+    "message": "كيف الحال؟",
+    "level": "A1",
+    "includeArabic": true,
+    "expectedBehavior": "fallback",
+    "mustFallback": true,
+    "expectedFallbackReason": "MIXED_LANGUAGE",
+    "expectedAnswerAr": null,
+    "notes": "Arabic input is rejected even if includeArabic is true."
+  },
+  {
+    "id": "hebrew_only_english_001",
+    "category": "english_input",
+    "message": "hello",
+    "level": "A1",
+    "includeArabic": false,
+    "expectedBehavior": "fallback",
+    "mustFallback": true,
+    "expectedFallbackReason": "MIXED_LANGUAGE",
+    "expectedAnswerAr": null,
+    "notes": "Pure English input is rejected."
+  },
+  {
+    "id": "hebrew_only_english_002",
+    "category": "english_input",
+    "message": "How do I say thank you?",
+    "level": "A1",
+    "includeArabic": true,
+    "expectedBehavior": "fallback",
+    "mustFallback": true,
+    "expectedFallbackReason": "MIXED_LANGUAGE",
+    "expectedAnswerAr": null,
+    "notes": "English learning request is rejected for now."
+  },
+  {
+    "id": "hebrew_only_mixed_001",
+    "category": "mixed_language",
+    "message": "שלום hello",
+    "level": "A1",
+    "includeArabic": false,
+    "expectedBehavior": "fallback",
+    "mustFallback": true,
+    "expectedFallbackReason": "MIXED_LANGUAGE",
+    "expectedAnswerAr": null,
+    "notes": "Hebrew plus English is rejected."
+  },
+  {
+    "id": "hebrew_only_mixed_002",
+    "category": "mixed_language",
+    "message": "שלום مرحبا",
+    "level": "A1",
+    "includeArabic": true,
+    "expectedBehavior": "fallback",
+    "mustFallback": true,
+    "expectedFallbackReason": "MIXED_LANGUAGE",
+    "expectedAnswerAr": null,
+    "notes": "Hebrew plus Arabic is rejected."
+  },
+  {
+    "id": "hebrew_only_mixed_003",
+    "category": "mixed_language",
+    "message": "איך אומרים coffee?",
+    "level": "A1",
+    "includeArabic": false,
+    "expectedBehavior": "fallback",
+    "mustFallback": true,
+    "expectedFallbackReason": "MIXED_LANGUAGE",
+    "expectedAnswerAr": null,
+    "notes": "Hebrew question containing English token is rejected."
+  }
+]

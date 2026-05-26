@@ -22,6 +22,9 @@ class Chunk:
     source: str
     content: str
     tokens: set[str]
+    normalized_content: str
+    source_tokens: frozenset[str]
+    line_count: int
 
 
 def resolve_level_path(level: str) -> Path:
@@ -66,11 +69,11 @@ def chunk_transcripts(transcripts: list[Transcript], chunk_size: int = 4, overla
         if len(lines) <= chunk_size:
             chunk_content = "\n".join(lines)
             chunks.append(
-                Chunk(
+                _build_chunk(
                     chunk_id=f"t{transcript_index}-c1",
                     source=transcript.source,
                     content=chunk_content,
-                    tokens=_extract_chunk_tokens(chunk_content),
+                    line_count=len(lines),
                 )
             )
             continue
@@ -83,11 +86,11 @@ def chunk_transcripts(transcripts: list[Transcript], chunk_size: int = 4, overla
                 continue
             chunk_content = "\n".join(selected_lines)
             chunks.append(
-                Chunk(
+                _build_chunk(
                     chunk_id=f"t{transcript_index}-c{chunk_counter}",
                     source=transcript.source,
                     content=chunk_content,
-                    tokens=_extract_chunk_tokens(chunk_content),
+                    line_count=len(selected_lines),
                 )
             )
             chunk_counter += 1
@@ -95,18 +98,32 @@ def chunk_transcripts(transcripts: list[Transcript], chunk_size: int = 4, overla
 
 
 def retrieve_relevant_chunks(message: str, chunks: list[Chunk], limit: int = 5) -> list[Chunk]:
-    message_tokens = {
-        normalize_hebrew_token(token)
-        for token in hebrew_words(message)
-        if normalize_hebrew_token(token)
-    }
-    scored_chunks: list[tuple[int, int, Chunk]] = []
-    for chunk in chunks:
-        overlap_score = len(message_tokens & chunk.tokens)
-        scored_chunks.append((overlap_score, len(chunk.tokens), chunk))
+    message_tokens = _extract_chunk_tokens(message)
+    normalized_message = _normalize_text(message)
+    message_bigrams = _token_bigrams(message_tokens)
+    scored_chunks: list[tuple[float, int, int, Chunk]] = []
 
-    scored_chunks.sort(key=lambda item: (item[0], item[1]), reverse=True)
-    top_chunks = [chunk for score, _, chunk in scored_chunks if score > 0][:limit]
+    for chunk in chunks:
+        overlap_count = len(message_tokens & chunk.tokens)
+        coverage_score = (overlap_count / max(1, len(message_tokens))) * 10
+        exact_phrase_bonus = 100.0 if normalized_message and normalized_message in chunk.normalized_content else 0.0
+        all_tokens_bonus = 20.0 if message_tokens and message_tokens.issubset(chunk.tokens) else 0.0
+        bigram_score = len(message_bigrams & _token_bigrams(chunk.tokens)) * 6.0
+        source_overlap_score = len(message_tokens & chunk.source_tokens) * 3.0
+        short_chunk_bonus = max(0, 5 - chunk.line_count)
+        total_score = (
+            exact_phrase_bonus
+            + all_tokens_bonus
+            + (overlap_count * 12.0)
+            + coverage_score
+            + bigram_score
+            + source_overlap_score
+            + short_chunk_bonus
+        )
+        scored_chunks.append((total_score, overlap_count, -chunk.line_count, chunk))
+
+    scored_chunks.sort(key=lambda item: (item[0], item[1], item[2], item[3].chunk_id), reverse=True)
+    top_chunks = _pick_diverse_chunks(scored_chunks, limit)
     if top_chunks:
         return top_chunks
     return chunks[:limit]
@@ -122,3 +139,61 @@ def _extract_chunk_tokens(content: str) -> set[str]:
         for token in hebrew_words(content)
         if normalize_hebrew_token(token)
     }
+
+
+def _build_chunk(chunk_id: str, source: str, content: str, line_count: int) -> Chunk:
+    return Chunk(
+        chunk_id=chunk_id,
+        source=source,
+        content=content,
+        tokens=_extract_chunk_tokens(content),
+        normalized_content=_normalize_text(content),
+        source_tokens=frozenset(_extract_chunk_tokens(source)),
+        line_count=line_count,
+    )
+
+
+def _normalize_text(text: str) -> str:
+    return " ".join(
+        normalize_hebrew_token(token)
+        for token in hebrew_words(text)
+        if normalize_hebrew_token(token)
+    ).strip()
+
+
+def _token_bigrams(tokens: set[str]) -> set[tuple[str, str]]:
+    ordered_tokens = sorted(token for token in tokens if token)
+    return {
+        (ordered_tokens[index], ordered_tokens[index + 1])
+        for index in range(len(ordered_tokens) - 1)
+    }
+
+
+def _pick_diverse_chunks(
+    scored_chunks: list[tuple[float, int, int, Chunk]],
+    limit: int,
+) -> list[Chunk]:
+    chosen: list[Chunk] = []
+    seen_sources: set[str] = set()
+
+    for score, overlap_count, _, chunk in scored_chunks:
+        if len(chosen) >= limit:
+            break
+        if score <= 0 or overlap_count <= 0:
+            continue
+        if chunk.source in seen_sources:
+            continue
+        chosen.append(chunk)
+        seen_sources.add(chunk.source)
+
+    if len(chosen) >= limit:
+        return chosen
+
+    for score, overlap_count, _, chunk in scored_chunks:
+        if len(chosen) >= limit:
+            break
+        if score <= 0 or overlap_count <= 0 or chunk in chosen:
+            continue
+        chosen.append(chunk)
+
+    return chosen
