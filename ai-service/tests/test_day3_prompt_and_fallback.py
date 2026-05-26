@@ -43,9 +43,9 @@ def build_prompt_acceptance_dataset() -> list[dict]:
         [
             {"message": "שלום", "includeArabic": False, "expectArabic": False},
             {"message": "תודה", "includeArabic": False, "expectArabic": False},
-            {"message": "קפה", "includeArabic": True, "expectArabic": True},
-            {"message": "שלום", "includeArabic": True, "expectArabic": True},
-            {"message": "תודה", "includeArabic": True, "expectArabic": True},
+            {"message": "קפה", "includeArabic": True, "expectArabic": False},
+            {"message": "שלום", "includeArabic": True, "expectArabic": False},
+            {"message": "תודה", "includeArabic": True, "expectArabic": False},
             {"message": "מה שלומך?", "includeArabic": False, "expectArabic": False},
         ]
     )
@@ -97,11 +97,7 @@ class TestPromptV2Contract:
             else:
                 assert count_hebrew_words(data["answerHe"]) <= MAX_HEBREW_WORDS
                 assert "\n" not in data["answerHe"]
-            if item["includeArabic"]:
-                if item["expectArabic"]:
-                    assert data["answerAr"] is not None
-            else:
-                assert data["answerAr"] is None
+            assert data["answerAr"] is None
 
 
 class TestFallbackSystem:

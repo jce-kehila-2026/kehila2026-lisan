@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import threading
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -26,22 +27,31 @@ CORE_TUTOR_VOCAB = [
     "איפה",
     "זה",
     "זאת",
+    "בסדר",
+    "בבקשה",
+    "יש",
+    "אין",
+    "גר",
+    "גרה",
+    "עובד",
+    "עובדת",
+    "רוצה",
 ]
-DIRECT_ARABIC_GLOSSARY = {
-    "שלום": "مرحبا",
-    "היי": "مرحبا",
-    "תודה": "شكرا",
-    "כן": "نعم",
-    "לא": "لا",
-    "מים": "ماء",
-    "קפה": "قهوة",
-    "בית": "بيت",
-    "אמא": "أم",
-    "אבא": "أب",
-    "ילד": "ولد",
-    "ילדה": "بنت",
-    "אישה": "امرأة",
-    "איש": "رجل",
+DIRECT_HEBREW_WORD_RESPONSES = {
+    "שלום": "שלום.",
+    "היי": "שלום.",
+    "תודה": "בבקשה.",
+    "כן": "כן.",
+    "לא": "לא.",
+    "מים": "זה מים.",
+    "קפה": "זה קפה.",
+    "בית": "זה בית.",
+    "אמא": "זאת אמא.",
+    "אבא": "זה אבא.",
+    "ילד": "זה ילד.",
+    "ילדה": "זאת ילדה.",
+    "אישה": "זאת אישה.",
+    "איש": "זה איש.",
 }
 _CACHE_LOCK = threading.Lock()
 
@@ -55,6 +65,7 @@ class CachedLevelBundle:
     advanced_only_tokens: frozenset[str]
     glossary: dict[str, str]
     question_answer_map: dict[str, str]
+    token_frequency: dict[str, int]
 
 
 CHAT_CACHE: dict[str, CachedLevelBundle] = {}
@@ -72,27 +83,26 @@ def warm_startup_chat_cache() -> None:
             if path.is_dir()
         )
 
-        raw_level_data: dict[str, tuple[list[str], list[Chunk]]] = {}
+        raw_level_data: dict[str, tuple[list[str], list[Chunk], list]] = {}
         for level in discovered_levels:
             transcripts, _ = load_transcripts(level)
             vocabulary = extract_vocabulary(transcripts)
             chunks = chunk_transcripts(transcripts)
-            raw_level_data[level] = (vocabulary, chunks)
+            raw_level_data[level] = (vocabulary, chunks, transcripts)
 
         cumulative_levels = sorted(raw_level_data.keys())
         for level in cumulative_levels:
-            vocabulary, chunks = raw_level_data[level]
+            vocabulary, chunks, transcripts = raw_level_data[level]
             higher_level_tokens = _collect_higher_level_tokens(level, raw_level_data)
-            transcripts, _ = load_transcripts(level)
-            glossary = dict(DIRECT_ARABIC_GLOSSARY)
             CHAT_CACHE[level] = CachedLevelBundle(
                 level=level,
                 vocab=vocabulary,
                 vocab_set=frozenset(vocabulary),
                 chunks=chunks,
                 advanced_only_tokens=frozenset(higher_level_tokens - set(vocabulary)),
-                glossary=glossary,
+                glossary=dict(DIRECT_HEBREW_WORD_RESPONSES),
                 question_answer_map=_build_question_answer_map(transcripts, set(vocabulary)),
+                token_frequency=_build_token_frequency_map(transcripts),
             )
 
 
@@ -124,19 +134,23 @@ def store_exact_cached_response(cache_key: str, response: ChatResponse) -> None:
 
 
 def build_allowed_vocabulary(bundle: CachedLevelBundle, selected_chunks: list[Chunk]) -> list[str]:
-    allowed_tokens = set(CORE_TUTOR_VOCAB)
+    priority_tokens = list(CORE_TUTOR_VOCAB)
+    allowed_tokens = set(priority_tokens)
     allowed_tokens.update(bundle.glossary.keys())
-    for chunk in selected_chunks:
-        allowed_tokens.update(chunk.tokens)
-    return sorted(token for token in allowed_tokens if token)
+
+    ranked_chunk_tokens = _rank_chunk_tokens(bundle, selected_chunks)
+    allowed_tokens.update(ranked_chunk_tokens)
+
+    ordered_tokens = priority_tokens + sorted(bundle.glossary.keys()) + ranked_chunk_tokens
+    return _dedupe_preserving_order(token for token in ordered_tokens if token in allowed_tokens)
 
 
 def _collect_higher_level_tokens(
     level: str,
-    raw_level_data: dict[str, tuple[list[str], list[Chunk]]],
+    raw_level_data: dict[str, tuple[list[str], list[Chunk], list]],
 ) -> set[str]:
     higher_tokens: set[str] = set()
-    for other_level, (vocabulary, _) in raw_level_data.items():
+    for other_level, (vocabulary, _, _) in raw_level_data.items():
         if other_level > level:
             higher_tokens.update(vocabulary)
     return higher_tokens
@@ -152,7 +166,11 @@ def _build_question_answer_map(transcripts, vocabulary: set[str]) -> dict[str, s
             normalized_question = _normalize_question_key(question)
             if not normalized_question:
                 continue
-            answer_tokens = {normalize_hebrew_token(token) for token in answer.split() if normalize_hebrew_token(token)}
+            answer_tokens = {
+                normalize_hebrew_token(token)
+                for token in answer.split()
+                if normalize_hebrew_token(token)
+            }
             if answer_tokens and answer_tokens.issubset(vocabulary) and is_short_hebrew_answer(answer):
                 question_answer_map.setdefault(normalized_question, answer)
     return question_answer_map
@@ -161,3 +179,37 @@ def _build_question_answer_map(transcripts, vocabulary: set[str]) -> dict[str, s
 def _normalize_question_key(text: str) -> str:
     normalized = " ".join(normalize_hebrew_token(part) for part in text.split() if normalize_hebrew_token(part))
     return normalized.strip()
+
+
+def _build_token_frequency_map(transcripts) -> dict[str, int]:
+    frequencies: Counter[str] = Counter()
+    for transcript in transcripts:
+        for token in transcript.content.split():
+            normalized = normalize_hebrew_token(token)
+            if normalized:
+                frequencies[normalized] += 1
+    return dict(frequencies)
+
+
+def _rank_chunk_tokens(bundle: CachedLevelBundle, selected_chunks: list[Chunk]) -> list[str]:
+    ranked: list[tuple[int, int, str]] = []
+    seen_tokens: set[str] = set()
+    for chunk in selected_chunks:
+        for token in chunk.tokens:
+            if not token or token in seen_tokens:
+                continue
+            seen_tokens.add(token)
+            ranked.append((bundle.token_frequency.get(token, 0), -len(token), token))
+    ranked.sort(reverse=True)
+    return [token for _, _, token in ranked]
+
+
+def _dedupe_preserving_order(tokens) -> list[str]:
+    ordered_tokens: list[str] = []
+    seen_tokens: set[str] = set()
+    for token in tokens:
+        if token in seen_tokens:
+            continue
+        seen_tokens.add(token)
+        ordered_tokens.append(token)
+    return ordered_tokens

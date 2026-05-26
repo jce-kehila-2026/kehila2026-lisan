@@ -27,3 +27,4 @@ class ChatResponse(BaseModel):
     routerHit: bool = False
     contextChunkIds: list[str] = Field(default_factory=list)
     guardrail: GuardrailReport = Field(default_factory=GuardrailReport)
+    suggestedNextPrompts: list[str] = Field(default_factory=list)

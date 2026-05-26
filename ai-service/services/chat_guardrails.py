@@ -104,6 +104,16 @@ def evaluate_vocabulary(answer: str, vocabulary: list[str]) -> GuardrailDecision
     )
 
 
+def is_hebrew_only_answer(answer: str) -> bool:
+    """Model output must be Hebrew text only for the current product scope."""
+    stripped_answer = (answer or "").strip()
+    if not stripped_answer:
+        return False
+    if LATIN_RE.search(stripped_answer) or ARABIC_RE.search(stripped_answer):
+        return False
+    return bool(hebrew_words(stripped_answer))
+
+
 def count_hebrew_words(text: str) -> int:
     return len([token for token in hebrew_words(text) if normalize_hebrew_token(token)])
 

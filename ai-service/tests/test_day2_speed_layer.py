@@ -109,22 +109,21 @@ class TestSmartRouter:
         assert data["routerHit"] is True
         assert data["fallbackUsed"] is False
 
-    def test_single_glossary_word_with_arabic(self):
+    def test_single_glossary_word_with_arabic_flag_stays_hebrew_only(self):
         r = post_chat("מים", includeArabic=True)
         data = r.json()
         assert data["routerHit"] is True
-        assert data["answerAr"] is not None
-        assert "ماء" in data["answerAr"]
+        assert data["answerAr"] is None
 
     def test_router_no_arabic_when_not_requested(self):
         r = post_chat("שלום", includeArabic=False)
         data = r.json()
         assert data["answerAr"] is None
 
-    def test_router_arabic_when_requested(self):
+    def test_router_arabic_flag_ignored_for_hebrew_only_scope(self):
         r = post_chat("שלום", includeArabic=True)
         data = r.json()
-        assert data["answerAr"] is not None
+        assert data["answerAr"] is None
 
     def test_non_routable_question_not_routed(self):
         """A valid Hebrew question not in router tables should NOT be routed."""
@@ -153,11 +152,12 @@ class TestExactCache:
         assert r_a1.json()["cacheHit"] is not None
         assert r_b1.json()["level"] in ("A1", "B1")
 
-    def test_cache_respects_arabic_flag(self):
+    def test_cache_ignores_arabic_flag_for_hebrew_only_scope(self):
         post_chat("שלום", includeArabic=False)
         r_arabic = post_chat("שלום", includeArabic=True)
         data = r_arabic.json()
-        assert data["answerAr"] is not None or data["routerHit"] is True
+        assert data["answerAr"] is None
+        assert data["cacheHit"] is True
 
     def test_fallback_also_cached(self):
         post_chat("")
@@ -394,6 +394,7 @@ class TestLLMPath:
         assert r.status_code == 200
         data = r.json()
         assert_valid_schema_v2(data)
+        assert data["answerAr"] is None
 
 
 # ===========================================================================

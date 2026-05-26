@@ -18,6 +18,7 @@ from services.chat_guardrails import (
     evaluate_vocabulary,
     get_fallback_text,
     is_clearly_out_of_scope,
+    is_hebrew_only_answer,
     is_short_hebrew_answer,
     normalize_level,
 )
@@ -36,6 +37,7 @@ from services.chat_retrieval import (
 )
 from services.chat_router import route_message
 from services.chat_schemas import ChatRequest, ChatResponse, GuardrailReport
+from services.chat_suggestions import get_suggestions
 
 logger = logging.getLogger("lisan.chat")
 
@@ -47,13 +49,24 @@ PROMPT_V1_PATH = BASE_DIR / "prompts" / "chat-system-prompt-v1.txt"
 def generate_chat_response(payload: ChatRequest) -> ChatResponse:
     provider, model = get_configured_provider()
     requested_level = normalize_level(payload.level)
-    cache_key = build_cache_key(payload.message, requested_level, payload.includeArabic)
+    # Current product scope is Hebrew-only. Ignore caller Arabic requests until
+    # the Arabic explanation path has its own quality pass and eval coverage.
+    include_arabic = False
+    cache_key = build_cache_key(payload.message, requested_level, include_arabic)
 
     cached_response = get_exact_cached_response(cache_key)
     if cached_response is not None:
         cached_response.cacheHit = True
         cached_response.latencyMs = 0
         cached_response.provider = provider
+        # Re-attach suggestions in case the cached entry pre-dates this field.
+        if not cached_response.suggestedNextPrompts:
+            cached_response.suggestedNextPrompts = get_suggestions(
+                answer_he=cached_response.answerHe,
+                message=payload.message,
+                level=requested_level,
+                fallback_used=cached_response.fallbackUsed,
+            )
         _log_response(cached_response, provider, 0)
         return cached_response
 
@@ -67,6 +80,7 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
             model=model,
             provider=provider,
             fallback_reason=fallback_reason,
+            message=payload.message,
         )
         store_exact_cached_response(cache_key, response)
         _log_response(response, provider, 0)
@@ -77,10 +91,15 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
         bundle=bundle,
         level=resolved_level,
         model=model,
-        include_arabic=payload.includeArabic,
+        include_arabic=include_arabic,
     )
     if routed_response is not None:
         routed_response.provider = provider
+        routed_response.suggestedNextPrompts = get_suggestions(
+            answer_he=routed_response.answerHe,
+            message=payload.message,
+            level=resolved_level,
+        )
         store_exact_cached_response(cache_key, routed_response)
         _log_response(routed_response, provider, 0)
         return routed_response
@@ -91,6 +110,7 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
             model=model,
             provider=provider,
             fallback_reason="OUT_OF_SCOPE",
+            message=payload.message,
         )
         store_exact_cached_response(cache_key, response)
         _log_response(response, provider, 0)
@@ -103,7 +123,6 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
         base_prompt=_load_prompt(),
         vocabulary=build_allowed_vocabulary(bundle, selected_chunks),
         context=context,
-        include_arabic=payload.includeArabic,
     )
 
     if not provider_circuit.allow_request():
@@ -113,6 +132,7 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
             provider=provider,
             fallback_reason="CIRCUIT_OPEN",
             context_chunk_ids=chunk_ids,
+            message=payload.message,
         )
         _log_response(response, provider, len(selected_chunks))
         return response
@@ -128,6 +148,7 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
             provider=provider,
             fallback_reason="MODEL_TIMEOUT",
             context_chunk_ids=chunk_ids,
+            message=payload.message,
         )
         store_exact_cached_response(cache_key, response)
         _log_response(response, provider, len(selected_chunks))
@@ -140,6 +161,7 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
             provider=provider,
             fallback_reason="PROVIDER_QUOTA",
             context_chunk_ids=chunk_ids,
+            message=payload.message,
         )
         _log_response(response, provider, len(selected_chunks))
         return response
@@ -151,6 +173,7 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
             provider=provider,
             fallback_reason="PROVIDER_AUTH",
             context_chunk_ids=chunk_ids,
+            message=payload.message,
         )
         _log_response(response, provider, len(selected_chunks))
         return response
@@ -162,6 +185,7 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
             provider=provider,
             fallback_reason="PROVIDER_NETWORK",
             context_chunk_ids=chunk_ids,
+            message=payload.message,
         )
         _log_response(response, provider, len(selected_chunks))
         return response
@@ -173,12 +197,13 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
             provider=provider,
             fallback_reason="MODEL_ERROR",
             context_chunk_ids=chunk_ids,
+            message=payload.message,
         )
         store_exact_cached_response(cache_key, response)
         _log_response(response, provider, len(selected_chunks))
         return response
 
-    answer_he, answer_ar = _split_answer(provider_result.answer, payload.includeArabic)
+    answer_he = _split_answer(provider_result.answer)
     if not answer_he:
         response = _build_fallback_response(
             level=resolved_level,
@@ -187,6 +212,21 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
             fallback_reason="EMPTY_RESPONSE",
             latency_ms=int(round(provider_result.latency_seconds * 1000)),
             context_chunk_ids=chunk_ids,
+            message=payload.message,
+        )
+        store_exact_cached_response(cache_key, response)
+        _log_response(response, provider, len(selected_chunks))
+        return response
+
+    if not is_hebrew_only_answer(answer_he):
+        response = _build_fallback_response(
+            level=resolved_level,
+            model=model,
+            provider=provider,
+            fallback_reason="VOCAB_LEAKAGE",
+            latency_ms=int(round(provider_result.latency_seconds * 1000)),
+            context_chunk_ids=chunk_ids,
+            message=payload.message,
         )
         store_exact_cached_response(cache_key, response)
         _log_response(response, provider, len(selected_chunks))
@@ -202,6 +242,7 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
             latency_ms=int(round(provider_result.latency_seconds * 1000)),
             context_chunk_ids=chunk_ids,
             blocked_tokens=vocabulary_decision.blocked_tokens,
+            message=payload.message,
         )
         store_exact_cached_response(cache_key, response)
         _log_response(response, provider, len(selected_chunks))
@@ -209,7 +250,7 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
 
     response = ChatResponse(
         answerHe=answer_he,
-        answerAr=answer_ar,
+        answerAr=None,
         fallbackUsed=False,
         fallbackReason=None,
         level=resolved_level,
@@ -220,6 +261,11 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
         routerHit=False,
         contextChunkIds=chunk_ids,
         guardrail=GuardrailReport(vocabularyLeakage=False, blockedTokens=[]),
+        suggestedNextPrompts=get_suggestions(
+            answer_he=answer_he,
+            message=payload.message,
+            level=resolved_level,
+        ),
     )
     store_exact_cached_response(cache_key, response)
     _log_response(response, provider, len(selected_chunks))
@@ -235,38 +281,25 @@ def _build_system_message(
     base_prompt: str,
     vocabulary: list[str],
     context: str,
-    include_arabic: bool,
 ) -> str:
     vocabulary_block = ", ".join(vocabulary)
-    arabic_instruction = ""
-    if include_arabic:
-        arabic_instruction = (
-            "\nArabic translation was requested by the caller. "
-            "Add one short Arabic translation on a new line in parentheses."
-        )
     return (
-        f"{base_prompt}{arabic_instruction}\n"
+        f"{base_prompt}\n"
         "Answer in one short Hebrew sentence.\n"
         "Maximum 12 Hebrew words.\n"
-        "No explanations unless explicitly requested.\n\n"
+        "Use Hebrew only. Do not add Arabic or English.\n"
+        "No explanations, translations, second lines, lists, or notes.\n\n"
         f"Approved vocabulary:\n{vocabulary_block}\n\n"
         f"Approved curriculum context:\n{context}"
     )
 
 
-def _split_answer(answer: str, include_arabic: bool) -> tuple[str, str | None]:
+def _split_answer(answer: str) -> str:
     lines = [line.strip() for line in (answer or "").splitlines() if line.strip()]
     if not lines:
-        return "", None
+        return ""
 
     answer_he = lines[0]
-    answer_ar = None
-    if include_arabic and len(lines) > 1:
-        second_line = lines[1]
-        if second_line.startswith("(") and second_line.endswith(")"):
-            answer_ar = second_line[1:-1].strip() or None
-        else:
-            answer_ar = second_line
 
     if not is_short_hebrew_answer(answer_he):
         trimmed_tokens: list[str] = []
@@ -275,7 +308,7 @@ def _split_answer(answer: str, include_arabic: bool) -> tuple[str, str | None]:
             if count_hebrew_words(" ".join(trimmed_tokens)) >= 12:
                 break
         answer_he = " ".join(trimmed_tokens).strip()
-    return answer_he, answer_ar
+    return answer_he
 
 
 def _build_fallback_response(
@@ -286,6 +319,7 @@ def _build_fallback_response(
     latency_ms: int = 0,
     context_chunk_ids: list[str] | None = None,
     blocked_tokens: list[str] | None = None,
+    message: str = "",
 ) -> ChatResponse:
     return ChatResponse(
         answerHe=get_fallback_text(fallback_reason),
@@ -302,6 +336,12 @@ def _build_fallback_response(
         guardrail=GuardrailReport(
             vocabularyLeakage=bool(blocked_tokens),
             blockedTokens=blocked_tokens or [],
+        ),
+        suggestedNextPrompts=get_suggestions(
+            answer_he=get_fallback_text(fallback_reason),
+            message=message,
+            level=level,
+            fallback_used=True,
         ),
     )
 
