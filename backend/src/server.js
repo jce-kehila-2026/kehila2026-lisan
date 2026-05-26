@@ -11,6 +11,7 @@ const transcriptsRoutes = require('./routes/transcripts');
 const evaluationRoutes = require('./routes/evaluation');
 const adminRoutes = require('./routes/admin');
 const chatRoutes = require('./routes/chats');
+const { router: aiChatRouter } = require('./routes/chat'); // Sprint 1/2: AI Gateway
 const progressRoutes = require('./routes/progress');
 const teacherRoutes = require('./routes/teacher');
 const sharedChatsRoutes = require('./routes/sharedChats');
@@ -56,7 +57,8 @@ app.use('/api/users', usersRoutes);
 app.use('/api/transcripts', transcriptsRoutes);
 app.use('/api/evaluation', evaluationRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/chats', chatRoutes);
+app.use('/api/chats', chatRoutes);          // legacy Sprint-0 sessions router
+app.use('/api/chat',  aiChatRouter);        // Sprint 1/2: AI Gateway (POST /api/chat/)
 app.use('/api/progress', progressRoutes);
 app.use('/api/teacher', teacherRoutes);
 app.use('/api/shared-chats', sharedChatsRoutes);
