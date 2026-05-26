@@ -12,9 +12,9 @@ class CircuitState(Enum):
     HALF_OPEN = "half_open"
 
 
-DEFAULT_FAILURE_THRESHOLD = 5
+DEFAULT_FAILURE_THRESHOLD = 3
 DEFAULT_WINDOW_SECONDS = 60.0
-DEFAULT_RECOVERY_SECONDS = 30.0
+DEFAULT_RECOVERY_SECONDS = 60.0
 
 
 class CircuitBreaker:
@@ -35,6 +35,7 @@ class CircuitBreaker:
         )
         self._lock = threading.Lock()
         self._failures: list[float] = []
+        self._consecutive_failures = 0
         self._state = CircuitState.CLOSED
         self._opened_at: float | None = None
 
@@ -56,6 +57,7 @@ class CircuitBreaker:
 
     def record_success(self) -> None:
         with self._lock:
+            self._consecutive_failures = 0
             if self._state == CircuitState.HALF_OPEN:
                 self._state = CircuitState.CLOSED
                 self._failures.clear()
@@ -66,18 +68,21 @@ class CircuitBreaker:
             now = time.monotonic()
             cutoff = now - self._window_seconds
             self._failures = [t for t in self._failures if t > cutoff]
+            self._consecutive_failures = len(self._failures)
             self._failures.append(now)
+            self._consecutive_failures += 1
 
             if self._state == CircuitState.HALF_OPEN:
                 self._state = CircuitState.OPEN
                 self._opened_at = now
-            elif len(self._failures) >= self._failure_threshold:
+            elif self._consecutive_failures >= self._failure_threshold:
                 self._state = CircuitState.OPEN
                 self._opened_at = now
 
     def reset(self) -> None:
         with self._lock:
             self._failures.clear()
+            self._consecutive_failures = 0
             self._state = CircuitState.CLOSED
             self._opened_at = None
 

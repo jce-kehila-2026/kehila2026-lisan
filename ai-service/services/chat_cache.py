@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import threading
+import time
 from collections import Counter
+from collections import deque
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable
 
 from services.chat_guardrails import is_short_hebrew_answer, normalize_hebrew_token, normalize_level
 from services.chat_retrieval import Chunk, chunk_transcripts, extract_vocabulary, load_transcripts
@@ -54,6 +57,11 @@ DIRECT_HEBREW_WORD_RESPONSES = {
     "איש": "זה איש.",
 }
 _CACHE_LOCK = threading.Lock()
+_EXACT_CACHE_LOCK = threading.Lock()
+DEFAULT_RESPONSE_CACHE_TTL_SECONDS = 3600
+DEFAULT_RESPONSE_CACHE_MAX_ENTRIES = 256
+DEFAULT_RATE_LIMIT_MAX_REQUESTS = 10
+DEFAULT_RATE_LIMIT_WINDOW_SECONDS = 60
 
 
 @dataclass(frozen=True)
@@ -68,8 +76,166 @@ class CachedLevelBundle:
     token_frequency: dict[str, int]
 
 
+@dataclass
+class CacheEntry:
+    response: ChatResponse
+    created_at: float
+    expires_at: float
+    hit_count: int = 0
+
+
+class CacheManager:
+    def __init__(
+        self,
+        default_ttl: int = DEFAULT_RESPONSE_CACHE_TTL_SECONDS,
+        max_entries: int = DEFAULT_RESPONSE_CACHE_MAX_ENTRIES,
+        time_func: Callable[[], float] | None = None,
+    ) -> None:
+        self.default_ttl = default_ttl
+        self.max_entries = max_entries
+        self._time_func = time_func or time.time
+        self._lock = threading.Lock()
+        self._entries: dict[tuple[str, str], CacheEntry] = {}
+        self._hits = 0
+        self._misses = 0
+
+    def get_cached_response(self, query_hash: str, language_level: str) -> ChatResponse | None:
+        normalized_level = normalize_level(language_level)
+        with self._lock:
+            self._clear_expired_entries_locked()
+            cache_key = self._build_key(query_hash, normalized_level)
+            entry = self._entries.get(cache_key)
+            if entry is None:
+                self._misses += 1
+                return None
+
+            entry.hit_count += 1
+            self._hits += 1
+            return entry.response.model_copy(deep=True)
+
+    def set_cached_response(
+        self,
+        query_hash: str,
+        language_level: str,
+        response: ChatResponse,
+        ttl: int = DEFAULT_RESPONSE_CACHE_TTL_SECONDS,
+    ) -> None:
+        normalized_level = normalize_level(language_level)
+        now = self._time_func()
+        with self._lock:
+            self._clear_expired_entries_locked()
+            if len(self._entries) >= self.max_entries:
+                self._evict_oldest_entry_locked()
+
+            cache_key = self._build_key(query_hash, normalized_level)
+            effective_ttl = ttl or self.default_ttl
+            self._entries[cache_key] = CacheEntry(
+                response=response.model_copy(deep=True),
+                created_at=now,
+                expires_at=now + effective_ttl,
+            )
+
+    def clear_expired_entries(self) -> int:
+        with self._lock:
+            return self._clear_expired_entries_locked()
+
+    def get_cache_stats(self) -> dict[str, int]:
+        with self._lock:
+            self._clear_expired_entries_locked()
+            return {
+                "hits": self._hits,
+                "misses": self._misses,
+                "size": len(self._entries),
+            }
+
+    def _build_key(self, query_hash: str, language_level: str) -> tuple[str, str]:
+        return (query_hash, language_level)
+
+    def _clear_expired_entries_locked(self) -> int:
+        now = self._time_func()
+        expired_keys = [
+            cache_key
+            for cache_key, entry in self._entries.items()
+            if entry.expires_at <= now
+        ]
+        for cache_key in expired_keys:
+            self._entries.pop(cache_key, None)
+        return len(expired_keys)
+
+    def _evict_oldest_entry_locked(self) -> None:
+        oldest_key = min(
+            self._entries,
+            key=lambda cache_key: self._entries[cache_key].created_at,
+        )
+        self._entries.pop(oldest_key, None)
+
+
+class RateLimiter:
+    def __init__(
+        self,
+        max_requests: int = DEFAULT_RATE_LIMIT_MAX_REQUESTS,
+        window_seconds: int = DEFAULT_RATE_LIMIT_WINDOW_SECONDS,
+        time_func: Callable[[], float] | None = None,
+    ) -> None:
+        self.max_requests = max_requests
+        self.window_seconds = window_seconds
+        self._time_func = time_func or time.time
+        self._lock = threading.Lock()
+        self._requests: dict[str, deque[float]] = {}
+
+    def check_request(self, user_id: str) -> tuple[bool, int]:
+        normalized_user_id = (user_id or "anonymous").strip() or "anonymous"
+        with self._lock:
+            requests = self._get_active_requests_locked(normalized_user_id)
+            if len(requests) >= self.max_requests:
+                retry_after = max(1, int(requests[0] + self.window_seconds - self._time_func()))
+                return False, retry_after
+
+            requests.append(self._time_func())
+            return True, 0
+
+    def get_status(self, user_id: str) -> dict[str, int | bool | str]:
+        normalized_user_id = (user_id or "anonymous").strip() or "anonymous"
+        with self._lock:
+            requests = self._get_active_requests_locked(normalized_user_id)
+            retry_after = 0
+            if len(requests) >= self.max_requests:
+                retry_after = max(1, int(requests[0] + self.window_seconds - self._time_func()))
+            remaining = max(0, self.max_requests - len(requests))
+            return {
+                "userId": normalized_user_id,
+                "maxRequests": self.max_requests,
+                "windowSeconds": self.window_seconds,
+                "requestsInWindow": len(requests),
+                "remainingRequests": remaining,
+                "allowed": len(requests) < self.max_requests,
+                "retryAfterSeconds": retry_after,
+            }
+
+    def reset(self, user_id: str | None = None) -> None:
+        with self._lock:
+            if user_id is None:
+                self._requests.clear()
+                return
+            normalized_user_id = (user_id or "anonymous").strip() or "anonymous"
+            self._requests.pop(normalized_user_id, None)
+
+    def _get_active_requests_locked(self, user_id: str) -> deque[float]:
+        now = self._time_func()
+        cutoff = now - self.window_seconds
+        requests = self._requests.setdefault(user_id, deque())
+        while requests and requests[0] <= cutoff:
+            requests.popleft()
+        if not requests:
+            self._requests[user_id] = deque()
+            requests = self._requests[user_id]
+        return requests
+
+
 CHAT_CACHE: dict[str, CachedLevelBundle] = {}
 EXACT_RESPONSE_CACHE: dict[str, ChatResponse] = {}
+RESPONSE_CACHE_MANAGER = CacheManager()
+RATE_LIMITER = RateLimiter()
 
 
 def warm_startup_chat_cache() -> None:
@@ -123,14 +289,55 @@ def normalize_message_for_cache(message: str) -> str:
 
 
 def get_exact_cached_response(cache_key: str) -> ChatResponse | None:
-    cached = EXACT_RESPONSE_CACHE.get(cache_key)
-    if cached is None:
-        return None
-    return cached.model_copy(deep=True)
+    level = _extract_level_from_cache_key(cache_key)
+    return RESPONSE_CACHE_MANAGER.get_cached_response(cache_key, level)
 
 
 def store_exact_cached_response(cache_key: str, response: ChatResponse) -> None:
-    EXACT_RESPONSE_CACHE[cache_key] = response.model_copy(deep=True)
+    level = _extract_level_from_cache_key(cache_key)
+    RESPONSE_CACHE_MANAGER.set_cached_response(cache_key, level, response)
+    with _EXACT_CACHE_LOCK:
+        EXACT_RESPONSE_CACHE[cache_key] = response.model_copy(deep=True)
+
+
+def clear_expired_entries() -> int:
+    cleared_count = RESPONSE_CACHE_MANAGER.clear_expired_entries()
+    if cleared_count:
+        with _EXACT_CACHE_LOCK:
+            for cache_key in list(EXACT_RESPONSE_CACHE.keys()):
+                manager_key = (
+                    cache_key,
+                    normalize_level(_extract_level_from_cache_key(cache_key)),
+                )
+                if manager_key not in RESPONSE_CACHE_MANAGER._entries:
+                    EXACT_RESPONSE_CACHE.pop(cache_key, None)
+    return cleared_count
+
+
+def get_cache_stats() -> dict[str, int]:
+    return RESPONSE_CACHE_MANAGER.get_cache_stats()
+
+
+def initialize_chat_cache() -> None:
+    warm_startup_chat_cache()
+    clear_expired_entries()
+    RATE_LIMITER.reset()
+
+
+def is_startup_cache_ready() -> bool:
+    return bool(CHAT_CACHE)
+
+
+def check_rate_limit(user_id: str) -> tuple[bool, int]:
+    return RATE_LIMITER.check_request(user_id)
+
+
+def get_rate_limit_status(user_id: str) -> dict[str, int | bool | str]:
+    return RATE_LIMITER.get_status(user_id)
+
+
+def reset_rate_limit(user_id: str | None = None) -> None:
+    RATE_LIMITER.reset(user_id)
 
 
 def build_allowed_vocabulary(bundle: CachedLevelBundle, selected_chunks: list[Chunk]) -> list[str]:
@@ -213,3 +420,13 @@ def _dedupe_preserving_order(tokens) -> list[str]:
         seen_tokens.add(token)
         ordered_tokens.append(token)
     return ordered_tokens
+
+
+def _extract_level_from_cache_key(cache_key: str) -> str:
+    try:
+        return cache_key.rsplit(":", 2)[1]
+    except IndexError:
+        return "A1"
+
+
+warm_startup_chat_cache()

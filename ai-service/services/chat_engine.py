@@ -11,10 +11,10 @@ from services.chat_cache import (
     get_level_bundle,
     store_exact_cached_response,
 )
-from services.chat_circuit_breaker import provider_circuit
 from services.chat_guardrails import (
     classify_fast_reject,
     count_hebrew_words,
+    enforce_hebrew_only_scope,
     evaluate_vocabulary,
     get_fallback_text,
     is_clearly_out_of_scope,
@@ -23,20 +23,22 @@ from services.chat_guardrails import (
     normalize_level,
 )
 from services.chat_provider import (
+    AllProvidersFailedError,
     ChatProviderAuthError,
     ChatProviderError,
     ChatProviderNetworkError,
     ChatProviderQuotaError,
     ChatProviderTimeoutError,
     call_provider,
+    call_provider as live_call_provider,
     get_configured_provider,
+    provider_circuit,
 )
 from services.chat_retrieval import (
-    render_context,
-    retrieve_relevant_chunks,
+    build_retrieval_context,
 )
 from services.chat_router import route_message
-from services.chat_schemas import ChatRequest, ChatResponse, GuardrailReport
+from services.chat_schemas import ChatRequest, ChatRequestContext, ChatResponse, GuardrailReport
 from services.chat_suggestions import get_suggestions
 
 logger = logging.getLogger("lisan.chat")
@@ -47,205 +49,189 @@ PROMPT_V1_PATH = BASE_DIR / "prompts" / "chat-system-prompt-v1.txt"
 
 
 def generate_chat_response(payload: ChatRequest) -> ChatResponse:
-    provider, model = get_configured_provider()
-    requested_level = normalize_level(payload.level)
-    # Current product scope is Hebrew-only. Ignore caller Arabic requests until
-    # the Arabic explanation path has its own quality pass and eval coverage.
-    include_arabic = False
-    cache_key = build_cache_key(payload.message, requested_level, include_arabic)
+    request_context = _build_request_context(payload)
 
-    cached_response = get_exact_cached_response(cache_key)
+    cached_response = get_exact_cached_response(request_context.cache_key)
     if cached_response is not None:
-        cached_response.cacheHit = True
-        cached_response.latencyMs = 0
-        cached_response.provider = provider
-        # Re-attach suggestions in case the cached entry pre-dates this field.
-        if not cached_response.suggestedNextPrompts:
-            cached_response.suggestedNextPrompts = get_suggestions(
-                answer_he=cached_response.answerHe,
-                message=payload.message,
-                level=requested_level,
-                fallback_used=cached_response.fallbackUsed,
-            )
-        _log_response(cached_response, provider, 0)
-        return cached_response
+        hydrated_response = _hydrate_cached_response(cached_response, request_context)
+        _log_response(hydrated_response, request_context.provider, 0)
+        return hydrated_response
 
-    bundle = get_level_bundle(requested_level)
+    bundle = get_level_bundle(request_context.requested_level)
     resolved_level = bundle.level
-    fallback_reason = classify_fast_reject(payload.message)
+    fallback_reason = classify_fast_reject(request_context.message)
 
     if fallback_reason:
-        response = _build_fallback_response(
-            level=requested_level,
-            model=model,
-            provider=provider,
+        response = _build_fallback_response_from_request(
+            request_context=request_context,
+            level=resolved_level,
             fallback_reason=fallback_reason,
-            message=payload.message,
         )
-        store_exact_cached_response(cache_key, response)
-        _log_response(response, provider, 0)
+        store_exact_cached_response(request_context.cache_key, response)
+        _log_response(response, request_context.provider, 0)
         return response
 
     routed_response = route_message(
-        message=payload.message.strip(),
+        message=request_context.normalized_message,
         bundle=bundle,
         level=resolved_level,
-        model=model,
-        include_arabic=include_arabic,
+        model=request_context.model,
+        include_arabic=request_context.include_arabic,
     )
     if routed_response is not None:
-        routed_response.provider = provider
+        routed_response.provider = request_context.provider
         routed_response.suggestedNextPrompts = get_suggestions(
             answer_he=routed_response.answerHe,
-            message=payload.message,
+            message=request_context.message,
             level=resolved_level,
         )
-        store_exact_cached_response(cache_key, routed_response)
-        _log_response(routed_response, provider, 0)
+        store_exact_cached_response(request_context.cache_key, routed_response)
+        _log_response(routed_response, request_context.provider, 0)
         return routed_response
 
-    if is_clearly_out_of_scope(payload.message, set(bundle.vocab_set), set(bundle.advanced_only_tokens)):
-        response = _build_fallback_response(
+    if is_clearly_out_of_scope(request_context.message, set(bundle.vocab_set), set(bundle.advanced_only_tokens)):
+        response = _build_fallback_response_from_request(
+            request_context=request_context,
             level=resolved_level,
-            model=model,
-            provider=provider,
             fallback_reason="OUT_OF_SCOPE",
-            message=payload.message,
         )
-        store_exact_cached_response(cache_key, response)
-        _log_response(response, provider, 0)
+        store_exact_cached_response(request_context.cache_key, response)
+        _log_response(response, request_context.provider, 0)
         return response
 
-    selected_chunks = retrieve_relevant_chunks(payload.message, bundle.chunks, limit=2)
-    chunk_ids = [chunk.chunk_id for chunk in selected_chunks]
-    context = render_context(selected_chunks)
+    retrieval_context = build_retrieval_context(request_context.message, bundle.chunks, limit=2)
     system_message = _build_system_message(
         base_prompt=_load_prompt(),
-        vocabulary=build_allowed_vocabulary(bundle, selected_chunks),
-        context=context,
+        vocabulary=build_allowed_vocabulary(bundle, _resolve_selected_chunks(bundle, retrieval_context.chunk_ids)),
+        context=retrieval_context.context_text,
     )
 
-    if not provider_circuit.allow_request():
-        response = _build_fallback_response(
-            level=resolved_level,
-            model=model,
-            provider=provider,
-            fallback_reason="CIRCUIT_OPEN",
-            context_chunk_ids=chunk_ids,
-            message=payload.message,
-        )
-        _log_response(response, provider, len(selected_chunks))
-        return response
-
     try:
-        provider_result = call_provider(provider, model, system_message, payload.message)
-        provider_circuit.record_success()
-    except ChatProviderTimeoutError:
-        provider_circuit.record_failure()
-        response = _build_fallback_response(
-            level=resolved_level,
-            model=model,
-            provider=provider,
-            fallback_reason="MODEL_TIMEOUT",
-            context_chunk_ids=chunk_ids,
-            message=payload.message,
+        provider_result = call_provider(
+            request_context.provider,
+            request_context.model,
+            system_message,
+            request_context.message,
         )
-        store_exact_cached_response(cache_key, response)
-        _log_response(response, provider, len(selected_chunks))
+        active_provider = provider_result.provider
+        active_model = provider_result.model
+    except AllProvidersFailedError as exc:
+        active_provider = request_context.provider
+        active_model = request_context.model
+        fallback_reason = _map_provider_error_to_fallback_reason(exc.primary_error)
+        response = _build_fallback_response_from_request(
+            request_context=request_context,
+            level=resolved_level,
+            fallback_reason=fallback_reason,
+            context_chunk_ids=retrieval_context.chunk_ids,
+        )
+        response.retrievalScores = retrieval_context.relevance_scores
+        _log_response(response, active_provider, retrieval_context.chunks_count)
+        return response
+    except ChatProviderTimeoutError:
+        active_provider = request_context.provider
+        active_model = request_context.model
+        response = _build_fallback_response_from_request(
+            request_context=request_context,
+            level=resolved_level,
+            fallback_reason="MODEL_TIMEOUT",
+            context_chunk_ids=retrieval_context.chunk_ids,
+        )
+        response.retrievalScores = retrieval_context.relevance_scores
+        _log_response(response, active_provider, retrieval_context.chunks_count)
         return response
     except ChatProviderQuotaError:
-        provider_circuit.record_failure()
-        response = _build_fallback_response(
+        active_provider = request_context.provider
+        active_model = request_context.model
+        response = _build_fallback_response_from_request(
+            request_context=request_context,
             level=resolved_level,
-            model=model,
-            provider=provider,
             fallback_reason="PROVIDER_QUOTA",
-            context_chunk_ids=chunk_ids,
-            message=payload.message,
+            context_chunk_ids=retrieval_context.chunk_ids,
         )
-        _log_response(response, provider, len(selected_chunks))
+        response.retrievalScores = retrieval_context.relevance_scores
+        _log_response(response, active_provider, retrieval_context.chunks_count)
         return response
     except ChatProviderAuthError:
-        provider_circuit.record_failure()
-        response = _build_fallback_response(
+        active_provider = request_context.provider
+        active_model = request_context.model
+        response = _build_fallback_response_from_request(
+            request_context=request_context,
             level=resolved_level,
-            model=model,
-            provider=provider,
             fallback_reason="PROVIDER_AUTH",
-            context_chunk_ids=chunk_ids,
-            message=payload.message,
+            context_chunk_ids=retrieval_context.chunk_ids,
         )
-        _log_response(response, provider, len(selected_chunks))
+        response.retrievalScores = retrieval_context.relevance_scores
+        _log_response(response, active_provider, retrieval_context.chunks_count)
         return response
     except ChatProviderNetworkError:
-        provider_circuit.record_failure()
-        response = _build_fallback_response(
+        active_provider = request_context.provider
+        active_model = request_context.model
+        response = _build_fallback_response_from_request(
+            request_context=request_context,
             level=resolved_level,
-            model=model,
-            provider=provider,
             fallback_reason="PROVIDER_NETWORK",
-            context_chunk_ids=chunk_ids,
-            message=payload.message,
+            context_chunk_ids=retrieval_context.chunk_ids,
         )
-        _log_response(response, provider, len(selected_chunks))
+        response.retrievalScores = retrieval_context.relevance_scores
+        _log_response(response, active_provider, retrieval_context.chunks_count)
         return response
     except ChatProviderError:
-        provider_circuit.record_failure()
-        response = _build_fallback_response(
+        active_provider = request_context.provider
+        active_model = request_context.model
+        response = _build_fallback_response_from_request(
+            request_context=request_context,
             level=resolved_level,
-            model=model,
-            provider=provider,
             fallback_reason="MODEL_ERROR",
-            context_chunk_ids=chunk_ids,
-            message=payload.message,
+            context_chunk_ids=retrieval_context.chunk_ids,
         )
-        store_exact_cached_response(cache_key, response)
-        _log_response(response, provider, len(selected_chunks))
+        response.retrievalScores = retrieval_context.relevance_scores
+        _log_response(response, active_provider, retrieval_context.chunks_count)
         return response
 
     answer_he = _split_answer(provider_result.answer)
     if not answer_he:
-        response = _build_fallback_response(
+        response = _build_fallback_response_from_request(
+            request_context=request_context,
             level=resolved_level,
-            model=model,
-            provider=provider,
             fallback_reason="EMPTY_RESPONSE",
             latency_ms=int(round(provider_result.latency_seconds * 1000)),
-            context_chunk_ids=chunk_ids,
-            message=payload.message,
+            context_chunk_ids=retrieval_context.chunk_ids,
         )
-        store_exact_cached_response(cache_key, response)
-        _log_response(response, provider, len(selected_chunks))
+        store_exact_cached_response(request_context.cache_key, response)
+        response.retrievalScores = retrieval_context.relevance_scores
+        _log_response(response, active_provider, retrieval_context.chunks_count)
         return response
 
     if not is_hebrew_only_answer(answer_he):
-        response = _build_fallback_response(
+        response = _build_fallback_response_from_request(
+            request_context=request_context,
             level=resolved_level,
-            model=model,
-            provider=provider,
             fallback_reason="VOCAB_LEAKAGE",
             latency_ms=int(round(provider_result.latency_seconds * 1000)),
-            context_chunk_ids=chunk_ids,
-            message=payload.message,
+            context_chunk_ids=retrieval_context.chunk_ids,
         )
-        store_exact_cached_response(cache_key, response)
-        _log_response(response, provider, len(selected_chunks))
+        store_exact_cached_response(request_context.cache_key, response)
+        response.retrievalScores = retrieval_context.relevance_scores
+        _log_response(response, active_provider, retrieval_context.chunks_count)
         return response
 
-    vocabulary_decision = evaluate_vocabulary(answer_he, build_allowed_vocabulary(bundle, selected_chunks))
+    vocabulary_decision = evaluate_vocabulary(
+        answer_he,
+        build_allowed_vocabulary(bundle, _resolve_selected_chunks(bundle, retrieval_context.chunk_ids)),
+    )
     if vocabulary_decision.fallback_used:
-        response = _build_fallback_response(
+        response = _build_fallback_response_from_request(
+            request_context=request_context,
             level=resolved_level,
-            model=model,
-            provider=provider,
             fallback_reason=vocabulary_decision.fallback_reason,
             latency_ms=int(round(provider_result.latency_seconds * 1000)),
-            context_chunk_ids=chunk_ids,
+            context_chunk_ids=retrieval_context.chunk_ids,
             blocked_tokens=vocabulary_decision.blocked_tokens,
-            message=payload.message,
         )
-        store_exact_cached_response(cache_key, response)
-        _log_response(response, provider, len(selected_chunks))
+        store_exact_cached_response(request_context.cache_key, response)
+        response.retrievalScores = retrieval_context.relevance_scores
+        _log_response(response, active_provider, retrieval_context.chunks_count)
         return response
 
     response = ChatResponse(
@@ -254,22 +240,61 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
         fallbackUsed=False,
         fallbackReason=None,
         level=resolved_level,
-        model=model,
-        provider=provider,
+        model=active_model,
+        provider=active_provider,
         latencyMs=int(round(provider_result.latency_seconds * 1000)),
         cacheHit=False,
         routerHit=False,
-        contextChunkIds=chunk_ids,
+        contextChunkIds=retrieval_context.chunk_ids,
+        retrievalScores=retrieval_context.relevance_scores,
         guardrail=GuardrailReport(vocabularyLeakage=False, blockedTokens=[]),
         suggestedNextPrompts=get_suggestions(
             answer_he=answer_he,
-            message=payload.message,
+            message=request_context.message,
             level=resolved_level,
         ),
     )
-    store_exact_cached_response(cache_key, response)
-    _log_response(response, provider, len(selected_chunks))
+    store_exact_cached_response(request_context.cache_key, response)
+    _log_response(response, active_provider, retrieval_context.chunks_count)
     return response
+
+
+def _build_request_context(payload: ChatRequest) -> ChatRequestContext:
+    provider, model = get_configured_provider()
+    requested_level = normalize_level(payload.level)
+    normalized_message = (payload.message or "").strip()
+    include_arabic = enforce_hebrew_only_scope(payload.includeArabic)
+    return ChatRequestContext(
+        message=payload.message,
+        normalized_message=normalized_message,
+        requested_level=requested_level,
+        include_arabic=include_arabic,
+        cache_key=build_cache_key(payload.message, requested_level, include_arabic),
+        provider=provider,
+        model=model,
+    )
+
+
+def _hydrate_cached_response(response: ChatResponse, request_context: ChatRequestContext) -> ChatResponse:
+    response.cacheHit = True
+    response.latencyMs = 0
+    response.provider = response.provider or request_context.provider
+    response.model = response.model or request_context.model
+    if not response.retrievalScores:
+        response.retrievalScores = []
+    if not response.suggestedNextPrompts:
+        response.suggestedNextPrompts = get_suggestions(
+            answer_he=response.answerHe,
+            message=request_context.message,
+            level=response.level or request_context.requested_level,
+            fallback_used=response.fallbackUsed,
+        )
+    return response
+
+
+def _resolve_selected_chunks(bundle, chunk_ids: list[str]):
+    chunk_lookup = {chunk.chunk_id: chunk for chunk in bundle.chunks}
+    return [chunk_lookup[chunk_id] for chunk_id in chunk_ids if chunk_id in chunk_lookup]
 
 
 def _load_prompt() -> str:
@@ -346,11 +371,33 @@ def _build_fallback_response(
     )
 
 
+def _build_fallback_response_from_request(
+    request_context: ChatRequestContext,
+    level: str,
+    fallback_reason: str,
+    latency_ms: int = 0,
+    context_chunk_ids: list[str] | None = None,
+    blocked_tokens: list[str] | None = None,
+) -> ChatResponse:
+    return _build_fallback_response(
+        level=level,
+        model=request_context.model,
+        provider=request_context.provider,
+        fallback_reason=fallback_reason,
+        latency_ms=latency_ms,
+        context_chunk_ids=context_chunk_ids,
+        blocked_tokens=blocked_tokens,
+        message=request_context.message,
+    )
+
+
 def _log_response(response: ChatResponse, provider: str, chunks_count: int = 0) -> None:
+    outcome = "fallback" if response.fallbackUsed else "answer"
     logger.info(
         json.dumps(
             {
                 "event": "chat_response",
+                "outcome": outcome,
                 "provider": provider,
                 "model": response.model,
                 "level": response.level,
@@ -365,3 +412,17 @@ def _log_response(response: ChatResponse, provider: str, chunks_count: int = 0) 
             ensure_ascii=False,
         )
     )
+
+
+def _map_provider_error_to_fallback_reason(error: Exception) -> str:
+    if isinstance(error, ChatProviderTimeoutError):
+        return "MODEL_TIMEOUT"
+    if isinstance(error, ChatProviderQuotaError):
+        return "PROVIDER_QUOTA"
+    if isinstance(error, ChatProviderAuthError):
+        return "PROVIDER_AUTH"
+    if isinstance(error, ChatProviderNetworkError):
+        return "PROVIDER_NETWORK"
+    if isinstance(error, ChatProviderError):
+        return "MODEL_ERROR"
+    return "MODEL_ERROR"

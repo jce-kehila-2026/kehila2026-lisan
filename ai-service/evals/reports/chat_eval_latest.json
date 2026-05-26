@@ -1,0 +1,76 @@
+{
+  "runAt": "2026-05-26T14:42:46.934288+00:00",
+  "datasetPath": "C:\\Users\\mshar\\Desktop\\lisan\\kehila2026-lisan\\ai-service\\evals\\chat_eval_dataset.json",
+  "totalCases": 130,
+  "metrics": {
+    "vocabularyLeakageRate": 0.0,
+    "fallbackAccuracy": 100.0,
+    "fallbackReasonAccuracy": 100.0,
+    "averageLatencyMs": 0.17,
+    "p95LatencyMs": 0.26,
+    "engineAverageLatencyMs": 0,
+    "engineP95LatencyMs": 0.0,
+    "overLengthResponses": 0
+  },
+  "counts": {
+    "vocabularyLeakageCases": 0,
+    "fallbackCorrectCases": 130,
+    "fallbackReasonCorrectCases": 130,
+    "overLengthCases": 0,
+    "cacheHitCases": 10,
+    "routerHitCases": 80,
+    "fallbackCases": 50
+  },
+  "categoryBreakdown": {
+    "valid_curriculum": {
+      "total": 60,
+      "fallback_correct": 60,
+      "leakage_count": 0,
+      "over_length_count": 0,
+      "avg_wall_latency_ms": 0.19
+    },
+    "valid_router": {
+      "total": 10,
+      "fallback_correct": 10,
+      "leakage_count": 0,
+      "over_length_count": 0,
+      "avg_wall_latency_ms": 0.17
+    },
+    "arabic_requested": {
+      "total": 10,
+      "fallback_correct": 10,
+      "leakage_count": 0,
+      "over_length_count": 0,
+      "avg_wall_latency_ms": 0.11
+    },
+    "mixed_language": {
+      "total": 15,
+      "fallback_correct": 15,
+      "leakage_count": 0,
+      "over_length_count": 0,
+      "avg_wall_latency_ms": 0.11
+    },
+    "too_long": {
+      "total": 10,
+      "fallback_correct": 10,
+      "leakage_count": 0,
+      "over_length_count": 0,
+      "avg_wall_latency_ms": 0.16
+    },
+    "out_of_scope": {
+      "total": 15,
+      "fallback_correct": 15,
+      "leakage_count": 0,
+      "over_length_count": 0,
+      "avg_wall_latency_ms": 0.25
+    },
+    "weird_input": {
+      "total": 10,
+      "fallback_correct": 10,
+      "leakage_count": 0,
+      "over_length_count": 0,
+      "avg_wall_latency_ms": 0.11
+    }
+  },
+  "failingCases": []
+}
