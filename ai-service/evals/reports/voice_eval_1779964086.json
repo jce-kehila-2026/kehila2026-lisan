@@ -1,0 +1,74 @@
+{
+  "runAt": "2026-05-28T10:28:06.605101+00:00",
+  "totalCases": 6,
+  "latencyBudgetMs": 3000,
+  "summary": {
+    "passed": 4,
+    "failed": 2
+  },
+  "latencyMetrics": {
+    "avgMs": 2003.3,
+    "p95Ms": 9015.0,
+    "maxMs": 12020
+  },
+  "cases": [
+    {
+      "id": "voice_a1_greeting_001",
+      "status": "PASS",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [],
+      "lastAnswer": "שלום.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_a1_question_002",
+      "status": "FAIL",
+      "avgLatencyMs": 12020,
+      "maxLatencyMs": 12020,
+      "errors": [
+        "latency 12020 ms exceeds budget 3000 ms"
+      ],
+      "lastAnswer": "נסה שוב עם שאלה קצרה.",
+      "lastFallbackReason": "PROVIDER_AUTH"
+    },
+    {
+      "id": "voice_a1_location_003",
+      "status": "PASS",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [],
+      "lastAnswer": "אני גר בתל אביב.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_arabic_input_004",
+      "status": "PASS",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [],
+      "lastAnswer": "נסה לשאול בעברית פשוטה.",
+      "lastFallbackReason": "MIXED_LANGUAGE"
+    },
+    {
+      "id": "voice_silence_005",
+      "status": "FAIL",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [
+        "answerHe should be empty, got 'כתוב שאלה קצרה בעברית.'"
+      ],
+      "lastAnswer": "כתוב שאלה קצרה בעברית.",
+      "lastFallbackReason": "EMPTY_MESSAGE"
+    },
+    {
+      "id": "voice_out_of_scope_006",
+      "status": "PASS",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [],
+      "lastAnswer": "זה לא בחומר שלנו עכשיו. נתרגל מילים מהשיעור.",
+      "lastFallbackReason": "OUT_OF_SCOPE"
+    }
+  ]
+}

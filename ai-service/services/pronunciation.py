@@ -116,9 +116,21 @@ class PronunciationValidator:
         return self.vocabulary_by_level.get(level) or self.vocabulary_by_level.get(DEFAULT_LEVEL, set())
 
     def _find_similar_words(self, word: str, approved_words: set[str]) -> list[str]:
+        def _normalize_sofiyot(text: str) -> str:
+            mapping = {
+                "ך": "כ",
+                "ם": "מ",
+                "ן": "נ",
+                "ף": "פ",
+                "ץ": "צ",
+            }
+            return "".join(mapping.get(char, char) for char in text)
+
         scored_matches: list[tuple[float, str]] = []
+        normalized_word = _normalize_sofiyot(word)
         for candidate in approved_words:
-            similarity = difflib.SequenceMatcher(a=word, b=candidate).ratio()
+            normalized_candidate = _normalize_sofiyot(candidate)
+            similarity = difflib.SequenceMatcher(a=normalized_word, b=normalized_candidate).ratio()
             if similarity >= SIMILARITY_THRESHOLD:
                 scored_matches.append((similarity, candidate))
 
