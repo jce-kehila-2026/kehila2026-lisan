@@ -77,6 +77,71 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
+exports.getChatStats = async (req, res) => {
+  try {
+    const now = new Date();
+    const startOfTodayUtc = new Date(Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
+      0,
+      0,
+      0,
+      0
+    ));
+
+    const snapshot = await db.collection('chatSessions').get();
+
+    let messagesToday = 0;
+    let newConversationsToday = 0;
+    const activeUserIds = new Set();
+
+    snapshot.forEach((doc) => {
+      const chat = doc.data() || {};
+      const startedAtDate = normalizeFirestoreDate(chat.startedAt);
+
+      if (startedAtDate && startedAtDate >= startOfTodayUtc) {
+        newConversationsToday += 1;
+      }
+
+      const messages = Array.isArray(chat.messages) ? chat.messages : [];
+      let hasMessageToday = false;
+
+      for (const message of messages) {
+        const messageDate = normalizeFirestoreDate(message?.createdAt);
+        if (!messageDate || messageDate < startOfTodayUtc) {
+          continue;
+        }
+
+        messagesToday += 1;
+        hasMessageToday = true;
+      }
+
+      if (hasMessageToday && chat.userId) {
+        activeUserIds.add(chat.userId);
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      stats: {
+        asOf: now.toISOString(),
+        messagesToday,
+        newConversationsToday,
+        activeUsersToday: activeUserIds.size,
+      }
+    });
+  } catch (error) {
+    console.error('Get chat stats error:', error);
+
+    return res.status(500).json({
+      success: false,
+      error: 'Server error',
+      code: 'SERVER_ERROR'
+    });
+  }
+};
+
 exports.createUser = async (req, res) => {
   try {
     const {
@@ -360,3 +425,27 @@ exports.deleteUser = async (req, res) => {
     });
   }
 };
+
+function normalizeFirestoreDate(value) {
+  if (!value) {
+    return null;
+  }
+
+  if (value instanceof Date) {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  if (typeof value.toDate === 'function') {
+    const dateValue = value.toDate();
+    return dateValue instanceof Date && !Number.isNaN(dateValue.getTime())
+      ? dateValue
+      : null;
+  }
+
+  return null;
+}

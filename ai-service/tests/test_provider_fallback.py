@@ -32,7 +32,7 @@ def _result(provider: str, model: str) -> ProviderResult:
 def test_fallback_uses_second_provider_when_primary_fails(monkeypatch):
     clear_provider_runtime_state()
 
-    def fake_call(config: ProviderConfig, system_message: str, question: str) -> ProviderResult:
+    def fake_call(config: ProviderConfig, system_message: str, question: str, options=None) -> ProviderResult:
         if config.name == "gemini":
             raise ChatProviderError("gemini failed")
         if config.name == "anthropic":
@@ -52,7 +52,7 @@ def test_fallback_uses_second_provider_when_primary_fails(monkeypatch):
 def test_fallback_uses_third_provider_when_first_two_fail(monkeypatch):
     clear_provider_runtime_state()
 
-    def fake_call(config: ProviderConfig, system_message: str, question: str) -> ProviderResult:
+    def fake_call(config: ProviderConfig, system_message: str, question: str, options=None) -> ProviderResult:
         if config.name in {"gemini", "anthropic"}:
             raise ChatProviderError(f"{config.name} failed")
         return _result(config.name, config.model)
@@ -68,7 +68,7 @@ def test_fallback_uses_third_provider_when_first_two_fail(monkeypatch):
 def test_all_providers_failed_raises_aggregate_error(monkeypatch):
     clear_provider_runtime_state()
 
-    def fake_call(config: ProviderConfig, system_message: str, question: str) -> ProviderResult:
+    def fake_call(config: ProviderConfig, system_message: str, question: str, options=None) -> ProviderResult:
         raise ChatProviderAuthError(f"{config.name} auth failed")
 
     monkeypatch.setattr("services.chat_provider._call_provider_with_timeout", fake_call)
@@ -85,7 +85,7 @@ def test_all_providers_failed_raises_aggregate_error(monkeypatch):
 def test_logs_endpoint_filters_failed_provider_attempts(monkeypatch):
     clear_provider_runtime_state()
 
-    def fake_call(config: ProviderConfig, system_message: str, question: str) -> ProviderResult:
+    def fake_call(config: ProviderConfig, system_message: str, question: str, options=None) -> ProviderResult:
         if config.name == "gemini":
             raise ChatProviderError("gemini failed")
         return _result(config.name, config.model)

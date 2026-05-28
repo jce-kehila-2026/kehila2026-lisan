@@ -1,0 +1,78 @@
+[
+  {
+    "id": "voice_a1_greeting_001",
+    "description": "Student says שלום correctly — expects a short Hebrew greeting back.",
+    "audio_path": "evals/voice_cases/a1_shalom.wav",
+    "tts_text": "שלום",
+    "student_level": "A1",
+    "checks": {
+      "transcribed_text_contains": "שלום",
+      "answer_he_not_empty": true,
+      "answer_he_max_words": 10,
+      "no_arabic_in_answer": true,
+      "fallback_used": false
+    }
+  },
+  {
+    "id": "voice_a1_question_002",
+    "description": "Student asks מה שמך — answer must be Hebrew-only, no Arabic. LLM cases skip latency check (Task 9 covers that).",
+    "audio_path": "evals/voice_cases/a1_ma_shimcha.wav",
+    "tts_text": "מה שמך",
+    "student_level": "A1",
+    "skip_latency_check": true,
+    "checks": {
+      "transcribed_text_contains": "שמך",
+      "answer_he_max_words": 10,
+      "no_arabic_in_answer": true
+    }
+  },
+  {
+    "id": "voice_a1_location_003",
+    "description": "Student asks איפה אתה גר — router hit expected (in-process, no LLM needed).",
+    "audio_path": "evals/voice_cases/a1_ayfo_gar.wav",
+    "tts_text": "איפה אתה גר",
+    "student_level": "A1",
+    "checks": {
+      "answer_he_not_empty": true,
+      "answer_he_max_words": 10,
+      "no_arabic_in_answer": true,
+      "fallback_used": false
+    }
+  },
+  {
+    "id": "voice_arabic_input_004",
+    "description": "Student speaks Arabic — guardrail returns a Hebrew fallback message and fallbackUsed=true.",
+    "audio_path": "evals/voice_cases/arabic_marhaba.wav",
+    "tts_text": "مرحبا",
+    "student_level": "A1",
+    "checks": {
+      "fallback_used": true,
+      "no_arabic_in_answer": true,
+      "fallback_reason_one_of": ["MIXED_LANGUAGE", "STT_FAILED", "STT_EMPTY", "STT_CIRCUIT_OPEN"]
+    }
+  },
+  {
+    "id": "voice_silence_005",
+    "description": "Empty/silent audio — empty transcript triggers EMPTY_MESSAGE guardrail, returns Hebrew fallback text.",
+    "audio_path": "evals/voice_cases/silence.wav",
+    "tts_text": "",
+    "student_level": "A1",
+    "checks": {
+      "answer_he_not_empty": true,
+      "no_arabic_in_answer": true,
+      "fallback_used": true,
+      "fallback_reason_one_of": ["STT_EMPTY", "STT_FAILED", "STT_CIRCUIT_OPEN", "STT_TIMEOUT", "EMPTY_MESSAGE"]
+    }
+  },
+  {
+    "id": "voice_out_of_scope_006",
+    "description": "Student says something outside A1 curriculum (advanced Hebrew) → OUT_OF_SCOPE fallback.",
+    "audio_path": "evals/voice_cases/advanced_hebrew.wav",
+    "tts_text": "הממשלה מאשרת תקציב לשנת הכספים הבאה",
+    "student_level": "A1",
+    "checks": {
+      "fallback_used": true,
+      "fallback_reason_one_of": ["OUT_OF_SCOPE", "VOCAB_LEAKAGE", "MIXED_LANGUAGE"]
+    }
+  }
+]

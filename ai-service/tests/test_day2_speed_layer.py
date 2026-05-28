@@ -25,8 +25,37 @@ from fastapi.testclient import TestClient
 
 from main import app
 
+import uuid
+
 client = TestClient(app)
 CHAT_URL = "/api/ai/chat"
+
+
+@pytest.fixture(autouse=True)
+def mock_provider_call(monkeypatch):
+    from services.chat_provider import ProviderResult
+    def fake_call(config, system_message, question, opts=None):
+        return ProviderResult(
+            answer="אני גר.",
+            latency_seconds=0.01,
+            input_tokens=10,
+            output_tokens=5,
+            provider=config.name,
+            model=config.model,
+        )
+    monkeypatch.setattr("services.chat_provider._call_provider_with_timeout", fake_call)
+
+
+
+def post_chat(message: str, level: str = "A1", includeArabic: bool = False):
+    uid = f"test-user-{uuid.uuid4()}"
+    return client.post(CHAT_URL, json={
+        "message": message,
+        "level": level,
+        "includeArabic": includeArabic,
+    }, headers={"X-User-ID": uid})
+
+
 
 REQUIRED_FIELDS = {
     "answerHe", "answerAr", "fallbackUsed", "fallbackReason",
@@ -35,19 +64,12 @@ REQUIRED_FIELDS = {
 }
 
 
-def post_chat(message: str, level: str = "A1", includeArabic: bool = False):
-    return client.post(CHAT_URL, json={
-        "message": message,
-        "level": level,
-        "includeArabic": includeArabic,
-    })
-
-
 def assert_valid_schema_v2(data: dict):
     missing = REQUIRED_FIELDS - set(data.keys())
     assert not missing, f"Missing fields: {missing}"
     assert isinstance(data["cacheHit"], bool)
     assert isinstance(data["routerHit"], bool)
+
 
 
 # ===========================================================================

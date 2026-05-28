@@ -1,0 +1,208 @@
+{
+  "recognized_text": "בוקר טוב בוקר טוב.",
+  "reference_text": "בוקר טוב",
+  "scores": {
+    "accuracy": 98.0,
+    "fluency": 49.0,
+    "completeness": 100.0,
+    "pronunciation": 69.0
+  },
+  "raw_json": {
+    "Id": "ec1247b7ef3c4c6eaf27a0fde79b2d84",
+    "RecognitionStatus": "Success",
+    "Offset": 600000,
+    "Duration": 21900000,
+    "Channel": 0,
+    "DisplayText": "בוקר טוב בוקר טוב.",
+    "SNR": 18.691166,
+    "NBest": [
+      {
+        "Confidence": 0.9614631,
+        "Lexical": "בוקר טוב בוקר טוב",
+        "ITN": "בוקר טוב בוקר טוב",
+        "MaskedITN": "בוקר טוב בוקר טוב",
+        "Display": "בוקר טוב בוקר טוב.",
+        "PronunciationAssessment": {
+          "AccuracyScore": 98.0,
+          "FluencyScore": 49.0,
+          "CompletenessScore": 100.0,
+          "PronScore": 69.0
+        },
+        "Words": [
+          {
+            "Word": "בוקר",
+            "Offset": 600000,
+            "Duration": 2000000,
+            "PronunciationAssessment": {
+              "AccuracyScore": 78.0,
+              "ErrorType": "Insertion"
+            },
+            "Phonemes": [
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 11.0
+                },
+                "Offset": 600000,
+                "Duration": 200000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 41.0
+                },
+                "Offset": 900000,
+                "Duration": 200000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 56.0
+                },
+                "Offset": 1200000,
+                "Duration": 200000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 93.0
+                },
+                "Offset": 1500000,
+                "Duration": 400000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 96.0
+                },
+                "Offset": 2000000,
+                "Duration": 600000
+              }
+            ]
+          },
+          {
+            "Word": "טוב",
+            "Offset": 2700000,
+            "Duration": 6400000,
+            "PronunciationAssessment": {
+              "AccuracyScore": 98.0,
+              "ErrorType": "Insertion"
+            },
+            "Phonemes": [
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 2700000,
+                "Duration": 1200000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 4000000,
+                "Duration": 900000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 97.0
+                },
+                "Offset": 5000000,
+                "Duration": 4100000
+              }
+            ]
+          },
+          {
+            "Word": "בוקר",
+            "Offset": 11800000,
+            "Duration": 4700000,
+            "PronunciationAssessment": {
+              "AccuracyScore": 100.0,
+              "ErrorType": "None"
+            },
+            "Phonemes": [
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 11800000,
+                "Duration": 1300000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 13200000,
+                "Duration": 1300000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 14600000,
+                "Duration": 600000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 15300000,
+                "Duration": 400000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 15800000,
+                "Duration": 700000
+              }
+            ]
+          },
+          {
+            "Word": "טוב",
+            "Offset": 16600000,
+            "Duration": 5900000,
+            "PronunciationAssessment": {
+              "AccuracyScore": 95.0,
+              "ErrorType": "None"
+            },
+            "Phonemes": [
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 16600000,
+                "Duration": 900000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 100.0
+                },
+                "Offset": 17600000,
+                "Duration": 1300000
+              },
+              {
+                "Phoneme": "",
+                "PronunciationAssessment": {
+                  "AccuracyScore": 89.0
+                },
+                "Offset": 19000000,
+                "Duration": 3500000
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

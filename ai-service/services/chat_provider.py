@@ -7,7 +7,7 @@ import threading
 import time
 from collections import deque
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Iterator
 
 from dotenv import load_dotenv
 
@@ -41,12 +41,26 @@ DEFAULT_MAX_RETRIES = 1
 DEFAULT_REQUEST_DELAY_SECONDS = 0.0
 DEFAULT_PROVIDER_LOG_LIMIT = 200
 
+# Voice mode uses tighter limits to hit the <3 s latency budget
+VOICE_MAX_OUTPUT_TOKENS = 60    # short spoken answer
+VOICE_TEMPERATURE = 0.1         # more deterministic → faster sampling
+VOICE_TIMEOUT_SECONDS = 8.0     # env: VOICE_PROVIDER_TIMEOUT_SECONDS
+
 
 @dataclass(frozen=True)
 class ProviderConfig:
     name: str
     model: str
     timeout_seconds: float
+
+
+@dataclass(frozen=True)
+class ProviderCallOptions:
+    """Runtime options forwarded from the calling layer to the LLM call."""
+    voice_mode: bool = False
+    max_output_tokens: int = 120
+    temperature: float = 0.2
+    history: tuple[dict, ...] = ()
 
 
 @dataclass
@@ -74,8 +88,8 @@ class ProviderResult:
     latency_seconds: float
     input_tokens: int
     output_tokens: int
-    provider: str
-    model: str
+    provider: str = ""
+    model: str = ""
     attempts: list[ProviderAttemptLog] = field(default_factory=list)
 
 
@@ -174,11 +188,18 @@ def clear_provider_runtime_state() -> None:
         circuit.reset()
 
 
-def call_provider(provider: str, model: str, system_message: str, question: str) -> ProviderResult:
+def call_provider(
+    provider: str,
+    model: str,
+    system_message: str,
+    question: str,
+    options: ProviderCallOptions | None = None,
+) -> ProviderResult:
+    opts = options or ProviderCallOptions()
     attempts: list[ProviderAttemptLog] = []
     failures: list[ProviderFailure] = []
 
-    for config in _build_provider_chain(provider, model):
+    for config in _build_provider_chain(provider, model, opts):
         circuit = get_provider_circuit(config.name)
         if not circuit.allow_request():
             attempt = ProviderAttemptLog(
@@ -201,7 +222,7 @@ def call_provider(provider: str, model: str, system_message: str, question: str)
             continue
 
         try:
-            result = _call_provider_with_timeout(config, system_message, question)
+            result = _call_provider_with_timeout(config, system_message, question, opts)
             circuit.record_success()
             success_attempt = ProviderAttemptLog(
                 provider=config.name,
@@ -238,9 +259,22 @@ def call_provider(provider: str, model: str, system_message: str, question: str)
     raise AllProvidersFailedError(failures)
 
 
-def _build_provider_chain(provider: str, model: str) -> list[ProviderConfig]:
+def _build_provider_chain(
+    provider: str,
+    model: str,
+    opts: ProviderCallOptions | None = None,
+) -> list[ProviderConfig]:
     requested_provider = (provider or DEFAULT_PROVIDER).strip().lower() or DEFAULT_PROVIDER
     requested_model = (model or DEFAULT_MODEL).strip() or DEFAULT_MODEL
+
+    voice_timeout = float(
+        os.getenv("VOICE_PROVIDER_TIMEOUT_SECONDS", str(VOICE_TIMEOUT_SECONDS))
+    )
+
+    def _effective_timeout(base: ProviderConfig) -> float:
+        if opts and opts.voice_mode:
+            return voice_timeout
+        return base.timeout_seconds
 
     chain: list[ProviderConfig] = []
     seen_providers: set[str] = set()
@@ -251,18 +285,19 @@ def _build_provider_chain(provider: str, model: str) -> list[ProviderConfig]:
                 ProviderConfig(
                     name=base_config.name,
                     model=requested_model,
-                    timeout_seconds=base_config.timeout_seconds,
+                    timeout_seconds=_effective_timeout(base_config),
                 )
             )
             seen_providers.add(base_config.name)
             break
 
     if requested_provider not in seen_providers:
+        timeout = voice_timeout if (opts and opts.voice_mode) else DEFAULT_TIMEOUT_SECONDS
         chain.append(
             ProviderConfig(
                 name=requested_provider,
                 model=requested_model,
-                timeout_seconds=DEFAULT_TIMEOUT_SECONDS,
+                timeout_seconds=timeout,
             )
         )
         seen_providers.add(requested_provider)
@@ -270,7 +305,13 @@ def _build_provider_chain(provider: str, model: str) -> list[ProviderConfig]:
     for base_config in PROVIDER_CHAIN:
         if base_config.name in seen_providers:
             continue
-        chain.append(base_config)
+        chain.append(
+            ProviderConfig(
+                name=base_config.name,
+                model=base_config.model,
+                timeout_seconds=_effective_timeout(base_config),
+            )
+        )
         seen_providers.add(base_config.name)
 
     return chain
@@ -281,7 +322,12 @@ def _append_provider_log(log: ProviderAttemptLog) -> None:
         _PROVIDER_LOGS.append(log)
 
 
-def _call_provider_with_timeout(config: ProviderConfig, system_message: str, question: str) -> ProviderResult:
+def _call_provider_with_timeout(
+    config: ProviderConfig,
+    system_message: str,
+    question: str,
+    opts: ProviderCallOptions | None = None,
+) -> ProviderResult:
     hard_timeout_seconds = float(
         os.getenv("CHAT_PROVIDER_HARD_TIMEOUT_SECONDS", str(config.timeout_seconds))
     )
@@ -289,7 +335,7 @@ def _call_provider_with_timeout(config: ProviderConfig, system_message: str, que
 
     def runner() -> None:
         try:
-            result_queue.put(("result", _call_provider_sync(config, system_message, question)))
+            result_queue.put(("result", _call_provider_sync(config, system_message, question, opts)))
         except Exception as exc:  # pragma: no cover - mirrored to caller
             result_queue.put(("error", exc))
 
@@ -347,9 +393,14 @@ def _coerce_provider_exception(exc: Exception) -> ChatProviderError | ChatProvid
     return ChatProviderError(str(exc))
 
 
-def _call_provider_sync(config: ProviderConfig, system_message: str, question: str) -> ProviderResult:
+def _call_provider_sync(
+    config: ProviderConfig,
+    system_message: str,
+    question: str,
+    opts: ProviderCallOptions | None = None,
+) -> ProviderResult:
     try:
-        return _dispatch_provider_call(config, system_message, question)
+        return _dispatch_provider_call(config, system_message, question, opts)
     except (ChatProviderTimeoutError, ChatProviderQuotaError, ChatProviderAuthError, ChatProviderNetworkError):
         raise
     except ChatProviderError as exc:
@@ -358,13 +409,19 @@ def _call_provider_sync(config: ProviderConfig, system_message: str, question: s
         _classify_and_raise(exc)
 
 
-def _dispatch_provider_call(config: ProviderConfig, system_message: str, question: str) -> ProviderResult:
+def _dispatch_provider_call(
+    config: ProviderConfig,
+    system_message: str,
+    question: str,
+    opts: ProviderCallOptions | None = None,
+) -> ProviderResult:
+    o = opts or ProviderCallOptions()
     if config.name == "openai":
-        return _call_openai(config.model, system_message, question, config.timeout_seconds)
+        return _call_openai(config.model, system_message, question, config.timeout_seconds, o)
     if config.name == "anthropic":
-        return _call_anthropic(config.model, system_message, question, config.timeout_seconds)
+        return _call_anthropic(config.model, system_message, question, config.timeout_seconds, o)
     if config.name == "gemini":
-        return _call_gemini(config.model, system_message, question, config.timeout_seconds)
+        return _call_gemini(config.model, system_message, question, config.timeout_seconds, o)
     raise ChatProviderError(f"Unsupported provider: {config.name}")
 
 
@@ -401,16 +458,25 @@ def _create_gemini_client(timeout_seconds: float) -> Any:
     )
 
 
-def _call_openai(model: str, system_message: str, question: str, timeout_seconds: float) -> ProviderResult:
+def _call_openai(
+    model: str,
+    system_message: str,
+    question: str,
+    timeout_seconds: float,
+    opts: ProviderCallOptions | None = None,
+) -> ProviderResult:
+    o = opts or ProviderCallOptions()
     client = _create_openai_client(timeout_seconds)
     started_at = time.perf_counter()
+    messages = (
+        [{"role": "system", "content": system_message}]
+        + list(o.history)
+        + [{"role": "user", "content": question}]
+    )
     response = client.responses.create(
         model=model,
-        input=[
-            {"role": "system", "content": system_message},
-            {"role": "user", "content": question},
-        ],
-        max_output_tokens=120,
+        input=messages,
+        max_output_tokens=o.max_output_tokens,
     )
     usage = response.usage
     return ProviderResult(
@@ -423,14 +489,22 @@ def _call_openai(model: str, system_message: str, question: str, timeout_seconds
     )
 
 
-def _call_anthropic(model: str, system_message: str, question: str, timeout_seconds: float) -> ProviderResult:
+def _call_anthropic(
+    model: str,
+    system_message: str,
+    question: str,
+    timeout_seconds: float,
+    opts: ProviderCallOptions | None = None,
+) -> ProviderResult:
+    o = opts or ProviderCallOptions()
     client = _create_anthropic_client(timeout_seconds)
     started_at = time.perf_counter()
+    messages = list(o.history) + [{"role": "user", "content": question}]
     response = client.messages.create(
         model=model,
         system=system_message,
-        messages=[{"role": "user", "content": question}],
-        max_tokens=120,
+        messages=messages,
+        max_tokens=o.max_output_tokens,
     )
     answer = "".join(
         block.text for block in response.content if getattr(block, "type", "") == "text"
@@ -445,23 +519,51 @@ def _call_anthropic(model: str, system_message: str, question: str, timeout_seco
     )
 
 
-def _call_gemini(model: str, system_message: str, question: str, timeout_seconds: float) -> ProviderResult:
+def _call_gemini(
+    model: str,
+    system_message: str,
+    question: str,
+    timeout_seconds: float,
+    opts: ProviderCallOptions | None = None,
+) -> ProviderResult:
+    o = opts or ProviderCallOptions()
     client = _create_gemini_client(timeout_seconds)
     max_retries = int(os.getenv("LISAN_MAX_RETRIES", str(DEFAULT_MAX_RETRIES)))
     base_delay = float(os.getenv("LISAN_REQUEST_DELAY_SECONDS", str(DEFAULT_REQUEST_DELAY_SECONDS)))
     attempt = 0
     while True:
-        if attempt == 0 and base_delay > 0:
-            time.sleep(base_delay)
         started_at = time.perf_counter()
         try:
+            # Build multi-turn contents for Gemini
+            # history messages are {"role": "user"/"assistant", "content": "..."}
+            # Gemini expects role "model" instead of "assistant"
+            if o.history:
+                contents = []
+                for msg in o.history:
+                    gemini_role = (
+                        "model" if msg["role"] == "assistant" else msg["role"]
+                    )
+                    contents.append(
+                        genai_types.Content(
+                            role=gemini_role,
+                            parts=[genai_types.Part(text=msg["content"])],
+                        )
+                    )
+                contents.append(
+                    genai_types.Content(
+                        role="user",
+                        parts=[genai_types.Part(text=question)],
+                    )
+                )
+            else:
+                contents = question
             response = client.models.generate_content(
                 model=model,
-                contents=question,
+                contents=contents,
                 config=genai_types.GenerateContentConfig(
                     system_instruction=system_message,
-                    temperature=0.2,
-                    max_output_tokens=120,
+                    temperature=o.temperature,
+                    max_output_tokens=o.max_output_tokens,
                 ),
             )
             usage = getattr(response, "usage_metadata", None)
@@ -487,6 +589,152 @@ def _parse_retry_delay_seconds(message: str) -> float | None:
     if not match:
         return None
     return float(match.group(1))
+
+
+# ---------------------------------------------------------------------------
+# Streaming API
+# ---------------------------------------------------------------------------
+
+def stream_provider(
+    provider: str,
+    model: str,
+    system_message: str,
+    question: str,
+    options: ProviderCallOptions | None = None,
+) -> Iterator[str]:
+    """
+    Yield text tokens from the LLM as they arrive.
+
+    Falls back to the non-streaming call and yields the whole answer as a
+    single chunk when the provider's streaming API is unavailable or throws.
+    Circuit-breaker and provider-chain logic mirrors call_provider().
+    """
+    opts = options or ProviderCallOptions()
+
+    for config in _build_provider_chain(provider, model, opts):
+        circuit = get_provider_circuit(config.name)
+        if not circuit.allow_request():
+            continue
+
+        try:
+            yield from _stream_provider_impl(config, system_message, question, opts)
+            circuit.record_success()
+            return
+        except Exception as raw_exc:
+            circuit.record_failure()
+            exc = _coerce_provider_exception(raw_exc)
+            # If all chunks already yielded, nothing to retry — just stop.
+            # If nothing was yielded yet, fall through to the next provider.
+            _append_provider_log(ProviderAttemptLog(
+                provider=config.name,
+                model=config.model,
+                status="failed",
+                error_type=exc.__class__.__name__,
+                error_message=str(exc),
+            ))
+
+    # Last-resort: non-streaming single-chunk fallback
+    result = call_provider(provider, model, system_message, question, options)
+    yield result.answer
+
+
+def _stream_provider_impl(
+    config: ProviderConfig,
+    system_message: str,
+    question: str,
+    opts: ProviderCallOptions,
+) -> Iterator[str]:
+    if config.name == "openai":
+        yield from _stream_openai(config.model, system_message, question, config.timeout_seconds, opts)
+    elif config.name == "anthropic":
+        yield from _stream_anthropic(config.model, system_message, question, config.timeout_seconds, opts)
+    elif config.name == "gemini":
+        yield from _stream_gemini(config.model, system_message, question, config.timeout_seconds, opts)
+    else:
+        raise ChatProviderError(f"Unsupported provider for streaming: {config.name}")
+
+
+def _stream_openai(
+    model: str,
+    system_message: str,
+    question: str,
+    timeout_seconds: float,
+    opts: ProviderCallOptions,
+) -> Iterator[str]:
+    client = _create_openai_client(timeout_seconds)
+    messages = (
+        [{"role": "system", "content": system_message}]
+        + list(opts.history)
+        + [{"role": "user", "content": question}]
+    )
+    with client.responses.stream(
+        model=model,
+        input=messages,
+        max_output_tokens=opts.max_output_tokens,
+    ) as stream:
+        for event in stream:
+            delta = getattr(event, "delta", None)
+            if delta and isinstance(delta, str):
+                yield delta
+
+
+def _stream_anthropic(
+    model: str,
+    system_message: str,
+    question: str,
+    timeout_seconds: float,
+    opts: ProviderCallOptions,
+) -> Iterator[str]:
+    client = _create_anthropic_client(timeout_seconds)
+    messages = list(opts.history) + [{"role": "user", "content": question}]
+    with client.messages.stream(
+        model=model,
+        system=system_message,
+        messages=messages,
+        max_tokens=opts.max_output_tokens,
+    ) as stream:
+        for text in stream.text_stream:
+            yield text
+
+
+def _stream_gemini(
+    model: str,
+    system_message: str,
+    question: str,
+    timeout_seconds: float,
+    opts: ProviderCallOptions,
+) -> Iterator[str]:
+    client = _create_gemini_client(timeout_seconds)
+    if opts.history:
+        contents = []
+        for msg in opts.history:
+            gemini_role = "model" if msg["role"] == "assistant" else msg["role"]
+            contents.append(
+                genai_types.Content(
+                    role=gemini_role,
+                    parts=[genai_types.Part(text=msg["content"])],
+                )
+            )
+        contents.append(
+            genai_types.Content(
+                role="user",
+                parts=[genai_types.Part(text=question)],
+            )
+        )
+    else:
+        contents = question
+
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=genai_types.GenerateContentConfig(
+            system_instruction=system_message,
+            temperature=opts.temperature,
+            max_output_tokens=opts.max_output_tokens,
+        ),
+    ):
+        if chunk.text:
+            yield chunk.text
 
 
 provider_circuit = get_provider_circuit(DEFAULT_PROVIDER)

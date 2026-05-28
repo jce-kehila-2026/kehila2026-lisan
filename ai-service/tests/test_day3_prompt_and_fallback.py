@@ -10,11 +10,30 @@ from services.chat_engine import _load_prompt
 from services.chat_guardrails import MAX_HEBREW_WORDS, count_hebrew_words, get_fallback_text
 from services.chat_provider import ChatProviderTimeoutError, ProviderResult
 
+import pytest
+import uuid
+
 client = TestClient(app)
 CHAT_URL = "/api/ai/chat"
 
 
+@pytest.fixture(autouse=True)
+def mock_provider_call(monkeypatch):
+    from services.chat_provider import ProviderResult
+    def fake_call(config, system_message, question, opts=None):
+        return ProviderResult(
+            answer="שלום, אני לומד עברית איתך.",
+            latency_seconds=0.01,
+            input_tokens=10,
+            output_tokens=5,
+            provider=config.name,
+            model=config.model,
+        )
+    monkeypatch.setattr("services.chat_provider._call_provider_with_timeout", fake_call)
+
+
 def post_chat(message: str, include_arabic: bool = False):
+    uid = f"test-user-{uuid.uuid4()}"
     return client.post(
         CHAT_URL,
         json={
@@ -22,7 +41,9 @@ def post_chat(message: str, include_arabic: bool = False):
             "level": "A1",
             "includeArabic": include_arabic,
         },
+        headers={"X-User-ID": uid}
     )
+
 
 
 def build_prompt_acceptance_dataset() -> list[dict]:
