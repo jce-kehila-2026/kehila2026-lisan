@@ -222,9 +222,9 @@ function SharedChat() {
   };
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
       <div
-        className="relative mx-auto min-h-[calc(100vh-2.5rem)] max-w-xl pb-28 sm:min-h-[780px]"
+        className="relative mx-auto min-h-[calc(100vh-2rem)] w-full max-w-6xl pb-32 sm:min-h-[780px]"
         dir="rtl"
       >
         <PageHeader showBack />
@@ -318,7 +318,7 @@ function SharedChat() {
             </button>
           </div>
 
-          <div className="mt-4 flex flex-col gap-3">
+          <div className="mt-4 grid gap-3 lg:grid-cols-2">
             {loadingChats ? (
               <p className="text-sm font-semibold text-slate-500">
                 טוען שיחות...

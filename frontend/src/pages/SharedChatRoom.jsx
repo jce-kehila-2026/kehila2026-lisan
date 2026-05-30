@@ -157,9 +157,9 @@ function SharedChatRoom() {
     };
 
     return (
-        <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8">
+        <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
             <div
-                className="relative mx-auto flex min-h-[calc(100vh-2.5rem)] max-w-xl flex-col pb-28 sm:min-h-[780px]"
+                className="relative mx-auto flex min-h-[calc(100vh-2rem)] w-full max-w-6xl flex-col pb-32 sm:min-h-[780px]"
                 dir="rtl"
             >
                 <PageHeader showBack />
@@ -207,7 +207,7 @@ function SharedChatRoom() {
                                 return (
                                     <div
                                         key={message.id}
-                                        className={`max-w-[82%] rounded-3xl px-4 py-3 text-sm leading-6 shadow-sm transition ${isMine
+                                    className={`max-w-[92%] rounded-3xl px-4 py-3 text-sm leading-6 shadow-sm transition sm:max-w-[82%] lg:max-w-[68%] ${isMine
                                                 ? 'self-end bg-violet-600 text-white'
                                                 : 'self-start bg-slate-100 text-slate-800'
                                             }`}

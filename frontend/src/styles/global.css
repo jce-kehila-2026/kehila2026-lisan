@@ -570,7 +570,7 @@ a {
 
 .app-page {
   min-height: 100vh;
-  padding: var(--space-6);
+  padding: var(--space-4);
   background: linear-gradient(180deg, #fff 0%, #f8f3ff 100%);
 }
 
@@ -579,12 +579,14 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  max-width: 1120px;
+  width: 100%;
+  max-width: 1280px;
   margin: 0 auto;
 }
 
 .page-title {
-  max-width: 1120px;
+  width: 100%;
+  max-width: 1280px;
   margin: var(--space-12) auto var(--space-8);
 }
 
@@ -605,7 +607,8 @@ a {
 
 .feature-grid {
   display: grid;
-  max-width: 1120px;
+  width: 100%;
+  max-width: 1280px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-6);
   margin: 0 auto;
@@ -649,6 +652,18 @@ a {
   gap: var(--space-4);
   margin: var(--space-16) auto;
   text-align: center;
+}
+
+@media (min-width: 640px) {
+  .app-page {
+    padding: var(--space-6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-page {
+    padding: var(--space-8);
+  }
 }
 
 .placeholder-page p,
