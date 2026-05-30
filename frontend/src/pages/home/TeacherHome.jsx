@@ -113,8 +113,8 @@ function TeacherHome() {
   const isTeacherMode = mode === 'teacher';
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8">
-      <div className="relative mx-auto min-h-[calc(100vh-2.5rem)] max-w-xl pb-28 sm:min-h-[780px]" dir="rtl">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
+      <div className="relative mx-auto min-h-[calc(100vh-2rem)] w-full max-w-6xl pb-32 sm:min-h-[780px]" dir="rtl">
         <PageHeader showLogout />
 
         <section className="mt-6 rounded-3xl bg-white p-5 shadow-card sm:p-6">
@@ -170,7 +170,7 @@ function TeacherHome() {
           />
         </div>
 
-        <section className="mt-5 grid gap-4">
+        <section className="mt-5 grid gap-4 lg:grid-cols-2">
           {featureSections.map((section) =>
             isTeacherMode ? (
               <TeacherFeatureCard key={section.to} section={section} showTeacherActions />

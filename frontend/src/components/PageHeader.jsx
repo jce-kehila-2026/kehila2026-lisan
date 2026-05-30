@@ -11,7 +11,7 @@ function PageHeader({ backTo, showBack = false, showLogout = false }) {
   const { t } = useTranslation();
 
   return (
-    <header className="flex items-center justify-between gap-4">
+    <header className="flex min-w-0 flex-wrap items-center justify-between gap-2 sm:gap-4">
       <button
         type="button"
         onClick={() => navigate('/home')}
@@ -22,7 +22,7 @@ function PageHeader({ backTo, showBack = false, showLogout = false }) {
         <Logo />
       </button>
 
-      <div className="flex items-center gap-3">
+      <div className="flex min-w-0 items-center gap-2 sm:gap-3">
         <LanguageToggle />
 
         {showBack ? (
