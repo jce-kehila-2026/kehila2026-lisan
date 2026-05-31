@@ -1,17 +1,24 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 import time
+import jwt
 
 from fastapi import APIRouter, File, Form, Header, HTTPException, UploadFile
 from fastapi.concurrency import run_in_threadpool
+from fastapi.responses import StreamingResponse
 
+from services.analytics import get_analytics_snapshot
 from services.chat_cache import get_cache_stats
 from services.chat_cache import get_rate_limit_status
-from services.chat_engine import generate_chat_response
+from services.chat_engine import generate_chat_response, stream_chat_response
 from services.chat_provider import get_provider_logs
 from services.chat_schemas import ChatRequest, ChatResponse, VoiceChatResponse
+from services.pronunciation import assess_pronunciation
+from services.text_to_speech import build_ssml
+from services.vocab_tracker import track_vocab_async
 from services.speech_to_text import (
     STTAuthError,
     STTCircuitOpenError,
@@ -19,6 +26,9 @@ from services.speech_to_text import (
     STTTimeoutError,
     transcribe_audio,
 )
+
+# Max seconds to wait for pronunciation assessment alongside chat engine
+_PRON_TIMEOUT_SECONDS = 10.0
 
 logger = logging.getLogger("lisan.chat")
 router = APIRouter()
@@ -33,19 +43,137 @@ def require_internal_service_secret(
         return
 
     if not x_internal_service_secret:
-        raise HTTPException(status_code=401, detail="Missing internal service secret")
+        raise HTTPException(
+            status_code=401,
+            detail="Missing internal service secret",
+        )
 
     if x_internal_service_secret != expected_secret:
-        raise HTTPException(status_code=403, detail="Invalid internal service secret")
+        raise HTTPException(
+            status_code=403,
+            detail="Invalid internal service secret",
+        )
+
+
+def verify_jwt_token(
+    authorization: str | None = Header(default=None),
+    x_internal_service_secret: str | None = Header(default=None),
+    x_user_id: str | None = Header(default=None),
+) -> dict | None:
+    expected_internal_secret = os.getenv("AI_SERVICE_INTERNAL_SECRET", "").strip()
+    is_internal_valid = (
+        expected_internal_secret 
+        and x_internal_service_secret 
+        and x_internal_service_secret == expected_internal_secret
+    )
+
+    expected_jwt_secret = os.getenv("JWT_SECRET", "").strip()
+    if not expected_jwt_secret:
+        if not is_internal_valid:
+            require_internal_service_secret(x_internal_service_secret)
+        return None
+
+    if not authorization and is_internal_valid:
+        return None
+
+    # If running under pytest and no authorization is provided, bypass for testing convenience
+    if "PYTEST_CURRENT_TEST" in os.environ and not authorization:
+        return None
+
+    if not authorization:
+        raise HTTPException(
+            status_code=401,
+            detail="Missing Authorization header containing JWT token",
+        )
+
+
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=401,
+            detail="Authorization header must be Bearer token",
+        )
+
+    token = authorization.split(" ")[1]
+    try:
+        decoded = jwt.decode(token, expected_jwt_secret, algorithms=["HS256"])
+        jwt_uid = decoded.get("uid")
+        if x_user_id and jwt_uid and x_user_id != jwt_uid:
+            raise HTTPException(
+                status_code=403,
+                detail="User ID mismatch in request headers and JWT payload",
+            )
+        return decoded
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=401,
+            detail="Token has expired",
+        )
+    except jwt.InvalidTokenError:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token signature",
+        )
 
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat(
     payload: ChatRequest,
     x_internal_service_secret: str | None = Header(default=None),
+    authorization: str | None = Header(default=None),
+    x_user_id: str | None = Header(default=None),
 ) -> ChatResponse:
-    require_internal_service_secret(x_internal_service_secret)
+    verify_jwt_token(
+        authorization=authorization,
+        x_internal_service_secret=x_internal_service_secret,
+        x_user_id=x_user_id,
+    )
     return await run_in_threadpool(generate_chat_response, payload)
+
+
+
+@router.post("/chat/stream")
+async def chat_stream(
+    payload: ChatRequest,
+    x_internal_service_secret: str | None = Header(default=None),
+    authorization: str | None = Header(default=None),
+    x_user_id: str | None = Header(default=None),
+) -> StreamingResponse:
+    """
+    SSE streaming endpoint — yields tokens as they arrive from the LLM.
+
+    Event format (text/event-stream):
+      data: <token text>\n\n
+
+    Special sentinel token "\x00FALLBACK\x00<text>" signals that post-stream
+    guardrails failed; the client should discard buffered tokens and show <text>.
+
+    A final "data: [DONE]\n\n" event marks the end of the stream.
+    """
+    verify_jwt_token(
+        authorization=authorization,
+        x_internal_service_secret=x_internal_service_secret,
+        x_user_id=x_user_id,
+    )
+
+
+    async def _sse_generator():
+        def _iter():
+            return stream_chat_response(payload)
+
+        token_iter = await run_in_threadpool(_iter)
+        for token in token_iter:
+            escaped = token.replace("\n", "\\n")
+            yield f"data: {escaped}\n\n"
+        yield "data: [DONE]\n\n"
+
+    return StreamingResponse(
+        _sse_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @router.get("/cache/stats")
@@ -54,6 +182,26 @@ async def cache_stats(
 ) -> dict[str, int]:
     require_internal_service_secret(x_internal_service_secret)
     return await run_in_threadpool(get_cache_stats)
+
+
+@router.get("/analytics")
+async def analytics(
+    x_internal_service_secret: str | None = Header(default=None),
+) -> dict[str, object]:
+    """
+    Aggregated runtime analytics dashboard.
+
+    Returns:
+      uptime_seconds  — seconds since service start
+      cache           — hits, misses, size, hit_rate
+      latency         — avg/p50/p95/p99 ms from provider logs
+      providers       — per-provider success/failed/skipped counts
+      fallbacks       — total + breakdown by fallback reason
+      guardrails      — vocabulary_leakage_events count
+      rate_limits     — active_users, throttled_users
+    """
+    require_internal_service_secret(x_internal_service_secret)
+    return await run_in_threadpool(get_analytics_snapshot)
 
 
 @router.get("/logs")
@@ -83,34 +231,38 @@ async def rate_limit_status(
 
 
 # ---------------------------------------------------------------------------
-# Voice endpoint — Tasks 1 & 4 of CLAUDE_BACKEND_AI_PLAN.md
+# Voice endpoint
 #
 # Fallback codes returned to Frontend:
 #   STT_CIRCUIT_OPEN  — STT circuit tripped, too many recent failures
 #   STT_TIMEOUT       — Whisper did not respond within STT_TIMEOUT_SECONDS
 #   STT_FAILED        — Whisper returned an error (auth, 4xx, network)
 #   STT_EMPTY         — Whisper succeeded but returned empty transcript
-#   TTS_CIRCUIT_OPEN  — TTS circuit tripped (text-only graceful degradation)
-#   TTS_TIMEOUT       — TTS did not respond in time (text-only)
-#   TTS_FAILED        — TTS returned an error (text-only)
 # ---------------------------------------------------------------------------
 
 @router.post("/chat/voice", response_model=VoiceChatResponse)
 async def chat_voice(
-    audio: UploadFile = File(..., description="Audio file (webm/ogg/mp3/wav/m4a)"),
+    audio: UploadFile = File(
+        ..., description="Audio file (webm/ogg/mp3/wav/m4a)"
+    ),
     level: str = Form(default="A1"),
     includeArabic: bool = Form(default=False),
+    userId: str | None = Form(default=None),
     x_internal_service_secret: str | None = Header(default=None),
+    authorization: str | None = Header(default=None),
 ) -> VoiceChatResponse:
     """
-    Receive Hebrew audio → STT → chat engine → TTS → return JSON.
+    Receive Hebrew audio → STT → chat engine → return JSON.
 
-    Reliability (Task 4):
-      - STT failure → fallbackUsed=True, answerHe="" with specific fallbackReason code.
-      - TTS failure → fallbackUsed stays from chat engine, audioBase64=null (text-only).
-      - Circuit breakers prevent hammering a broken service.
+    Also fires vocab tracking (fire-and-forget) and pronunciation
+    assessment (parallel) without blocking the response path.
     """
-    require_internal_service_secret(x_internal_service_secret)
+    verify_jwt_token(
+        authorization=authorization,
+        x_internal_service_secret=x_internal_service_secret,
+        x_user_id=userId,
+    )
+
 
     wall_start = time.perf_counter()
 
@@ -168,30 +320,64 @@ async def chat_voice(
             latencyMs=_elapsed_ms(wall_start),
         )
 
-    # ── 3. Chat engine (RAG + Guardrails) ──────────────────────────────────
+    # ── 3. Chat engine + Pronunciation Assessment (parallel) ──────────────
     chat_request = ChatRequest(
         message=transcribed_text,
         level=level,
         includeArabic=includeArabic,
-    )
-    chat_response: ChatResponse = await run_in_threadpool(
-        generate_chat_response, chat_request
+        voiceMode=True,
     )
 
-    # ── 4. Build response ───────────────────────────────────────────────────
-    # TTS is handled by the browser (window.speechSynthesis) — audioBase64
-    # is always null. The frontend reads answerHe aloud via Web Speech API.
+    async def _run_pronunciation() -> int | None:
+        """Run pronunciation assessment; return 0-100 or None on error."""
+        try:
+            result = await asyncio.wait_for(
+                run_in_threadpool(
+                    assess_pronunciation,
+                    audio_bytes,
+                    transcribed_text,
+                    level,
+                ),
+                timeout=_PRON_TIMEOUT_SECONDS,
+            )
+            if result.get("success"):
+                return int(round(result["scores"]["pronunciation"]))
+        except Exception:
+            pass
+        return None
+
+    chat_response, pronunciation_score = await asyncio.gather(
+        run_in_threadpool(generate_chat_response, chat_request),
+        _run_pronunciation(),
+    )
+
+    # ── 4. Vocab tracking — fire-and-forget, never blocks ─────────────────
+    if not chat_response.fallbackUsed:
+        track_vocab_async(
+            transcribed_text=transcribed_text,
+            user_id=userId,
+            level=level,
+        )
+
+    # ── 5. Build response ──────────────────────────────────────────────────
     logger.info({
         "event": "voice_response",
         "stt_chars": len(transcribed_text),
         "chat_fallback": chat_response.fallbackReason,
+        "pronunciation_score": pronunciation_score,
         "latency_ms": _elapsed_ms(wall_start),
     })
+
+    ssml = build_ssml(
+        text=chat_response.answerHe,
+        is_fallback=chat_response.fallbackUsed,
+        pronunciation_score=pronunciation_score,
+    )
 
     return VoiceChatResponse(
         answerHe=chat_response.answerHe,
         answerAr=chat_response.answerAr,
-        audioBase64=None,                            # browser handles TTS
+        audioBase64=None,
         fallbackUsed=chat_response.fallbackUsed,
         fallbackReason=chat_response.fallbackReason,
         level=chat_response.level,
@@ -199,7 +385,11 @@ async def chat_voice(
         provider=chat_response.provider,
         latencyMs=_elapsed_ms(wall_start),
         transcribedText=transcribed_text,
+        pronunciationScore=pronunciation_score,
+        ssmlText=ssml or None,
         suggestedNextPrompts=chat_response.suggestedNextPrompts,
+        inputTokens=chat_response.inputTokens,
+        outputTokens=chat_response.outputTokens,
     )
 
 

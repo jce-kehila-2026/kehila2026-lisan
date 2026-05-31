@@ -11,10 +11,15 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
 
 if (!admin.apps.length) {
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
+    credential: admin.credential.cert(serviceAccount),
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET || undefined,
   });
 }
 
 const db = admin.firestore();
+const storage = admin.storage();
+const bucket = process.env.FIREBASE_STORAGE_BUCKET
+  ? storage.bucket(process.env.FIREBASE_STORAGE_BUCKET)
+  : storage.bucket();
 
-module.exports = { admin, db };
+module.exports = { admin, db, storage, bucket };

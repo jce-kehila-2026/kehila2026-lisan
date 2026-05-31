@@ -1,0 +1,17 @@
+{
+  "level": "A2",
+  "id_prefix": "L2",
+  "categories": [
+    "family",
+    "daily_life",
+    "travel",
+    "health",
+    "school",
+    "food_restaurant",
+    "shopping_leisure",
+    "work_jobs",
+    "culture_music",
+    "past_events",
+    "animals_nature"
+  ]
+}

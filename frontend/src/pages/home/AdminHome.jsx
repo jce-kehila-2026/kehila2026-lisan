@@ -52,8 +52,8 @@ function AdminHome() {
   ];
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8">
-      <div className="relative mx-auto min-h-[calc(100vh-2.5rem)] max-w-5xl pb-10">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
+      <div className="relative mx-auto min-h-[calc(100vh-2rem)] w-full max-w-7xl pb-10">
         <PageHeader showLogout />
         <HomeHeader
           t={t}
@@ -75,7 +75,7 @@ function AdminHome() {
           </div>
         </HomeHeader>
 
-        <section className="mt-5 grid gap-4 md:grid-cols-2">
+        <section className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {cards.map((card) => (
             <ManagementCard key={card.title} {...card} />
           ))}

@@ -6,7 +6,25 @@ from main import app
 from services.chat_cache import CacheManager, build_cache_key
 from services.chat_schemas import ChatResponse, GuardrailReport
 
+import pytest
+
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def mock_provider_call(monkeypatch):
+    from services.chat_provider import ProviderResult
+    def fake_call(config, system_message, question, opts=None):
+        return ProviderResult(
+            answer="אני גר.",
+            latency_seconds=0.01,
+            input_tokens=10,
+            output_tokens=5,
+            provider=config.name,
+            model=config.model,
+        )
+    monkeypatch.setattr("services.chat_provider._call_provider_with_timeout", fake_call)
+
 
 
 def make_response(answer: str = "שלום.") -> ChatResponse:

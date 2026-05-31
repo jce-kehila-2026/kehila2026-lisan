@@ -2,11 +2,16 @@ from __future__ import annotations
 
 import threading
 import time
+import os
+import logging
 from collections import Counter
 from collections import deque
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
+
+logger = logging.getLogger("lisan.chat")
+
 
 from services.chat_guardrails import is_short_hebrew_answer, normalize_hebrew_token, normalize_level
 from services.chat_retrieval import Chunk, chunk_transcripts, extract_vocabulary, load_transcripts
@@ -101,6 +106,20 @@ class CacheManager:
 
     def get_cached_response(self, query_hash: str, language_level: str) -> ChatResponse | None:
         normalized_level = normalize_level(language_level)
+        from services.redis_client import get_redis_client
+        redis_client = get_redis_client()
+        if redis_client:
+            try:
+                cache_key = f"cache:{query_hash}:{normalized_level}"
+                cached_data = redis_client.get(cache_key)
+                if cached_data:
+                    self._hits += 1
+                    return ChatResponse.model_validate_json(cached_data)
+                self._misses += 1
+                return None
+            except Exception as exc:
+                logger.warning(f"Redis get failed: {exc}")
+
         with self._lock:
             self._clear_expired_entries_locked()
             cache_key = self._build_key(query_hash, normalized_level)
@@ -121,6 +140,18 @@ class CacheManager:
         ttl: int = DEFAULT_RESPONSE_CACHE_TTL_SECONDS,
     ) -> None:
         normalized_level = normalize_level(language_level)
+        effective_ttl = ttl or self.default_ttl
+
+        from services.redis_client import get_redis_client
+        redis_client = get_redis_client()
+        if redis_client:
+            try:
+                cache_key = f"cache:{query_hash}:{normalized_level}"
+                redis_client.set(cache_key, response.model_dump_json(), ex=effective_ttl)
+                return
+            except Exception as exc:
+                logger.warning(f"Redis set failed: {exc}")
+
         now = self._time_func()
         with self._lock:
             self._clear_expired_entries_locked()
@@ -128,7 +159,6 @@ class CacheManager:
                 self._evict_oldest_entry_locked()
 
             cache_key = self._build_key(query_hash, normalized_level)
-            effective_ttl = ttl or self.default_ttl
             self._entries[cache_key] = CacheEntry(
                 response=response.model_copy(deep=True),
                 created_at=now,
@@ -185,6 +215,32 @@ class RateLimiter:
 
     def check_request(self, user_id: str) -> tuple[bool, int]:
         normalized_user_id = (user_id or "anonymous").strip() or "anonymous"
+        from services.redis_client import get_redis_client
+        redis_client = get_redis_client()
+        if redis_client:
+            try:
+                now = self._time_func()
+                cutoff = now - self.window_seconds
+                key = f"ratelimit:{normalized_user_id}"
+                
+                pipe = redis_client.pipeline()
+                pipe.zremrangebyscore(key, 0, cutoff)
+                pipe.zcard(key)
+                pipe.zadd(key, {str(now): now})
+                pipe.expire(key, self.window_seconds)
+                pipe.zrange(key, 0, 0, withscores=True)
+                res = pipe.execute()
+                
+                req_count = res[1]
+                if req_count >= self.max_requests:
+                    redis_client.zrem(key, str(now))
+                    oldest_ts = res[4][0][1] if (len(res) > 4 and res[4]) else now
+                    retry_after = max(1, int(oldest_ts + self.window_seconds - now))
+                    return False, retry_after
+                return True, 0
+            except Exception as exc:
+                logger.warning(f"Redis rate limit check failed: {exc}")
+
         with self._lock:
             requests = self._get_active_requests_locked(normalized_user_id)
             if len(requests) >= self.max_requests:
@@ -196,6 +252,39 @@ class RateLimiter:
 
     def get_status(self, user_id: str) -> dict[str, int | bool | str]:
         normalized_user_id = (user_id or "anonymous").strip() or "anonymous"
+        from services.redis_client import get_redis_client
+        redis_client = get_redis_client()
+        if redis_client:
+            try:
+                now = self._time_func()
+                cutoff = now - self.window_seconds
+                key = f"ratelimit:{normalized_user_id}"
+                
+                pipe = redis_client.pipeline()
+                pipe.zremrangebyscore(key, 0, cutoff)
+                pipe.zcard(key)
+                pipe.zrange(key, 0, 0, withscores=True)
+                res = pipe.execute()
+                
+                req_count = res[1]
+                retry_after = 0
+                if req_count >= self.max_requests:
+                    oldest_ts = res[2][0][1] if (len(res) > 2 and res[2]) else now
+                    retry_after = max(1, int(oldest_ts + self.window_seconds - now))
+                remaining = max(0, self.max_requests - req_count)
+                
+                return {
+                    "userId": normalized_user_id,
+                    "maxRequests": self.max_requests,
+                    "windowSeconds": self.window_seconds,
+                    "requestsInWindow": req_count,
+                    "remainingRequests": remaining,
+                    "allowed": req_count < self.max_requests,
+                    "retryAfterSeconds": retry_after,
+                }
+            except Exception as exc:
+                logger.warning(f"Redis rate limit status failed: {exc}")
+
         with self._lock:
             requests = self._get_active_requests_locked(normalized_user_id)
             retry_after = 0
@@ -213,11 +302,26 @@ class RateLimiter:
             }
 
     def reset(self, user_id: str | None = None) -> None:
+        from services.redis_client import get_redis_client
+        redis_client = get_redis_client()
+        if redis_client:
+            try:
+                if user_id is None:
+                    keys = redis_client.keys("ratelimit:*")
+                    if keys:
+                        redis_client.delete(*keys)
+                else:
+                    normalized_user_id = (user_id or "anonymous").strip() or "anonymous"
+                    redis_client.delete(f"ratelimit:{normalized_user_id}")
+            except Exception as exc:
+                logger.warning(f"Redis rate limit reset failed: {exc}")
+
         with self._lock:
             if user_id is None:
                 self._requests.clear()
                 return
             normalized_user_id = (user_id or "anonymous").strip() or "anonymous"
+
             self._requests.pop(normalized_user_id, None)
 
     def _get_active_requests_locked(self, user_id: str) -> deque[float]:

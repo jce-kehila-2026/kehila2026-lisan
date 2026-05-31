@@ -1,0 +1,58 @@
+[
+  {
+    "id": "greeting_shalom",
+    "message": "שלום",
+    "level": "A1",
+    "expect_fallback": false,
+    "description": "Simple Hebrew greeting should produce a warm A1 reply"
+  },
+  {
+    "id": "where_do_you_live",
+    "message": "איפה אתה גר?",
+    "level": "A1",
+    "expect_fallback": false,
+    "description": "Common A1 question about residence"
+  },
+  {
+    "id": "what_is_your_name",
+    "message": "מה שמך?",
+    "level": "A1",
+    "expect_fallback": false,
+    "description": "Common A1 question about name"
+  },
+  {
+    "id": "what_do_you_do",
+    "message": "מה אתה עושה?",
+    "level": "A1",
+    "expect_fallback": false,
+    "description": "Simple question about occupation"
+  },
+  {
+    "id": "affirmation_ken",
+    "message": "כן",
+    "level": "A1",
+    "expect_fallback": false,
+    "description": "Single-word affirmation should get a natural response"
+  },
+  {
+    "id": "english_out_of_scope",
+    "message": "hello how are you",
+    "level": "A1",
+    "expect_fallback": true,
+    "description": "English input should trigger fallback"
+  },
+  {
+    "id": "complex_topic",
+    "message": "ספר לי על הפרלמנט הישראלי",
+    "level": "A1",
+    "expect_fallback": true,
+    "description": "Complex political topic is out of A1 scope"
+  },
+  {
+    "id": "numbers_question",
+    "message": "כמה אנשים יש בישראל?",
+    "level": "A1",
+    "expect_fallback": true,
+    "description": "Statistics question out of A1 curriculum"
+  }
+]

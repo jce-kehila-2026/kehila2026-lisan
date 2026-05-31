@@ -5,14 +5,16 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "test": "node --test"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "supertest": "^7.2.2"
   },
   "dependencies": {
     "@google/genai": "^2.6.0",
@@ -26,5 +28,7 @@
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.1",
     "openai": "^6.39.0"
+    "multer": "^2.1.1",
+    "pino": "^9.9.4"
   }
 }

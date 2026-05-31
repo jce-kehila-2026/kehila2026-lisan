@@ -34,7 +34,7 @@ function getStudentTeacherIds(student) {
 function Modal({ children, onClose, title, description }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-4 py-6 backdrop-blur-sm">
-      <section className="w-full max-w-xl rounded-[1.75rem] border border-white/80 bg-white p-5 shadow-2xl sm:p-6" dir="rtl">
+      <section className="w-full max-w-3xl rounded-[1.75rem] border border-white/80 bg-white p-5 shadow-2xl sm:p-6" dir="rtl">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-xl font-black text-slate-950">{title}</h2>
@@ -309,8 +309,8 @@ function TeachersManagement() {
   };
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8">
-      <div className="mx-auto max-w-6xl" dir="rtl">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl" dir="rtl">
         <header className="flex flex-wrap items-center justify-between gap-3">
           <button type="button" onClick={() => navigate('/admin/dashboard')} className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-sm transition hover:bg-violet-50">
             <ArrowRight className="h-4 w-4" />
@@ -332,7 +332,7 @@ function TeachersManagement() {
             מורות, אדמינים ושיוך תלמידות
           </h1>
 
-          <p className="mt-3 max-w-2xl text-sm font-semibold leading-7 text-slate-600 sm:text-base">
+          <p className="mt-3 max-w-4xl text-sm font-semibold leading-7 text-slate-600 sm:text-base">
             ניהול מורות, יצירת אדמינים חדשים ושיוך תלמידות למורה אחת או יותר.
           </p>
 
