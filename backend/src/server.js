@@ -15,6 +15,7 @@ const progressRoutes = require('./routes/progress');
 const teacherRoutes = require('./routes/teacher');
 const sharedChatsRoutes = require('./routes/sharedChats');
 const notificationsRoutes = require('./routes/notifications');
+const datasetRoutes = require('./routes/dataset');
 const vocabRoutes = require('./routes/vocab');
 
 require('./config/firebase');
@@ -95,6 +96,23 @@ if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
+});
+
+app.use('/api/auth', authRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/transcripts', transcriptsRoutes);
+app.use('/api/evaluation', evaluationRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/chats', chatRoutes);
+app.use('/api/progress', progressRoutes);
+app.use('/api/teacher', teacherRoutes);
+app.use('/api/shared-chats', sharedChatsRoutes);
+app.use('/api/notifications', notificationsRoutes);
+app.use('/api/dataset', datasetRoutes);
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 }
 
 module.exports = {
