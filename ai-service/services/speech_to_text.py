@@ -111,7 +111,29 @@ def transcribe_audio(audio_bytes: bytes, filename: str = "audio.webm") -> str:
 
             recognizer.start_continuous_recognition()
             done_event.wait(timeout=stt_timeout)
-            recognizer.stop_continuous_recognition()
+            # Force-stop with bounded wait; avoids dangling Azure thread
+            # if the SDK is slow to drain on timeout.
+            try:
+                stop_future = recognizer.stop_continuous_recognition_async()
+                # SDK Future supports .get(timeout) on most versions; fall back
+                # to no-arg if unsupported.
+                try:
+                    stop_future.get(timeout=2.0)
+                except TypeError:
+                    stop_future.get()
+            except Exception as stop_exc:
+                logger.warning({
+                    "event": "stt_stop_failed",
+                    "detail": str(stop_exc),
+                })
+            # Disconnect handlers so the background thread can't write
+            # into result_holder after this function returns.
+            try:
+                recognizer.recognized.disconnect_all()
+                recognizer.canceled.disconnect_all()
+                recognizer.session_stopped.disconnect_all()
+            except Exception:
+                pass
 
         finally:
             import os as _os

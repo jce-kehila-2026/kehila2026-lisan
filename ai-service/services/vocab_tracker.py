@@ -16,7 +16,7 @@ from __future__ import annotations
 import logging
 import os
 import threading
-from typing import Sequence
+import time
 
 import httpx
 
@@ -26,8 +26,33 @@ from services.chat_cache import get_level_bundle
 logger = logging.getLogger("lisan.vocab_tracker")
 
 _BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:3000")
-_VOCAB_ENDPOINT = f"{_BACKEND_URL}/api/vocab/progress"
+_VOCAB_PATH = os.getenv("VOCAB_TRACK_PATH", "/api/vocab/progress")
+_VOCAB_ENDPOINT = f"{_BACKEND_URL}{_VOCAB_PATH}"
 _REQUEST_TIMEOUT = 5.0   # seconds — fire-and-forget, short timeout
+
+# Track in-flight tracker threads so we can join them on shutdown.
+# Without this, daemon threads get killed mid-POST during rolling deploys
+# and the student's vocab progress is silently lost.
+_INFLIGHT_LOCK = threading.Lock()
+_INFLIGHT_THREADS: list[threading.Thread] = []
+
+
+def wait_for_inflight(timeout: float = 5.0) -> int:
+    """
+    Block until all in-flight tracker threads finish (or timeout).
+    Call from app shutdown hook.
+    Returns the number of threads that did NOT finish in time.
+    """
+    with _INFLIGHT_LOCK:
+        threads = list(_INFLIGHT_THREADS)
+    deadline = time.monotonic() + timeout
+    not_done = 0
+    for t in threads:
+        remaining = max(0.0, deadline - time.monotonic())
+        t.join(timeout=remaining)
+        if t.is_alive():
+            not_done += 1
+    return not_done
 
 
 def _get_internal_secret() -> str:
@@ -88,7 +113,15 @@ def _post_to_backend(user_id: str, words: list[dict], level: str) -> None:
                 "body": resp.text[:200],
             })
     except Exception as exc:
-        logger.debug({"event": "vocab_tracker_error", "detail": str(exc)})
+        # Was logger.debug — silently dropped real failures.
+        # Vocab tracking outages need to be observable in production.
+        logger.warning({
+            "event": "vocab_tracker_error",
+            "endpoint": _VOCAB_ENDPOINT,
+            "user_id": user_id,
+            "word_count": len(words),
+            "detail": str(exc),
+        })
 
 
 def track_vocab_async(
@@ -110,9 +143,20 @@ def track_vocab_async(
     if not words:
         return
 
-    thread = threading.Thread(
-        target=_post_to_backend,
-        args=(uid, words, level),
-        daemon=True,
-    )
+    def _runner():
+        try:
+            _post_to_backend(uid, words, level)
+        finally:
+            with _INFLIGHT_LOCK:
+                try:
+                    _INFLIGHT_THREADS.remove(threading.current_thread())
+                except ValueError:
+                    pass
+
+    thread = threading.Thread(target=_runner, daemon=True)
+    with _INFLIGHT_LOCK:
+        # Cap the in-flight list so it can't grow unbounded under load.
+        _INFLIGHT_THREADS.append(thread)
+        if len(_INFLIGHT_THREADS) > 200:
+            _INFLIGHT_THREADS.pop(0)
     thread.start()

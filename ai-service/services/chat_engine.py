@@ -49,6 +49,7 @@ from services.grammar_rules import build_grammar_hint, detect_grammar_errors
 from services.chat_schemas import ChatRequest, ChatRequestContext, ChatResponse, GuardrailReport
 from services.chat_suggestions import get_suggestions
 from services.conversation_memory import CONVERSATION_MEMORY
+from services.vocab_tracker import track_vocab_async
 
 logger = logging.getLogger("lisan.chat")
 
@@ -294,7 +295,11 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
         routerHit=False,
         contextChunkIds=retrieval_context.chunk_ids,
         retrievalScores=retrieval_context.relevance_scores,
-        guardrail=GuardrailReport(vocabularyLeakage=False, blockedTokens=[]),
+        guardrail=GuardrailReport(
+            vocabularyLeakage=False,
+            blockedTokens=[],
+            grammarErrors=[e.hint for e in grammar_errors],
+        ),
         suggestedNextPrompts=get_suggestions(
             answer_he=answer_he,
             message=request_context.message,
@@ -311,6 +316,12 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
             user_message=request_context.message,
             assistant_message=answer_he,
         )
+    # Vocab tracking for text-chat (fire-and-forget, never blocks)
+    track_vocab_async(
+        transcribed_text=request_context.message,
+        user_id=request_context.user_id,
+        level=resolved_level,
+    )
     _log_response(response, active_provider, retrieval_context.chunks_count)
     return response
 
@@ -327,7 +338,7 @@ def stream_chat_response(payload: ChatRequest) -> Iterator[str]:
     least one yield.  Post-LLM guardrails (vocab, Hebrew-only) are applied
     on the accumulated answer after streaming completes; if they fail the
     fallback text is yielded as a final correction chunk prefixed with
-    the sentinel "\x00FALLBACK\x00" so the SSE layer can signal the client.
+    the sentinel "__LISAN_FALLBACK_b6a7d3f1__" so the SSE layer can signal the client.
     """
     request_context = _build_request_context(payload)
 
@@ -420,7 +431,7 @@ def stream_chat_response(payload: ChatRequest) -> Iterator[str]:
         "".join(accumulated), voice_mode=request_context.voice_mode
     )
     if not answer_he or not is_hebrew_only_answer(answer_he):
-        yield "\x00FALLBACK\x00" + get_fallback_text("VOCAB_LEAKAGE")
+        yield "__LISAN_FALLBACK_b6a7d3f1__" + get_fallback_text("VOCAB_LEAKAGE")
         return
 
     allowed_vocab = build_allowed_vocabulary(
@@ -429,7 +440,7 @@ def stream_chat_response(payload: ChatRequest) -> Iterator[str]:
     )
     vocab_decision = evaluate_vocabulary(answer_he, allowed_vocab, level=resolved_level)
     if vocab_decision.fallback_used:
-        yield "\x00FALLBACK\x00" + get_fallback_text("VOCAB_LEAKAGE")
+        yield "__LISAN_FALLBACK_b6a7d3f1__" + get_fallback_text("VOCAB_LEAKAGE")
         return
 
     # ── persist to conversation memory ───────────────────────────────────────
@@ -456,6 +467,7 @@ def _build_request_context(payload: ChatRequest) -> ChatRequestContext:
         model=model,
         voice_mode=getattr(payload, "voiceMode", False),
         session_id=getattr(payload, "sessionId", None) or None,
+        user_id=getattr(payload, "userId", None) or None,
     )
 
 

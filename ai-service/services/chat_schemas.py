@@ -11,11 +11,13 @@ class ChatRequest(BaseModel):
     includeArabic: bool = Field(default=False)
     voiceMode: bool = Field(default=False)
     sessionId: str | None = Field(default=None)
+    userId: str | None = Field(default=None)
 
 
 class GuardrailReport(BaseModel):
     vocabularyLeakage: bool = False
     blockedTokens: list[str] = Field(default_factory=list)
+    grammarErrors: list[str] = Field(default_factory=list)
 
 
 class ChatResponse(BaseModel):
@@ -95,6 +97,7 @@ class ChatRequestContext:
     model: str
     voice_mode: bool = False
     session_id: str | None = None
+    user_id: str | None = None
 
 
 @dataclass(frozen=True)

@@ -76,9 +76,10 @@ def verify_jwt_token(
     if not authorization and is_internal_valid:
         return None
 
-    # If running under pytest and no authorization is provided, bypass for testing convenience
-    if "PYTEST_CURRENT_TEST" in os.environ and not authorization:
-        return None
+    # SECURITY: previously bypassed auth when PYTEST_CURRENT_TEST was set in
+    # the environment. That env var can leak into production (CI/CD, Docker
+    # build args) and would silently disable JWT validation. Tests now must
+    # provide either internal secret OR a valid JWT — no implicit bypass.
 
     if not authorization:
         raise HTTPException(
@@ -93,7 +94,12 @@ def verify_jwt_token(
             detail="Authorization header must be Bearer token",
         )
 
-    token = authorization.split(" ")[1]
+    token = authorization[len("Bearer "):].strip()
+    if not token:
+        raise HTTPException(
+            status_code=401,
+            detail="Missing JWT token after Bearer",
+        )
     try:
         decoded = jwt.decode(token, expected_jwt_secret, algorithms=["HS256"])
         jwt_uid = decoded.get("uid")
@@ -161,10 +167,26 @@ async def chat_stream(
             return stream_chat_response(payload)
 
         token_iter = await run_in_threadpool(_iter)
-        for token in token_iter:
-            escaped = token.replace("\n", "\\n")
-            yield f"data: {escaped}\n\n"
-        yield "data: [DONE]\n\n"
+        try:
+            for token in token_iter:
+                escaped = token.replace("\n", "\\n")
+                yield f"data: {escaped}\n\n"
+            yield "data: [DONE]\n\n"
+        except GeneratorExit:
+            # Client disconnected mid-stream — stop pulling tokens from the
+            # underlying iterator so we don't keep paying LLM costs for a
+            # response no one is listening to.
+            logger.info({"event": "sse_client_disconnect"})
+            try:
+                token_iter.close()
+            except Exception:
+                pass
+            raise
+        finally:
+            try:
+                token_iter.close()
+            except Exception:
+                pass
 
     return StreamingResponse(
         _sse_generator(),
@@ -406,6 +428,42 @@ async def voice_health(
         "stt_circuit": stt_circuit.state.value,
         "tts_circuit": tts_circuit.state.value,
     }
+
+
+# ── Manual circuit-breaker reset (admin recovery) ────────────────────────────
+
+@router.post("/admin/circuits/reset")
+async def reset_circuits(
+    x_internal_service_secret: str | None = Header(default=None),
+) -> dict[str, object]:
+    """
+    Reset all circuit breakers (LLM provider, STT, TTS).
+
+    Use when a provider has recovered but the circuit is still in OPEN
+    state and you don't want to wait for the recovery timer.
+    """
+    require_internal_service_secret(x_internal_service_secret)
+    reset_list: list[str] = []
+
+    try:
+        from services.chat_provider import (
+            clear_provider_runtime_state,
+            _PROVIDER_CIRCUITS,
+        )
+        clear_provider_runtime_state()
+        reset_list.extend(_PROVIDER_CIRCUITS.keys())
+    except Exception as exc:
+        logger.warning({"event": "circuit_reset_llm_failed", "detail": str(exc)})
+
+    try:
+        from services.voice_circuits import stt_circuit, tts_circuit
+        stt_circuit.reset()
+        tts_circuit.reset()
+        reset_list.extend(["stt", "tts"])
+    except Exception as exc:
+        logger.warning({"event": "circuit_reset_voice_failed", "detail": str(exc)})
+
+    return {"success": True, "reset": reset_list}
 
 
 def _elapsed_ms(start: float) -> int:

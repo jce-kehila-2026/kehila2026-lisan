@@ -26,8 +26,11 @@ from dataclasses import dataclass
 # Token sets
 # ---------------------------------------------------------------------------
 
-_MASC_PRONOUNS = frozenset(["הוא", "אתה", "אני"])   # context-dependent for אני
+# Only unambiguous singular pronouns. אני is dual-gender in Hebrew and
+# must not trigger a gender-mismatch error in either direction.
+_MASC_PRONOUNS = frozenset(["הוא", "אתה"])
 _FEM_PRONOUNS  = frozenset(["היא", "את"])
+_NEUTRAL_PRONOUNS = frozenset(["אני"])
 _PLUR_PRONOUNS = frozenset(["הם", "הן", "אנחנו", "אתם", "אתן"])
 
 # Present-tense verb pairs  {masculine_singular: feminine_singular}

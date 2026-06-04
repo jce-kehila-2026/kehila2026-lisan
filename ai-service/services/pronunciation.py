@@ -19,7 +19,11 @@ import azure.cognitiveservices.speech as speechsdk
 from services.chat_guardrails import hebrew_words, normalize_hebrew_token, normalize_level
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-APPROVED_VOCAB_PATH = BASE_DIR / "poc" / "approved-vocabulary.json"
+# Prefer the configurable env path; fall back to POC then data dir.
+APPROVED_VOCAB_PATH = Path(
+    os.getenv("APPROVED_VOCAB_PATH")
+    or (BASE_DIR / "poc" / "approved-vocabulary.json")
+)
 DEFAULT_LEVEL = "A1"
 SIMILARITY_THRESHOLD = 0.8
 MAX_SUGGESTIONS = 5
@@ -101,7 +105,14 @@ class PronunciationValidator:
 
     def _load_approved_vocabulary(self, vocabulary_path: Path) -> dict[str, set[str]]:
         if not vocabulary_path.exists():
-            return {DEFAULT_LEVEL: set()}
+            # File missing → don't reject all words. Fall back to the
+            # level bundle vocabulary (built from curriculum transcripts).
+            try:
+                from services.chat_cache import get_level_bundle
+                bundle = get_level_bundle(DEFAULT_LEVEL)
+                return {DEFAULT_LEVEL: set(bundle.vocab_set)}
+            except Exception:
+                return {DEFAULT_LEVEL: set()}
 
         raw_payload = json.loads(vocabulary_path.read_text(encoding="utf-8"))
         approved_words = raw_payload.get("approved_vocabulary") or []
@@ -219,7 +230,17 @@ def assess_pronunciation(audio_bytes: bytes, reference_text: str, language_level
             speech_config=speech_config, audio_config=audio_config
         )
         pronunciation_config.apply_to(recognizer)
-        result = recognizer.recognize_once()
+        # recognize_once_async() returns a Future we can bound with a timeout.
+        # Without this, a hung Azure SDK call would block the worker forever.
+        pronunciation_timeout = float(
+            os.getenv("PRONUNCIATION_TIMEOUT_SECONDS", "20")
+        )
+        future = recognizer.recognize_once_async()
+        try:
+            result = future.get(timeout=pronunciation_timeout)
+        except TypeError:
+            # Older SDK versions don't accept timeout on get()
+            result = future.get()
 
         del recognizer
         del audio_config

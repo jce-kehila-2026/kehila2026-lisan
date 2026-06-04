@@ -84,7 +84,12 @@ class ConversationMemory:
         user_message: str,
         assistant_message: str,
     ) -> None:
-        """Append one user+assistant turn; trim to MAX_TURNS pairs."""
+        """Append one user+assistant turn; trim to MAX_TURNS pairs.
+
+        Uses Redis WATCH/MULTI/EXEC optimistic-lock pattern when Redis is
+        available, so concurrent writers to the same session_id can't
+        clobber each other's turns.
+        """
         sid = (session_id or "").strip()
         if not sid or not user_message.strip():
             return
@@ -94,15 +99,31 @@ class ConversationMemory:
         if redis_client:
             try:
                 key = f"session:{sid}"
-                history = self.get_history(sid)
-                history.append({"role": "user", "content": user_message})
-                history.append({"role": "assistant", "content": assistant_message or ""})
-                
                 max_msgs = self._max_turns * 2
-                while len(history) > max_msgs:
-                    history.pop(0)
-                    
-                redis_client.set(key, json.dumps(history), ex=self._ttl)
+                new_msgs = [
+                    {"role": "user", "content": user_message},
+                    {"role": "assistant", "content": assistant_message or ""},
+                ]
+                # WATCH/MULTI/EXEC loop — retries on concurrent modification
+                for _ in range(5):
+                    with redis_client.pipeline() as pipe:
+                        try:
+                            pipe.watch(key)
+                            raw = pipe.get(key)
+                            history = json.loads(raw) if raw else []
+                            history.extend(new_msgs)
+                            while len(history) > max_msgs:
+                                history.pop(0)
+                            pipe.multi()
+                            pipe.set(key, json.dumps(history), ex=self._ttl)
+                            pipe.execute()
+                            return
+                        except Exception as watch_exc:
+                            # WatchError or similar — retry
+                            if "WatchError" not in type(watch_exc).__name__:
+                                raise
+                            continue
+                logger.warning(f"Redis append_turn gave up after retries for {sid}")
                 return
             except Exception as exc:
                 logger.warning(f"Redis append_turn failed: {exc}")
@@ -155,6 +176,17 @@ class ConversationMemory:
             sid for sid, s in self._sessions.items()
             if now - s.last_accessed > self._ttl
         ]
+        if not expired:
+            return
+        # Delete from Redis too so storage doesn't bloat with stale sessions.
+        # (Redis TTL also handles this, but local evictions should mirror.)
+        try:
+            from services.redis_client import get_redis_client
+            redis_client = get_redis_client()
+            if redis_client:
+                redis_client.delete(*[f"session:{sid}" for sid in expired])
+        except Exception as exc:
+            logger.warning(f"Redis eviction cleanup failed: {exc}")
         for sid in expired:
             del self._sessions[sid]
 

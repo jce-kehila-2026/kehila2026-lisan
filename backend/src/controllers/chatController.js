@@ -13,7 +13,7 @@ const {
   DEFAULT_VOICE_CHAT_TITLE,
   uploadStudentVoiceAudio,
 } = require('../services/chatPersistenceService');
-const { logger, toErrorPayload } = require('../lib/logger');
+const { logger, toErrorPayload, hashUserId } = require('../lib/logger');
 
 const AI_VOICE_FAILURE_MESSAGE = 'אוי, יש בעיה. נסו שוב מאוחר יותר.';
 
@@ -242,6 +242,7 @@ exports.sendAiMessage = async (req, res) => {
       level: chat.level || 'A1',
       includeArabic: chat.defaultIncludeArabic === true,
       userId,
+      sessionId: chatId,
       userToken,
     });
 
@@ -281,7 +282,14 @@ exports.sendAiMessage = async (req, res) => {
     return res.status(200).json({
       success: true,
       userMessage,
-      aiMessage
+      aiMessage,
+      answerAr: aiResponse?.answerAr || null,
+      suggestedNextPrompts: aiResponse?.suggestedNextPrompts || [],
+      cacheHit: aiResponse?.cacheHit === true,
+      routerHit: aiResponse?.routerHit === true,
+      contextChunkIds: aiResponse?.contextChunkIds || [],
+      fallbackUsed: aiResponse?.fallbackUsed === true,
+      fallbackReason: aiResponse?.fallbackReason || null,
     });
   } catch (error) {
     logChatError('send_ai_message_failed', error, {
@@ -521,6 +529,7 @@ exports.sendVoiceMessage = async (req, res) => {
       level: normalizedLevel,
       includeArabic,
       userId,
+      sessionId: chatId,
       userToken,
     });
 
@@ -586,6 +595,9 @@ exports.sendVoiceMessage = async (req, res) => {
       ...aiVoiceResponse,
       conversationId: chatId,
       audioUrl: uploadedAudio.audioUrl,
+      pronunciationScore: aiVoiceResponse?.pronunciationScore ?? null,
+      ssmlText: aiVoiceResponse?.ssmlText ?? null,
+      suggestedNextPrompts: aiVoiceResponse?.suggestedNextPrompts || [],
     });
   } catch (error) {
     logChatError('send_voice_message_failed', error, {
@@ -1000,10 +1012,15 @@ function buildVoiceIdempotentResponse({
 }
 
 function logChatError(event, error, context = {}) {
+  // PII redaction: hash userId before it hits any sink (stdout/Sentry/log aggregator)
+  const safeContext = { ...context };
+  if (safeContext.userId !== undefined) {
+    safeContext.userId = hashUserId(safeContext.userId);
+  }
   logger.error(
     {
       event,
-      ...context,
+      ...safeContext,
       error: toErrorPayload(error),
     },
     event
