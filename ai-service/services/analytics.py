@@ -71,8 +71,12 @@ def _latency_metrics() -> dict[str, Any]:
     n = len(sorted_latencies)
 
     def _percentile(p: float) -> int:
-        idx = max(0, int(p / 100 * n) - 1)
-        return sorted_latencies[min(idx, n - 1)]
+        # Nearest-rank method: rank = ceil(p/100 * n), 1-indexed.
+        # Old code used int() (floor) - 1 which under-reported high
+        # percentiles when n was small.
+        import math
+        rank = max(1, math.ceil(p / 100.0 * n))
+        return sorted_latencies[min(rank - 1, n - 1)]
 
     return {
         "avg_ms": int(statistics.mean(sorted_latencies)),

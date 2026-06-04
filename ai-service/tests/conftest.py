@@ -7,7 +7,13 @@ test order doesn't affect results.
 from __future__ import annotations
 
 import os
-os.environ.setdefault("AI_SERVICE_INTERNAL_SECRET", "")
+
+# Force-disable auth in tests. We removed the PYTEST_CURRENT_TEST bypass
+# from the auth middleware (P01) because it was a production security hole.
+# Tests instead disable auth explicitly by clearing the secrets here BEFORE
+# any application module is imported — so .env values don't bleed into tests.
+os.environ["AI_SERVICE_INTERNAL_SECRET"] = ""
+os.environ["JWT_SECRET"] = ""
 
 import pytest
 
@@ -38,5 +44,19 @@ def _clear_caches():
     from services.chat_provider import clear_provider_runtime_state, provider_circuit
     clear_provider_runtime_state()
     provider_circuit.reset()
+
+    # Reset voice circuit breakers — only catch the narrow set of import/
+    # attribute errors that can legitimately occur in a partial install.
+    # Hiding all Exception masks real bugs (AttributeError on stale code).
+    try:
+        from services.voice_circuits import stt_circuit, tts_circuit
+        stt_circuit.reset()
+        tts_circuit.reset()
+    except (ImportError, AttributeError):
+        pass
+
+    # Reset analytics start time so uptime_seconds stays near 0 in tests
+    import services.analytics as _analytics
+    _analytics._START_TIME = __import__('time').time()
 
     yield

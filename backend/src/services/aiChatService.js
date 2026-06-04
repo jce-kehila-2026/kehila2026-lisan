@@ -64,6 +64,7 @@ async function sendChatMessageToAi({
   level = 'A1',
   includeArabic = false,
   userId = null,
+  sessionId = null,
   userToken = null,
 }) {
   try {
@@ -73,11 +74,13 @@ async function sendChatMessageToAi({
         message,
         level,
         includeArabic,
+        voiceMode: false,
+        ...(userId && { userId }),
+        ...(sessionId && { sessionId }),
       },
       createAiRequestConfig({
         headers: {
           'Content-Type': 'application/json',
-          ...(userId ? { 'X-User-ID': userId } : {}),
           ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {}),
         }
       })
@@ -96,6 +99,7 @@ async function sendVoiceMessageToAi({
   level = 'A1',
   includeArabic = false,
   userId = null,
+  sessionId = null,
   userToken = null,
 }) {
   try {
@@ -105,6 +109,8 @@ async function sendVoiceMessageToAi({
     formData.append('audio', audioBlob, fileName);
     formData.append('level', level);
     formData.append('includeArabic', String(includeArabic));
+    if (userId) formData.append('userId', userId);
+    if (sessionId) formData.append('sessionId', sessionId);
 
     const response = await axios.post(
       getAiVoiceServiceUrl(),
@@ -112,7 +118,6 @@ async function sendVoiceMessageToAi({
       createAiRequestConfig({
         timeout: getAiVoiceServiceTimeoutMs(),
         headers: {
-          ...(userId ? { 'X-User-ID': userId } : {}),
           ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {}),
         }
       })
@@ -122,42 +127,56 @@ async function sendVoiceMessageToAi({
   } catch (error) {
     throw mapAiServiceError(error);
   }
-
 }
 
+/**
+ * Normalises every shape ai-service or axios may throw into:
+ *   { status, code, message, details? }
+ *
+ * ai-service raises HTTPException → { "detail": "..." }
+ * backend convention             → { success: false, error: "...", code: "..." }
+ * This translates the former into the latter so the frontend only
+ * needs to handle ONE shape.
+ */
 function mapAiServiceError(error) {
   if (error?.code === 'ECONNABORTED') {
     return {
       status: 408,
       code: 'AI_TIMEOUT',
-      message: 'AI service timed out'
+      message: 'AI service timed out',
     };
   }
 
   if (error?.response) {
     const status = error.response.status || 502;
-    const responseData = error.response.data || {};
-
-    return {
-      status,
-      code: responseData.code || 'AI_SERVICE_BAD_STATUS',
-      message: responseData.error || responseData.detail || 'AI service returned an error',
-      details: responseData,
-    };
+    const data = error.response.data || {};
+    // FastAPI puts the human-readable error in "detail"
+    const message =
+      data.error ||
+      (typeof data.detail === 'string' ? data.detail : null) ||
+      (Array.isArray(data.detail) ? JSON.stringify(data.detail) : null) ||
+      'AI service returned an error';
+    const code =
+      data.code ||
+      (status === 429 ? 'AI_RATE_LIMITED' :
+       status === 401 ? 'AI_UNAUTHORIZED' :
+       status === 403 ? 'AI_FORBIDDEN' :
+       'AI_SERVICE_BAD_STATUS');
+    return { status, code, message, details: data };
   }
 
   if (error?.request) {
     return {
       status: 503,
       code: 'AI_SERVICE_UNAVAILABLE',
-      message: 'AI service is unavailable'
+      message: 'AI service is unavailable',
     };
   }
 
   return {
     status: 500,
     code: 'AI_SERVICE_ERROR',
-    message: error?.message || 'AI service request failed'
+    message: error?.message || 'AI service request failed',
   };
 }
 

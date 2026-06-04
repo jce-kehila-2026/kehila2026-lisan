@@ -22,6 +22,12 @@ _LEVEL_CONFIGS: dict[str, _LevelConfig] = {
         max_hebrew_words=12,
         max_message_length=200,
         oos_all_unknown_min=3,
+        # FUTURE TUNING: 0.50 is conservative — flags 2 unknown / 2 known
+        # as OOS. Real-world A1 students often try to use one new word
+        # alongside known vocab. Track OOS false-positive rate in prod
+        # analytics; raise to 0.55-0.65 once data confirms the regression.
+        # NOTE: changing this requires updating tests in
+        # test_day3_prompt_and_fallback.py FALLBACK_FAST_REJECT_DATASET.
         oos_unknown_ratio=0.50,
         oos_advanced_no_known=2,
         vocab_strict=True,

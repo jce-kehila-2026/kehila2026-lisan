@@ -1,0 +1,107 @@
+# ─── Lisan stack ──────────────────────────────────────────────────────────────
+# Run:        docker compose up -d --build
+# Logs:       docker compose logs -f backend ai-service
+# Down:       docker compose down
+# Down + DB:  docker compose down -v   (wipes Redis data)
+#
+# Required: .env file at the project root with at least:
+#   JWT_SECRET, AI_SERVICE_INTERNAL_SECRET, GEMINI_API_KEY,
+#   AZURE_SPEECH_KEY, AZURE_SPEECH_REGION, FIREBASE_SERVICE_ACCOUNT,
+#   FIREBASE_STORAGE_BUCKET, CORS_ALLOWED_ORIGINS
+
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - lisan-net
+
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      # Shared with backend
+      AI_SERVICE_INTERNAL_SECRET: ${AI_SERVICE_INTERNAL_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
+      # LLM
+      LLM_PROVIDER: ${LLM_PROVIDER:-gemini}
+      LLM_MODEL: ${LLM_MODEL:-gemini-2.5-flash-lite}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      # Azure Speech
+      AZURE_SPEECH_KEY: ${AZURE_SPEECH_KEY}
+      AZURE_SPEECH_REGION: ${AZURE_SPEECH_REGION}
+      USE_AZURE_PRONUNCIATION: ${USE_AZURE_PRONUNCIATION:-true}
+      MAX_AUDIO_BYTES: ${MAX_AUDIO_BYTES:-26214400}
+      # Backend callback (vocab tracking)
+      BACKEND_URL: http://backend:3000
+      VOCAB_TRACK_PATH: ${VOCAB_TRACK_PATH:-/api/vocab/progress}
+      # Redis
+      REDIS_URL: redis://redis:6379
+      # CORS
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+      ENV_MODE: ${ENV_MODE:-production}
+      LOG_PII_MODE: ${LOG_PII_MODE:-hash}
+    networks:
+      - lisan-net
+    # Not exposed externally — only backend reaches it via service name
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      ai-service:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+    environment:
+      PORT: 3000
+      NODE_ENV: ${NODE_ENV:-production}
+      # JWT
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
+      # AI service (internal network DNS)
+      AI_SERVICE_URL: http://ai-service:8000
+      AI_SERVICE_TIMEOUT_MS: ${AI_SERVICE_TIMEOUT_MS:-20000}
+      AI_SERVICE_VOICE_TIMEOUT_MS: ${AI_SERVICE_VOICE_TIMEOUT_MS:-20000}
+      AI_SERVICE_STREAM_TIMEOUT_MS: ${AI_SERVICE_STREAM_TIMEOUT_MS:-60000}
+      AI_SERVICE_INTERNAL_SECRET: ${AI_SERVICE_INTERNAL_SECRET}
+      # Rate limits
+      CHAT_RATE_LIMIT_MAX: ${CHAT_RATE_LIMIT_MAX:-15}
+      VOICE_RATE_LIMIT_MAX: ${VOICE_RATE_LIMIT_MAX:-5}
+      ADMIN_RATE_LIMIT_MAX: ${ADMIN_RATE_LIMIT_MAX:-60}
+      # CORS
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+      # Firebase
+      FIREBASE_SERVICE_ACCOUNT: ${FIREBASE_SERVICE_ACCOUNT}
+      FIREBASE_STORAGE_BUCKET: ${FIREBASE_STORAGE_BUCKET}
+      # Logging
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      LOG_PII_MODE: ${LOG_PII_MODE:-hash}
+    networks:
+      - lisan-net
+
+volumes:
+  redis-data:
+
+networks:
+  lisan-net:
+    driver: bridge

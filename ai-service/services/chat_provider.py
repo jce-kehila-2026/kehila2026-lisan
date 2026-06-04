@@ -314,6 +314,16 @@ def _build_provider_chain(
         )
         seen_providers.add(base_config.name)
 
+    # Re-order so providers whose circuit is OPEN go to the END of the chain.
+    # Prevents wasting latency on a known-broken provider while still falling
+    # back to it as a last resort if every healthy provider has also failed.
+    def _circuit_open(name: str) -> bool:
+        try:
+            return not get_provider_circuit(name).allow_request()
+        except Exception:
+            return False
+
+    chain.sort(key=lambda c: 1 if _circuit_open(c.name) else 0)
     return chain
 
 
@@ -580,7 +590,12 @@ def _call_gemini(
             is_quota = "429" in str(exc)
             if attempt > max_retries or not is_quota:
                 _classify_and_raise(exc)
-            retry_delay = _parse_retry_delay_seconds(str(exc)) or max(6.0, base_delay)
+            # Cap retry delay so a worker thread can't be blocked > 2s.
+            # Long Gemini retry-after hints would otherwise exhaust the
+            # FastAPI threadpool under concurrent quota errors.
+            parsed = _parse_retry_delay_seconds(str(exc))
+            raw_delay = parsed if parsed is not None else base_delay
+            retry_delay = min(2.0, max(0.1, raw_delay))
             time.sleep(retry_delay)
 
 

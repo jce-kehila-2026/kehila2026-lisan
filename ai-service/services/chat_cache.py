@@ -4,7 +4,7 @@ import threading
 import time
 import os
 import logging
-from collections import Counter
+from collections import Counter, OrderedDict
 from collections import deque
 from dataclasses import dataclass
 from pathlib import Path
@@ -337,7 +337,9 @@ class RateLimiter:
 
 
 CHAT_CACHE: dict[str, CachedLevelBundle] = {}
-EXACT_RESPONSE_CACHE: dict[str, ChatResponse] = {}
+# Bounded LRU dict — preserves insertion order; oldest evicted when full.
+EXACT_CACHE_MAX_ENTRIES = 512
+EXACT_RESPONSE_CACHE: "OrderedDict[str, ChatResponse]" = OrderedDict()
 RESPONSE_CACHE_MANAGER = CacheManager()
 RATE_LIMITER = RateLimiter()
 
@@ -383,12 +385,27 @@ def get_level_bundle(level: str) -> CachedLevelBundle:
 
 
 def build_cache_key(message: str, level: str, include_arabic: bool) -> str:
+    # Hash the normalized message so colons / whitespace / diacritics in the
+    # input can't collide with the structural ":" separators in the key.
+    import hashlib
     normalized_message = normalize_message_for_cache(message)
-    return f"{normalized_message}:{normalize_level(level)}:{str(include_arabic).lower()}"
+    msg_hash = hashlib.sha1(
+        normalized_message.encode("utf-8"), usedforsecurity=False
+    ).hexdigest()[:16]
+    return f"{msg_hash}:{normalize_level(level)}:{str(include_arabic).lower()}"
 
 
 def normalize_message_for_cache(message: str) -> str:
-    parts = [normalize_hebrew_token(part) or part.strip().lower() for part in (message or "").split()]
+    # Strip Hebrew diacritics (nikud) and collapse whitespace so that
+    # "שלום" and "שָׁלוֹם" and "שלום  " all map to the same cache entry.
+    import re as _re
+    raw = (message or "").strip().lower()
+    # Hebrew points: niqqud (U+05B0..U+05BC, U+05BF, U+05C1..U+05C2, U+05C4..U+05C5, U+05C7)
+    raw = _re.sub(r"[֑-ׇ]", "", raw)
+    parts = [
+        normalize_hebrew_token(part) or part.strip()
+        for part in raw.split()
+    ]
     return " ".join(part for part in parts if part)
 
 
@@ -401,7 +418,12 @@ def store_exact_cached_response(cache_key: str, response: ChatResponse) -> None:
     level = _extract_level_from_cache_key(cache_key)
     RESPONSE_CACHE_MANAGER.set_cached_response(cache_key, level, response)
     with _EXACT_CACHE_LOCK:
+        # LRU: move existing key to end, then evict oldest if over cap
+        if cache_key in EXACT_RESPONSE_CACHE:
+            EXACT_RESPONSE_CACHE.move_to_end(cache_key)
         EXACT_RESPONSE_CACHE[cache_key] = response.model_copy(deep=True)
+        while len(EXACT_RESPONSE_CACHE) > EXACT_CACHE_MAX_ENTRIES:
+            EXACT_RESPONSE_CACHE.popitem(last=False)
 
 
 def clear_expired_entries() -> int:

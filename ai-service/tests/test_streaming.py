@@ -211,7 +211,7 @@ class TestStreamChatResponse:
         ):
             chunks = list(stream_chat_response(ChatRequest(message="מה שמך?", level="A1")))
 
-        sentinel_chunks = [c for c in chunks if c.startswith("\x00FALLBACK\x00")]
+        sentinel_chunks = [c for c in chunks if c.startswith("__LISAN_FALLBACK_b6a7d3f1__")]
         assert len(sentinel_chunks) == 1
 
     def test_fallback_sentinel_on_non_hebrew_answer(self):
@@ -226,7 +226,7 @@ class TestStreamChatResponse:
         ):
             chunks = list(stream_chat_response(ChatRequest(message="מה שמך?", level="A1")))
 
-        sentinel_chunks = [c for c in chunks if c.startswith("\x00FALLBACK\x00")]
+        sentinel_chunks = [c for c in chunks if c.startswith("__LISAN_FALLBACK_b6a7d3f1__")]
         assert len(sentinel_chunks) == 1
 
     def test_model_error_yields_fallback(self):
