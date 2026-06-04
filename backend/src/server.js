@@ -15,6 +15,7 @@ const progressRoutes = require('./routes/progress');
 const teacherRoutes = require('./routes/teacher');
 const sharedChatsRoutes = require('./routes/sharedChats');
 const notificationsRoutes = require('./routes/notifications');
+const datasetRoutes = require('./routes/dataset');
 const vocabRoutes = require('./routes/vocab');
 
 require('./config/firebase');
@@ -169,6 +170,7 @@ function createApp() {
   app.use('/api/teacher', teacherRoutes);
   app.use('/api/shared-chats', sharedChatsRoutes);
   app.use('/api/notifications', notificationsRoutes);
+  app.use('/api/dataset', datasetRoutes);
   app.use('/api/vocab', vocabRoutes);
 
   return app;
