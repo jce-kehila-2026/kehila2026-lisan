@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
+const dotenv = require('dotenv');
 
-const admin = require('./src/config/firebase');
-
-const db = admin.firestore();
+dotenv.config();
+const { admin, db } = require('./src/config/firebase');
 
 const BASE_DIR = path.join(__dirname, '..', 'content', 'transcripts');
 

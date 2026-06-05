@@ -21,7 +21,6 @@ CURRICULUM_RESPONSES = {
     "מי אתה": "אני עידו.",
     "מה שלומך": "הכל בסדר.",
     "מה נשמע": "הכל בסדר.",
-    "איפה הדואר": "הדואר ליד החנות.",
     "אני רוצה קפה": "בסדר. קפה אחד.",
     "איפה אתה גר": "אני גר בתל אביב.",
     "איפה את גרה": "אני גרה בירושלים.",
@@ -66,12 +65,11 @@ def route_message(
             model=model,
         )
 
-    if normalized_question in bundle.question_answer_map:
-        return _build_router_response(
-            answer_he=bundle.question_answer_map[normalized_question],
-            level=level,
-            model=model,
-        )
+    # NOTE: the auto-extracted bundle.question_answer_map was intentionally
+    # removed from routing. It returned raw transcript lines (e.g. broken
+    # fragments ending in a colon) and short-circuited RAG, so curriculum
+    # questions never reached the leading-teacher LLM. Those questions now flow
+    # to RAG + the model. Only the small, curated maps below short-circuit.
 
     if normalized_question in CURRICULUM_RESPONSES:
         return _build_router_response(

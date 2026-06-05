@@ -50,6 +50,13 @@ services:
       # Backend callback (vocab tracking)
       BACKEND_URL: http://backend:3000
       VOCAB_TRACK_PATH: ${VOCAB_TRACK_PATH:-/api/vocab/progress}
+      # RAG transcript source: prefer backend / Firestore, with local fallback
+      RAG_TRANSCRIPTS_SOURCE: ${RAG_TRANSCRIPTS_SOURCE:-auto}
+      RAG_BACKEND_URL: http://backend:3000
+      RAG_BACKEND_TIMEOUT_SECONDS: ${RAG_BACKEND_TIMEOUT_SECONDS:-2.5}
+      RAG_BACKEND_RETRY_SECONDS: ${RAG_BACKEND_RETRY_SECONDS:-15}
+      RAG_REQUIRE_BACKEND: ${RAG_REQUIRE_BACKEND:-false}
+      RAG_LEVELS: ${RAG_LEVELS:-A1,A2,B1,B2}
       # Redis
       REDIS_URL: redis://redis:6379
       # CORS

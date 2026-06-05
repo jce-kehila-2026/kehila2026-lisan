@@ -191,10 +191,24 @@ def readiness():
 
     # 1. Startup cache warmed?
     try:
-        from services.chat_cache import is_startup_cache_ready
+        from services.chat_cache import get_rag_cache_status, is_startup_cache_ready
         checks["cache"] = "ok" if is_startup_cache_ready() else "cold"
         if checks["cache"] != "ok":
             overall_ok = False
+        rag_status = get_rag_cache_status()
+        transcript_sources = rag_status.get("transcripts", {})
+        if transcript_sources:
+            sources = {
+                str(status.get("source"))
+                for status in transcript_sources.values()
+                if isinstance(status, dict)
+            }
+            checks["rag"] = ",".join(sorted(sources))
+            if os.getenv("RAG_REQUIRE_BACKEND", "").strip().lower() in {"1", "true", "yes", "on"}:
+                if sources != {"backend"}:
+                    overall_ok = False
+        else:
+            checks["rag"] = "unknown"
     except Exception as exc:
         checks["cache"] = f"error: {exc}"
         overall_ok = False

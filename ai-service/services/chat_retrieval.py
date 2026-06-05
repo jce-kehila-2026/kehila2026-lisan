@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import threading
+import urllib.error
+import urllib.parse
+import urllib.request
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
@@ -15,6 +19,8 @@ TRANSCRIPTS_DIR = BASE_DIR / "data" / "transcripts"
 RAG_CHUNKS_PATH = BASE_DIR / "poc" / "rag-chunks.json"
 DEFAULT_LEVEL = "A1"
 DEFAULT_SIMILARITY_THRESHOLD = 0.7
+DEFAULT_BACKEND_TIMEOUT_SECONDS = 2.5
+TRANSCRIPT_SOURCE_STATUS: dict[str, dict[str, object]] = {}
 
 
 @dataclass
@@ -141,6 +147,35 @@ def resolve_level_path(level: str) -> Path:
 
 
 def load_transcripts(level: str) -> tuple[list[Transcript], str]:
+    normalized_level = normalize_level(level)
+    backend_error: str | None = None
+
+    if _should_try_backend_transcripts():
+        try:
+            backend_transcripts = _load_transcripts_from_backend(normalized_level)
+            if backend_transcripts:
+                _record_transcript_source_status(
+                    normalized_level,
+                    source="backend",
+                    count=len(backend_transcripts),
+                    error=None,
+                )
+                return backend_transcripts, normalized_level
+            backend_error = "backend returned no transcripts"
+        except TranscriptBackendError as exc:
+            backend_error = str(exc)
+
+        if _require_backend_transcripts():
+            _record_transcript_source_status(
+                normalized_level,
+                source="backend_error",
+                count=0,
+                error=backend_error,
+            )
+            raise FileNotFoundError(
+                f"Backend transcripts unavailable for {normalized_level}: {backend_error}"
+            )
+
     level_path = resolve_level_path(level)
     transcripts: list[Transcript] = []
     for file_path in sorted(level_path.rglob("*.txt")):
@@ -152,7 +187,146 @@ def load_transcripts(level: str) -> tuple[list[Transcript], str]:
         )
     if not transcripts:
         raise FileNotFoundError(f"No transcript files found for level path: {level_path}")
-    return transcripts, normalize_level(level) if (TRANSCRIPTS_DIR / normalize_level(level)).exists() else DEFAULT_LEVEL
+    resolved_level = normalized_level if (TRANSCRIPTS_DIR / normalized_level).exists() else DEFAULT_LEVEL
+    _record_transcript_source_status(
+        normalized_level,
+        source="local_fallback" if backend_error else "local",
+        count=len(transcripts),
+        error=backend_error,
+    )
+    return transcripts, resolved_level
+
+
+class TranscriptBackendError(RuntimeError):
+    pass
+
+
+def is_backend_transcript_source_configured() -> bool:
+    return bool(_backend_base_url()) and _transcript_source_mode() != "local"
+
+
+def get_transcript_source_status() -> dict[str, dict[str, object]]:
+    return {level: dict(status) for level, status in TRANSCRIPT_SOURCE_STATUS.items()}
+
+
+def _transcript_source_mode() -> str:
+    mode = os.getenv("RAG_TRANSCRIPTS_SOURCE", "auto").strip().lower()
+    if mode in {"backend", "database", "db", "firestore"}:
+        return "backend"
+    if mode in {"local", "files", "file"}:
+        return "local"
+    return "auto"
+
+
+def _should_try_backend_transcripts() -> bool:
+    mode = _transcript_source_mode()
+    return mode != "local" and bool(_backend_base_url())
+
+
+def _require_backend_transcripts() -> bool:
+    raw = os.getenv("RAG_REQUIRE_BACKEND", "").strip().lower()
+    return raw in {"1", "true", "yes", "on"}
+
+
+def _backend_base_url() -> str:
+    return (
+        os.getenv("RAG_BACKEND_URL", "")
+        or os.getenv("BACKEND_URL", "")
+    ).strip().rstrip("/")
+
+
+def _backend_timeout_seconds() -> float:
+    raw = os.getenv("RAG_BACKEND_TIMEOUT_SECONDS", "").strip()
+    try:
+        value = float(raw)
+    except ValueError:
+        return DEFAULT_BACKEND_TIMEOUT_SECONDS
+    return value if value > 0 else DEFAULT_BACKEND_TIMEOUT_SECONDS
+
+
+def _load_transcripts_from_backend(level: str) -> list[Transcript]:
+    base_url = _backend_base_url()
+    if not base_url:
+        return []
+
+    encoded_level = urllib.parse.quote(normalize_level(level), safe="")
+    url = f"{base_url}/api/transcripts/level/{encoded_level}"
+    request = urllib.request.Request(
+        url,
+        headers=_backend_request_headers(),
+        method="GET",
+    )
+
+    try:
+        with urllib.request.urlopen(request, timeout=_backend_timeout_seconds()) as response:
+            status = getattr(response, "status", 200)
+            if status < 200 or status >= 300:
+                raise TranscriptBackendError(f"backend status {status}")
+            payload = json.loads(response.read().decode("utf-8"))
+    except (OSError, urllib.error.URLError, TimeoutError) as exc:
+        raise TranscriptBackendError(str(exc)) from exc
+    except json.JSONDecodeError as exc:
+        raise TranscriptBackendError(f"invalid backend JSON: {exc}") from exc
+
+    records = payload.get("results") if isinstance(payload, dict) else payload
+    if not isinstance(records, list):
+        raise TranscriptBackendError("backend payload is not a transcript list")
+
+    transcripts = [
+        transcript
+        for record in records
+        if isinstance(record, dict)
+        for transcript in [_transcript_from_backend_record(record)]
+        if transcript is not None
+    ]
+    transcripts.sort(key=lambda item: item.source)
+    return transcripts
+
+
+def _backend_request_headers() -> dict[str, str]:
+    headers = {
+        "Accept": "application/json",
+        "User-Agent": "lisan-ai-rag/1.0",
+    }
+    internal_secret = os.getenv("AI_SERVICE_INTERNAL_SECRET", "").strip()
+    if internal_secret:
+        headers["X-Internal-Service-Secret"] = internal_secret
+    return headers
+
+
+def _transcript_from_backend_record(record: dict) -> Transcript | None:
+    content = (
+        record.get("text")
+        or record.get("content")
+        or record.get("transcript")
+        or ""
+    )
+    content = str(content).strip()
+    if not content:
+        return None
+
+    source = (
+        record.get("fileName")
+        or record.get("source")
+        or record.get("title")
+        or record.get("id")
+        or "database-transcript"
+    )
+    return Transcript(source=str(source), content=content)
+
+
+def _record_transcript_source_status(
+    level: str,
+    *,
+    source: str,
+    count: int,
+    error: str | None,
+) -> None:
+    TRANSCRIPT_SOURCE_STATUS[normalize_level(level)] = {
+        "source": source,
+        "count": count,
+        "error": error,
+    }
 
 
 def extract_vocabulary(transcripts: list[Transcript]) -> list[str]:

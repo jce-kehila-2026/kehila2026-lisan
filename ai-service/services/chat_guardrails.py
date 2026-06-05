@@ -1,11 +1,20 @@
 from __future__ import annotations
 
+import os
 import re
 from dataclasses import dataclass
 from typing import NamedTuple
 
 DEFAULT_LEVEL = "A1"
 DEFAULT_FALLBACK_REASON = "OUT_OF_SCOPE"
+
+# Vocab-leak tolerance (env-tunable). A proactive tutor that corrects and asks
+# questions naturally uses a few words beyond the small A1 whitelist
+# (כמעט, אומרים, נסה ...). Zero-tolerance nuked whole replies and caused the
+# canned-fallback loop, so we only treat a reply as a leak when it is
+# DOMINATED by unknown vocabulary, not when a couple of words slip in.
+VOCAB_LEAK_MAX_UNKNOWN = int(os.getenv("VOCAB_LEAK_MAX_UNKNOWN", "3"))
+VOCAB_LEAK_MAX_RATIO = float(os.getenv("VOCAB_LEAK_MAX_RATIO", "0.5"))
 
 
 class _LevelConfig(NamedTuple):
@@ -68,6 +77,15 @@ HEBREW_WORD_RE = re.compile(r"[\u0590-\u05FF]+(?:['-][\u0590-\u05FF]+)*")
 LATIN_RE = re.compile(r"[A-Za-z]")
 ARABIC_RE = re.compile(r"[\u0600-\u06FF]")
 NON_HEBREW_SCRIPT_RE = re.compile(r"[^\u0590-\u05FF\s!?.,'\"()0-9\-]")
+# Any alphabetic letter that is NOT Hebrew (Latin, Cyrillic, Greek, CJK, ...).
+# Catches homoglyph/lookalike attacks (e.g. a Cyrillic "\u0430" next to Hebrew)
+# that the Latin/Arabic-only checks used to miss.
+NON_HEBREW_LETTER_RE = re.compile(r"[^\W\d_\u0590-\u05FF]", re.UNICODE)
+# Invisible characters used to smuggle hidden text or split words:
+# zero-width (ZWSP/ZWNJ/ZWJ/word-joiner/BOM) and bidi/directional marks.
+_ZERO_WIDTH_RE = re.compile(r"[\u200B\u200C\u200D\u2060\uFEFF]")
+_DIRECTIONAL_RE = re.compile(r"[\u200E\u200F\u202A-\u202E\u2066-\u2069]")
+_HEBREW_MAQAF = "\u05BE"  # \u05BE \u2014 Hebrew hyphen; treat as a word separator
 MAX_MESSAGE_LENGTH = 200
 MAX_HEBREW_WORDS = 12
 MAX_VOICE_WORDS = 10
@@ -96,13 +114,34 @@ def normalize_level(level: str | None) -> str:
     return normalized or DEFAULT_LEVEL
 
 
+def sanitize_input(text: str) -> str:
+    """
+    Normalize raw user input before any guardrail/routing/LLM step.
+
+    Removes invisible smuggling characters (zero-width + bidi/directional
+    marks) that can hide foreign text or split Hebrew words, converts the
+    Hebrew maqaf to a space, and collapses whitespace. This closes the
+    Unicode edge cases the hardening audit caught (e.g. "ש‍לום" with a
+    zero-width joiner, or "איפה־הדואר" with a maqaf).
+    """
+    if not text:
+        return ""
+    cleaned = _ZERO_WIDTH_RE.sub("", text)
+    cleaned = _DIRECTIONAL_RE.sub("", cleaned)
+    cleaned = cleaned.replace(_HEBREW_MAQAF, " ")
+    return re.sub(r"\s+", " ", cleaned).strip()
+
+
 def classify_fast_reject(message: str) -> str | None:
     stripped_message = (message or "").strip()
     if not stripped_message:
         return "EMPTY_MESSAGE"
     if len(stripped_message) > MAX_MESSAGE_LENGTH:
         return "MESSAGE_TOO_LONG"
-    if LATIN_RE.search(stripped_message) or ARABIC_RE.search(stripped_message):
+    # Any non-Hebrew letter (Latin, Cyrillic, Greek, ...) or Arabic script
+    # → mixed language. NON_HEBREW_LETTER_RE generalises the old Latin-only
+    # check so homoglyph attacks (e.g. a Cyrillic "а") are caught too.
+    if ARABIC_RE.search(stripped_message) or NON_HEBREW_LETTER_RE.search(stripped_message):
         return "MIXED_LANGUAGE"
     if not hebrew_words(stripped_message):
         return "OUT_OF_SCOPE"
@@ -144,11 +183,16 @@ def strip_non_tts_chars(text: str) -> str:
     cleaned = re.sub(r"[\d()\[\]{}/\\|@#$%^&*+=<>~`]", "", text)
     # Collapse multiple spaces
     cleaned = re.sub(r"\s+", " ", cleaned).strip()
-    # Keep only the first sentence if multiple remain
-    for sep in (".", "?", "!"):
-        if sep in cleaned:
-            cleaned = cleaned.split(sep)[0] + sep
-            break
+    # Keep up to the first TWO sentences so a spoken tutor turn (a gentle
+    # correction followed by a question) isn't cut down to a single fragment.
+    parts = re.split(r"([.?!])", cleaned)
+    sentences: list[str] = []
+    for i in range(0, len(parts) - 1, 2):
+        segment = (parts[i] + parts[i + 1]).strip()
+        if segment:
+            sentences.append(segment)
+    if sentences:
+        cleaned = " ".join(sentences[:2])
     return cleaned
 
 
@@ -203,9 +247,21 @@ def evaluate_vocabulary(answer: str, vocabulary: list[str], level: str | None = 
     if not cfg.vocab_strict:
         return GuardrailDecision(fallback_used=False, fallback_reason=None, blocked_tokens=[])
     blocked_tokens = find_blocked_tokens(answer, vocabulary)
+    if not blocked_tokens:
+        return GuardrailDecision(fallback_used=False, fallback_reason=None, blocked_tokens=[])
+
+    # Tolerant check: only treat the reply as a real leak when it is DOMINATED
+    # by unknown vocabulary. A few natural teaching words slipping in is fine —
+    # zero-tolerance was nuking whole corrections and looping the fallback.
+    total_words = count_hebrew_words(answer) or len(blocked_tokens)
+    unknown_ratio = len(blocked_tokens) / total_words
+    leaked = (
+        len(blocked_tokens) > VOCAB_LEAK_MAX_UNKNOWN
+        and unknown_ratio > VOCAB_LEAK_MAX_RATIO
+    )
     return GuardrailDecision(
-        fallback_used=bool(blocked_tokens),
-        fallback_reason="VOCAB_LEAKAGE" if blocked_tokens else None,
+        fallback_used=leaked,
+        fallback_reason="VOCAB_LEAKAGE" if leaked else None,
         blocked_tokens=blocked_tokens,
     )
 

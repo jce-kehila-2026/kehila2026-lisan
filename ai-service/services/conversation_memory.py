@@ -35,6 +35,7 @@ MAX_SESSIONS = 2000    # guard against unbounded growth
 class _Session:
     messages: deque[dict[str, str]]
     last_accessed: float = field(default_factory=time.time)
+    facts: dict[str, str] = field(default_factory=dict)
 
 
 class ConversationMemory:
@@ -77,6 +78,67 @@ class ConversationMemory:
                 return []
             session.last_accessed = self._time()
             return list(session.messages)
+
+    def set_fact(self, session_id: str, key: str, value: str) -> None:
+        """Store a small session-scoped fact, such as the learner's name."""
+        sid = (session_id or "").strip()
+        fact_key = (key or "").strip()
+        fact_value = (value or "").strip()
+        if not sid or not fact_key or not fact_value:
+            return
+
+        from services.redis_client import get_redis_client
+        redis_client = get_redis_client()
+        if redis_client:
+            try:
+                redis_key = f"session_fact:{sid}"
+                raw = redis_client.get(redis_key)
+                facts = json.loads(raw) if raw else {}
+                facts[fact_key] = fact_value
+                redis_client.set(redis_key, json.dumps(facts), ex=self._ttl)
+                return
+            except Exception as exc:
+                logger.warning(f"Redis set_fact failed: {exc}")
+
+        with self._lock:
+            self._evict_expired_locked()
+            if sid not in self._sessions:
+                if len(self._sessions) >= self._max_sessions:
+                    self._evict_oldest_locked()
+                self._sessions[sid] = _Session(messages=deque())
+            session = self._sessions[sid]
+            session.facts[fact_key] = fact_value
+            session.last_accessed = self._time()
+
+    def get_fact(self, session_id: str, key: str) -> str | None:
+        sid = (session_id or "").strip()
+        fact_key = (key or "").strip()
+        if not sid or not fact_key:
+            return None
+
+        from services.redis_client import get_redis_client
+        redis_client = get_redis_client()
+        if redis_client:
+            try:
+                raw = redis_client.get(f"session_fact:{sid}")
+                facts = json.loads(raw) if raw else {}
+                value = facts.get(fact_key)
+                if value is None:
+                    return None
+                return str(value).strip() or None
+            except Exception as exc:
+                logger.warning(f"Redis get_fact failed: {exc}")
+
+        with self._lock:
+            self._evict_expired_locked()
+            session = self._sessions.get(sid)
+            if session is None:
+                return None
+            session.last_accessed = self._time()
+            value = session.facts.get(fact_key)
+            if value is None:
+                return None
+            return value.strip() or None
 
     def append_turn(
         self,
@@ -151,6 +213,7 @@ class ConversationMemory:
         if redis_client:
             try:
                 redis_client.delete(f"session:{sid}")
+                redis_client.delete(f"session_fact:{sid}")
             except Exception as exc:
                 logger.warning(f"Redis clear_session failed: {exc}")
 

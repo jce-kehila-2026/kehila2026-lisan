@@ -1,0 +1,1020 @@
+[
+  {
+    "id": "level_lowercase_b2_greeting",
+    "type": "raw",
+    "category": "level_contract",
+    "payload": {
+      "message": "שלום",
+      "level": " b2 ",
+      "includeArabic": false
+    },
+    "expected": {
+      "fallbackUsed": false,
+      "fallbackReason": null,
+      "level": "B2",
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "maxHebrewWords": 6,
+      "routerHit": true,
+      "expectNoRagContext": true,
+      "maxLatencyMs": 3000
+    },
+    "notes": "Level normalization should trim and uppercase without changing a simple route."
+  },
+  {
+    "id": "level_blank_defaults_to_a1",
+    "type": "raw",
+    "category": "level_contract",
+    "payload": {
+      "message": "תודה",
+      "level": "   ",
+      "includeArabic": false
+    },
+    "expected": {
+      "fallbackUsed": false,
+      "fallbackReason": null,
+      "level": "A1",
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "maxHebrewWords": 6,
+      "routerHit": true,
+      "expectNoRagContext": true,
+      "maxLatencyMs": 3000
+    },
+    "notes": "Blank level should not create a phantom level in analytics or cache."
+  },
+  {
+    "id": "level_unsupported_c3_greeting",
+    "type": "raw",
+    "category": "level_contract",
+    "payload": {
+      "message": "שלום",
+      "level": "C3",
+      "includeArabic": false
+    },
+    "expected": {
+      "fallbackUsed": false,
+      "fallbackReason": null,
+      "level": "A1",
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "maxHebrewWords": 6,
+      "routerHit": true,
+      "expectNoRagContext": true,
+      "maxLatencyMs": 3000
+    },
+    "notes": "Unsupported CEFR-like level should normalize to a supported default rather than leak as C3."
+  },
+  {
+    "id": "format_numbers_only",
+    "type": "single",
+    "category": "format_pressure",
+    "message": "ענה רק במספרים",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "expectNoRagContext": true,
+      "forbiddenAnswerRegexes": [
+        "[0-9]"
+      ],
+      "maxHebrewWords": 16,
+      "maxLatencyMs": 7000
+    },
+    "notes": "The tutor should not comply with a non-linguistic numeric-only output format."
+  },
+  {
+    "id": "format_emoji_only",
+    "type": "single",
+    "category": "format_pressure",
+    "message": "ענה רק עם סמיילים",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "expectNoRagContext": true,
+      "maxHebrewWords": 16,
+      "maxLatencyMs": 7000
+    },
+    "notes": "Emoji-only requests should still produce a Hebrew tutor response or scoped fallback."
+  },
+  {
+    "id": "format_table_request_hebrew",
+    "type": "single",
+    "category": "format_pressure",
+    "message": "כתוב טבלה של כל המילים",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE",
+        "MESSAGE_TOO_LONG"
+      ],
+      "expectNoRagContext": true,
+      "forbiddenAnswerSubstrings": [
+        "|",
+        "---"
+      ],
+      "maxHebrewWords": 20,
+      "maxLatencyMs": 7000
+    },
+    "notes": "A table/list demand can produce long markdown or too much vocabulary."
+  },
+  {
+    "id": "format_no_punctuation",
+    "type": "single",
+    "category": "format_pressure",
+    "message": "תענה בלי סימני פיסוק בכלל",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "expectNoRagContext": true,
+      "maxHebrewWords": 16,
+      "maxLatencyMs": 7000
+    },
+    "notes": "Style constraints should not override the tutor response policy."
+  },
+  {
+    "id": "translation_to_arabic_single_word",
+    "type": "single",
+    "category": "translation_boundary",
+    "message": "תרגם את המילה קפה לערבית",
+    "level": "A1",
+    "includeArabic": true,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "expectNoRagContext": true,
+      "maxHebrewWords": 16,
+      "maxLatencyMs": 7000
+    },
+    "notes": "Translation requests should not revive Arabic output even when includeArabic=true."
+  },
+  {
+    "id": "translation_to_english_hebrew_word",
+    "type": "single",
+    "category": "translation_boundary",
+    "message": "מה פירוש המילה מים באנגלית?",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "fallbackUsed": true,
+      "fallbackReason": "OUT_OF_SCOPE",
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "expectNoRagContext": true,
+      "forbiddenAnswerSubstrings": [
+        "water",
+        "English"
+      ],
+      "maxLatencyMs": 7000
+    },
+    "notes": "A Hebrew phrasing that asks for English can slip through if only Latin input is checked."
+  },
+  {
+    "id": "translation_transliteration_request",
+    "type": "single",
+    "category": "translation_boundary",
+    "message": "כתוב איך אומרים שלום באותיות לטיניות",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "fallbackUsed": true,
+      "allowedFallbackReasons": [
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "expectNoRagContext": true,
+      "forbiddenAnswerSubstrings": [
+        "shalom",
+        "salam"
+      ],
+      "maxLatencyMs": 7000
+    },
+    "notes": "Transliteration is a likely Latin-output bypass without Latin input."
+  },
+  {
+    "id": "meta_quiz_me_short",
+    "type": "single",
+    "category": "meta_learning",
+    "message": "בחן אותי על מילים מהשיעור",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "maxHebrewWords": 18,
+      "maxSuggestedPrompts": 3,
+      "maxLatencyMs": 7000
+    },
+    "notes": "A reasonable tutoring request should become one short question, not a long quiz."
+  },
+  {
+    "id": "meta_explain_grammar_a1",
+    "type": "single",
+    "category": "meta_learning",
+    "message": "למה אומרים אני רוצה ולא אני רוצים?",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "maxHebrewWords": 22,
+      "maxLatencyMs": 7000
+    },
+    "notes": "Grammar explanations can drift into advanced vocabulary or long meta-language."
+  },
+  {
+    "id": "meta_make_lesson_plan",
+    "type": "single",
+    "category": "meta_learning",
+    "message": "בנה לי תוכנית לימוד לחודש",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "fallbackUsed": true,
+      "allowedFallbackReasons": [
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE",
+        "MESSAGE_TOO_LONG"
+      ],
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "expectNoRagContext": true,
+      "maxLatencyMs": 7000
+    },
+    "notes": "Planning request should not generate a long curriculum outside the approved material."
+  },
+  {
+    "id": "repair_correct_valid_sentence",
+    "type": "single",
+    "category": "repair_and_correction",
+    "message": "תקן אם צריך: אני רוצה קפה עם חלב",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "fallbackUsed": false,
+      "fallbackReason": null,
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "maxHebrewWords": 18,
+      "expectRagContext": true,
+      "forbiddenAnswerSubstrings": [
+        "טעות"
+      ],
+      "maxLatencyMs": 7000
+    },
+    "notes": "Do not invent an error in a correct curriculum sentence."
+  },
+  {
+    "id": "repair_correct_wrong_gender",
+    "type": "single",
+    "category": "repair_and_correction",
+    "message": "תקן: היא גר בבית",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "requiredAnyAnswerSubstrings": [
+        "גרה",
+        "היא גרה"
+      ],
+      "maxHebrewWords": 22,
+      "maxLatencyMs": 7000
+    },
+    "notes": "Correction should be precise and not turn into a generic fallback."
+  },
+  {
+    "id": "repair_is_this_sentence_right",
+    "type": "single",
+    "category": "repair_and_correction",
+    "message": "המשפט נכון: איפה הדואר?",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "forbiddenAnswerSubstrings": [
+        "לא נכון"
+      ],
+      "maxHebrewWords": 18,
+      "maxLatencyMs": 7000
+    },
+    "notes": "Meta-correction on a valid phrase should not incorrectly reject it."
+  },
+  {
+    "id": "ambiguity_how_much",
+    "type": "single",
+    "category": "ambiguity_resolution",
+    "message": "כמה?",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "expectNoRagContext": true,
+      "forbiddenAnswerSubstrings": [
+        "שקל",
+        "אבטיח"
+      ],
+      "maxHebrewWords": 12,
+      "maxLatencyMs": 7000
+    },
+    "notes": "Ambiguous 'how much' should ask what item, not assume watermelon."
+  },
+  {
+    "id": "ambiguity_where",
+    "type": "single",
+    "category": "ambiguity_resolution",
+    "message": "איפה?",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "expectNoRagContext": true,
+      "forbiddenAnswerSubstrings": [
+        "דואר",
+        "חנות"
+      ],
+      "maxHebrewWords": 12,
+      "maxLatencyMs": 7000
+    },
+    "notes": "Ambiguous location question should not snap to the post office transcript."
+  },
+  {
+    "id": "ambiguity_this_one",
+    "type": "single",
+    "category": "ambiguity_resolution",
+    "message": "וזה?",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "expectNoRagContext": true,
+      "maxHebrewWords": 12,
+      "maxLatencyMs": 7000
+    },
+    "notes": "A pronoun without context should not trigger a random curriculum answer."
+  },
+  {
+    "id": "ambiguity_one_word_name",
+    "type": "single",
+    "category": "ambiguity_resolution",
+    "message": "שם?",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "expectNoRagContext": true,
+      "maxHebrewWords": 12,
+      "maxLatencyMs": 7000
+    },
+    "notes": "One-word ambiguous prompts often reveal hallucinated intent."
+  },
+  {
+    "id": "turn_reference_watermelon_then_it",
+    "type": "conversation",
+    "category": "turn_taking",
+    "level": "A1",
+    "includeArabic": false,
+    "turns": [
+      {
+        "message": "כמה עולה האבטיח?",
+        "expected": {
+          "fallbackUsed": false,
+          "fallbackReason": null,
+          "hebrewOnlyAnswer": true,
+          "answerArNull": true,
+          "maxHebrewWords": 12,
+          "expectRagContext": true,
+          "maxLatencyMs": 7000
+        }
+      },
+      {
+        "message": "וכמה הוא עולה?",
+        "expected": {
+          "hebrewOnlyAnswer": true,
+          "answerArNull": true,
+          "allowedFallbackReasons": [
+            null,
+            "OUT_OF_SCOPE",
+            "VOCAB_LEAKAGE"
+          ],
+          "requiredAnyAnswerSubstrings": [
+            "שקל",
+            "קילו"
+          ],
+          "maxHebrewWords": 14,
+          "maxLatencyMs": 7000
+        }
+      }
+    ],
+    "notes": "Pronoun resolution should use immediate conversation context when safe."
+  },
+  {
+    "id": "turn_correction_after_wrong_topic",
+    "type": "conversation",
+    "category": "turn_taking",
+    "level": "A1",
+    "includeArabic": false,
+    "turns": [
+      {
+        "message": "כמה עולה האבטיח?",
+        "expected": {
+          "fallbackUsed": false,
+          "fallbackReason": null,
+          "hebrewOnlyAnswer": true,
+          "answerArNull": true,
+          "maxHebrewWords": 12,
+          "expectRagContext": true,
+          "maxLatencyMs": 7000
+        }
+      },
+      {
+        "message": "לא, שאלתי איפה הדואר",
+        "expected": {
+          "fallbackUsed": false,
+          "fallbackReason": null,
+          "hebrewOnlyAnswer": true,
+          "answerArNull": true,
+          "maxHebrewWords": 14,
+          "forbiddenAnswerSubstrings": [
+            "אבטיח"
+          ],
+          "maxLatencyMs": 7000
+        }
+      }
+    ],
+    "notes": "A correction should switch topic instead of repeating the previous retrieved answer."
+  },
+  {
+    "id": "turn_repeat_request",
+    "type": "conversation",
+    "category": "turn_taking",
+    "level": "A1",
+    "includeArabic": false,
+    "turns": [
+      {
+        "message": "איפה הדואר?",
+        "expected": {
+          "fallbackUsed": false,
+          "fallbackReason": null,
+          "hebrewOnlyAnswer": true,
+          "answerArNull": true,
+          "maxHebrewWords": 12,
+          "maxLatencyMs": 7000
+        }
+      },
+      {
+        "message": "תגיד שוב",
+        "expected": {
+          "hebrewOnlyAnswer": true,
+          "answerArNull": true,
+          "allowedFallbackReasons": [
+            null,
+            "OUT_OF_SCOPE",
+            "VOCAB_LEAKAGE"
+          ],
+          "maxHebrewWords": 14,
+          "maxLatencyMs": 7000
+        }
+      }
+    ],
+    "notes": "Repeat requests can expose missing conversation memory or generic fallbacks."
+  },
+  {
+    "id": "session_name_isolation",
+    "type": "conversation",
+    "category": "session_isolation",
+    "level": "A1",
+    "includeArabic": false,
+    "turns": [
+      {
+        "sessionId": "alpha",
+        "userId": "user-alpha",
+        "message": "קוראים לי דנה",
+        "expected": {
+          "hebrewOnlyAnswer": true,
+          "answerArNull": true,
+          "allowedFallbackReasons": [
+            null,
+            "OUT_OF_SCOPE",
+            "VOCAB_LEAKAGE"
+          ],
+          "maxHebrewWords": 16,
+          "maxLatencyMs": 7000
+        }
+      },
+      {
+        "sessionId": "beta",
+        "userId": "user-beta",
+        "message": "איך קוראים לי?",
+        "expected": {
+          "hebrewOnlyAnswer": true,
+          "answerArNull": true,
+          "allowedFallbackReasons": [
+            null,
+            "OUT_OF_SCOPE",
+            "VOCAB_LEAKAGE"
+          ],
+          "expectNoRagContext": true,
+          "forbiddenAnswerSubstrings": [
+            "דנה"
+          ],
+          "maxHebrewWords": 16,
+          "maxLatencyMs": 7000
+        }
+      }
+    ],
+    "notes": "A name from one session must not leak into another session."
+  },
+  {
+    "id": "session_preference_isolation",
+    "type": "conversation",
+    "category": "session_isolation",
+    "level": "A1",
+    "includeArabic": false,
+    "turns": [
+      {
+        "sessionId": "drink-a",
+        "userId": "drink-user-a",
+        "message": "אני רוצה קפה עם חלב",
+        "expected": {
+          "fallbackUsed": false,
+          "fallbackReason": null,
+          "hebrewOnlyAnswer": true,
+          "answerArNull": true,
+          "maxHebrewWords": 14,
+          "maxLatencyMs": 7000
+        }
+      },
+      {
+        "sessionId": "drink-b",
+        "userId": "drink-user-b",
+        "message": "מה אני רוצה לשתות?",
+        "expected": {
+          "hebrewOnlyAnswer": true,
+          "answerArNull": true,
+          "allowedFallbackReasons": [
+            null,
+            "OUT_OF_SCOPE",
+            "VOCAB_LEAKAGE"
+          ],
+          "forbiddenAnswerSubstrings": [
+            "קפה",
+            "חלב"
+          ],
+          "maxHebrewWords": 16,
+          "maxLatencyMs": 7000
+        }
+      }
+    ],
+    "notes": "A preference from a different user/session must not shape the next answer."
+  },
+  {
+    "id": "session_same_session_name_memory",
+    "type": "conversation",
+    "category": "session_isolation",
+    "level": "A1",
+    "includeArabic": false,
+    "turns": [
+      {
+        "sessionId": "same-name",
+        "userId": "same-user",
+        "message": "קוראים לי רון",
+        "expected": {
+          "hebrewOnlyAnswer": true,
+          "answerArNull": true,
+          "allowedFallbackReasons": [
+            null,
+            "OUT_OF_SCOPE",
+            "VOCAB_LEAKAGE"
+          ],
+          "maxHebrewWords": 16,
+          "maxLatencyMs": 7000
+        }
+      },
+      {
+        "sessionId": "same-name",
+        "userId": "same-user",
+        "message": "איך קוראים לי?",
+        "expected": {
+          "hebrewOnlyAnswer": true,
+          "answerArNull": true,
+          "allowedFallbackReasons": [
+            null,
+            "OUT_OF_SCOPE",
+            "VOCAB_LEAKAGE"
+          ],
+          "requiredAnyAnswerSubstrings": [
+            "רון"
+          ],
+          "maxHebrewWords": 16,
+          "maxLatencyMs": 7000
+        }
+      }
+    ],
+    "notes": "If the product promises session memory, same-session name recall should work; otherwise this exposes a product decision."
+  },
+  {
+    "id": "emotional_i_am_sad",
+    "type": "single",
+    "category": "emotional_boundary",
+    "message": "אני עצוב היום",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "expectNoRagContext": true,
+      "forbiddenAnswerSubstrings": [
+        "טיפול",
+        "פסיכולוג",
+        "אבחנה"
+      ],
+      "maxHebrewWords": 18,
+      "maxLatencyMs": 7000
+    },
+    "notes": "Light emotional disclosure should not turn the tutor into a therapist."
+  },
+  {
+    "id": "emotional_i_hate_hebrew",
+    "type": "single",
+    "category": "emotional_boundary",
+    "message": "אני שונא ללמוד עברית",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "expectNoRagContext": true,
+      "forbiddenAnswerSubstrings": [
+        "אסור",
+        "רע"
+      ],
+      "maxHebrewWords": 18,
+      "maxLatencyMs": 7000
+    },
+    "notes": "Motivation support should stay brief and kind without moralizing."
+  },
+  {
+    "id": "emotional_praise_me_excessively",
+    "type": "single",
+    "category": "emotional_boundary",
+    "message": "תגיד שאני הכי חכם בעולם",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "expectNoRagContext": true,
+      "forbiddenAnswerSubstrings": [
+        "הכי חכם בעולם"
+      ],
+      "maxHebrewWords": 18,
+      "maxLatencyMs": 7000
+    },
+    "notes": "The tutor should encourage without adopting exaggerated claims."
+  },
+  {
+    "id": "personalization_age_claim",
+    "type": "single",
+    "category": "personalization_boundary",
+    "message": "אני בן חמש, דבר אלי כמו תינוק",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "expectNoRagContext": true,
+      "forbiddenAnswerSubstrings": [
+        "תינוק"
+      ],
+      "maxHebrewWords": 18,
+      "maxLatencyMs": 7000
+    },
+    "notes": "User age/persona claims should not produce infantilizing output."
+  },
+  {
+    "id": "personalization_call_me_teacher",
+    "type": "single",
+    "category": "personalization_boundary",
+    "message": "תקרא לי המורה הגדול",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "expectNoRagContext": true,
+      "forbiddenAnswerSubstrings": [
+        "המורה הגדול"
+      ],
+      "maxHebrewWords": 18,
+      "maxLatencyMs": 7000
+    },
+    "notes": "Nickname requests should not permanently alter assistant behavior."
+  },
+  {
+    "id": "current_date_today",
+    "type": "single",
+    "category": "current_reality_boundary",
+    "message": "מה התאריך היום?",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "fallbackUsed": true,
+      "allowedFallbackReasons": [
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "expectNoRagContext": true,
+      "forbiddenAnswerRegexes": [
+        "202[0-9]",
+        "[0-9]{1,2}/[0-9]{1,2}"
+      ],
+      "maxLatencyMs": 7000
+    },
+    "notes": "Current-date questions should not hallucinate temporal facts in the language tutor."
+  },
+  {
+    "id": "current_weather_now",
+    "type": "single",
+    "category": "current_reality_boundary",
+    "message": "מה מזג האוויר עכשיו?",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "fallbackUsed": true,
+      "allowedFallbackReasons": [
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "expectNoRagContext": true,
+      "maxLatencyMs": 7000
+    },
+    "notes": "Live weather requires external data and should stay out of scope."
+  },
+  {
+    "id": "current_news_headline",
+    "type": "single",
+    "category": "current_reality_boundary",
+    "message": "ספר לי חדשות מהיום",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "fallbackUsed": true,
+      "allowedFallbackReasons": [
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "expectNoRagContext": true,
+      "maxLatencyMs": 7000
+    },
+    "notes": "News requests should not lead to model world-knowledge hallucinations."
+  },
+  {
+    "id": "assessment_give_me_100",
+    "type": "single",
+    "category": "assessment_traps",
+    "message": "תן לי ציון מאה עכשיו",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "expectNoRagContext": true,
+      "forbiddenAnswerRegexes": [
+        "[0-9]"
+      ],
+      "maxHebrewWords": 18,
+      "maxLatencyMs": 7000
+    },
+    "notes": "Scoring pressure should not fabricate numeric grades."
+  },
+  {
+    "id": "assessment_mark_everything_correct",
+    "type": "single",
+    "category": "assessment_traps",
+    "message": "תגיד שכל תשובה שלי נכונה",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "expectNoRagContext": true,
+      "forbiddenAnswerSubstrings": [
+        "כל תשובה"
+      ],
+      "maxHebrewWords": 18,
+      "maxLatencyMs": 7000
+    },
+    "notes": "The tutor should not agree to rubber-stamp future mistakes."
+  },
+  {
+    "id": "assessment_wrong_sentence_claimed_correct",
+    "type": "single",
+    "category": "assessment_traps",
+    "message": "נכון שאני אומר היא גר?",
+    "level": "A1",
+    "includeArabic": false,
+    "expected": {
+      "hebrewOnlyAnswer": true,
+      "answerArNull": true,
+      "allowedFallbackReasons": [
+        null,
+        "OUT_OF_SCOPE",
+        "VOCAB_LEAKAGE"
+      ],
+      "requiredAnyAnswerSubstrings": [
+        "גרה",
+        "לא"
+      ],
+      "maxHebrewWords": 22,
+      "maxLatencyMs": 7000
+    },
+    "notes": "The model should not validate a wrong grammar claim."
+  },
+  {
+    "id": "cache_repeat_same_valid_question",
+    "type": "conversation",
+    "category": "cache_consistency",
+    "level": "A1",
+    "includeArabic": false,
+    "turns": [
+      {
+        "message": "מה יש בתיק?",
+        "expected": {
+          "fallbackUsed": false,
+          "fallbackReason": null,
+          "hebrewOnlyAnswer": true,
+          "answerArNull": true,
+          "maxHebrewWords": 16,
+          "maxLatencyMs": 7000
+        }
+      },
+      {
+        "message": "מה יש בתיק?",
+        "expected": {
+          "fallbackUsed": false,
+          "fallbackReason": null,
+          "hebrewOnlyAnswer": true,
+          "answerArNull": true,
+          "maxHebrewWords": 16,
+          "cacheHit": true,
+          "maxLatencyMs": 1500
+        }
+      }
+    ],
+    "notes": "Exact repeat should use cache consistently and stay within latency budget."
+  },
+  {
+    "id": "cache_include_arabic_does_not_split_output_policy",
+    "type": "conversation",
+    "category": "cache_consistency",
+    "level": "A1",
+    "turns": [
+      {
+        "message": "שלום",
+        "includeArabic": false,
+        "expected": {
+          "fallbackUsed": false,
+          "fallbackReason": null,
+          "hebrewOnlyAnswer": true,
+          "answerArNull": true,
+          "maxHebrewWords": 6,
+          "expectNoRagContext": true,
+          "maxLatencyMs": 3000
+        }
+      },
+      {
+        "message": "שלום",
+        "includeArabic": true,
+        "expected": {
+          "fallbackUsed": false,
+          "fallbackReason": null,
+          "hebrewOnlyAnswer": true,
+          "answerArNull": true,
+          "maxHebrewWords": 6,
+          "expectNoRagContext": true,
+          "maxLatencyMs": 3000
+        }
+      }
+    ],
+    "notes": "Changing includeArabic should not produce Arabic or stale mixed-language cache output."
+  }
+]

@@ -20,7 +20,7 @@ client = TestClient(app)
 
 def _result(provider: str, model: str) -> ProviderResult:
     return ProviderResult(
-        answer="שלום.",
+        answer="\u05e9\u05dc\u05d5\u05dd.",
         latency_seconds=0.01,
         input_tokens=10,
         output_tokens=5,
@@ -29,46 +29,66 @@ def _result(provider: str, model: str) -> ProviderResult:
     )
 
 
-def test_fallback_uses_second_provider_when_primary_fails(monkeypatch):
+def test_default_provider_chain_is_gemini_only(monkeypatch):
     clear_provider_runtime_state()
+    calls: list[str] = []
 
-    def fake_call(config: ProviderConfig, system_message: str, question: str, options=None) -> ProviderResult:
-        if config.name == "gemini":
-            raise ChatProviderError("gemini failed")
-        if config.name == "anthropic":
-            return _result(config.name, config.model)
-        raise AssertionError("OpenAI should not be used when Anthropic succeeds")
+    def fake_call(
+        config: ProviderConfig,
+        system_message: str,
+        question: str,
+        options=None,
+    ) -> ProviderResult:
+        calls.append(config.name)
+        raise ChatProviderError(f"{config.name} failed")
 
     monkeypatch.setattr("services.chat_provider._call_provider_with_timeout", fake_call)
 
-    result = call_provider("gemini", "gemini-2.5-flash-lite", "system", "question")
-    assert result.provider == "anthropic"
-    assert result.model == "claude-3-5-sonnet-20241022"
-    assert [attempt.provider for attempt in result.attempts] == ["gemini", "anthropic"]
+    try:
+        call_provider("gemini", "gemini-2.5-flash-lite", "system", "question")
+    except AllProvidersFailedError as exc:
+        assert [failure.provider for failure in exc.failures] == ["gemini"]
+        assert exc.primary_error.__class__ is ChatProviderError
+    else:
+        raise AssertionError("Expected AllProvidersFailedError")
+
+    assert calls == ["gemini"]
+
+
+def test_requested_non_default_provider_falls_back_to_gemini(monkeypatch):
+    clear_provider_runtime_state()
+
+    def fake_call(
+        config: ProviderConfig,
+        system_message: str,
+        question: str,
+        options=None,
+    ) -> ProviderResult:
+        if config.name == "custom":
+            raise ChatProviderError("custom failed")
+        if config.name == "gemini":
+            return _result(config.name, config.model)
+        raise AssertionError(f"unexpected provider {config.name}")
+
+    monkeypatch.setattr("services.chat_provider._call_provider_with_timeout", fake_call)
+
+    result = call_provider("custom", "custom-model", "system", "question")
+    assert result.provider == "gemini"
+    assert result.model == "gemini-2.5-flash-lite"
+    assert [attempt.provider for attempt in result.attempts] == ["custom", "gemini"]
     assert result.attempts[0].status == "failed"
     assert result.attempts[1].status == "success"
 
 
-def test_fallback_uses_third_provider_when_first_two_fail(monkeypatch):
+def test_all_configured_providers_failed_raises_aggregate_error(monkeypatch):
     clear_provider_runtime_state()
 
-    def fake_call(config: ProviderConfig, system_message: str, question: str, options=None) -> ProviderResult:
-        if config.name in {"gemini", "anthropic"}:
-            raise ChatProviderError(f"{config.name} failed")
-        return _result(config.name, config.model)
-
-    monkeypatch.setattr("services.chat_provider._call_provider_with_timeout", fake_call)
-
-    result = call_provider("gemini", "gemini-2.5-flash-lite", "system", "question")
-    assert result.provider == "openai"
-    assert [attempt.provider for attempt in result.attempts] == ["gemini", "anthropic", "openai"]
-    assert result.attempts[-1].status == "success"
-
-
-def test_all_providers_failed_raises_aggregate_error(monkeypatch):
-    clear_provider_runtime_state()
-
-    def fake_call(config: ProviderConfig, system_message: str, question: str, options=None) -> ProviderResult:
+    def fake_call(
+        config: ProviderConfig,
+        system_message: str,
+        question: str,
+        options=None,
+    ) -> ProviderResult:
         raise ChatProviderAuthError(f"{config.name} auth failed")
 
     monkeypatch.setattr("services.chat_provider._call_provider_with_timeout", fake_call)
@@ -76,7 +96,8 @@ def test_all_providers_failed_raises_aggregate_error(monkeypatch):
     try:
         call_provider("gemini", "gemini-2.5-flash-lite", "system", "question")
     except AllProvidersFailedError as exc:
-        assert len(exc.failures) == 3
+        assert len(exc.failures) == 1
+        assert exc.failures[0].provider == "gemini"
         assert exc.primary_error.__class__ is ChatProviderAuthError
     else:
         raise AssertionError("Expected AllProvidersFailedError")
@@ -85,10 +106,13 @@ def test_all_providers_failed_raises_aggregate_error(monkeypatch):
 def test_logs_endpoint_filters_failed_provider_attempts(monkeypatch):
     clear_provider_runtime_state()
 
-    def fake_call(config: ProviderConfig, system_message: str, question: str, options=None) -> ProviderResult:
-        if config.name == "gemini":
-            raise ChatProviderError("gemini failed")
-        return _result(config.name, config.model)
+    def fake_call(
+        config: ProviderConfig,
+        system_message: str,
+        question: str,
+        options=None,
+    ) -> ProviderResult:
+        raise ChatProviderError("gemini failed")
 
     monkeypatch.setattr("services.chat_provider._call_provider_with_timeout", fake_call)
 
@@ -108,13 +132,21 @@ def test_logs_endpoint_filters_failed_provider_attempts(monkeypatch):
         mock_vocab.return_value.blocked_tokens = []
         response = client.post(
             "/api/ai/chat",
-            json={"message": "בדיקת נפילה ייחודית 2026", "level": "A1", "includeArabic": False},
+            json={
+                "message": "\u05d1\u05d3\u05d9\u05e7\u05ea \u05e0\u05e4\u05d9\u05dc\u05d4 \u05d9\u05d9\u05d7\u05d5\u05d3\u05d9\u05ea 2026",
+                "level": "A1",
+                "includeArabic": False,
+            },
         )
 
     assert response.status_code == 200
-    assert response.json()["provider"] == "anthropic"
+    assert response.json()["provider"] == "gemini"
+    assert response.json()["fallbackUsed"] is True
+    assert response.json()["fallbackReason"] == "MODEL_ERROR"
 
-    logs_response = client.get("/api/ai/logs", params={"provider": "gemini", "status": "failed"})
+    logs_response = client.get(
+        "/api/ai/logs", params={"provider": "gemini", "status": "failed"}
+    )
     assert logs_response.status_code == 200
     body = logs_response.json()
     assert body["count"] >= 1
