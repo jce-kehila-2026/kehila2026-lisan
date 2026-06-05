@@ -14,7 +14,7 @@ exports.getAllTranscripts = async (req, res) => {
             });
         });
 
-        return res.status(200).json(transcripts);
+        return res.status(200).json(sortTranscripts(transcripts));
 
     } catch (error) {
 
@@ -45,7 +45,7 @@ exports.getTranscriptsByLevel = async (req, res) => {
             });
         });
 
-        return res.status(200).json(transcripts);
+        return res.status(200).json(sortTranscripts(transcripts));
 
     } catch (error) {
 
@@ -96,7 +96,7 @@ exports.searchTranscripts = async (req, res) => {
             query: q,
             level: level || 'all',
             count: results.length,
-            results
+            results: sortTranscripts(results)
         });
 
     } catch (error) {
@@ -108,3 +108,20 @@ exports.searchTranscripts = async (req, res) => {
         });
     }
 };
+
+function sortTranscripts(transcripts) {
+    return [...transcripts].sort((left, right) => {
+        const leftKey = [
+            left.level || '',
+            left.fileName || left.source || '',
+            left.id || '',
+        ].join('|');
+        const rightKey = [
+            right.level || '',
+            right.fileName || right.source || '',
+            right.id || '',
+        ].join('|');
+
+        return leftKey.localeCompare(rightKey);
+    });
+}

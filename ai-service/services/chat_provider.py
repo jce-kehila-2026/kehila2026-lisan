@@ -127,10 +127,12 @@ class AllProvidersFailedError(ChatProviderError):
         return self.failures[-1].error if self.failures else ChatProviderError("All providers failed")
 
 
+# Free-tier mode: Gemini only. Anthropic/OpenAI were removed from the chain
+# because no API keys are provisioned for them — keeping them here just wasted
+# a request cycle failing on every fallback. The _call_anthropic/_call_openai
+# functions remain below so re-enabling is a one-line add to this list.
 PROVIDER_CHAIN: list[ProviderConfig] = [
     ProviderConfig(name="gemini", model="gemini-2.5-flash-lite", timeout_seconds=12.0),
-    ProviderConfig(name="anthropic", model="claude-3-5-sonnet-20241022", timeout_seconds=15.0),
-    ProviderConfig(name="openai", model="gpt-4o-mini", timeout_seconds=15.0),
 ]
 
 _PROVIDER_CIRCUITS: dict[str, CircuitBreaker] = {
@@ -238,7 +240,11 @@ def call_provider(
             return result
         except Exception as raw_exc:
             exc = _coerce_provider_exception(raw_exc)
-            circuit.record_failure()
+            # Quota (429) is a soft rate-limit, not a provider outage. Tripping
+            # the circuit on it would block requests even after the rate-limit
+            # window resets. Real failures (timeout/network/5xx) still open it.
+            if not isinstance(exc, ChatProviderQuotaError):
+                circuit.record_failure()
             failed_attempt = ProviderAttemptLog(
                 provider=config.name,
                 model=config.model,
@@ -453,10 +459,47 @@ def _create_anthropic_client(timeout_seconds: float) -> Any:
     return Anthropic(api_key=api_key, timeout=timeout_seconds, max_retries=DEFAULT_MAX_RETRIES)
 
 
-def _create_gemini_client(timeout_seconds: float) -> Any:
-    api_key = os.getenv("GEMINI_API_KEY")
+_GEMINI_KEY_LOCK = threading.Lock()
+_gemini_key_cursor = 0
+
+
+def _get_gemini_keys() -> list[str]:
+    """
+    Return the configured Gemini API keys, de-duplicated, in order.
+
+    Reads GEMINI_API_KEYS (comma-separated) first, falling back to the legacy
+    single GEMINI_API_KEY. Each key should come from a DIFFERENT Google Cloud
+    project so they each carry their own independent free-tier quota.
+    """
+    raw = (
+        os.getenv("GEMINI_API_KEYS", "").strip()
+        or os.getenv("GEMINI_API_KEY", "").strip()
+    )
+    keys: list[str] = []
+    seen: set[str] = set()
+    for part in raw.split(","):
+        key = part.strip()
+        if key and key not in seen:
+            seen.add(key)
+            keys.append(key)
+    return keys
+
+
+def _next_gemini_start_index(n: int) -> int:
+    """Round-robin starting point so load is spread across keys, not always #1."""
+    global _gemini_key_cursor
+    with _GEMINI_KEY_LOCK:
+        idx = _gemini_key_cursor % n
+        _gemini_key_cursor = (_gemini_key_cursor + 1) % n
+        return idx
+
+
+def _create_gemini_client(timeout_seconds: float, api_key: str) -> Any:
     if not api_key:
-        raise ChatProviderError("GEMINI_API_KEY is missing from ai-service/.env")
+        raise ChatProviderError(
+            "No Gemini API key configured. Set GEMINI_API_KEYS (comma-separated) "
+            "or GEMINI_API_KEY in ai-service/.env"
+        )
     if genai is None or genai_types is None:
         raise ChatProviderError("google-genai package is not installed. Run pip install -r requirements.txt")
     return genai.Client(
@@ -537,44 +580,54 @@ def _call_gemini(
     opts: ProviderCallOptions | None = None,
 ) -> ProviderResult:
     o = opts or ProviderCallOptions()
-    client = _create_gemini_client(timeout_seconds)
-    max_retries = int(os.getenv("LISAN_MAX_RETRIES", str(DEFAULT_MAX_RETRIES)))
-    base_delay = float(os.getenv("LISAN_REQUEST_DELAY_SECONDS", str(DEFAULT_REQUEST_DELAY_SECONDS)))
-    attempt = 0
-    while True:
+    keys = _get_gemini_keys()
+    if not keys:
+        raise ChatProviderError(
+            "No Gemini API key configured. Set GEMINI_API_KEYS (comma-separated) "
+            "or GEMINI_API_KEY in ai-service/.env"
+        )
+
+    # Build the request contents once (key-independent).
+    # history messages are {"role": "user"/"assistant", "content": "..."}
+    # Gemini expects role "model" instead of "assistant".
+    if o.history:
+        contents: Any = []
+        for msg in o.history:
+            gemini_role = "model" if msg["role"] == "assistant" else msg["role"]
+            contents.append(
+                genai_types.Content(
+                    role=gemini_role,
+                    parts=[genai_types.Part(text=msg["content"])],
+                )
+            )
+        contents.append(
+            genai_types.Content(role="user", parts=[genai_types.Part(text=question)])
+        )
+    else:
+        contents = question
+
+    config = genai_types.GenerateContentConfig(
+        system_instruction=system_message,
+        temperature=o.temperature,
+        max_output_tokens=o.max_output_tokens,
+    )
+
+    # Round-robin across keys; on a 429 (rate-limit) move to the NEXT key
+    # instead of sleeping. Each key is a separate project with its own quota,
+    # so this multiplies effective free-tier throughput. Only when EVERY key
+    # is rate-limited do we surface a quota error (which, per the cascade fix,
+    # degrades gracefully without opening the circuit).
+    start = _next_gemini_start_index(len(keys))
+    ordered_keys = [keys[(start + i) % len(keys)] for i in range(len(keys))]
+    last_exc: Exception | None = None
+    for api_key in ordered_keys:
+        client = _create_gemini_client(timeout_seconds, api_key)
         started_at = time.perf_counter()
         try:
-            # Build multi-turn contents for Gemini
-            # history messages are {"role": "user"/"assistant", "content": "..."}
-            # Gemini expects role "model" instead of "assistant"
-            if o.history:
-                contents = []
-                for msg in o.history:
-                    gemini_role = (
-                        "model" if msg["role"] == "assistant" else msg["role"]
-                    )
-                    contents.append(
-                        genai_types.Content(
-                            role=gemini_role,
-                            parts=[genai_types.Part(text=msg["content"])],
-                        )
-                    )
-                contents.append(
-                    genai_types.Content(
-                        role="user",
-                        parts=[genai_types.Part(text=question)],
-                    )
-                )
-            else:
-                contents = question
             response = client.models.generate_content(
                 model=model,
                 contents=contents,
-                config=genai_types.GenerateContentConfig(
-                    system_instruction=system_message,
-                    temperature=o.temperature,
-                    max_output_tokens=o.max_output_tokens,
-                ),
+                config=config,
             )
             usage = getattr(response, "usage_metadata", None)
             return ProviderResult(
@@ -586,17 +639,15 @@ def _call_gemini(
                 model=model,
             )
         except Exception as exc:
-            attempt += 1
-            is_quota = "429" in str(exc)
-            if attempt > max_retries or not is_quota:
-                _classify_and_raise(exc)
-            # Cap retry delay so a worker thread can't be blocked > 2s.
-            # Long Gemini retry-after hints would otherwise exhaust the
-            # FastAPI threadpool under concurrent quota errors.
-            parsed = _parse_retry_delay_seconds(str(exc))
-            raw_delay = parsed if parsed is not None else base_delay
-            retry_delay = min(2.0, max(0.1, raw_delay))
-            time.sleep(retry_delay)
+            last_exc = exc
+            if "429" in str(exc):
+                # This key is rate-limited — try the next key in the rotation.
+                continue
+            # Any non-quota error: classify and raise immediately.
+            _classify_and_raise(exc)
+
+    # Every key was rate-limited.
+    _classify_and_raise(last_exc or ChatProviderQuotaError("All Gemini keys rate-limited"))
 
 
 def _parse_retry_delay_seconds(message: str) -> float | None:

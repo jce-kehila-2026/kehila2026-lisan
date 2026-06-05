@@ -5,23 +5,19 @@
  * Unit tests for the AI service client using Node.js built-in test runner.
  * No real HTTP calls — axios is mocked via module-level patching.
  */
-const { test, describe, beforeEach, mock } = require('node:test');
+const { test, describe, beforeEach } = require('node:test');
 const assert = require('node:assert/strict');
 
 // ── Minimal axios mock ────────────────────────────────────────────────────────
 let _axiosPostImpl = async () => ({ data: {} });
 let _axiosGetImpl  = async () => ({ data: {} });
 
-mock.module('axios', {
-  namedExports: {
+require.cache[require.resolve('axios')] = {
+  exports: {
     post: async (...args) => _axiosPostImpl(...args),
-    get:  async (...args) => _axiosGetImpl(...args),
+    get: async (...args) => _axiosGetImpl(...args),
   },
-  defaultExport: {
-    post: async (...args) => _axiosPostImpl(...args),
-    get:  async (...args) => _axiosGetImpl(...args),
-  },
-});
+};
 
 const {
   sendChatMessageToAi,

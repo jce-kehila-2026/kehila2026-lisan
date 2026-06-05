@@ -2,12 +2,22 @@ fastapi==0.115.0
 uvicorn==0.34.0
 python-dotenv==1.1.0
 python-multipart==0.0.20
-azure-cognitiveservices-speech==1.49.1
-anthropic==0.51.0
-openai==1.78.1
+# STT — local, free, no per-minute quota (replaces Azure for transcription).
+faster-whisper==1.1.0
 google-genai==1.15.0
 pyjwt==2.10.1
 locust==2.32.4
 redis>=5.0.0
 httpx>=0.27.0
+
+# ── Optional ────────────────────────────────────────────────────────────────
+# Pronunciation scoring is Azure-only and OFF by default
+# (USE_AZURE_PRONUNCIATION=false). Install this only if you enable it, e.g.
+# for B2 where accuracy matters:
+# azure-cognitiveservices-speech==1.49.1
+#
+# Extra LLM fallbacks — not used in free-tier mode (Gemini-only chain).
+# Re-add to PROVIDER_CHAIN in chat_provider.py if you provision keys:
+# anthropic==0.51.0
+# openai==1.78.1
 

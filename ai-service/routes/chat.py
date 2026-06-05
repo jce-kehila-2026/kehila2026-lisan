@@ -16,19 +16,26 @@ from services.chat_cache import get_rate_limit_status
 from services.chat_engine import generate_chat_response, stream_chat_response
 from services.chat_provider import get_provider_logs
 from services.chat_schemas import ChatRequest, ChatResponse, VoiceChatResponse
-from services.pronunciation import assess_pronunciation
 from services.text_to_speech import build_ssml
 from services.vocab_tracker import track_vocab_async
+# STT exceptions live in speech_to_text; the engine is now faster-whisper.
 from services.speech_to_text import (
     STTAuthError,
     STTCircuitOpenError,
     STTError,
     STTTimeoutError,
-    transcribe_audio,
 )
+from services.whisper_stt import transcribe_audio
 
 # Max seconds to wait for pronunciation assessment alongside chat engine
 _PRON_TIMEOUT_SECONDS = 10.0
+
+# Pronunciation scoring is Azure-only and OFF by default (free-tier mode).
+# Set USE_AZURE_PRONUNCIATION=true (and provide AZURE_SPEECH_KEY) to enable
+# it — e.g. for B2 where accuracy matters. When off, Azure is never loaded.
+_PRONUNCIATION_ENABLED = (
+    os.getenv("USE_AZURE_PRONUNCIATION", "false").strip().lower() == "true"
+)
 
 logger = logging.getLogger("lisan.chat")
 router = APIRouter()
@@ -353,6 +360,9 @@ async def chat_voice(
     async def _run_pronunciation() -> int | None:
         """Run pronunciation assessment; return 0-100 or None on error."""
         try:
+            # Lazy import keeps the Azure Speech SDK out of memory unless
+            # pronunciation is actually enabled.
+            from services.pronunciation import assess_pronunciation
             result = await asyncio.wait_for(
                 run_in_threadpool(
                     assess_pronunciation,
@@ -364,14 +374,18 @@ async def chat_voice(
             )
             if result.get("success"):
                 return int(round(result["scores"]["pronunciation"]))
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning({"event": "pronunciation_failed", "detail": str(exc)})
         return None
 
-    chat_response, pronunciation_score = await asyncio.gather(
-        run_in_threadpool(generate_chat_response, chat_request),
-        _run_pronunciation(),
-    )
+    if _PRONUNCIATION_ENABLED:
+        chat_response, pronunciation_score = await asyncio.gather(
+            run_in_threadpool(generate_chat_response, chat_request),
+            _run_pronunciation(),
+        )
+    else:
+        chat_response = await run_in_threadpool(generate_chat_response, chat_request)
+        pronunciation_score = None
 
     # ── 4. Vocab tracking — fire-and-forget, never blocks ─────────────────
     if not chat_response.fallbackUsed:

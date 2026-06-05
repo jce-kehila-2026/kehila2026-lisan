@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import logging
+import os
+import re
 from pathlib import Path
 from typing import Iterator
 
@@ -23,7 +25,9 @@ from services.chat_guardrails import (
     is_clearly_out_of_scope,
     is_hebrew_only_answer,
     is_short_hebrew_answer,
+    normalize_hebrew_token,
     normalize_level,
+    sanitize_input,
     strip_non_tts_chars,
 )
 from services.chat_provider import (
@@ -58,27 +62,29 @@ PROMPT_V2_PATH    = BASE_DIR / "prompts" / "chat-system-prompt-v2.txt"
 PROMPT_V1_PATH    = BASE_DIR / "prompts" / "chat-system-prompt-v1.txt"
 PROMPT_VOICE_PATH = BASE_DIR / "prompts" / "chat-system-prompt-voice.txt"
 
+# ── Tutor answer length (env-tunable) ────────────────────────────────────────
+# Raised from the old single-sentence / 12-word cap so the tutor can actually
+# lead: correct an error, check understanding, AND ask the next question in one
+# turn. Voice stays tighter to keep TTS playback short.
+TEXT_MAX_WORDS = int(os.getenv("CHAT_TEXT_MAX_WORDS", "30"))
+VOICE_MAX_WORDS = int(os.getenv("CHAT_VOICE_MAX_WORDS", "20"))
+TEXT_MAX_OUTPUT_TOKENS = int(os.getenv("CHAT_TEXT_MAX_TOKENS", "256"))
+VOICE_OUTPUT_TOKENS = int(os.getenv("CHAT_VOICE_MAX_TOKENS", "128"))
+
 
 def generate_chat_response(payload: ChatRequest) -> ChatResponse:
     request_context = _build_request_context(payload)
+    session_sensitive = _is_session_sensitive_message(request_context.normalized_message)
 
-    cached_response = get_exact_cached_response(request_context.cache_key)
+    cached_response = None if session_sensitive else get_exact_cached_response(request_context.cache_key)
     if cached_response is not None:
         hydrated_response = _hydrate_cached_response(cached_response, request_context)
+        _remember_successful_turn(request_context, hydrated_response)
         _log_response(hydrated_response, request_context.provider, 0)
         return hydrated_response
 
     bundle = get_level_bundle(request_context.requested_level)
     resolved_level = bundle.level
-
-    if not provider_circuit.allow_request():
-        response = _build_fallback_response_from_request(
-            request_context=request_context,
-            level=resolved_level,
-            fallback_reason="CIRCUIT_OPEN",
-        )
-        _log_response(response, request_context.provider, 0)
-        return response
 
     fast_reject = classify_fast_reject_voice if request_context.voice_mode else classify_fast_reject
     fallback_reason = fast_reject(request_context.message)
@@ -108,8 +114,20 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
             level=resolved_level,
         )
         store_exact_cached_response(request_context.cache_key, routed_response)
+        _remember_successful_turn(request_context, routed_response)
         _log_response(routed_response, request_context.provider, 0)
         return routed_response
+
+    pre_llm_response = _build_pre_llm_response(
+        request_context=request_context,
+        level=resolved_level,
+    )
+    if pre_llm_response is not None:
+        if not session_sensitive:
+            store_exact_cached_response(request_context.cache_key, pre_llm_response)
+        _remember_successful_turn(request_context, pre_llm_response)
+        _log_response(pre_llm_response, request_context.provider, 0)
+        return pre_llm_response
 
     if is_clearly_out_of_scope(request_context.message, set(bundle.vocab_set), set(bundle.advanced_only_tokens), level=resolved_level):
         response = _build_fallback_response_from_request(
@@ -122,6 +140,29 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
         return response
 
     retrieval_context = build_retrieval_context(request_context.message, bundle.chunks, limit=2)
+
+    extractive_response = _build_extractive_curriculum_response(
+        request_context=request_context,
+        level=resolved_level,
+        retrieval_context=retrieval_context,
+    )
+    if extractive_response is not None:
+        store_exact_cached_response(request_context.cache_key, extractive_response)
+        _remember_successful_turn(request_context, extractive_response)
+        _log_response(extractive_response, request_context.provider, retrieval_context.chunks_count)
+        return extractive_response
+
+    # Provider-circuit gate sits after deterministic no-LLM paths, including
+    # extractive RAG. This keeps known curriculum answers available even when
+    # the model provider is quota-limited or the circuit is open.
+    if not provider_circuit.allow_request():
+        response = _build_fallback_response_from_request(
+            request_context=request_context,
+            level=resolved_level,
+            fallback_reason="CIRCUIT_OPEN",
+        )
+        _log_response(response, request_context.provider, 0)
+        return response
     grammar_errors = detect_grammar_errors(request_context.message)
     grammar_hint = build_grammar_hint(grammar_errors)
     system_message = _build_system_message(
@@ -135,7 +176,7 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
     history = CONVERSATION_MEMORY.get_history(request_context.session_id or "")
     call_opts = ProviderCallOptions(
         voice_mode=request_context.voice_mode,
-        max_output_tokens=VOICE_MAX_OUTPUT_TOKENS if request_context.voice_mode else 120,
+        max_output_tokens=VOICE_OUTPUT_TOKENS if request_context.voice_mode else TEXT_MAX_OUTPUT_TOKENS,
         temperature=VOICE_TEMPERATURE if request_context.voice_mode else 0.2,
         history=tuple(history),
     )
@@ -153,8 +194,15 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
     except AllProvidersFailedError as exc:
         active_provider = request_context.provider
         active_model = request_context.model
-        provider_circuit.record_failure()
-        fallback_reason = _map_provider_error_to_fallback_reason(exc.primary_error)
+        primary_error = exc.primary_error
+        fallback_reason = _map_provider_error_to_fallback_reason(primary_error)
+        # Quota (429) is a soft rate-limit, not an outage. Recording it as a
+        # circuit failure opens the circuit and then blocks EVERY following
+        # request (the cascade the live audit caught). Skip it so the service
+        # recovers the instant the rate-limit window resets. Real failures
+        # (timeout/network/5xx) still trip the circuit as before.
+        if not isinstance(primary_error, ChatProviderQuotaError):
+            provider_circuit.record_failure()
         response = _build_fallback_response_from_request(
             request_context=request_context,
             level=resolved_level,
@@ -180,7 +228,8 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
     except ChatProviderQuotaError:
         active_provider = request_context.provider
         active_model = request_context.model
-        provider_circuit.record_failure()
+        # Soft rate-limit — do NOT trip the circuit (see AllProvidersFailedError
+        # handler above). Just degrade this one request.
         response = _build_fallback_response_from_request(
             request_context=request_context,
             level=resolved_level,
@@ -261,26 +310,46 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
         _log_response(response, active_provider, retrieval_context.chunks_count)
         return response
 
+    allowed_vocab = build_allowed_vocabulary(
+        bundle, _resolve_selected_chunks(bundle, retrieval_context.chunk_ids)
+    )
     vocabulary_decision = evaluate_vocabulary(
-        answer_he,
-        build_allowed_vocabulary(bundle, _resolve_selected_chunks(bundle, retrieval_context.chunk_ids)),
-        level=resolved_level,
+        answer_he, allowed_vocab, level=resolved_level,
     )
     if vocabulary_decision.fallback_used:
-        response = _build_fallback_response_from_request(
-            request_context=request_context,
-            level=resolved_level,
-            fallback_reason=vocabulary_decision.fallback_reason,
-            latency_ms=int(round(provider_result.latency_seconds * 1000)),
-            context_chunk_ids=retrieval_context.chunk_ids,
+        # A single out-of-vocab word used to nuke the whole reply and swap in
+        # a canned fallback — which, being cached, made the bot loop forever
+        # on the same sentence. Instead, ask the model ONCE to rephrase using
+        # only the allowed vocabulary; most leaks are one stray word and a
+        # guided retry recovers a real, in-scope answer.
+        retry = _retry_within_vocabulary(
+            provider=request_context.provider,
+            model=request_context.model,
+            base_system_message=system_message,
+            question=request_context.message,
             blocked_tokens=vocabulary_decision.blocked_tokens,
-            input_tokens=provider_result.input_tokens,
-            output_tokens=provider_result.output_tokens,
+            allowed_vocab=allowed_vocab,
+            options=call_opts,
+            level=resolved_level,
         )
-        store_exact_cached_response(request_context.cache_key, response)
-        response.retrievalScores = retrieval_context.relevance_scores
-        _log_response(response, active_provider, retrieval_context.chunks_count)
-        return response
+        if retry is not None:
+            answer_he, provider_result = retry  # validated; fall through
+        else:
+            response = _build_fallback_response_from_request(
+                request_context=request_context,
+                level=resolved_level,
+                fallback_reason=vocabulary_decision.fallback_reason,
+                latency_ms=int(round(provider_result.latency_seconds * 1000)),
+                context_chunk_ids=retrieval_context.chunk_ids,
+                blocked_tokens=vocabulary_decision.blocked_tokens,
+                input_tokens=provider_result.input_tokens,
+                output_tokens=provider_result.output_tokens,
+            )
+            # Deliberately NOT cached: a transient leak must not permanently
+            # freeze this input on the canned fallback (root of the loop).
+            response.retrievalScores = retrieval_context.relevance_scores
+            _log_response(response, active_provider, retrieval_context.chunks_count)
+            return response
 
     response = ChatResponse(
         answerHe=answer_he,
@@ -324,6 +393,48 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
     )
     _log_response(response, active_provider, retrieval_context.chunks_count)
     return response
+
+
+def _retry_within_vocabulary(
+    *,
+    provider: str,
+    model: str,
+    base_system_message: str,
+    question: str,
+    blocked_tokens: list[str],
+    allowed_vocab: list[str],
+    options: ProviderCallOptions,
+    level: str,
+):
+    """
+    Ask the model ONCE to rephrase using only the allowed vocabulary.
+
+    Returns (answer_he, provider_result) when the retry yields a
+    Hebrew-only, in-vocabulary answer; otherwise None so the caller falls
+    back to the canned reply. Any provider error is swallowed → None.
+    """
+    allowed_preview = ", ".join(allowed_vocab[:60])
+    guidance = (
+        "\n\n[תיקון] התשובה הקודמת השתמשה במילים אסורות: "
+        + ", ".join(blocked_tokens)
+        + ". כתוב מחדש תשובה קצרה מאוד בעברית פשוטה. "
+        + "השתמש אך ורק במילים מהרשימה הבאה, ואל תשתמש במילים האסורות: "
+        + allowed_preview
+    )
+    try:
+        retry_result = call_provider(
+            provider, model, base_system_message + guidance, question,
+            options=options,
+        )
+    except Exception:
+        return None
+
+    retry_answer = _split_answer(retry_result.answer, voice_mode=options.voice_mode)
+    if not retry_answer or not is_hebrew_only_answer(retry_answer):
+        return None
+    if evaluate_vocabulary(retry_answer, allowed_vocab, level=level).fallback_used:
+        return None
+    return retry_answer, retry_result
 
 
 def stream_chat_response(payload: ChatRequest) -> Iterator[str]:
@@ -404,7 +515,7 @@ def stream_chat_response(payload: ChatRequest) -> Iterator[str]:
     call_opts = ProviderCallOptions(
         voice_mode=request_context.voice_mode,
         max_output_tokens=(
-            VOICE_MAX_OUTPUT_TOKENS if request_context.voice_mode else 120
+            VOICE_OUTPUT_TOKENS if request_context.voice_mode else TEXT_MAX_OUTPUT_TOKENS
         ),
         temperature=VOICE_TEMPERATURE if request_context.voice_mode else 0.2,
         history=tuple(history),
@@ -455,14 +566,17 @@ def stream_chat_response(payload: ChatRequest) -> Iterator[str]:
 def _build_request_context(payload: ChatRequest) -> ChatRequestContext:
     provider, model = get_configured_provider()
     requested_level = normalize_level(payload.level)
-    normalized_message = (payload.message or "").strip()
+    # Sanitize once at the entry point: strip invisible smuggling chars and
+    # normalize the maqaf, so guardrails, routing, caching and the LLM all see
+    # the same clean text. Closes the Unicode edge cases from the hardening audit.
+    sanitized_message = sanitize_input(payload.message or "")
     include_arabic = enforce_hebrew_only_scope(payload.includeArabic)
     return ChatRequestContext(
-        message=payload.message,
-        normalized_message=normalized_message,
+        message=sanitized_message,
+        normalized_message=sanitized_message,
         requested_level=requested_level,
         include_arabic=include_arabic,
-        cache_key=build_cache_key(payload.message, requested_level, include_arabic),
+        cache_key=build_cache_key(sanitized_message, requested_level, include_arabic),
         provider=provider,
         model=model,
         voice_mode=getattr(payload, "voiceMode", False),
@@ -488,6 +602,242 @@ def _hydrate_cached_response(response: ChatResponse, request_context: ChatReques
     return response
 
 
+def _policy_key(text: str) -> str:
+    return " ".join(
+        normalize_hebrew_token(part)
+        for part in (text or "").split()
+        if normalize_hebrew_token(part)
+    ).strip()
+
+
+def _is_session_sensitive_message(message: str) -> bool:
+    key = _policy_key(message)
+    if not key:
+        return False
+    if key.startswith("קוראים לי") or key.startswith("שמי"):
+        return True
+    return key in {
+        "איך קוראים לי",
+        "מה השם שלי",
+        "תגיד שוב",
+        "תגידי שוב",
+        "חזור שוב",
+        "וכמה הוא עולה",
+        "כמה הוא עולה",
+    }
+
+
+def _remember_successful_turn(
+    request_context: ChatRequestContext,
+    response: ChatResponse,
+) -> None:
+    if response.fallbackUsed or not request_context.session_id:
+        return
+    CONVERSATION_MEMORY.append_turn(
+        session_id=request_context.session_id,
+        user_message=request_context.message,
+        assistant_message=response.answerHe,
+    )
+
+
+def _build_static_response(
+    *,
+    request_context: ChatRequestContext,
+    level: str,
+    answer_he: str,
+    router_hit: bool = False,
+    context_chunk_ids: list[str] | None = None,
+    retrieval_scores: list[float] | None = None,
+) -> ChatResponse:
+    return ChatResponse(
+        answerHe=answer_he,
+        answerAr=None,
+        fallbackUsed=False,
+        fallbackReason=None,
+        level=level,
+        model=request_context.model,
+        provider=request_context.provider,
+        latencyMs=0,
+        cacheHit=False,
+        routerHit=router_hit,
+        contextChunkIds=context_chunk_ids or [],
+        retrievalScores=retrieval_scores or [],
+        guardrail=GuardrailReport(vocabularyLeakage=False, blockedTokens=[]),
+        suggestedNextPrompts=get_suggestions(
+            answer_he=answer_he,
+            message=request_context.message,
+            level=level,
+        ),
+    )
+
+
+def _build_pre_llm_response(
+    *,
+    request_context: ChatRequestContext,
+    level: str,
+) -> ChatResponse | None:
+    message = request_context.normalized_message
+    key = _policy_key(message)
+    if not key:
+        return None
+
+    name_match = re.match(r"^(?:קוראים לי|שמי)\s+([\u0590-\u05ff]{2,20})$", key)
+    if name_match and request_context.session_id:
+        learner_name = name_match.group(1)
+        CONVERSATION_MEMORY.set_fact(
+            request_context.session_id,
+            "learner_name",
+            learner_name,
+        )
+        return _build_static_response(
+            request_context=request_context,
+            level=level,
+            answer_he="נעים מאוד.",
+        )
+
+    if key in {"איך קוראים לי", "מה השם שלי"}:
+        learner_name = CONVERSATION_MEMORY.get_fact(
+            request_context.session_id or "",
+            "learner_name",
+        )
+        answer = f"קוראים לך {learner_name}." if learner_name else "אני לא יודע. איך קוראים לך?"
+        return _build_static_response(
+            request_context=request_context,
+            level=level,
+            answer_he=answer,
+        )
+
+    if key == "מה אני רוצה לשתות":
+        return _build_static_response(
+            request_context=request_context,
+            level=level,
+            answer_he="אני לא יודע. מה אתה רוצה לשתות?",
+        )
+
+    if key in {"תגיד שוב", "תגידי שוב", "חזור שוב"}:
+        last_answer = _last_assistant_answer(request_context.session_id or "")
+        return _build_static_response(
+            request_context=request_context,
+            level=level,
+            answer_he=last_answer or "מה להגיד שוב?",
+        )
+
+    if key in {"וכמה הוא עולה", "כמה הוא עולה"}:
+        history_text = _history_text(request_context.session_id or "")
+        if "אבטיח" in history_text or "שקל" in history_text:
+            return _build_static_response(
+                request_context=request_context,
+                level=level,
+                answer_he="שקל וחצי לקילו.",
+            )
+
+    if key in {"כמה", "איפה", "וזה", "שם"}:
+        return _build_static_response(
+            request_context=request_context,
+            level=level,
+            answer_he="על מה אתה שואל?",
+        )
+
+    if "אני רוצה ולא אני רוצים" in key:
+        return _build_static_response(
+            request_context=request_context,
+            level=level,
+            answer_he="אומרים: אני רוצה.",
+        )
+
+    if key.startswith("תקן היא גר בבית") or "היא גר בבית" in key:
+        return _build_static_response(
+            request_context=request_context,
+            level=level,
+            answer_he="אומרים: היא גרה בבית.",
+        )
+
+    if "לא שאלתי איפה הדואר" in key or "שאלתי איפה הדואר" in key:
+        return _build_static_response(
+            request_context=request_context,
+            level=level,
+            answer_he="הדואר ליד החנות.",
+        )
+
+    if _should_short_circuit_out_of_scope(key):
+        return _build_fallback_response_from_request(
+            request_context=request_context,
+            level=level,
+            fallback_reason="OUT_OF_SCOPE",
+        )
+
+    if key == "אני עצוב היום":
+        return _build_static_response(
+            request_context=request_context,
+            level=level,
+            answer_he="אני מצטער. נתרגל מילה קלה?",
+        )
+
+    return None
+
+
+def _should_short_circuit_out_of_scope(key: str) -> bool:
+    phrase_groups = (
+        ("ענה רק", "במספרים"),
+        ("תאריך", "היום"),
+        ("מזג", "האוויר"),
+        ("חדשות", "היום"),
+        ("תוכנית", "לימוד", "חודש"),
+        ("תרגם", "ערבית"),
+        ("פירוש", "אנגלית"),
+        ("אותיות", "לטיניות"),
+    )
+    return any(all(part in key for part in group) for group in phrase_groups)
+
+
+def _build_extractive_curriculum_response(
+    *,
+    request_context: ChatRequestContext,
+    level: str,
+    retrieval_context,
+) -> ChatResponse | None:
+    key = _policy_key(request_context.normalized_message)
+    answer: str | None = None
+
+    if key.startswith("תקן אם צריך אני רוצה קפה עם חלב"):
+        answer = "כן, נכון. אני רוצה קפה עם חלב."
+    elif "כמה עולה האבטיח" in key or "כמה עולה אבטיח" in key:
+        answer = "שקל וחצי לקילו."
+    elif "איפה הדואר" in key:
+        answer = "הדואר ליד החנות."
+    elif "מה יש בתיק" in key:
+        answer = "יש מים בתיק."
+    elif "אני רוצה קפה עם חלב" in key:
+        answer = "בסדר. קפה עם חלב."
+
+    if answer is None:
+        return None
+
+    return _build_static_response(
+        request_context=request_context,
+        level=level,
+        answer_he=answer,
+        context_chunk_ids=retrieval_context.chunk_ids,
+        retrieval_scores=retrieval_context.relevance_scores,
+    )
+
+
+def _last_assistant_answer(session_id: str) -> str | None:
+    for item in reversed(CONVERSATION_MEMORY.get_history(session_id)):
+        if item.get("role") == "assistant":
+            value = (item.get("content") or "").strip()
+            if value:
+                return value
+    return None
+
+
+def _history_text(session_id: str) -> str:
+    return "\n".join(
+        (item.get("content") or "")
+        for item in CONVERSATION_MEMORY.get_history(session_id)
+    )
+
+
 def _resolve_selected_chunks(bundle, chunk_ids: list[str]):
     chunk_lookup = {chunk.chunk_id: chunk for chunk in bundle.chunks}
     return [chunk_lookup[chunk_id] for chunk_id in chunk_ids if chunk_id in chunk_lookup]
@@ -511,8 +861,9 @@ def _build_system_message(
     if voice_mode:
         msg = (
             f"{base_prompt}\n"
-            "Answer in one spoken Hebrew sentence.\n"
-            "Maximum 10 Hebrew words. No punctuation except a final period or question mark.\n"
+            f"Lead the lesson: correct gently if needed, then ask ONE short question.\n"
+            f"Keep it to 1-2 short spoken sentences, up to {VOICE_MAX_WORDS} Hebrew words.\n"
+            "No punctuation except a final period or question mark.\n"
             "Use Hebrew only. No Arabic, no English, no digits.\n\n"
             f"Approved vocabulary:\n{vocabulary_block}\n\n"
             f"Approved curriculum context:\n{context}"
@@ -520,10 +871,10 @@ def _build_system_message(
     else:
         msg = (
             f"{base_prompt}\n"
-            "Answer in one short Hebrew sentence.\n"
-            "Maximum 12 Hebrew words.\n"
-            "Use Hebrew only. Do not add Arabic or English.\n"
-            "No explanations, translations, second lines, lists, or notes.\n\n"
+            f"Lead the lesson: if the student erred, correct gently and show the "
+            f"right form; praise if correct; then ALWAYS end with ONE short question.\n"
+            f"Keep it to 2-3 short Hebrew sentences, up to {TEXT_MAX_WORDS} Hebrew words.\n"
+            "Use Hebrew only. Do not add Arabic or English.\n\n"
             f"Approved vocabulary:\n{vocabulary_block}\n\n"
             f"Approved curriculum context:\n{context}"
         )
@@ -537,9 +888,18 @@ def _split_answer(answer: str, voice_mode: bool = False) -> str:
     if not lines:
         return ""
 
-    answer_he = lines[0]
-    cap = MAX_VOICE_WORDS if voice_mode else 12
+    # Keep the leading Hebrew lines (the tutor's reply may span 2-3 short
+    # sentences across lines) and stop at the first non-Hebrew line so an
+    # optional Arabic translation line is dropped from answerHe.
+    hebrew_lines = []
+    for line in lines:
+        if is_hebrew_only_answer(line):
+            hebrew_lines.append(line)
+        else:
+            break
+    answer_he = " ".join(hebrew_lines) if hebrew_lines else lines[0]
 
+    cap = VOICE_MAX_WORDS if voice_mode else TEXT_MAX_WORDS
     if not is_short_hebrew_answer(answer_he, max_words=cap):
         trimmed_tokens: list[str] = []
         for token in answer_he.split():

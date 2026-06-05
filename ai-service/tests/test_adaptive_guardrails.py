@@ -161,9 +161,21 @@ class TestEvaluateVocabA1Strict:
     def test_unknown_word_blocked_at_a1(self):
         # "אוניברסיטה" is not in _VOCAB → blocked at A1
         decision = evaluate_vocabulary("שלום אוניברסיטה", _VOCAB, level="A1")
+        assert decision.fallback_used is False
+        assert decision.fallback_reason is None
+        assert "אוניברסיטה" in decision.blocked_tokens
+
+    def test_dominated_unknown_sentence_blocked_at_a1(self):
+        answer = (
+            "\u05e4\u05d9\u05dc\u05d5\u05e1\u05d5\u05e4\u05d9\u05d4 "
+            "\u05de\u05d5\u05d3\u05e8\u05e0\u05d9\u05ea "
+            "\u05d0\u05d5\u05e0\u05d9\u05d1\u05e8\u05e1\u05d9\u05d8\u05d4 "
+            "\u05ea\u05d0\u05d5\u05e8\u05d9\u05d4 "
+            "\u05de\u05d5\u05e8\u05db\u05d1\u05ea"
+        )
+        decision = evaluate_vocabulary(answer, _VOCAB, level="A1")
         assert decision.fallback_used is True
         assert decision.fallback_reason == "VOCAB_LEAKAGE"
-        assert "אוניברסיטה" in decision.blocked_tokens
 
     def test_all_known_passes_at_a1(self):
         decision = evaluate_vocabulary("שלום טוב", _VOCAB, level="A1")
@@ -190,5 +202,6 @@ class TestEvaluateVocabA2Lenient:
         answer = "שלום אוניברסיטה"
         a1_decision = evaluate_vocabulary(answer, _VOCAB, level="A1")
         a2_decision = evaluate_vocabulary(answer, _VOCAB, level="A2")
-        assert a1_decision.fallback_used is True
+        assert a1_decision.fallback_used is False
+        assert a1_decision.blocked_tokens
         assert a2_decision.fallback_used is False

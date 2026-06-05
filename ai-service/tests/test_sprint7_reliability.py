@@ -303,7 +303,7 @@ class TestEngineCircuitBreaker:
             )
             assert response.fallbackUsed is True
             assert response.fallbackReason == "PROVIDER_QUOTA"
-            mock_circuit.record_failure.assert_called_once()
+            mock_circuit.record_failure.assert_not_called()
 
     def test_auth_error_records_failure(self):
         with ExitStack() as stack:

@@ -14,7 +14,14 @@ logger = logging.getLogger("lisan.chat")
 
 
 from services.chat_guardrails import is_short_hebrew_answer, normalize_hebrew_token, normalize_level
-from services.chat_retrieval import Chunk, chunk_transcripts, extract_vocabulary, load_transcripts
+from services.chat_retrieval import (
+    Chunk,
+    chunk_transcripts,
+    extract_vocabulary,
+    get_transcript_source_status,
+    is_backend_transcript_source_configured,
+    load_transcripts,
+)
 from services.chat_schemas import ChatResponse
 
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -44,6 +51,13 @@ CORE_TUTOR_VOCAB = [
     "עובד",
     "עובדת",
     "רוצה",
+    # ── Tutor politeness / encouragement / meta words ──────────────────────
+    # Added so natural tutor replies ("תודה רבה", "מצוין", "גם") aren't
+    # thrown away by the strict A1 vocab guard — that was nuking whole
+    # answers on a single stray word and looping the canned fallback.
+    "רבה", "מאוד", "גם", "יופי", "מצוין", "נכון", "נהדר", "אפשר",
+    "עוד", "פעם", "מילה", "משפט", "שאלה", "תשובה", "סליחה",
+    "להתראות", "בוקר", "ערב", "טוב",
 ]
 DIRECT_HEBREW_WORD_RESPONSES = {
     "שלום": "שלום.",
@@ -63,8 +77,16 @@ DIRECT_HEBREW_WORD_RESPONSES = {
 }
 _CACHE_LOCK = threading.Lock()
 _EXACT_CACHE_LOCK = threading.Lock()
-DEFAULT_RESPONSE_CACHE_TTL_SECONDS = 3600
-DEFAULT_RESPONSE_CACHE_MAX_ENTRIES = 256
+# Bigger defaults than before (was 3600s / 256 entries). A larger, longer
+# cache is the main lever for stretching the Gemini free quota across more
+# users — repeated questions are served from memory instead of the LLM.
+# Both are env-tunable.
+DEFAULT_RESPONSE_CACHE_TTL_SECONDS = int(
+    os.getenv("RESPONSE_CACHE_TTL_SECONDS", "86400")  # 24h
+)
+DEFAULT_RESPONSE_CACHE_MAX_ENTRIES = int(
+    os.getenv("RESPONSE_CACHE_MAX_ENTRIES", "2000")
+)
 DEFAULT_RATE_LIMIT_MAX_REQUESTS = 10
 DEFAULT_RATE_LIMIT_WINDOW_SECONDS = 60
 
@@ -337,6 +359,8 @@ class RateLimiter:
 
 
 CHAT_CACHE: dict[str, CachedLevelBundle] = {}
+CHAT_CACHE_LOADED_AT = 0.0
+CHAT_CACHE_NEEDS_BACKEND_REFRESH = False
 # Bounded LRU dict — preserves insertion order; oldest evicted when full.
 EXACT_CACHE_MAX_ENTRIES = 512
 EXACT_RESPONSE_CACHE: "OrderedDict[str, ChatResponse]" = OrderedDict()
@@ -344,16 +368,14 @@ RESPONSE_CACHE_MANAGER = CacheManager()
 RATE_LIMITER = RateLimiter()
 
 
-def warm_startup_chat_cache() -> None:
+def warm_startup_chat_cache(force: bool = False) -> None:
+    global CHAT_CACHE_LOADED_AT, CHAT_CACHE_NEEDS_BACKEND_REFRESH
+
     with _CACHE_LOCK:
-        if CHAT_CACHE:
+        if CHAT_CACHE and not force:
             return
 
-        discovered_levels = sorted(
-            path.name.upper()
-            for path in TRANSCRIPTS_DIR.iterdir()
-            if path.is_dir()
-        )
+        discovered_levels = _discover_curriculum_levels()
 
         raw_level_data: dict[str, tuple[list[str], list[Chunk], list]] = {}
         for level in discovered_levels:
@@ -362,11 +384,12 @@ def warm_startup_chat_cache() -> None:
             chunks = chunk_transcripts(transcripts)
             raw_level_data[level] = (vocabulary, chunks, transcripts)
 
+        next_cache: dict[str, CachedLevelBundle] = {}
         cumulative_levels = sorted(raw_level_data.keys())
         for level in cumulative_levels:
             vocabulary, chunks, transcripts = raw_level_data[level]
             higher_level_tokens = _collect_higher_level_tokens(level, raw_level_data)
-            CHAT_CACHE[level] = CachedLevelBundle(
+            next_cache[level] = CachedLevelBundle(
                 level=level,
                 vocab=vocabulary,
                 vocab_set=frozenset(vocabulary),
@@ -376,12 +399,79 @@ def warm_startup_chat_cache() -> None:
                 question_answer_map=_build_question_answer_map(transcripts, set(vocabulary)),
                 token_frequency=_build_token_frequency_map(transcripts),
             )
+        CHAT_CACHE.clear()
+        CHAT_CACHE.update(next_cache)
+        CHAT_CACHE_LOADED_AT = time.time()
+        CHAT_CACHE_NEEDS_BACKEND_REFRESH = _cache_uses_local_fallback()
 
 
 def get_level_bundle(level: str) -> CachedLevelBundle:
     warm_startup_chat_cache()
+    _refresh_chat_cache_after_backend_startup()
     normalized_level = normalize_level(level)
     return CHAT_CACHE.get(normalized_level) or CHAT_CACHE["A1"]
+
+
+def get_rag_cache_status() -> dict[str, object]:
+    warm_startup_chat_cache()
+    _refresh_chat_cache_after_backend_startup()
+    return {
+        "loaded": bool(CHAT_CACHE),
+        "levels": sorted(CHAT_CACHE.keys()),
+        "needsBackendRefresh": CHAT_CACHE_NEEDS_BACKEND_REFRESH,
+        "transcripts": get_transcript_source_status(),
+    }
+
+
+def _discover_curriculum_levels() -> list[str]:
+    configured_levels = [
+        level.strip().upper()
+        for level in os.getenv("RAG_LEVELS", "").split(",")
+        if level.strip()
+    ]
+    if configured_levels:
+        return configured_levels
+
+    return sorted(
+        path.name.upper()
+        for path in TRANSCRIPTS_DIR.iterdir()
+        if path.is_dir()
+    )
+
+
+def _rag_backend_retry_seconds() -> float:
+    raw = os.getenv("RAG_BACKEND_RETRY_SECONDS", "").strip()
+    try:
+        value = float(raw)
+    except ValueError:
+        return 15.0
+    return value if value > 0 else 15.0
+
+
+def _cache_uses_local_fallback() -> bool:
+    if not is_backend_transcript_source_configured():
+        return False
+
+    statuses = get_transcript_source_status()
+    return any(
+        status.get("source") != "backend"
+        for level, status in statuses.items()
+        if level in CHAT_CACHE
+    )
+
+
+def _refresh_chat_cache_after_backend_startup() -> None:
+    if not CHAT_CACHE_NEEDS_BACKEND_REFRESH:
+        return
+    if not is_backend_transcript_source_configured():
+        return
+    if time.time() - CHAT_CACHE_LOADED_AT < _rag_backend_retry_seconds():
+        return
+
+    try:
+        warm_startup_chat_cache(force=True)
+    except Exception as exc:
+        logger.warning(f"RAG backend refresh failed: {exc}")
 
 
 def build_cache_key(message: str, level: str, include_arabic: bool) -> str:

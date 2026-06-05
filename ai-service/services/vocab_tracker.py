@@ -29,6 +29,8 @@ _BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:3000")
 _VOCAB_PATH = os.getenv("VOCAB_TRACK_PATH", "/api/vocab/progress")
 _VOCAB_ENDPOINT = f"{_BACKEND_URL}{_VOCAB_PATH}"
 _REQUEST_TIMEOUT = 5.0   # seconds — fire-and-forget, short timeout
+_MAX_RETRIES = int(os.getenv("VOCAB_TRACK_MAX_RETRIES", "3"))
+_RETRY_BACKOFF_SECONDS = float(os.getenv("VOCAB_TRACK_BACKOFF_SECONDS", "0.5"))
 
 # Track in-flight tracker threads so we can join them on shutdown.
 # Without this, daemon threads get killed mid-POST during rolling deploys
@@ -91,7 +93,14 @@ def extract_known_words(
 
 
 def _post_to_backend(user_id: str, words: list[dict], level: str) -> None:
-    """Blocking HTTP POST — run in a daemon thread."""
+    """
+    Blocking HTTP POST — run in a daemon thread.
+
+    Retries transient failures (network errors / 5xx) with exponential
+    backoff so a brief backend blip doesn't silently drop the student's
+    vocab progress. 4xx responses are NOT retried (they won't fix
+    themselves) and a successful POST returns immediately.
+    """
     secret = _get_internal_secret()
     headers = {"Content-Type": "application/json"}
     if secret:
@@ -103,25 +112,38 @@ def _post_to_backend(user_id: str, words: list[dict], level: str) -> None:
         "level": level,
     }
 
-    try:
-        with httpx.Client(timeout=_REQUEST_TIMEOUT) as client:
-            resp = client.post(_VOCAB_ENDPOINT, json=payload, headers=headers)
-        if resp.status_code not in (200, 201):
-            logger.warning({
-                "event": "vocab_tracker_non_200",
-                "status": resp.status_code,
-                "body": resp.text[:200],
-            })
-    except Exception as exc:
-        # Was logger.debug — silently dropped real failures.
-        # Vocab tracking outages need to be observable in production.
-        logger.warning({
-            "event": "vocab_tracker_error",
-            "endpoint": _VOCAB_ENDPOINT,
-            "user_id": user_id,
-            "word_count": len(words),
-            "detail": str(exc),
-        })
+    last_error: str | None = None
+    for attempt in range(1, _MAX_RETRIES + 1):
+        try:
+            with httpx.Client(timeout=_REQUEST_TIMEOUT) as client:
+                resp = client.post(_VOCAB_ENDPOINT, json=payload, headers=headers)
+            if resp.status_code in (200, 201):
+                return  # success
+            if 400 <= resp.status_code < 500:
+                # Client error — retrying won't help; log once and stop.
+                logger.warning({
+                    "event": "vocab_tracker_non_200",
+                    "status": resp.status_code,
+                    "body": resp.text[:200],
+                })
+                return
+            # 5xx — retryable
+            last_error = f"HTTP {resp.status_code}"
+        except Exception as exc:
+            last_error = str(exc)
+
+        if attempt < _MAX_RETRIES:
+            time.sleep(_RETRY_BACKOFF_SECONDS * (2 ** (attempt - 1)))
+
+    # All attempts exhausted — log so the outage is observable in production.
+    logger.warning({
+        "event": "vocab_tracker_error",
+        "endpoint": _VOCAB_ENDPOINT,
+        "user_id": user_id,
+        "word_count": len(words),
+        "attempts": _MAX_RETRIES,
+        "detail": last_error,
+    })
 
 
 def track_vocab_async(

@@ -99,8 +99,9 @@ FALLBACK_FAST_REJECT_DATASET = [
 class TestPromptV2Contract:
     def test_prompt_v2_is_loaded(self):
         prompt = _load_prompt()
-        assert "beginner Hebrew tutor for Arabic-speaking students" in prompt
-        assert "maximum 12 Hebrew words" in prompt
+        assert "PROACTIVE Hebrew tutor for Arabic-speaking beginners" in prompt
+        assert "Reply in simple A1 Hebrew only" in prompt
+        assert "2 to 3 very short sentences" in prompt
 
     def test_prompt_acceptance_dataset_has_50_questions(self):
         assert len(PROMPT_ACCEPTANCE_DATASET) == 50
@@ -154,10 +155,10 @@ class TestFallbackSystem:
             patch(
                 "services.chat_engine.call_provider",
                 return_value=ProviderResult(
-                    answer="פילוסופיה מודרנית",
+                    answer="פילוסופיה מודרנית אוניברסיטה תאוריה מורכבת",
                     latency_seconds=0.01,
                     input_tokens=10,
-                    output_tokens=2,
+                    output_tokens=5,
                 ),
             ),
         ):

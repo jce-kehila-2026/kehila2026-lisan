@@ -132,8 +132,9 @@ class TestVoiceEndpointPronunciationField:
             unittest.mock.patch(
                 "routes.chat.transcribe_audio", return_value="שלום"
             ),
+            unittest.mock.patch("routes.chat._PRONUNCIATION_ENABLED", True),
             unittest.mock.patch(
-                "routes.chat.assess_pronunciation",
+                "services.pronunciation.assess_pronunciation",
                 return_value={
                     "success": False,
                     "error": "Azure credentials not configured",
@@ -166,8 +167,9 @@ class TestVoiceEndpointPronunciationField:
             unittest.mock.patch(
                 "routes.chat.transcribe_audio", return_value="שלום"
             ),
+            unittest.mock.patch("routes.chat._PRONUNCIATION_ENABLED", True),
             unittest.mock.patch(
-                "routes.chat.assess_pronunciation",
+                "services.pronunciation.assess_pronunciation",
                 return_value=mock_result,
             ),
         ):
@@ -186,8 +188,9 @@ class TestVoiceEndpointPronunciationField:
             unittest.mock.patch(
                 "routes.chat.transcribe_audio", return_value="שלום"
             ),
+            unittest.mock.patch("routes.chat._PRONUNCIATION_ENABLED", True),
             unittest.mock.patch(
-                "routes.chat.assess_pronunciation",
+                "services.pronunciation.assess_pronunciation",
                 side_effect=RuntimeError("Azure connection failed"),
             ),
         ):
