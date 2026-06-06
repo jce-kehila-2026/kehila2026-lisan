@@ -28,8 +28,8 @@
     "jsonwebtoken": "^9.0.3",
     "kehila2026-lisan": "file:..",
     "morgan": "^1.10.1",
-    "openai": "^6.39.0",
     "multer": "^2.1.1",
+    "openai": "^6.39.0",
     "pino": "^9.9.4"
   }
 }

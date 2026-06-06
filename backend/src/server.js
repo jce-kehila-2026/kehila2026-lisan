@@ -111,6 +111,7 @@ function createApp() {
 
   app.use(morgan('dev'));
   app.use(express.json());
+  app.use('/uploads', express.static('uploads'));
 
   app.get('/', (req, res) => {
     res.send('Lisan backend is running');
