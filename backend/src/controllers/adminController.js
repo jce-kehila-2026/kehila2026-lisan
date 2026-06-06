@@ -913,7 +913,17 @@ exports.deleteAudioRecording = async (req, res) => {
 
 exports.getAllConversations = async (req, res) => {
   try {
-    const { studentId, level, isArchived } = req.query;
+    const {
+      studentId,
+      teacherId,
+      level,
+      isArchived,
+      from,
+      to,
+      search,
+      page = 1,
+      limit = 20
+    } = req.query;
 
     let query = db.collection('chatSessions');
 
@@ -931,7 +941,7 @@ exports.getAllConversations = async (req, res) => {
 
     const snapshot = await query.get();
 
-    const conversations = [];
+    let conversations = [];
 
     snapshot.forEach((doc) => {
       const data = doc.data();
@@ -943,10 +953,75 @@ exports.getAllConversations = async (req, res) => {
         level: data.level || 'A1',
         isArchived: data.isArchived === true,
         messagesCount: Array.isArray(data.messages) ? data.messages.length : 0,
+        messages: Array.isArray(data.messages) ? data.messages : [],
         startedAt: data.startedAt || null,
         updatedAt: data.updatedAt || null
       });
     });
+
+    if (teacherId) {
+      const studentSnapshot = await db
+        .collection('users')
+        .where('role', '==', 'student')
+        .get();
+
+      const allowedStudentIds = new Set();
+
+      studentSnapshot.forEach((doc) => {
+        const student = doc.data();
+        const teacherIds = normalizeTeacherIds(student.teacherIds, student.teacherId);
+
+        if (teacherIds.includes(teacherId)) {
+          allowedStudentIds.add(doc.id);
+        }
+      });
+
+      conversations = conversations.filter((conversation) =>
+        allowedStudentIds.has(conversation.userId)
+      );
+    }
+
+    if (from || to) {
+      const fromDate = from ? new Date(from) : null;
+      const toDate = to ? new Date(to) : null;
+
+      conversations = conversations.filter((conversation) => {
+        const updatedAt = normalizeFirestoreDate(conversation.updatedAt);
+
+        if (!updatedAt) {
+          return false;
+        }
+
+        if (fromDate && updatedAt < fromDate) {
+          return false;
+        }
+
+        if (toDate && updatedAt > toDate) {
+          return false;
+        }
+
+        return true;
+      });
+    }
+
+    if (search) {
+      const normalizedSearch = String(search).trim().toLowerCase();
+
+      conversations = conversations.filter((conversation) => {
+        const title = String(conversation.title || '').toLowerCase();
+
+        const messagesText = conversation.messages
+          .map((message) => `${message.text || ''} ${message.transcribedText || ''}`)
+          .join(' ')
+          .toLowerCase();
+
+        return (
+          title.includes(normalizedSearch) ||
+          conversation.userId.toLowerCase().includes(normalizedSearch) ||
+          messagesText.includes(normalizedSearch)
+        );
+      });
+    }
 
     conversations.sort((a, b) => {
       const first = normalizeFirestoreDate(a.updatedAt)?.getTime() || 0;
@@ -954,9 +1029,23 @@ exports.getAllConversations = async (req, res) => {
       return second - first;
     });
 
+    const pageNumber = Math.max(Number(page) || 1, 1);
+    const limitNumber = Math.min(Math.max(Number(limit) || 20, 1), 100);
+    const total = conversations.length;
+    const startIndex = (pageNumber - 1) * limitNumber;
+    const paginatedConversations = conversations
+      .slice(startIndex, startIndex + limitNumber)
+      .map(({ messages, ...conversation }) => conversation);
+
     return res.status(200).json({
       success: true,
-      conversations
+      conversations: paginatedConversations,
+      pagination: {
+        page: pageNumber,
+        limit: limitNumber,
+        total,
+        totalPages: Math.ceil(total / limitNumber)
+      }
     });
   } catch (error) {
     console.error('Get admin conversations error:', error);
@@ -992,6 +1081,177 @@ exports.getConversationById = async (req, res) => {
     });
   } catch (error) {
     console.error('Get admin conversation error:', error);
+
+    return res.status(500).json({
+      success: false,
+      error: 'Server error',
+      code: 'SERVER_ERROR'
+    });
+  }
+};
+
+exports.getPendingWords = async (req, res) => {
+  try {
+    const snapshot = await db
+      .collection('pendingWords')
+      .orderBy('createdAt', 'desc')
+      .get();
+
+    const words = [];
+
+    snapshot.forEach((doc) => {
+      words.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+
+    return res.status(200).json({
+      success: true,
+      words
+    });
+  } catch (error) {
+    console.error('Get pending words error:', error);
+
+    return res.status(500).json({
+      success: false,
+      error: 'Server error',
+      code: 'SERVER_ERROR'
+    });
+  }
+};
+
+exports.createWord = async (req, res) => {
+  try {
+    const {
+      word,
+      translation,
+      level,
+      language,
+      notes
+    } = req.body;
+
+    if (!word || !translation) {
+      return res.status(400).json({
+        success: false,
+        error: 'word and translation are required',
+        code: 'VALIDATION_ERROR'
+      });
+    }
+
+    if (level && !allowedLevels.includes(level)) {
+      return res.status(400).json({
+        success: false,
+        error: 'level must be one of A1, A2, B1, B2',
+        code: 'VALIDATION_ERROR'
+      });
+    }
+
+    if (language && !allowedLanguages.includes(language)) {
+      return res.status(400).json({
+        success: false,
+        error: 'language must be one of ar, he, en',
+        code: 'VALIDATION_ERROR'
+      });
+    }
+
+    const docRef = await db.collection('pendingWords').add({
+      word: String(word).trim(),
+      translation: String(translation).trim(),
+      level: level || 'A1',
+      language: language || 'he',
+      notes: notes || '',
+      status: 'pending',
+      createdBy: req.user.uid,
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    return res.status(201).json({
+      success: true,
+      id: docRef.id
+    });
+  } catch (error) {
+    console.error('Create word error:', error);
+
+    return res.status(500).json({
+      success: false,
+      error: 'Server error',
+      code: 'SERVER_ERROR'
+    });
+  }
+};
+
+exports.approveWord = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const pendingRef = db.collection('pendingWords').doc(id);
+    const pendingDoc = await pendingRef.get();
+
+    if (!pendingDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'Word not found',
+        code: 'WORD_NOT_FOUND'
+      });
+    }
+
+    const data = pendingDoc.data();
+
+    const approvedRef = await db.collection('words').add({
+      ...data,
+      status: 'approved',
+      reviewedBy: req.user.uid,
+      reviewedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    await pendingRef.delete();
+
+    return res.status(200).json({
+      success: true,
+      wordId: approvedRef.id
+    });
+  } catch (error) {
+    console.error('Approve word error:', error);
+
+    return res.status(500).json({
+      success: false,
+      error: 'Server error',
+      code: 'SERVER_ERROR'
+    });
+  }
+};
+
+exports.rejectWord = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { notes } = req.body;
+
+    const wordRef = db.collection('pendingWords').doc(id);
+
+    const wordDoc = await wordRef.get();
+
+    if (!wordDoc.exists) {
+      return res.status(404).json({
+        success: false,
+        error: 'Word not found',
+        code: 'WORD_NOT_FOUND'
+      });
+    }
+
+    await wordRef.update({
+      status: 'rejected',
+      rejectionNotes: notes || '',
+      reviewedBy: req.user.uid,
+      reviewedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Word rejected successfully'
+    });
+  } catch (error) {
+    console.error('Reject word error:', error);
 
     return res.status(500).json({
       success: false,

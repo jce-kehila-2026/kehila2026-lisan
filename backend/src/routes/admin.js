@@ -167,4 +167,32 @@ router.get(
   adminController.getConversationById
 );
 
+router.get(
+  '/words/pending',
+  requireAuth,
+  requireRole('admin'),
+  adminController.getPendingWords
+);
+
+router.post(
+  '/words',
+  requireAuth,
+  requireRole('admin'),
+  adminController.createWord
+);
+
+router.put(
+  '/words/:id/approve',
+  requireAuth,
+  requireRole('admin'),
+  adminController.approveWord
+);
+
+router.put(
+  '/words/:id/reject',
+  requireAuth,
+  requireRole('admin'),
+  adminController.rejectWord
+);
+
 module.exports = router;
