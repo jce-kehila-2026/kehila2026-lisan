@@ -2,858 +2,597 @@
 
 ## Base URL
 
-```text
+```txt
 http://localhost:3000/api
 ```
 
 ---
 
-## Endpoints
+## Authentication Header
 
-| Endpoint | Method | Purpose | Auth Required | Status |
-|---|---|---|---|---|
-| `/api/health` | GET | Server health check | No | ✅ |
-| `/api/auth/login` | POST | User login | No | ✅ |
-| `/api/users/me` | GET | Get current user profile | Yes | ✅ |
-| `/api/admin/users` | GET | Get all users | Admin | ✅ |
-| `/api/admin/users` | POST | Create new user | Admin | ✅ |
-| `/api/admin/users/:id` | PUT | Update user | Admin | ✅ |
-| `/api/admin/users/:id` | DELETE | Delete user | Admin | ✅ |
-| `/api/transcripts` | GET | Get all transcripts | No | ✅ |
-| `/api/transcripts/level/:level` | GET | Get transcripts by level | No | ✅ |
-| `/api/transcripts/search?q=&level=` | GET | Search transcripts | No | ✅ |
-| `/api/evaluation/context` | GET | Get evaluation context | No | ✅ |
-| `/api/evaluation/attempts` | POST | Save student attempt | No | ✅ |
-| `/api/chats` | POST | Create chat session | Yes | ✅ |
-| `/api/chats/my` | GET | Get my chat sessions | Yes | ✅ |
-| `/api/chats/:chatId` | GET | Get chat by ID | Yes | ✅ |
-| `/api/chats/:chatId/messages` | POST | Add message to chat | Yes | ✅ |
-| `/api/progress/me` | GET | Get my progress | Yes | ✅ |
-| `/api/progress/me/attempts` | GET | Get my attempts | Yes | ✅ |
+Protected routes require:
 
----
-
-## 1. Health Check
-
-**GET** `/api/health`
-
-### Response
-
-```json
-{
-  "status": "ok",
-  "timestamp": "2026-04-23T12:00:00Z",
-  "version": "1.0.0"
-}
+```txt
+Authorization: Bearer <token>
 ```
 
 ---
 
-## 2. Login
+# 1. Health
 
-**POST** `/api/auth/login`
+## GET `/api/health`
 
-### Request Body
+Checks server status.
+
+---
+
+# 2. Authentication
+
+## POST `/api/auth/login`
+
+Login with email and password.
+
+### Body
 
 ```json
 {
-  "email": "student@test.com",
+  "email": "admin@test.com",
   "password": "Test1234!"
 }
 ```
 
-### Success Response (200)
+---
 
-```json
-{
-  "token": "jwt-token-here",
-  "user": {
-    "id": "abc123",
-    "name": "Test User",
-    "role": "student",
-    "language": "ar"
-  }
-}
-```
+# 3. Users
 
-### Error Responses
+## GET `/api/users/me`
 
-#### 400 - Missing fields
+Get current logged-in user.
 
-```json
-{
-  "error": "Email and password are required"
-}
-```
-
-#### 401 - Invalid credentials
-
-```json
-{
-  "error": "Invalid credentials"
-}
-```
-
-#### 423 - Account locked
-
-```json
-{
-  "error": "Account is locked",
-  "unlockAt": "2026-05-04T18:00:00Z"
-}
-```
+Auth required.
 
 ---
 
-## 3. Get Current User
+# 4. Admin Users
 
-**GET** `/api/users/me`
+Admin only.
 
-### Headers
+## GET `/api/admin/users`
 
-```text
-Authorization: Bearer <token>
-```
+Get all users.
 
-### Success Response (200)
+## POST `/api/admin/users`
+
+Create user.
+
+### Body
 
 ```json
 {
-  "id": "abc123",
-  "name": "Test User",
   "email": "student@test.com",
-  "role": "student",
-  "language": "ar",
-  "level": "A1"
-}
-```
-
-### Error Responses
-
-#### 401 - No or invalid token
-
-```json
-{
-  "error": "No token provided"
-}
-```
-
-```json
-{
-  "error": "Invalid or expired token"
-}
-```
-
-#### 404 - User not found
-
-```json
-{
-  "error": "User not found"
-}
-```
-
----
-
-## 4. Admin Users
-
-Admin endpoints require a valid JWT token with role `admin`.
-
-### 4.1 Get All Users
-
-**GET** `/api/admin/users`
-
-### Headers
-
-```text
-Authorization: Bearer <admin-token>
-```
-
-### Success Response (200)
-
-```json
-{
-  "success": true,
-  "users": [
-    {
-      "id": "abc123",
-      "email": "student@test.com",
-      "name": "Test Student",
-      "role": "student",
-      "level": "A1",
-      "language": "ar",
-      "isActive": true,
-      "createdAt": null,
-      "lastLoginAt": null
-    }
-  ]
-}
-```
-
----
-
-### 4.2 Create User
-
-**POST** `/api/admin/users`
-
-### Headers
-
-```text
-Authorization: Bearer <admin-token>
-```
-
-### Request Body
-
-```json
-{
-  "email": "newstudent@test.com",
   "password": "Test1234!",
-  "name": "New Student",
+  "name": "Student Name",
   "role": "student",
   "level": "A1",
-  "language": "ar"
-}
-```
-
-### Success Response (201)
-
-```json
-{
-  "success": true,
-  "user": {
-    "id": "abc123",
-    "email": "newstudent@test.com",
-    "name": "New Student",
-    "role": "student",
-    "level": "A1",
-    "language": "ar",
-    "isActive": true
-  }
-}
-```
-
-### Error Responses
-
-```json
-{
-  "success": false,
-  "error": "User already exists",
-  "code": "USER_ALREADY_EXISTS"
-}
-```
-
----
-
-### 4.3 Update User
-
-**PUT** `/api/admin/users/:id`
-
-### Headers
-
-```text
-Authorization: Bearer <admin-token>
-```
-
-### Request Body
-
-```json
-{
-  "level": "A2",
   "language": "ar",
-  "isActive": true
+  "teacherIds": []
 }
 ```
 
-### Success Response (200)
+Allowed roles:
 
-```json
-{
-  "success": true,
-  "message": "User updated successfully"
-}
+```txt
+student
+teacher
+admin
 ```
+
+## PUT `/api/admin/users/:id`
+
+Update user.
+
+## DELETE `/api/admin/users/:id`
+
+Delete user.
 
 ---
 
-### 4.4 Delete User
+# 5. Admin Audio Recordings
 
-**DELETE** `/api/admin/users/:id`
+Admin only.
 
-### Headers
+## POST `/api/admin/audio-recordings`
 
-```text
-Authorization: Bearer <admin-token>
+Create audio recording.
+
+Content type:
+
+```txt
+multipart/form-data
 ```
 
-### Success Response (200)
+Fields:
 
-```json
-{
-  "success": true,
-  "message": "User deleted successfully"
-}
+```txt
+title
+description
+level
+language
+category
+transcriptText
+duration
+tags
+isActive
+audioFile
+jsonFile
 ```
 
----
+Required:
 
-## 5. Transcripts
-
-### 5.1 Get All Transcripts
-
-**GET** `/api/transcripts`
-
-### Success Response (200)
-
-```json
-[
-  {
-    "id": "abc123",
-    "level": "A1",
-    "fileName": "Copy of 1. מי אני.txt",
-    "text": "Hebrew transcript text...",
-    "language": "he",
-    "source": "lisan_curriculum"
-  }
-]
+```txt
+title
+level
+language
+category
+transcriptText
+audioFile
 ```
 
----
+Allowed levels:
 
-### 5.2 Get Transcripts By Level
+```txt
+A1
+A2
+B1
+B2
+```
 
-**GET** `/api/transcripts/level/:level`
+Allowed languages:
+
+```txt
+ar
+he
+en
+```
+
+## GET `/api/admin/audio-recordings`
+
+Get all audio recordings.
+
+Optional query filters:
+
+```txt
+level
+language
+category
+isActive
+```
 
 Example:
 
-```text
-GET /api/transcripts/level/A1
+```txt
+/api/admin/audio-recordings?level=A1&language=he&isActive=true
 ```
 
-### Success Response (200)
+## GET `/api/admin/audio-recordings/:id`
 
-```json
-[
-  {
-    "id": "abc123",
-    "level": "A1",
-    "fileName": "Copy of 1. מי אני.txt",
-    "text": "Hebrew transcript text..."
-  }
-]
-```
+Get recording by ID.
+
+## PUT `/api/admin/audio-recordings/:id`
+
+Update recording.
+
+Supports metadata update and optional new files.
+
+## DELETE `/api/admin/audio-recordings/:id`
+
+Delete recording and uploaded local files.
 
 ---
 
-### 5.3 Search Transcripts
+# 6. Admin Conversations Review
 
-**GET** `/api/transcripts/search?q=ירושלים`
+Admin only.
 
-Optional level filter:
+## GET `/api/admin/conversations`
 
-```text
-GET /api/transcripts/search?q=ירושלים&level=A1
+Get AI conversations.
+
+Supported filters:
+
+```txt
+studentId
+teacherId
+level
+isArchived
+from
+to
+search
+page
+limit
 ```
 
-### Success Response (200)
+Example:
+
+```txt
+/api/admin/conversations?page=1&limit=5
+```
+
+Example with search:
+
+```txt
+/api/admin/conversations?page=1&limit=5&search=%D7%A9%D7%99%D7%97%D7%94
+```
+
+Example with level:
+
+```txt
+/api/admin/conversations?level=A1
+```
+
+Response includes:
 
 ```json
 {
-  "query": "ירושלים",
+  "success": true,
+  "conversations": [],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 0,
+    "totalPages": 0
+  }
+}
+```
+
+## GET `/api/admin/conversations/:id`
+
+Get full conversation by ID.
+
+---
+
+# 7. Admin Words Review
+
+Admin only.
+
+## GET `/api/admin/words/pending`
+
+Get pending words.
+
+## POST `/api/admin/words`
+
+Create pending word.
+
+### Body
+
+```json
+{
+  "word": "shalom",
+  "translation": "مرحبا",
   "level": "A1",
-  "count": 2,
-  "results": [
-    {
-      "id": "abc123",
-      "level": "A1",
-      "fileName": "example.txt",
-      "text": "..."
-    }
-  ]
+  "language": "he",
+  "notes": "test word"
+}
+```
+
+Validation:
+
+```txt
+level must be A1, A2, B1, or B2
+language must be ar, he, or en
+```
+
+## PUT `/api/admin/words/:id/approve`
+
+Approve pending word.
+
+Moves word from:
+
+```txt
+pendingWords
+```
+
+to:
+
+```txt
+words
+```
+
+## PUT `/api/admin/words/:id/reject`
+
+Reject pending word.
+
+### Body
+
+```json
+{
+  "notes": "not suitable"
 }
 ```
 
 ---
 
-## 6. Evaluation Context
+# 8. Admin AI Tools
 
-**GET** `/api/evaluation/context`
+Admin only.
 
-### Purpose
+## GET `/api/admin/ai/analytics`
 
-Returns a normalized evaluation context for the AI speaking assessment model based on `userId`, `activityId`, and optional `turnId`.
+Proxy to AI service analytics.
 
-### Query Parameters
+## GET `/api/admin/ai/logs`
 
-| Parameter | Required | Description |
-|---|---|---|
-| `userId` | Yes | Student user ID |
-| `activityId` | Yes | Activity ID |
-| `turnId` | No | Specific dialogue turn ID |
+Get AI provider logs.
 
-### Example Request
+Optional filters:
 
-```text
-GET /api/evaluation/context?userId=test_user&activityId=a1_booking_appointment&turnId=turn_01
+```txt
+provider
+status
+limit
 ```
 
-### Success Response (200)
+## POST `/api/admin/ai/circuits/reset`
 
-```json
-{
-  "success": true,
-  "context": {
-    "userId": "test_user",
-    "activityId": "a1_booking_appointment",
-    "turnId": "turn_01",
-    "level": "A1",
-    "skill": "speaking",
-    "activity": {
-      "title": "קביעת תור",
-      "topic": "booking an appointment",
-      "activityMode": "guided_conversation",
-      "analysisDepth": "meaning_only",
-      "targetVocabulary": ["לקבוע תור", "תעודת זהות", "שעה"],
-      "targetGrammar": ["אני רוצה", "אפשר"],
-      "expectedPatterns": [
-        "אני רוצה לקבוע תור",
-        "אפשר לקבוע תור?"
-      ],
-      "referenceText": "אני רוצה לקבוע תור",
-      "strictness": "low",
-      "maxFeedbackItems": 1,
-      "feedbackLanguage": "he",
-      "supportLanguage": "ar",
-      "allowAdvancedCorrectLanguage": true,
-      "simplifyAdvancedLanguage": true
-    },
-    "currentTurn": {
-      "botTextHe": "שלום, איך אפשר לעזור?",
-      "expectedStudentAction": "ask_to_book_appointment",
-      "expectedPatterns": [
-        "אני רוצה לקבוע תור",
-        "אפשר לקבוע תור?"
-      ],
-      "referenceText": "אני רוצה לקבוע תור"
-    },
-    "rubric": {
-      "expectedMeaning": "הסטודנט צריך לבקש לקבוע תור.",
-      "requiredElements": ["request_appointment"],
-      "acceptablePatterns": [
-        "אני רוצה לקבוע תור",
-        "אפשר לקבוע תור?",
-        "ברצוני לקבוע פגישה"
-      ],
-      "commonMistakes": [
-        {
-          "wrong": "לעשות תור",
-          "correct": "לקבוע תור",
-          "type": "vocabulary",
-          "explanationHeSimple": "בעברית אומרים לקבוע תור."
-        }
-      ],
-      "correctionPolicy": {
-        "maxCorrections": 1,
-        "correctOnlyLevelRelevant": true,
-        "ignoreAdvancedStylisticIssues": true,
-        "doNotPunishAdvancedCorrectHebrew": true
-      }
-    },
-    "limits": {
-      "remainingPronunciationChecks": 20,
-      "monthlyPronunciationLimit": 30
-    }
-  }
-}
-```
-
-### Error Responses
-
-#### 400 - Missing query parameters
-
-```json
-{
-  "success": false,
-  "error": "userId and activityId are required",
-  "code": "MISSING_REQUIRED_PARAMS"
-}
-```
-
-#### 404 - Context not found
-
-```json
-{
-  "success": false,
-  "error": "Activity not found",
-  "code": "ACTIVITY_NOT_FOUND"
-}
-```
+Reset AI voice circuit breaker.
 
 ---
 
-## 7. Save Student Attempt
+# 9. Teacher APIs
 
-**POST** `/api/evaluation/attempts`
+Teacher only.
 
-### Purpose
+## GET `/api/teacher/students`
 
-Saves a student speaking attempt after STT recognition and AI evaluation.
+Get assigned students.
 
-### Request Body
+## GET `/api/teacher/students/:id/progress`
 
-```json
-{
-  "userId": "test_user",
-  "activityId": "a1_booking_appointment",
-  "turnId": "turn_01",
-  "recognizedTextHe": "אני רוצה לקבוע תור",
-  "aiEvaluation": {
-    "feedbackHe": "יפה מאוד",
-    "isMeaningCorrect": true
-  },
-  "usage": {
-    "level": "A1",
-    "referenceText": "אני רוצה לקבוע תור",
-    "usedAzurePronunciation": false,
-    "costMode": "standard"
-  }
-}
-```
+Get student progress.
 
-### Success Response (201)
+## GET `/api/teacher/students/:id/attempts`
 
-```json
-{
-  "success": true,
-  "attempt": {
-    "id": "YgRiLFYHMpE0FIVd54ur",
-    "userId": "test_user",
-    "activityId": "a1_booking_appointment",
-    "turnId": "turn_01",
-    "level": "A1",
-    "recognizedTextHe": "אני רוצה לקבוע תור",
-    "referenceText": "אני רוצה לקבוע תור",
-    "aiEvaluation": {
-      "feedbackHe": "יפה מאוד",
-      "isMeaningCorrect": true
-    },
-    "usedAzurePronunciation": false,
-    "costMode": "standard",
-    "createdAt": "2026-05-16T16:59:41.431Z"
-  }
-}
-```
+Get student attempts.
 
-### Error Responses
+## GET `/api/teacher/students/:id/chats`
 
-#### 400 - Missing required fields
-
-```json
-{
-  "success": false,
-  "error": "userId, activityId, and recognizedTextHe are required",
-  "code": "MISSING_REQUIRED_FIELDS"
-}
-```
-
-#### 500 - Server error
-
-```json
-{
-  "success": false,
-  "error": "Server error",
-  "code": "SERVER_ERROR"
-}
-```
+Get student chats.
 
 ---
 
-## 8. Chat History
+# 10. AI Chats
 
-All chat endpoints require a valid JWT token.
+Auth required.
 
-### 8.1 Create Chat
+## POST `/api/chats`
 
-**POST** `/api/chats`
+Create AI chat.
 
-### Headers
+## GET `/api/chats/my`
 
-```text
-Authorization: Bearer <token>
-```
+Get my chats.
 
-### Request Body
+## GET `/api/chats/:chatId`
 
-```json
-{
-  "title": "Restaurant Practice",
-  "level": "A1"
-}
-```
+Get chat by ID.
 
-### Success Response (201)
+## POST `/api/chats/:chatId/messages`
 
-```json
-{
-  "success": true,
-  "chat": {
-    "id": "chat123",
-    "userId": "user123",
-    "title": "Restaurant Practice",
-    "level": "A1",
-    "messages": []
-  }
-}
-```
+Add message manually.
+
+## POST `/api/chats/:chatId/ai`
+
+Send message to AI.
+
+## POST `/api/chats/voice`
+
+Send voice message to AI.
+
+## PUT `/api/chats/:id/archive`
+
+Archive chat.
+
+## DELETE `/api/chats/:chatId`
+
+Delete chat.
 
 ---
 
-### 8.2 Get My Chats
+# 11. Shared Chats
 
-**GET** `/api/chats/my`
+Auth required.
 
-### Headers
+## GET `/api/shared-chats/available-users`
 
-```text
-Authorization: Bearer <token>
-```
+Get users available for shared chat.
 
-### Success Response (200)
+Rules:
+
+* Teacher can chat with assigned students.
+* Student can chat with assigned teachers.
+* Student can chat with students in the same level.
+* User cannot chat with self.
+
+## POST `/api/shared-chats`
+
+Create shared chat.
+
+### Body
 
 ```json
 {
-  "success": true,
-  "chats": [
-    {
-      "id": "chat123",
-      "userId": "user123",
-      "title": "Restaurant Practice",
-      "level": "A1",
-      "messagesCount": 2
-    }
-  ]
+  "participantIds": ["userId1"]
 }
 ```
 
----
+## GET `/api/shared-chats/my`
 
-### 8.3 Get Chat By ID
+Get my shared chats.
 
-**GET** `/api/chats/:chatId`
+Sorted by latest updated chat first.
 
-### Headers
+## GET `/api/shared-chats/:id`
 
-```text
-Authorization: Bearer <token>
-```
+Get shared chat and messages.
 
-### Success Response (200)
+Also clears current user's unread state.
 
-```json
-{
-  "success": true,
-  "chat": {
-    "id": "chat123",
-    "userId": "user123",
-    "title": "Restaurant Practice",
-    "level": "A1",
-    "messages": [
-      {
-        "sender": "user",
-        "text": "אני רוצה מים",
-        "createdAt": "2026-05-22T07:17:58.918Z"
-      },
-      {
-        "sender": "ai",
-        "text": "יפה מאוד. אפשר גם להגיד: אני רוצה כוס מים.",
-        "createdAt": "2026-05-22T07:18:13.743Z"
-      }
-    ]
-  }
-}
-```
+## POST `/api/shared-chats/:id/messages`
 
----
+Send shared chat message.
 
-### 8.4 Add Message To Chat
-
-**POST** `/api/chats/:chatId/messages`
-
-### Headers
-
-```text
-Authorization: Bearer <token>
-```
-
-### Request Body
+### Body
 
 ```json
 {
-  "sender": "user",
   "text": "שלום"
 }
 ```
 
-Allowed senders:
+Validation:
 
-```text
-user
-ai
+```txt
+text is required
+max length: 5000 characters
 ```
 
-### Success Response (201)
+---
+
+# 12. Notifications
+
+Auth required.
+
+## GET `/api/notifications/my`
+
+Get my notifications.
+
+## PUT `/api/notifications/:id/read`
+
+Mark notification as read.
+
+---
+
+# 13. Transcripts
+
+## GET `/api/transcripts`
+
+Get transcripts.
+
+## GET `/api/transcripts/level/:level`
+
+Get transcripts by level.
+
+## GET `/api/transcripts/search?q=&level=`
+
+Search transcripts.
+
+---
+
+# 14. Evaluation
+
+## GET `/api/evaluation/context`
+
+Get evaluation context.
+
+Query:
+
+```txt
+userId
+activityId
+turnId
+```
+
+## POST `/api/evaluation/attempts`
+
+Save student attempt.
+
+---
+
+# 15. Progress
+
+Auth required.
+
+## GET `/api/progress/me`
+
+Get my progress.
+
+## GET `/api/progress/me/attempts`
+
+Get my attempts.
+
+---
+
+# 16. Vocabulary Progress
+
+Auth required.
+
+## POST `/api/vocab/progress`
+
+Save vocabulary progress.
+
+## GET `/api/vocab/progress/:userId`
+
+Get vocabulary progress.
+
+---
+
+# Error Format
+
+Most backend errors follow:
 
 ```json
 {
-  "success": true,
-  "message": {
-    "sender": "user",
-    "text": "שלום",
-    "createdAt": "2026-05-22T07:05:42.914Z"
-  }
+  "success": false,
+  "error": "Error message",
+  "code": "ERROR_CODE"
+}
+```
+
+Some shared chat routes return:
+
+```json
+{
+  "error": "Error message"
 }
 ```
 
 ---
 
-## 9. Student Progress
+# Common Status Codes
 
-All progress endpoints require a valid JWT token.
-
-### 9.1 Get My Progress
-
-**GET** `/api/progress/me`
-
-### Headers
-
-```text
-Authorization: Bearer <token>
-```
-
-### Success Response (200)
-
-```json
-{
-  "success": true,
-  "progress": {
-    "userId": "user123",
-    "name": "Test student",
-    "role": "student",
-    "level": "A2",
-    "totalAttempts": 0,
-    "correctMeaningCount": 0,
-    "totalChats": 3,
-    "pronunciationUsage": {
-      "monthlyLimit": 30,
-      "usedThisMonth": 0
-    },
-    "accuracy": 0
-  }
-}
+```txt
+200 OK
+201 Created
+400 Bad Request
+401 Unauthorized
+403 Forbidden
+404 Not Found
+409 Conflict
+423 Locked
+500 Server Error
 ```
 
 ---
 
-### 9.2 Get My Attempts
+# Final Backend Status
 
-**GET** `/api/progress/me/attempts`
+Completed:
 
-### Headers
+* Admin audio recordings
+* Admin conversations review
+* Admin words review
+* Teacher APIs
+* Shared chats
+* Notifications
+* AI chats
+* Voice chats
+* User management
+* Validation
+* Security
+* Firebase integration
 
-```text
-Authorization: Bearer <token>
-```
+Notes:
 
-### Success Response (200)
-
-```json
-{
-  "success": true,
-  "count": 0,
-  "attempts": []
-}
-```
-
----
-
-## Example cURL Commands
-
-### Health Check
-
-```bash
-curl http://localhost:3000/api/health
-```
-
-### Login
-
-```bash
-curl -X POST http://localhost:3000/api/auth/login \
--H "Content-Type: application/json" \
--d '{"email":"student@test.com","password":"Test1234!"}'
-```
-
-### Get Current User
-
-```bash
-curl http://localhost:3000/api/users/me \
--H "Authorization: Bearer <token>"
-```
-
-### Get All Users Admin
-
-```bash
-curl http://localhost:3000/api/admin/users \
--H "Authorization: Bearer <admin-token>"
-```
-
-### Create Chat
-
-```bash
-curl -X POST http://localhost:3000/api/chats \
--H "Authorization: Bearer <token>" \
--H "Content-Type: application/json" \
--d '{"title":"Restaurant Practice","level":"A1"}'
-```
-
-### Add Chat Message
-
-```bash
-curl -X POST http://localhost:3000/api/chats/<chatId>/messages \
--H "Authorization: Bearer <token>" \
--H "Content-Type: application/json" \
--d '{"sender":"user","text":"שלום"}'
-```
-
-### Get Progress
-
-```bash
-curl http://localhost:3000/api/progress/me \
--H "Authorization: Bearer <token>"
-```
-
-### Get Evaluation Context
-
-```bash
-curl "http://localhost:3000/api/evaluation/context?userId=test_user&activityId=a1_booking_appointment&turnId=turn_01"
-```
-
-### Save Student Attempt
-
-```bash
-curl -X POST http://localhost:3000/api/evaluation/attempts \
--H "Content-Type: application/json" \
--d '{
-  "userId": "test_user",
-  "activityId": "a1_booking_appointment",
-  "turnId": "turn_01",
-  "recognizedTextHe": "אני רוצה לקבוע תור",
-  "aiEvaluation": {
-    "feedbackHe": "יפה מאוד",
-    "isMeaningCorrect": true
-  },
-  "usage": {
-    "level": "A1",
-    "referenceText": "אני רוצה לקבוע תור",
-    "usedAzurePronunciation": false,
-    "costMode": "standard"
-  }
-}'
-```
+* Audio files currently use local storage under `backend/uploads`.
+* Firebase Storage can be enabled later when billing/storage is configured.
+* Production requires environment variables instead of local private key files.
