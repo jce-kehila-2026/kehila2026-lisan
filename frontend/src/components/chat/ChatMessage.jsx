@@ -17,6 +17,7 @@ import { motion } from 'framer-motion';
 import { Bot, UserRound } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { bubbleMotion } from '../ui/motion.js';
+import { getPronunciationFeedback } from '../../services/chat.js';
 
 // Maps backend fallbackReason codes to human-readable i18n keys
 const REASON_KEY_MAP = {
@@ -24,6 +25,11 @@ const REASON_KEY_MAP = {
   SERVICE_UNAVAILABLE:  'fallbackReasonUnavailable',
   OUT_OF_SCOPE:         'fallbackReasonOutOfScope',
   CACHE_HIT:            'fallbackReasonCache',
+  // Voice STT couldn't make out the audio
+  STT_EMPTY:            'fallbackReasonVoiceUnclear',
+  STT_FAILED:           'fallbackReasonVoiceUnclear',
+  STT_TIMEOUT:          'fallbackReasonVoiceUnclear',
+  STT_CIRCUIT_OPEN:     'fallbackReasonVoiceUnclear',
 };
 
 function ChatMessage({
@@ -33,9 +39,13 @@ function ChatMessage({
   pending = false,
   fallbackUsed = false,
   fallbackReason = null,
+  pronunciationScore = null,
 }) {
   const { t } = useTranslation();
   const isUser = role === 'user';
+  // Pronunciation feedback only applies to the student's own (transcribed)
+  // speech, so it is rendered on user bubbles that carry a score.
+  const pronunciationFeedback = isUser ? getPronunciationFeedback(pronunciationScore) : null;
 
   return (
     <motion.article
@@ -70,6 +80,21 @@ function ChatMessage({
           <p className="chat-message__translation" dir="rtl" lang="ar">
             {textAr}
           </p>
+        ) : null}
+
+        {/* Pronunciation feedback — shown under the student's spoken Hebrew */}
+        {!pending && pronunciationFeedback ? (
+          <span
+            className={`chat-message__pronunciation chat-message__pronunciation--${pronunciationFeedback.tone}`}
+            role="note"
+          >
+            <span className="chat-message__pronunciation-score" aria-hidden="true">
+              {pronunciationFeedback.score}
+            </span>
+            <span className="chat-message__pronunciation-label">
+              {t('chatPronunciationLabel')}: {t(pronunciationFeedback.labelKey)}
+            </span>
+          </span>
         ) : null}
 
         {/* Typing / pending dots */}

@@ -9,9 +9,11 @@ const chatController = require('../controllers/chatController');
 const { requireAuth } = require('../middleware/auth');
 const { handleVoiceUpload } = require('../middleware/voiceUpload');
 const { voiceRateLimit } = require('../middleware/voiceRateLimit');
-const { createAiRequestConfig } = require('../services/aiChatService');
+const {
+  createAiRequestConfig,
+  normalizeAiServiceBaseUrl,
+} = require('../services/aiChatService');
 
-const AI_SERVICE_BASE = process.env.AI_SERVICE_URL || 'http://localhost:8000';
 const STREAM_TIMEOUT_MS = Number(
   process.env.AI_SERVICE_STREAM_TIMEOUT_MS || 60000
 );
@@ -113,7 +115,7 @@ router.post('/:chatId/stream', requireAuth, async (req, res) => {
     });
 
     upstream = await axios.post(
-      `${AI_SERVICE_BASE}/api/ai/chat/stream`,
+      `${normalizeAiServiceBaseUrl()}/api/ai/chat/stream`,
       {
         message: text,
         level,
@@ -178,7 +180,7 @@ router.post('/:chatId/pronunciation', requireAuth, async (req, res) => {
 
     const userToken = req.headers.authorization?.replace('Bearer ', '') || null;
     const response = await axios.post(
-      `${AI_SERVICE_BASE}/api/ai/pronunciation/assess`,
+      `${normalizeAiServiceBaseUrl()}/api/ai/pronunciation/assess`,
       { audioBase64, transcribedText, level, sessionId: chatId },
       createAiRequestConfig({
         headers: {

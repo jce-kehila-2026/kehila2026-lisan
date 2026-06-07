@@ -1,4 +1,4 @@
-import Chatbot from './pages/Chatbot.jsx';
+import ChatbotPage from './pages/ChatbotPage.jsx';
 import React, { useEffect } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
 import ProtectedRoute from './routes/ProtectedRoute.jsx';
@@ -24,6 +24,7 @@ import TeacherLogin from './pages/teacher/Login.jsx';
 import DatasetUploader from './pages/teacher/DatasetUploader.jsx';
 import { getStoredUser } from './services/auth.js';
 
+const SKIP_AUTH = import.meta.env.VITE_SKIP_AUTH === 'true';
 
 function MoreByRole() {
   const user = getStoredUser();
@@ -75,7 +76,7 @@ function App() {
     <Router>
       <StudentPreferenceSync />
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<Navigate to={SKIP_AUTH ? '/home' : '/login'} replace />} />
         <Route path="/login" element={<StudentLogin />} />
         <Route path="/forgot-access" element={<ForgotAccess />} />
         <Route path="/admin/login" element={<AdminLogin />} />
@@ -132,7 +133,7 @@ function App() {
           path="/chatbot"
           element={
             <ProtectedRoute role={['student', 'teacher']}>
-              <Chatbot />
+              <ChatbotPage />
             </ProtectedRoute>
           }
         />
@@ -272,7 +273,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to={SKIP_AUTH ? '/home' : '/login'} replace />} />
       </Routes>
     </Router>
   );

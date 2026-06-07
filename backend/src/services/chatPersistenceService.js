@@ -1,8 +1,7 @@
 const crypto = require('crypto');
 const path = require('path');
 
-const { bucket } = require('../config/firebase');
-const { admin, db } = require('../config/firebase');
+const { admin, bucket, db } = require('../config/firebase');
 
 const SIGNED_URL_EXPIRY = '2100-01-01';
 const DEFAULT_CHAT_TITLE = 'New Chat';
@@ -10,10 +9,57 @@ const DEFAULT_VOICE_CHAT_TITLE = 'Voice Chat';
 const AUTO_TITLE_MAX_WORDS = 10;
 
 function ensureStorageBucketConfigured() {
-  if (!process.env.FIREBASE_STORAGE_BUCKET) {
+  if (!bucket?.name) {
     throw {
       code: 'STORAGE_BUCKET_NOT_CONFIGURED',
       message: 'Firebase Storage bucket is not configured'
+    };
+  }
+}
+
+async function verifyVoiceStorageBucketAvailable() {
+  if (String(process.env.SKIP_VOICE_STORAGE || '').trim() === 'true') {
+    return {
+      status: 'skipped',
+      bucketName: 'local-dev',
+    };
+  }
+
+  ensureStorageBucketConfigured();
+
+  try {
+    const [exists] = await bucket.exists();
+    if (!exists) {
+      throw {
+        code: 'STORAGE_BUCKET_NOT_FOUND',
+        message:
+          `Firebase Storage bucket "${bucket.name}" was not found. ` +
+          'Enable Firebase Storage for the project or set FIREBASE_STORAGE_BUCKET to an existing bucket.'
+      };
+    }
+
+    return {
+      status: 'ok',
+      bucketName: bucket.name,
+    };
+  } catch (error) {
+    if (error?.code === 'STORAGE_BUCKET_NOT_FOUND') {
+      throw error;
+    }
+
+    if (error?.code === 404) {
+      throw {
+        code: 'STORAGE_BUCKET_NOT_FOUND',
+        message:
+          `Firebase Storage bucket "${bucket.name}" was not found. ` +
+          'Enable Firebase Storage for the project or set FIREBASE_STORAGE_BUCKET to an existing bucket.'
+      };
+    }
+
+    throw {
+      code: 'STORAGE_BUCKET_CHECK_FAILED',
+      message: error?.message || 'Firebase Storage bucket check failed',
+      details: error,
     };
   }
 }
@@ -148,8 +194,6 @@ async function uploadStudentVoiceAudio({
   fileName,
   mimeType,
 }) {
-  ensureStorageBucketConfigured();
-
   if (!audioBuffer || !Buffer.isBuffer(audioBuffer) || audioBuffer.length === 0) {
     throw {
       code: 'VOICE_AUDIO_BUFFER_INVALID',
@@ -163,20 +207,44 @@ async function uploadStudentVoiceAudio({
     fileName,
   });
 
+  if (String(process.env.SKIP_VOICE_STORAGE || '').trim() === 'true') {
+    return {
+      audioUrl: `local-dev://${storagePath}`,
+      storagePath,
+      bucketName: 'local-dev',
+      contentType: mimeType || 'application/octet-stream',
+      sizeBytes: audioBuffer.length,
+    };
+  }
+
+  await verifyVoiceStorageBucketAvailable();
+
   const storageFile = bucket.file(storagePath);
 
-  await storageFile.save(audioBuffer, {
-    metadata: {
-      contentType: mimeType || 'application/octet-stream',
+  try {
+    await storageFile.save(audioBuffer, {
       metadata: {
-        userId: userId || '',
-        conversationId: conversationId || '',
-        source: 'voice-chat',
+        contentType: mimeType || 'application/octet-stream',
+        metadata: {
+          userId: userId || '',
+          conversationId: conversationId || '',
+          source: 'voice-chat',
+        },
       },
-    },
-    resumable: false,
-    validation: 'crc32c',
-  });
+      resumable: false,
+      validation: 'crc32c',
+    });
+  } catch (error) {
+    throw {
+      code: error?.code === 404
+        ? 'STORAGE_BUCKET_NOT_FOUND'
+        : 'VOICE_AUDIO_UPLOAD_FAILED',
+      message: error?.code === 404
+        ? `Firebase Storage bucket "${bucket.name}" was not found.`
+        : error?.message || 'Failed to upload voice audio',
+      details: error,
+    };
+  }
 
   const [audioUrl] = await storageFile.getSignedUrl({
     action: 'read',
@@ -201,4 +269,5 @@ module.exports = {
   DEFAULT_VOICE_CHAT_TITLE,
   sanitizeFileName,
   uploadStudentVoiceAudio,
+  verifyVoiceStorageBucketAvailable,
 };

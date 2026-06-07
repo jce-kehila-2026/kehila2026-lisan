@@ -83,10 +83,14 @@ def transcribe_audio(audio_bytes: bytes, filename: str = "audio.webm") -> str:
         )
         speech_config.speech_recognition_language = "he-IL"
 
-        # Azure SDK needs a file — write bytes to a temp file
-        suffix = _get_suffix(filename)
-        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
-            tmp.write(audio_bytes)
+        # Azure's file input expects PCM WAV, but the browser records
+        # webm/opus — transcode first (no-op if already canonical WAV).
+        from services.audio_convert import to_wav_pcm16
+        wav_bytes = to_wav_pcm16(audio_bytes)
+
+        # Azure SDK needs a file path — write the WAV to a temp file
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+            tmp.write(wav_bytes)
             tmp_path = tmp.name
 
         try:

@@ -18,14 +18,15 @@ from services.chat_provider import get_provider_logs
 from services.chat_schemas import ChatRequest, ChatResponse, VoiceChatResponse
 from services.text_to_speech import build_ssml
 from services.vocab_tracker import track_vocab_async
-# STT exceptions live in speech_to_text; the engine is now faster-whisper.
+# STT exceptions live in speech_to_text (shared by every engine).
 from services.speech_to_text import (
     STTAuthError,
     STTCircuitOpenError,
     STTError,
     STTTimeoutError,
 )
-from services.whisper_stt import transcribe_audio
+# Engine is selected at call time via STT_ENGINE (whisper [default] | azure).
+from services.stt import transcribe_audio
 
 # Max seconds to wait for pronunciation assessment alongside chat engine
 _PRON_TIMEOUT_SECONDS = 10.0
@@ -74,10 +75,32 @@ def verify_jwt_token(
         and x_internal_service_secret == expected_internal_secret
     )
 
+    if is_internal_valid:
+        if authorization and authorization.startswith("Bearer "):
+            token = authorization[len("Bearer "):].strip()
+            if token:
+                try:
+                    decoded = jwt.decode(
+                        token,
+                        options={"verify_signature": False},
+                        algorithms=["HS256"],
+                    )
+                    jwt_uid = decoded.get("uid")
+                    if x_user_id and jwt_uid and x_user_id != jwt_uid:
+                        raise HTTPException(
+                            status_code=403,
+                            detail="User ID mismatch in request headers and JWT payload",
+                        )
+                    return decoded
+                except HTTPException:
+                    raise
+                except Exception:
+                    return None
+        return None
+
     expected_jwt_secret = os.getenv("JWT_SECRET", "").strip()
     if not expected_jwt_secret:
-        if not is_internal_valid:
-            require_internal_service_secret(x_internal_service_secret)
+        require_internal_service_secret(x_internal_service_secret)
         return None
 
     if not authorization and is_internal_valid:

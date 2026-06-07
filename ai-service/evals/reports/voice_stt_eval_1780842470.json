@@ -1,0 +1,344 @@
+{
+  "runAt": "2026-06-07T14:27:50.958968+00:00",
+  "totalCases": 18,
+  "passed": 4,
+  "failed": 14,
+  "latencyBudgetMs": 4000,
+  "sttAccuracyAvg": null,
+  "pronScoreAvg": null,
+  "sttLatency": {
+    "avgMs": 121.5,
+    "p95Ms": 229.9,
+    "maxMs": 242
+  },
+  "chatLatency": {
+    "avgMs": 0,
+    "p95Ms": 0.0,
+    "maxMs": 0
+  },
+  "cases": [
+    {
+      "id": "stt_he_shalom",
+      "kind": "speech",
+      "transcript": "",
+      "similarity": 0.0,
+      "pron_score": null,
+      "stt_ms": 242,
+      "chat_ms": 0,
+      "answer": "",
+      "answer_words": 0,
+      "fallback_used": true,
+      "fallback_reason": "STT_FAILED",
+      "status": "FAIL",
+      "errors": [
+        "STT returned empty transcript",
+        "transcript '' missing expected word 'שלום'",
+        "teacher answer empty"
+      ]
+    },
+    {
+      "id": "stt_he_ma_shlomcha",
+      "kind": "speech",
+      "transcript": "",
+      "similarity": 0.0,
+      "pron_score": null,
+      "stt_ms": 0,
+      "chat_ms": 0,
+      "answer": "",
+      "answer_words": 0,
+      "fallback_used": true,
+      "fallback_reason": "STT_FAILED",
+      "status": "FAIL",
+      "errors": [
+        "STT returned empty transcript",
+        "transcript '' missing expected word 'שלומך'",
+        "teacher answer empty"
+      ]
+    },
+    {
+      "id": "stt_he_toda",
+      "kind": "speech",
+      "transcript": "",
+      "similarity": 0.0,
+      "pron_score": null,
+      "stt_ms": 0,
+      "chat_ms": 0,
+      "answer": "",
+      "answer_words": 0,
+      "fallback_used": true,
+      "fallback_reason": "STT_FAILED",
+      "status": "FAIL",
+      "errors": [
+        "STT returned empty transcript",
+        "transcript '' missing expected word 'תודה'",
+        "teacher answer empty"
+      ]
+    },
+    {
+      "id": "stt_he_ayfo_gar",
+      "kind": "speech",
+      "transcript": "",
+      "similarity": 0.0,
+      "pron_score": null,
+      "stt_ms": 0,
+      "chat_ms": 0,
+      "answer": "",
+      "answer_words": 0,
+      "fallback_used": true,
+      "fallback_reason": "STT_CIRCUIT_OPEN",
+      "status": "FAIL",
+      "errors": [
+        "STT returned empty transcript",
+        "transcript '' missing expected word 'איפה'",
+        "teacher answer empty"
+      ]
+    },
+    {
+      "id": "stt_he_ani_dana",
+      "kind": "speech",
+      "transcript": "",
+      "similarity": 0.0,
+      "pron_score": null,
+      "stt_ms": 0,
+      "chat_ms": 0,
+      "answer": "",
+      "answer_words": 0,
+      "fallback_used": true,
+      "fallback_reason": "STT_CIRCUIT_OPEN",
+      "status": "FAIL",
+      "errors": [
+        "STT returned empty transcript",
+        "transcript '' missing expected word 'אני'",
+        "teacher answer empty"
+      ]
+    },
+    {
+      "id": "stt_he_ayfo_hadoar",
+      "kind": "speech",
+      "transcript": "",
+      "similarity": 0.0,
+      "pron_score": null,
+      "stt_ms": 0,
+      "chat_ms": 0,
+      "answer": "",
+      "answer_words": 0,
+      "fallback_used": true,
+      "fallback_reason": "STT_CIRCUIT_OPEN",
+      "status": "FAIL",
+      "errors": [
+        "STT returned empty transcript",
+        "transcript '' missing expected word 'דואר'",
+        "teacher answer empty"
+      ]
+    },
+    {
+      "id": "stt_he_kama_avatiach",
+      "kind": "speech",
+      "transcript": "",
+      "similarity": 0.0,
+      "pron_score": null,
+      "stt_ms": 0,
+      "chat_ms": 0,
+      "answer": "",
+      "answer_words": 0,
+      "fallback_used": true,
+      "fallback_reason": "STT_CIRCUIT_OPEN",
+      "status": "FAIL",
+      "errors": [
+        "STT returned empty transcript",
+        "transcript '' missing expected word 'אבטיח'",
+        "teacher answer empty"
+      ]
+    },
+    {
+      "id": "stt_he_mi_ani",
+      "kind": "speech",
+      "transcript": "",
+      "similarity": 0.0,
+      "pron_score": null,
+      "stt_ms": 0,
+      "chat_ms": 0,
+      "answer": "",
+      "answer_words": 0,
+      "fallback_used": true,
+      "fallback_reason": "STT_CIRCUIT_OPEN",
+      "status": "FAIL",
+      "errors": [
+        "STT returned empty transcript",
+        "transcript '' missing expected word 'אני'",
+        "teacher answer empty"
+      ]
+    },
+    {
+      "id": "stt_he_emotional",
+      "kind": "speech",
+      "transcript": "",
+      "similarity": 0.0,
+      "pron_score": null,
+      "stt_ms": 0,
+      "chat_ms": 0,
+      "answer": "",
+      "answer_words": 0,
+      "fallback_used": true,
+      "fallback_reason": "STT_CIRCUIT_OPEN",
+      "status": "FAIL",
+      "errors": [
+        "STT returned empty transcript",
+        "transcript '' missing expected word 'עצוב'",
+        "teacher answer empty"
+      ]
+    },
+    {
+      "id": "stt_a2_restaurant",
+      "kind": "speech",
+      "transcript": "",
+      "similarity": 0.0,
+      "pron_score": null,
+      "stt_ms": 0,
+      "chat_ms": 0,
+      "answer": "",
+      "answer_words": 0,
+      "fallback_used": true,
+      "fallback_reason": "STT_CIRCUIT_OPEN",
+      "status": "FAIL",
+      "errors": [
+        "STT returned empty transcript",
+        "transcript '' missing expected word 'מסעדה'",
+        "teacher answer empty"
+      ]
+    },
+    {
+      "id": "stt_a2_family",
+      "kind": "speech",
+      "transcript": "",
+      "similarity": 0.0,
+      "pron_score": null,
+      "stt_ms": 0,
+      "chat_ms": 0,
+      "answer": "",
+      "answer_words": 0,
+      "fallback_used": true,
+      "fallback_reason": "STT_CIRCUIT_OPEN",
+      "status": "FAIL",
+      "errors": [
+        "STT returned empty transcript",
+        "transcript '' missing expected word 'משפחה'",
+        "teacher answer empty"
+      ]
+    },
+    {
+      "id": "stt_a2_trip",
+      "kind": "speech",
+      "transcript": "",
+      "similarity": 0.0,
+      "pron_score": null,
+      "stt_ms": 0,
+      "chat_ms": 0,
+      "answer": "",
+      "answer_words": 0,
+      "fallback_used": true,
+      "fallback_reason": "STT_CIRCUIT_OPEN",
+      "status": "FAIL",
+      "errors": [
+        "STT returned empty transcript",
+        "transcript '' missing expected word 'איסטנבול'",
+        "teacher answer empty"
+      ]
+    },
+    {
+      "id": "stt_pron_wrong_word",
+      "kind": "speech",
+      "transcript": "",
+      "similarity": 0.0,
+      "pron_score": null,
+      "stt_ms": 0,
+      "chat_ms": 0,
+      "answer": "",
+      "answer_words": 0,
+      "fallback_used": true,
+      "fallback_reason": "STT_CIRCUIT_OPEN",
+      "status": "FAIL",
+      "errors": [
+        "STT returned empty transcript",
+        "teacher answer empty"
+      ]
+    },
+    {
+      "id": "stt_low_volume",
+      "kind": "lowvol",
+      "transcript": "",
+      "similarity": 0.0,
+      "pron_score": null,
+      "stt_ms": 0,
+      "chat_ms": 0,
+      "answer": "",
+      "answer_words": 0,
+      "fallback_used": true,
+      "fallback_reason": "STT_CIRCUIT_OPEN",
+      "status": "FAIL",
+      "errors": [
+        "low-volume clip transcribed to nothing"
+      ]
+    },
+    {
+      "id": "stt_noise",
+      "kind": "noise",
+      "transcript": "",
+      "similarity": 0.0,
+      "pron_score": null,
+      "stt_ms": 0,
+      "chat_ms": 0,
+      "answer": "",
+      "answer_words": 0,
+      "fallback_used": true,
+      "fallback_reason": "STT_CIRCUIT_OPEN",
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "id": "stt_silence",
+      "kind": "silence",
+      "transcript": "",
+      "similarity": 0.0,
+      "pron_score": null,
+      "stt_ms": 0,
+      "chat_ms": 0,
+      "answer": "",
+      "answer_words": 0,
+      "fallback_used": true,
+      "fallback_reason": "STT_CIRCUIT_OPEN",
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "id": "stt_arabic_speaker",
+      "kind": "speech",
+      "transcript": "",
+      "similarity": 0.0,
+      "pron_score": null,
+      "stt_ms": 0,
+      "chat_ms": 0,
+      "answer": "",
+      "answer_words": 0,
+      "fallback_used": true,
+      "fallback_reason": "STT_CIRCUIT_OPEN",
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "id": "stt_english_speaker",
+      "kind": "speech",
+      "transcript": "",
+      "similarity": 0.0,
+      "pron_score": null,
+      "stt_ms": 1,
+      "chat_ms": 0,
+      "answer": "",
+      "answer_words": 0,
+      "fallback_used": true,
+      "fallback_reason": "STT_CIRCUIT_OPEN",
+      "status": "PASS",
+      "errors": []
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+[
+  { "id": "stt_he_shalom",        "kind": "speech", "lang": "he", "level": "A1", "text": "שלום",                 "expect_word": "שלום",   "answer_max_words": 10 },
+  { "id": "stt_he_ma_shlomcha",   "kind": "speech", "lang": "he", "level": "A1", "text": "מה שלומך",             "expect_word": "שלומך",  "answer_max_words": 10 },
+  { "id": "stt_he_toda",          "kind": "speech", "lang": "he", "level": "A1", "text": "תודה",                 "expect_word": "תודה",   "answer_max_words": 10 },
+  { "id": "stt_he_ayfo_gar",      "kind": "speech", "lang": "he", "level": "A1", "text": "איפה אתה גר",          "expect_word": "איפה",   "answer_max_words": 12 },
+  { "id": "stt_he_ani_dana",      "kind": "speech", "lang": "he", "level": "A1", "text": "אני דנה",              "expect_word": "אני",    "answer_max_words": 12 },
+  { "id": "stt_he_ayfo_hadoar",   "kind": "speech", "lang": "he", "level": "A1", "text": "איפה הדואר",           "expect_word": "דואר",   "answer_max_words": 12 },
+  { "id": "stt_he_kama_avatiach", "kind": "speech", "lang": "he", "level": "A1", "text": "כמה עולה האבטיח",      "expect_word": "אבטיח",  "answer_max_words": 12 },
+  { "id": "stt_he_mi_ani",        "kind": "speech", "lang": "he", "level": "A1", "text": "מי אני",               "expect_word": "אני",    "answer_max_words": 10 },
+  { "id": "stt_he_emotional",     "kind": "speech", "lang": "he", "level": "A1", "text": "אני עצוב היום",        "expect_word": "עצוב",   "answer_max_words": 12 },
+  { "id": "stt_a2_restaurant",    "kind": "speech", "lang": "he", "level": "A2", "text": "במסעדה של רמי",        "expect_word": "מסעדה",  "answer_max_words": 14 },
+  { "id": "stt_a2_family",        "kind": "speech", "lang": "he", "level": "A2", "text": "משפחה של פילים",       "expect_word": "משפחה",  "answer_max_words": 14 },
+  { "id": "stt_a2_trip",          "kind": "speech", "lang": "he", "level": "A2", "text": "טסים לאיסטנבול",       "expect_word": "איסטנבול","answer_max_words": 14 },
+  { "id": "stt_pron_wrong_word",  "kind": "speech", "lang": "he", "level": "A1", "text": "כמה עולה האבטך",       "expect_word": "",       "answer_max_words": 16 },
+  { "id": "stt_low_volume",       "kind": "lowvol", "lang": "he", "level": "A1", "text": "שלום מה שלומך",        "expect_word": "",       "answer_max_words": 12 },
+  { "id": "stt_noise",            "kind": "noise",  "lang": "he", "level": "A1", "text": "",                     "expect_word": "",       "answer_max_words": 12 },
+  { "id": "stt_silence",          "kind": "silence","lang": "he", "level": "A1", "text": "",                     "expect_word": "",       "answer_max_words": 12 },
+  { "id": "stt_arabic_speaker",   "kind": "speech", "lang": "ar", "level": "A1", "text": "مرحبا كيف حالك",       "expect_word": "",       "answer_max_words": 12 },
+  { "id": "stt_english_speaker",  "kind": "speech", "lang": "en", "level": "A1", "text": "hello how are you",    "expect_word": "",       "answer_max_words": 12 }
+]

@@ -207,8 +207,15 @@ function loadAppWithMocks(options = {}) {
   clearBackendModuleCache();
 
   process.env.JWT_SECRET = 'test-jwt-secret';
+  delete process.env.SKIP_AUTH;
+  delete process.env.SKIP_AUTH_ROLE;
   process.env.VOICE_RATE_LIMIT_WINDOW_MS = String(options.voiceWindowMs ?? 60 * 1000);
   process.env.VOICE_RATE_LIMIT_MAX = String(options.voiceLimit ?? 5);
+  if (options.storeVoiceAudio) {
+    process.env.STORE_VOICE_AUDIO = 'true';
+  } else {
+    delete process.env.STORE_VOICE_AUDIO;
+  }
 
   const firebaseMock = createFirebaseMock();
   const aiCalls = [];
@@ -589,12 +596,11 @@ test('POST /api/chat/voice saves the voice exchange and forwards the audio buffe
   assert.equal(response.status, 200);
   assert.equal(response.body.answerHe, 'שלום');
   assert.equal(response.body.transcribedText, 'שלום');
-  assert.equal(response.body.audioUrl, 'https://storage.example.test/audio.webm');
+  assert.equal(response.body.audioUrl, null);
+  assert.equal(response.body.audioStored, false);
   assert.match(response.body.conversationId, /^chat-\d+$/);
 
-  assert.equal(uploadCalls.length, 1);
-  assert.equal(uploadCalls[0].mimeType, 'audio/webm');
-  assert.equal(Buffer.isBuffer(uploadCalls[0].audioBuffer), true);
+  assert.equal(uploadCalls.length, 0);
 
   assert.equal(aiCalls.length, 1);
   assert.equal(aiCalls[0].mimeType, 'audio/webm');
@@ -606,11 +612,38 @@ test('POST /api/chat/voice saves the voice exchange and forwards the audio buffe
   assert.equal(storedChat.title, response.body.transcribedText);
   assert.equal(storedChat.messages.length, 2);
   assert.equal(storedChat.messages[0].type, 'voice');
-  assert.equal(storedChat.messages[0].audioUrl, 'https://storage.example.test/audio.webm');
+  assert.equal(storedChat.messages[0].audioUrl, null);
+  assert.equal(storedChat.messages[0].audioStored, false);
   assert.equal(storedChat.messages[0].transcribedText, 'שלום');
   assert.equal(storedChat.messages[1].sender, 'ai');
   assert.equal(storedChat.messages[1].text, 'שלום');
   assert.equal(storedChat.messages[1].fallbackUsed, false);
+});
+
+test('POST /api/chat/voice uploads audio only when STORE_VOICE_AUDIO is enabled', async () => {
+  const { app, chats, uploadCalls } = loadAppWithMocks({ storeVoiceAudio: true });
+  const token = createAuthToken({ uid: 'student-store-audio' });
+
+  const response = await request(app)
+    .post('/api/chat/voice')
+    .set('Authorization', `Bearer ${token}`)
+    .field('level', 'A1')
+    .attach('audio', Buffer.from('voice-bytes-store'), {
+      filename: 'store.webm',
+      contentType: 'audio/webm',
+    });
+
+  assert.equal(response.status, 200);
+  assert.equal(response.body.audioUrl, 'https://storage.example.test/audio.webm');
+  assert.equal(response.body.audioStored, true);
+  assert.equal(uploadCalls.length, 1);
+  assert.equal(uploadCalls[0].mimeType, 'audio/webm');
+  assert.equal(Buffer.isBuffer(uploadCalls[0].audioBuffer), true);
+
+  const storedChat = chats.get(response.body.conversationId);
+  assert.ok(storedChat);
+  assert.equal(storedChat.messages[0].audioUrl, 'https://storage.example.test/audio.webm');
+  assert.equal(storedChat.messages[0].audioStored, true);
 });
 
 test('POST /api/chat/voice reuses the previous response when clientMessageId is retried', async () => {
@@ -646,7 +679,7 @@ test('POST /api/chat/voice reuses the previous response when clientMessageId is 
   assert.equal(secondResponse.body.answerHe, firstResponse.body.answerHe);
   assert.equal(secondResponse.body.audioUrl, firstResponse.body.audioUrl);
   assert.equal(aiCalls.length, 1);
-  assert.equal(uploadCalls.length, 1);
+  assert.equal(uploadCalls.length, 0);
 
   const storedChat = chats.get(firstResponse.body.conversationId);
   assert.ok(storedChat);
@@ -790,7 +823,7 @@ test('POST /api/chat/voice saves fallback history when the AI service fails', as
   assert.equal(response.body.fallbackReason, 'AI_SERVICE_UNAVAILABLE');
   assert.match(response.body.conversationId, /^chat-\d+$/);
 
-  assert.equal(uploadCalls.length, 1);
+  assert.equal(uploadCalls.length, 0);
   assert.equal(aiCalls.length, 1);
 
   const storedChat = chats.get(response.body.conversationId);
@@ -798,7 +831,8 @@ test('POST /api/chat/voice saves fallback history when the AI service fails', as
   assert.equal(storedChat.messages.length, 2);
   assert.equal(storedChat.messages[0].sender, 'user');
   assert.equal(storedChat.messages[0].type, 'voice');
-  assert.equal(storedChat.messages[0].audioUrl, 'https://storage.example.test/audio.webm');
+  assert.equal(storedChat.messages[0].audioUrl, null);
+  assert.equal(storedChat.messages[0].audioStored, false);
   assert.equal(storedChat.messages[0].transcribedText, null);
   assert.equal(storedChat.messages[1].sender, 'ai');
   assert.equal(storedChat.messages[1].fallbackUsed, true);

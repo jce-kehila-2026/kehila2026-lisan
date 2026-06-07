@@ -5,9 +5,11 @@ const router = express.Router();
 
 const evaluationController = require('../controllers/evaluationController');
 const { requireAuth } = require('../middleware/auth');
-const { createAiRequestConfig, mapAiServiceError } = require('../services/aiChatService');
-
-const AI_SERVICE_BASE = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+const {
+  createAiRequestConfig,
+  mapAiServiceError,
+  normalizeAiServiceBaseUrl,
+} = require('../services/aiChatService');
 
 router.get('/context', evaluationController.getContext);
 router.post('/attempts', evaluationController.saveAttempt);
@@ -17,7 +19,7 @@ router.post('/speaking', requireAuth, async (req, res) => {
   try {
     const userToken = req.headers.authorization?.replace('Bearer ', '') || null;
     const response = await axios.post(
-      `${AI_SERVICE_BASE}/api/ai/evaluate-speaking`,
+      `${normalizeAiServiceBaseUrl()}/api/ai/evaluate-speaking`,
       req.body,
       createAiRequestConfig({
         headers: {

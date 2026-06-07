@@ -1,7 +1,14 @@
 const axios = require('axios');
 
-const DEFAULT_AI_SERVICE_BASE_URL =
-  process.env.AI_SERVICE_URL || 'http://localhost:8000';
+function normalizeAiServiceBaseUrl(value = process.env.AI_SERVICE_URL) {
+  const raw = String(value || 'http://localhost:8000').trim();
+  return raw
+    .replace(/\/+$/, '')
+    .replace(/\/api\/ai\/chat\/voice$/, '')
+    .replace(/\/api\/ai\/chat\/stream$/, '')
+    .replace(/\/api\/ai\/chat$/, '')
+    .replace(/\/api\/ai$/, '');
+}
 
 const DEFAULT_AI_TIMEOUT_MS = 20000;
 const DEFAULT_AI_VOICE_TIMEOUT_MS = 20000;
@@ -48,7 +55,7 @@ function createAiRequestConfig(extra = {}) {
 }
 
 function getAiChatServiceUrl() {
-  return `${DEFAULT_AI_SERVICE_BASE_URL}/api/ai/chat`;
+  return `${normalizeAiServiceBaseUrl()}/api/ai/chat`;
 }
 
 function getAiVoiceServiceUrl() {
@@ -56,7 +63,7 @@ function getAiVoiceServiceUrl() {
     return process.env.AI_SERVICE_VOICE_URL;
   }
 
-  return `${DEFAULT_AI_SERVICE_BASE_URL}/api/ai/chat/voice`;
+  return `${normalizeAiServiceBaseUrl()}/api/ai/chat/voice`;
 }
 
 async function sendChatMessageToAi({
@@ -82,6 +89,7 @@ async function sendChatMessageToAi({
         headers: {
           'Content-Type': 'application/json',
           ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {}),
+          ...(userId ? { 'X-User-ID': userId } : {}),
         }
       })
     );
@@ -119,6 +127,7 @@ async function sendVoiceMessageToAi({
         timeout: getAiVoiceServiceTimeoutMs(),
         headers: {
           ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {}),
+          ...(userId ? { 'X-User-ID': userId } : {}),
         }
       })
     );
@@ -182,6 +191,7 @@ function mapAiServiceError(error) {
 
 module.exports = {
   buildInternalServiceHeaders,
+  normalizeAiServiceBaseUrl,
   getAiChatServiceUrl,
   createAiRequestConfig,
   getAiServiceTimeoutMs,
