@@ -1,4 +1,12 @@
 const API_BASE_URL = 'http://localhost:3000/api';
+const SKIP_AUTH = import.meta.env.VITE_SKIP_AUTH === 'true';
+const SKIP_AUTH_ROLE = import.meta.env.VITE_SKIP_AUTH_ROLE || 'student';
+const SKIP_AUTH_USER = {
+  id: 'dev-user',
+  email: import.meta.env.VITE_SKIP_AUTH_EMAIL || 'dev@localhost',
+  name: import.meta.env.VITE_SKIP_AUTH_NAME || 'Dev User',
+  role: SKIP_AUTH_ROLE,
+};
 
 export const getLandingPathForRole = (role) => {
   if (role === 'admin') return '/admin/dashboard';
@@ -38,18 +46,28 @@ export const storeSession = ({ token, user }) => {
 };
 
 export const getStoredToken = () => {
-  return localStorage.getItem('lisan-token');
+  const token = localStorage.getItem('lisan-token');
+  if (token) return token;
+  if (SKIP_AUTH) return 'dev-token';
+  return null;
 };
 
 export const getStoredUser = () => {
   try {
-    return JSON.parse(localStorage.getItem('lisan-user'));
-  } catch {
+    const stored = localStorage.getItem('lisan-user');
+    if (stored) return JSON.parse(stored);
+    if (SKIP_AUTH) return SKIP_AUTH_USER;
     return null;
+  } catch {
+    return SKIP_AUTH ? SKIP_AUTH_USER : null;
   }
 };
 
 export const getCurrentUser = async () => {
+  if (SKIP_AUTH) {
+    return SKIP_AUTH_USER;
+  }
+
   const token = getStoredToken();
 
   if (!token) {
