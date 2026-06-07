@@ -163,6 +163,14 @@
   "chatVoiceUnsupported": "التسجيل الصوتي غير مدعوم في هذا المتصفح.",
   "chatVoiceGenericError": "حدثت مشكلة أثناء التسجيل الصوتي. حاولي مجددًا.",
   "chatVoiceRecordedMessage": "رسالة صوتية",
+  "chatVoiceProcessing": "نسمعكِ الآن... جارٍ تحويل صوتك",
+  "chatVoiceAnalyzing": "نحلّل نطقك الآن...",
+  "chatVoiceNotHeard": "لم أسمعكِ بوضوح. اقتربي من المايك وتكلّمي بوضوح أكثر، أو اكتبي رسالتك.",
+  "chatVoiceTimeoutError": "أخذ تحويل الصوت وقتًا أطول من المعتاد. حاولي مجددًا أو اكتبي رسالتك.",
+  "chatPronunciationLabel": "النطق",
+  "chatPronunciationExcellent": "ممتاز! نطق واضح",
+  "chatPronunciationGood": "جيد، جرّبي نطقًا أوضح",
+  "chatPronunciationPractice": "انتبهي للنطق، حاولي مرة أخرى",
   "chatFallbackNotice": "إجابة بديلة",
   "chatIncludeArabic": "شرح بالعربية",
   "chatQuickPromptsLabel": "أسئلة سريعة لبدء المحادثة",
@@ -172,5 +180,6 @@
   "fallbackReasonTimeout": "إجابة بديلة — لم يستجب الذكاء الاصطناعي في الوقت المحدد",
   "fallbackReasonUnavailable": "إجابة بديلة — الخدمة غير متاحة",
   "fallbackReasonOutOfScope": "توجيه: السؤال خارج نطاق الدرس",
-  "fallbackReasonCache": "إجابة من الذاكرة المؤقتة"
+  "fallbackReasonCache": "إجابة من الذاكرة المؤقتة",
+  "fallbackReasonVoiceUnclear": "لم نلتقط الصوت بوضوح"
 }

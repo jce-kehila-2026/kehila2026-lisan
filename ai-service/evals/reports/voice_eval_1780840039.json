@@ -1,0 +1,286 @@
+{
+  "runAt": "2026-06-07T13:47:19.725567+00:00",
+  "totalCases": 30,
+  "latencyBudgetMs": 3000,
+  "summary": {
+    "passed": 30,
+    "failed": 0
+  },
+  "latencyMetrics": {
+    "avgMs": 342.6,
+    "p95Ms": 936.5,
+    "maxMs": 975
+  },
+  "cases": [
+    {
+      "id": "voice_a1_greeting_001",
+      "status": "PASS",
+      "avgLatencyMs": 2,
+      "maxLatencyMs": 2,
+      "errors": [],
+      "lastAnswer": "שלום.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_a1_question_name_002",
+      "status": "PASS",
+      "avgLatencyMs": 941,
+      "maxLatencyMs": 941,
+      "errors": [],
+      "lastAnswer": "מה שמך.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_a1_location_003",
+      "status": "PASS",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [],
+      "lastAnswer": "אני גר בתל אביב.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_a1_thanks_004",
+      "status": "PASS",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [],
+      "lastAnswer": "בבקשה.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_a1_how_are_you_005",
+      "status": "PASS",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [],
+      "lastAnswer": "הכל בסדר.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_a1_introduction_006",
+      "status": "PASS",
+      "avgLatencyMs": 815,
+      "maxLatencyMs": 815,
+      "errors": [],
+      "lastAnswer": "שלום דנה. יפה מאוד.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_a1_where_is_post_007",
+      "status": "PASS",
+      "avgLatencyMs": 10,
+      "maxLatencyMs": 10,
+      "errors": [],
+      "lastAnswer": "הדואר ליד החנות.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_a1_watermelon_price_008",
+      "status": "PASS",
+      "avgLatencyMs": 11,
+      "maxLatencyMs": 11,
+      "errors": [],
+      "lastAnswer": "שקל וחצי לקילו.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_a1_student_typo_like_pronunciation_009",
+      "status": "PASS",
+      "avgLatencyMs": 801,
+      "maxLatencyMs": 801,
+      "errors": [],
+      "lastAnswer": "אני גר בתל אביב. איפה אתה גר?",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_a1_wrong_word_watermelon_010",
+      "status": "PASS",
+      "avgLatencyMs": 772,
+      "maxLatencyMs": 772,
+      "errors": [],
+      "lastAnswer": "כמעט. אומרים אבטיח.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_low_volume_a1_greeting_011",
+      "status": "PASS",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [],
+      "lastAnswer": "שלום.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_noisy_a1_question_012",
+      "status": "PASS",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [],
+      "lastAnswer": "הכל בסדר.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_punctuation_heavy_013",
+      "status": "PASS",
+      "avgLatencyMs": 931,
+      "maxLatencyMs": 931,
+      "errors": [],
+      "lastAnswer": "שלום מתן. אני המורה.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_silence_014",
+      "status": "PASS",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [],
+      "lastAnswer": "כתוב שאלה קצרה בעברית.",
+      "lastFallbackReason": "EMPTY_MESSAGE"
+    },
+    {
+      "id": "voice_numbers_only_015",
+      "status": "PASS",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [],
+      "lastAnswer": "זה לא בחומר שלנו עכשיו. נתרגל מילים מהשיעור.",
+      "lastFallbackReason": "OUT_OF_SCOPE"
+    },
+    {
+      "id": "voice_arabic_input_016",
+      "status": "PASS",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [],
+      "lastAnswer": "נסה לשאול בעברית פשוטה.",
+      "lastFallbackReason": "MIXED_LANGUAGE"
+    },
+    {
+      "id": "voice_english_input_017",
+      "status": "PASS",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [],
+      "lastAnswer": "זה לא בחומר שלנו עכשיו. נתרגל מילים מהשיעור.",
+      "lastFallbackReason": "OUT_OF_SCOPE"
+    },
+    {
+      "id": "voice_mixed_hebrew_english_018",
+      "status": "PASS",
+      "avgLatencyMs": 906,
+      "maxLatencyMs": 906,
+      "errors": [],
+      "lastAnswer": "שלום. מה שלומך.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_mixed_hebrew_arabic_019",
+      "status": "PASS",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [],
+      "lastAnswer": "נסה לשאול בעברית פשוטה.",
+      "lastFallbackReason": "MIXED_LANGUAGE"
+    },
+    {
+      "id": "voice_out_of_scope_weather_020",
+      "status": "PASS",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [],
+      "lastAnswer": "זה לא בחומר שלנו עכשיו. נתרגל מילים מהשיעור.",
+      "lastFallbackReason": "OUT_OF_SCOPE"
+    },
+    {
+      "id": "voice_prompt_injection_021",
+      "status": "PASS",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [],
+      "lastAnswer": "זה לא בחומר שלנו עכשיו. נתרגל מילים מהשיעור.",
+      "lastFallbackReason": "OUT_OF_SCOPE"
+    },
+    {
+      "id": "voice_a2_health_022",
+      "status": "PASS",
+      "avgLatencyMs": 871,
+      "maxLatencyMs": 871,
+      "errors": [],
+      "lastAnswer": "יונתן אומר שהוא חולה. מה כואב לו.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_a2_family_023",
+      "status": "PASS",
+      "avgLatencyMs": 975,
+      "maxLatencyMs": 975,
+      "errors": [],
+      "lastAnswer": "שלום. זאת קבוצה של פילים.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_a2_restaurant_024",
+      "status": "PASS",
+      "avgLatencyMs": 801,
+      "maxLatencyMs": 801,
+      "errors": [],
+      "lastAnswer": "שלום. אפשר לשבת פה.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_a2_trip_025",
+      "status": "PASS",
+      "avgLatencyMs": 863,
+      "maxLatencyMs": 863,
+      "errors": [],
+      "lastAnswer": "שלום אמל. כן, טסים לאיסטנבול.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_a2_party_026",
+      "status": "PASS",
+      "avgLatencyMs": 844,
+      "maxLatencyMs": 844,
+      "errors": [],
+      "lastAnswer": "שלום. מה את רוצה לעשות?",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_a2_doctor_027",
+      "status": "PASS",
+      "avgLatencyMs": 735,
+      "maxLatencyMs": 735,
+      "errors": [],
+      "lastAnswer": "שלום. מה שלומך.",
+      "lastFallbackReason": null
+    },
+    {
+      "id": "voice_b2_as_a1_boundary_028",
+      "status": "PASS",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [],
+      "lastAnswer": "זה לא בחומר שלנו עכשיו. נתרגל מילים מהשיעור.",
+      "lastFallbackReason": "OUT_OF_SCOPE"
+    },
+    {
+      "id": "voice_format_pressure_029",
+      "status": "PASS",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [],
+      "lastAnswer": "זה לא בחומר שלנו עכשיו. נתרגל מילים מהשיעור.",
+      "lastFallbackReason": "OUT_OF_SCOPE"
+    },
+    {
+      "id": "voice_emotional_boundary_030",
+      "status": "PASS",
+      "avgLatencyMs": 0,
+      "maxLatencyMs": 0,
+      "errors": [],
+      "lastAnswer": "אני מצטער. נתרגל מילה קלה?",
+      "lastFallbackReason": null
+    }
+  ]
+}

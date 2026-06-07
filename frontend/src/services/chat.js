@@ -4,6 +4,11 @@ export const CHAT_VOICE_API_PATH = `${CHAT_API_PATH}/voice`;
 
 export const DEFAULT_CHAT_LEVEL = 'A1';
 
+// Client-side guard so a slow STT/TTS round-trip never leaves the user staring
+// at an indefinite spinner. Backend voice latency peaks around ~8s, so 25s is a
+// generous ceiling that only trips on a genuine hang.
+export const VOICE_REQUEST_TIMEOUT_MS = 25_000;
+
 export const DEFAULT_SUGGESTED_PROMPTS = Object.freeze([
   'מה השם שלך?',
   'איך אומרים תודה?',
@@ -28,6 +33,7 @@ const CHAT_ERROR_KEY_BY_CODE = Object.freeze({
   STT_TIMEOUT: 'chatVoiceTranscriptionError',
   STT_CIRCUIT_OPEN: 'chatVoiceTranscriptionError',
   STT_EMPTY: 'chatVoiceTranscriptionError',
+  VOICE_CLIENT_TIMEOUT: 'chatVoiceTimeoutError',
   TTS_FAILED: 'chatVoicePlaybackError',
   TTS_TIMEOUT: 'chatVoicePlaybackError',
   TTS_CIRCUIT_OPEN: 'chatVoicePlaybackError',
@@ -94,10 +100,31 @@ export function normalizeVoiceChatResponse(payload = {}) {
     level: payload.level ?? DEFAULT_CHAT_LEVEL,
     latencyMs: Number.isFinite(payload.latencyMs) ? payload.latencyMs : 0,
     transcribedText: payload.transcribedText ?? null,
+    pronunciationScore: Number.isFinite(payload.pronunciationScore)
+      ? payload.pronunciationScore
+      : null,
     suggestedNextPrompts: Array.isArray(payload.suggestedNextPrompts)
       ? payload.suggestedNextPrompts
       : [...DEFAULT_SUGGESTED_PROMPTS],
   };
+}
+
+/**
+ * Maps a 0-100 Azure pronunciation score to a learner-facing feedback band.
+ * Returns null when no score is available (assessment disabled or failed) so
+ * the UI simply renders nothing rather than a misleading "0".
+ *
+ *   >= 80  excellent  — clear pronunciation
+ *   >= 60  good       — understandable, encourage clearer speech
+ *   <  60  practice   — needs another attempt
+ */
+export function getPronunciationFeedback(score) {
+  if (typeof score !== 'number' || !Number.isFinite(score)) return null;
+
+  const value = Math.max(0, Math.min(100, Math.round(score)));
+  if (value >= 80) return { score: value, tone: 'excellent', labelKey: 'chatPronunciationExcellent' };
+  if (value >= 60) return { score: value, tone: 'good', labelKey: 'chatPronunciationGood' };
+  return { score: value, tone: 'practice', labelKey: 'chatPronunciationPractice' };
 }
 
 function createClientMessageId() {
@@ -159,6 +186,25 @@ function createChatApiError(response, responseBody = {}, fallbackMessage) {
   });
 }
 
+async function createConversation({ title, level = DEFAULT_CHAT_LEVEL }) {
+  const response = await fetch(CHAT_API_PATH, {
+    method: 'POST',
+    headers: getChatHeaders(),
+    body: JSON.stringify({
+      title: title || 'Hebrew practice',
+      level,
+    }),
+  });
+
+  const responseBody = await readJsonSafe(response);
+
+  if (!response.ok) {
+    throw createChatApiError(response, responseBody, 'chatCreateFailed');
+  }
+
+  return responseBody.chat || null;
+}
+
 export function getChatErrorPresentation(error) {
   if (error instanceof ChatApiError) {
     return {
@@ -187,18 +233,40 @@ export async function sendChatMessage({
   level = DEFAULT_CHAT_LEVEL,
   includeArabic = false,
 }) {
+  const trimmedMessage = typeof message === 'string' ? message.trim() : '';
+  let activeConversationId = conversationId;
+
+  if (!activeConversationId) {
+    const conversation = await createConversation({
+      title: trimmedMessage || 'Hebrew practice',
+      level,
+    });
+    activeConversationId = conversation?.id || null;
+  }
+
+  if (!activeConversationId) {
+    throw new ChatApiError('Conversation was not created', {
+      status: 500,
+      code: 'CONVERSATION_NOT_CREATED',
+      translationKey: 'chatServiceError',
+    });
+  }
+
   const requestPayload = buildChatRequest({
-    message,
-    conversationId,
+    message: trimmedMessage,
+    conversationId: activeConversationId,
     level,
     includeArabic,
     clientMessageId: createClientMessageId(),
   });
 
-  const response = await fetch(CHAT_API_PATH, {
+  const response = await fetch(`${CHAT_API_PATH}/${activeConversationId}/ai-message`, {
     method: 'POST',
     headers: getChatHeaders(),
-    body: JSON.stringify(requestPayload),
+    body: JSON.stringify({
+      text: requestPayload.message,
+      clientMessageId: requestPayload.clientMessageId,
+    }),
   });
 
   const responseBody = await readJsonSafe(response);
@@ -207,7 +275,11 @@ export async function sendChatMessage({
     throw createChatApiError(response, responseBody, 'chatRequestFailed');
   }
 
-  return normalizeChatResponse(responseBody);
+  return normalizeChatResponse({
+    ...responseBody,
+    conversationId: activeConversationId,
+    answerHe: responseBody.aiMessage?.text || responseBody.answerHe || '',
+  });
 }
 
 export async function sendVoiceMessage({
@@ -225,13 +297,33 @@ export async function sendVoiceMessage({
   }
 
   const token = localStorage.getItem('lisan-token');
-  const response = await fetch(CHAT_VOICE_API_PATH, {
-    method: 'POST',
-    headers: {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: formData,
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), VOICE_REQUEST_TIMEOUT_MS);
+
+  let response;
+  try {
+    response = await fetch(CHAT_VOICE_API_PATH, {
+      method: 'POST',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+      signal: controller.signal,
+    });
+  } catch (error) {
+    // AbortError = our own timeout fired. Surface a clear, actionable message
+    // instead of a generic network failure so the user knows to retry/type.
+    if (error?.name === 'AbortError') {
+      throw new ChatApiError('Voice request timed out', {
+        status: 408,
+        code: 'VOICE_CLIENT_TIMEOUT',
+        translationKey: 'chatVoiceTimeoutError',
+      });
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
   const responseBody = await readJsonSafe(response);
 
@@ -251,19 +343,26 @@ function normalizeConversationSummary(payload = {}) {
     createdAt: payload.createdAt ?? null,
     lastMessageAt: payload.lastMessageAt ?? null,
     lastMessagePreview: payload.lastMessagePreview ?? '',
-    messageCount: Number.isFinite(payload.messageCount) ? payload.messageCount : 0,
+    messageCount: Number.isFinite(payload.messageCount)
+      ? payload.messageCount
+      : Number.isFinite(payload.messagesCount)
+        ? payload.messagesCount
+        : 0,
   };
 }
 
 export function normalizeConversationMessage(payload = {}) {
   return {
     id: payload.id ?? '',
-    role: payload.role ?? 'assistant',
-    textHe: payload.textHe ?? payload.rawText ?? '',
+    role: payload.role ?? (payload.sender === 'ai' ? 'assistant' : 'user'),
+    textHe: payload.textHe ?? payload.text ?? payload.transcribedText ?? payload.rawText ?? '',
     textAr: payload.textAr ?? null,
     rawText: payload.rawText ?? null,
     fallbackUsed: payload.fallbackUsed === true,
     fallbackReason: payload.fallbackReason ?? null,
+    pronunciationScore: Number.isFinite(payload.pronunciationScore)
+      ? payload.pronunciationScore
+      : null,
     createdAt: payload.createdAt ?? null,
   };
 }
@@ -280,13 +379,19 @@ export async function fetchConversations() {
     throw createChatApiError(response, responseBody, 'chatConversationsFailed');
   }
 
-  return Array.isArray(responseBody.conversations)
-    ? responseBody.conversations.map(normalizeConversationSummary)
-    : [];
+  const items = Array.isArray(responseBody.conversations)
+    ? responseBody.conversations
+    : Array.isArray(responseBody.chats)
+      ? responseBody.chats
+      : [];
+
+  return items
+    .map(normalizeConversationSummary)
+    .sort((a, b) => String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')));
 }
 
 export async function fetchConversation(conversationId) {
-  const response = await fetch(`${CHAT_CONVERSATIONS_API_PATH}/${conversationId}`, {
+  const response = await fetch(`${CHAT_API_PATH}/${conversationId}`, {
     method: 'GET',
     headers: getChatHeaders(),
   });
@@ -297,16 +402,21 @@ export async function fetchConversation(conversationId) {
     throw createChatApiError(response, responseBody, 'chatConversationFailed');
   }
 
+  const chat = responseBody.chat || {};
+
   return {
-    conversation: normalizeConversationSummary(responseBody.conversation || {}),
-    messages: Array.isArray(responseBody.messages)
-      ? responseBody.messages.map(normalizeConversationMessage)
+    conversation: normalizeConversationSummary({
+      id: conversationId,
+      ...chat,
+    }),
+    messages: Array.isArray(chat.messages)
+      ? chat.messages.map(normalizeConversationMessage)
       : [],
   };
 }
 
 export async function deleteConversation(conversationId) {
-  const response = await fetch(`${CHAT_CONVERSATIONS_API_PATH}/${conversationId}`, {
+  const response = await fetch(`${CHAT_API_PATH}/${conversationId}`, {
     method: 'DELETE',
     headers: getChatHeaders(),
   });

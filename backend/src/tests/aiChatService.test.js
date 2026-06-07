@@ -22,7 +22,10 @@ require.cache[require.resolve('axios')] = {
 const {
   sendChatMessageToAi,
   sendVoiceMessageToAi,
+  getAiChatServiceUrl,
+  getAiVoiceServiceUrl,
   mapAiServiceError,
+  normalizeAiServiceBaseUrl,
 } = require('../services/aiChatService');
 
 // ── sendChatMessageToAi ───────────────────────────────────────────────────────
@@ -30,6 +33,39 @@ const {
 describe('sendChatMessageToAi', () => {
   beforeEach(() => {
     _axiosPostImpl = async () => ({ data: { answerHe: 'שלום', fallbackUsed: false } });
+  });
+
+  test('normalizes AI_SERVICE_URL when it points at the chat endpoint', () => {
+    const previousUrl = process.env.AI_SERVICE_URL;
+    process.env.AI_SERVICE_URL = 'http://127.0.0.1:8000/api/ai/chat';
+
+    assert.equal(normalizeAiServiceBaseUrl(), 'http://127.0.0.1:8000');
+    assert.equal(getAiChatServiceUrl(), 'http://127.0.0.1:8000/api/ai/chat');
+    assert.equal(getAiVoiceServiceUrl(), 'http://127.0.0.1:8000/api/ai/chat/voice');
+
+    if (previousUrl === undefined) {
+      delete process.env.AI_SERVICE_URL;
+    } else {
+      process.env.AI_SERVICE_URL = previousUrl;
+    }
+  });
+
+  test('sends user id header when a user token is proxied', async () => {
+    let capturedConfig = null;
+    _axiosPostImpl = async (_url, _body, config) => {
+      capturedConfig = config;
+      return { data: {} };
+    };
+
+    await sendChatMessageToAi({
+      message: 'שלום',
+      level: 'A1',
+      userId: 'uid-123',
+      userToken: 'frontend-token',
+    });
+
+    assert.equal(capturedConfig.headers.Authorization, 'Bearer frontend-token');
+    assert.equal(capturedConfig.headers['X-User-ID'], 'uid-123');
   });
 
   test('returns data from axios response', async () => {

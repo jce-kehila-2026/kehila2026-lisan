@@ -888,6 +888,54 @@ a {
   flex-shrink: 0;
 }
 
+/* Pronunciation feedback badge — score chip + learner-facing label.
+   Tone (excellent / good / practice) is set by the band helper in chat.js. */
+.chat-message__pronunciation {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.45rem;
+  padding: 0.22rem 0.55rem 0.22rem 0.3rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border: 1px solid transparent;
+  clear: both;
+}
+
+.chat-message__pronunciation-score {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.45rem;
+  height: 1.45rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.65);
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.chat-message__pronunciation--excellent {
+  background: rgba(22, 163, 74, 0.1);
+  border-color: rgba(22, 163, 74, 0.22);
+  color: #15803d;
+}
+
+.chat-message__pronunciation--good {
+  background: rgba(202, 138, 4, 0.1);
+  border-color: rgba(202, 138, 4, 0.22);
+  color: #a16207;
+}
+
+.chat-message__pronunciation--practice {
+  background: rgba(234, 88, 12, 0.1);
+  border-color: rgba(234, 88, 12, 0.22);
+  color: #c2410c;
+}
+
 /* ── Chat Composer ─────────────────────────────────────────────────────────── */
 
 .chat-composer {

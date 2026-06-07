@@ -2,4 +2,6 @@
 __pycache__/
 *.pyc
 *.wav
+*.webm
+evals/voice_stt_audio/
 results/

@@ -64,6 +64,15 @@ import {
   sendVoiceMessage,
 } from '../services/chat.js';
 
+// Fallback reasons that mean STT couldn't make out the speech (vs an
+// out-of-scope / guardrail fallback where a transcript does exist).
+const STT_FALLBACK_REASONS = new Set([
+  'STT_EMPTY',
+  'STT_FAILED',
+  'STT_TIMEOUT',
+  'STT_CIRCUIT_OPEN',
+]);
+
 function createLocalMessage({
   role,
   textHe,
@@ -71,6 +80,7 @@ function createLocalMessage({
   pending       = false,
   fallbackUsed  = false,
   fallbackReason = null,
+  pronunciationScore = null,
 }) {
   return {
     localId: `${role}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
@@ -80,6 +90,7 @@ function createLocalMessage({
     pending,
     fallbackUsed,
     fallbackReason,
+    pronunciationScore,
   };
 }
 
@@ -92,6 +103,13 @@ function ChatbotPage() {
   const [conversations, setConversations] = useState([]);
   const [conversationId, setConversationId] = useState(null);
   const [loading, setLoading] = useState(false);
+  // Distinguishes a voice round-trip (STT → chat → TTS) from a text request so
+  // the typing indicator can show a voice-aware "we're listening…" label.
+  const [voiceProcessing, setVoiceProcessing] = useState(false);
+  // Two perceived phases of a voice request: first STT ("listening"), then the
+  // chat + pronunciation assessment ("analyzing"). One request, but a timed
+  // switch makes the wait feel responsive and explains the latency.
+  const [voicePhase, setVoicePhase] = useState('listening');
   const [conversationsLoading, setConversationsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -311,7 +329,13 @@ function ChatbotPage() {
     if (!audioBlob || loading) return;
 
     setErrorMessage('');
+    setVoiceProcessing(true);
+    setVoicePhase('listening');
     setLoading(true);
+
+    // After STT typically completes (~2.5s), shift the label to "analyzing
+    // pronunciation" so the remaining wait reads as deliberate, not stuck.
+    const phaseTimer = setTimeout(() => setVoicePhase('analyzing'), 2500);
 
     try {
       const response = await sendVoiceMessage({
@@ -323,21 +347,29 @@ function ChatbotPage() {
 
       setConversationId(response.conversationId);
 
-      const userText = response.transcribedText || t('chatVoiceRecordedMessage');
-      setMessages((curr) => [
-        ...curr,
-        createLocalMessage({
+      // STT failures surface a clear, encouraging "couldn't hear you" message
+      // rather than a generic bubble. No transcript → skip the empty user bubble.
+      const transcript = (response.transcribedText || '').trim();
+      const sttFailed = response.fallbackUsed && STT_FALLBACK_REASONS.has(response.fallbackReason);
+      const assistantText = response.answerHe
+        || (sttFailed ? t('chatVoiceNotHeard') : t('chatVoiceTranscriptionError'));
+
+      const newMessages = [];
+      if (transcript) {
+        newMessages.push(createLocalMessage({
           role: 'user',
-          textHe: userText,
-        }),
-        createLocalMessage({
-          role: 'assistant',
-          textHe: response.answerHe || t('chatVoiceTranscriptionError'),
-          textAr: response.answerAr,
-          fallbackUsed: response.fallbackUsed,
-          fallbackReason: response.fallbackReason,
-        }),
-      ]);
+          textHe: transcript,
+          pronunciationScore: response.pronunciationScore,
+        }));
+      }
+      newMessages.push(createLocalMessage({
+        role: 'assistant',
+        textHe: assistantText,
+        textAr: response.answerAr,
+        fallbackUsed: response.fallbackUsed,
+        fallbackReason: response.fallbackReason,
+      }));
+      setMessages((curr) => [...curr, ...newMessages]);
 
       // TTS is handled by the browser — speak the Hebrew answer aloud
       if (response.answerHe && !response.fallbackUsed) {
@@ -348,7 +380,9 @@ function ChatbotPage() {
     } catch (error) {
       presentError(error);
     } finally {
+      clearTimeout(phaseTimer);
       recorder.clearAudio();
+      setVoiceProcessing(false);
       setLoading(false);
     }
   }, [
@@ -429,7 +463,11 @@ function ChatbotPage() {
           <ChatWindow
             messages={messages}
             loading={loading}
-            loadingLabel={t('chatThinking')}
+            loadingLabel={
+              voiceProcessing
+                ? t(voicePhase === 'analyzing' ? 'chatVoiceAnalyzing' : 'chatVoiceProcessing')
+                : t('chatThinking')
+            }
             emptyTitle={t('chatEmptyTitle')}
             emptyDescription={t('chatEmptyDescription')}
             emptyPrompts={suggestedPrompts}

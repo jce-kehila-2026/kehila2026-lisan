@@ -163,6 +163,14 @@
   "chatVoiceUnsupported": "הקלטה קולית אינה נתמכת בדפדפן הזה.",
   "chatVoiceGenericError": "אירעה בעיה בזמן ההקלטה. נסי שוב.",
   "chatVoiceRecordedMessage": "הודעה קולית",
+  "chatVoiceProcessing": "מקשיבים לך עכשיו... ממירים את הקול לטקסט",
+  "chatVoiceAnalyzing": "מנתחים את ההגייה שלך...",
+  "chatVoiceNotHeard": "לא שמעתי אותך בבירור. נסי לדבר קרוב יותר למיקרופון וברור יותר, או כתבי את ההודעה.",
+  "chatVoiceTimeoutError": "המרת הקול ארכה יותר מהרגיל. נסי שוב או כתבי את ההודעה.",
+  "chatPronunciationLabel": "הגייה",
+  "chatPronunciationExcellent": "מצוין! הגייה ברורה",
+  "chatPronunciationGood": "טוב, נסי הגייה ברורה יותר",
+  "chatPronunciationPractice": "שימי לב להגייה, נסי שוב",
   "chatFallbackNotice": "תשובה חלופית",
   "chatIncludeArabic": "הסבר בערבית",
   "chatQuickPromptsLabel": "שאלות מהירות לתחילת שיחה",
@@ -172,5 +180,6 @@
   "fallbackReasonTimeout": "תגובה חלופית — AI לא הגיב בזמן",
   "fallbackReasonUnavailable": "תגובה חלופית — שירות לא זמין",
   "fallbackReasonOutOfScope": "תוגה: שאלה מחוץ לנושא הלימוד",
-  "fallbackReasonCache": "תגובה ממטמון"
+  "fallbackReasonCache": "תגובה ממטמון",
+  "fallbackReasonVoiceUnclear": "לא קלטנו את הקול בבירור"
 }

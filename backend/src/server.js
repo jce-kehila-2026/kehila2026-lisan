@@ -144,13 +144,28 @@ function createApp() {
     // AI service ping
     try {
       const axios = require('axios');
-      const aiBase = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+      const { normalizeAiServiceBaseUrl } = require('./services/aiChatService');
+      const aiBase = normalizeAiServiceBaseUrl();
       const r = await axios.get(`${aiBase}/api/ai/health`, { timeout: 3000 });
       checks.ai_service = r.status === 200 ? 'ok' : `status_${r.status}`;
       if (r.status !== 200) allOk = false;
     } catch (err) {
       checks.ai_service = `unreachable: ${err.message}`;
       allOk = false;
+    }
+
+    if (String(process.env.STORE_VOICE_AUDIO || '').trim() === 'true') {
+      try {
+        const { verifyVoiceStorageBucketAvailable } =
+          require('./services/chatPersistenceService');
+        const storage = await verifyVoiceStorageBucketAvailable();
+        checks.voice_storage = storage.status;
+      } catch (err) {
+        checks.voice_storage = `error: ${err.message}`;
+        allOk = false;
+      }
+    } else {
+      checks.voice_storage = 'not_required';
     }
 
     res.status(allOk ? 200 : 503).json({

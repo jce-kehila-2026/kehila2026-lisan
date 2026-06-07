@@ -6,7 +6,10 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    console.log('🔐 LOGIN ATTEMPT:', { env: process.env.NODE_ENV, email, password, match: password === '123456' });
+
     if (process.env.NODE_ENV === 'development' && password === '123456') {
+        console.log('📌 DEV LOGIN MATCHED');
       const devUsers = {
         'admin': {
           uid: 'dev-admin',

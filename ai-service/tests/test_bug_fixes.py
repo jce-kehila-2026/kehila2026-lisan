@@ -306,3 +306,46 @@ class TestB20JwtMalformedHeader:
             assert resp.status_code in (
                 401, 403
             ), f"got {resp.status_code}: {resp.text}"
+
+    def test_internal_secret_allows_backend_proxy_jwt_signed_elsewhere(self):
+        """Backend proxy auth must trust internal secret even if frontend JWT uses a different secret."""
+        from fastapi.testclient import TestClient
+        import jwt
+        from main import app
+        from services.chat_schemas import ChatResponse, GuardrailReport
+        import routes.chat as chat_route
+
+        token = jwt.encode({"uid": "uid-123"}, "backend-secret", algorithm="HS256")
+        response = ChatResponse(
+            answerHe="שלום",
+            answerAr=None,
+            fallbackUsed=False,
+            fallbackReason=None,
+            level="A1",
+            model="test",
+            latencyMs=0,
+            guardrail=GuardrailReport(),
+        )
+
+        with mock.patch.dict(
+            os.environ,
+            {
+                "AI_SERVICE_INTERNAL_SECRET": "internal-secret",
+                "JWT_SECRET": "ai-service-secret",
+            },
+        ):
+            with mock.patch.object(
+                chat_route, "generate_chat_response", return_value=response
+            ):
+                client = TestClient(app)
+                resp = client.post(
+                    "/api/ai/chat",
+                    json={"message": "שלום", "level": "A1"},
+                    headers={
+                        "Authorization": f"Bearer {token}",
+                        "X-Internal-Service-Secret": "internal-secret",
+                        "X-User-ID": "uid-123",
+                    },
+                )
+
+        assert resp.status_code == 200, resp.text

@@ -7,11 +7,9 @@ words against the approved curriculum vocabulary before sending requests.
 from __future__ import annotations
 
 import difflib
-import io
 import json
 import os
 import tempfile
-import wave
 from pathlib import Path
 
 import azure.cognitiveservices.speech as speechsdk
@@ -153,28 +151,15 @@ VALIDATOR = PronunciationValidator()
 
 
 def _ensure_wav_format(audio_bytes: bytes) -> bytes:
-    """Validate and re-encode audio as 16kHz, 16-bit, mono PCM WAV."""
-    try:
-        with io.BytesIO(audio_bytes) as buf:
-            with wave.open(buf, "rb") as w:
-                frames = w.readframes(w.getnframes())
-                n_channels = w.getnchannels()
-                sampwidth = w.getsampwidth()
-                framerate = w.getframerate()
+    """Return 16kHz / 16-bit / mono PCM WAV bytes, transcoding if needed.
 
-        if n_channels == 1 and sampwidth == 2 and framerate == 16000:
-            return audio_bytes
-
-        output = io.BytesIO()
-        with wave.open(output, "wb") as w:
-            w.setnchannels(1)
-            w.setsampwidth(2)
-            w.setframerate(16000)
-            w.writeframes(frames)
-        return output.getvalue()
-
-    except wave.Error:
-        return audio_bytes
+    Browsers record webm/opus, which the stdlib ``wave`` module cannot read
+    (and which Azure cannot score). Such inputs — and any non-canonical WAV
+    (wrong rate/channels/width) — are transcoded via PyAV/ffmpeg. Canonical
+    WAV is returned untouched.
+    """
+    from services.audio_convert import to_wav_pcm16
+    return to_wav_pcm16(audio_bytes)
 
 
 def validate_pronunciation_reference(word: str, language_level: str) -> dict:

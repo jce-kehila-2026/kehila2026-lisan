@@ -75,6 +75,7 @@ function ChatWindow({
             pending={message.pending}
             fallbackUsed={message.fallbackUsed}
             fallbackReason={message.fallbackReason}
+            pronunciationScore={message.pronunciationScore}
           />
         ))}
       </AnimatePresence>

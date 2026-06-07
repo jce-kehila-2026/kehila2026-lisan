@@ -17,6 +17,10 @@ const { logger, toErrorPayload, hashUserId } = require('../lib/logger');
 
 const AI_VOICE_FAILURE_MESSAGE = 'אוי, יש בעיה. נסו שוב מאוחר יותר.';
 
+function shouldStoreVoiceAudio() {
+  return String(process.env.STORE_VOICE_AUDIO || '').trim() === 'true';
+}
+
 exports.createChat = async (req, res) => {
   try {
     const { title } = req.body;
@@ -496,7 +500,7 @@ exports.sendVoiceMessage = async (req, res) => {
       uploadedAudio = {
         audioUrl: existingVoiceMessagePair.userMessage.audioUrl,
       };
-    } else {
+    } else if (shouldStoreVoiceAudio()) {
       uploadedAudio = await uploadStudentVoiceAudio({
         userId,
         conversationId: chatId,
@@ -517,7 +521,7 @@ exports.sendVoiceMessage = async (req, res) => {
         originalName: audioFile.originalname,
         mimeType: audioFile.mimetype,
         size: audioFile.size,
-        audioUrl: uploadedAudio.audioUrl,
+        audioUrl: uploadedAudio?.audioUrl || null,
       }
     };
 
@@ -539,10 +543,11 @@ exports.sendVoiceMessage = async (req, res) => {
       type: 'voice',
       text: aiVoiceResponse?.transcribedText || null,
       clientMessageId: normalizedClientMessageId,
-      audioUrl: uploadedAudio.audioUrl,
+      audioUrl: uploadedAudio?.audioUrl || null,
       transcribedText: aiVoiceResponse?.transcribedText || null,
       fallbackUsed: false,
       fallbackReason: null,
+      audioStored: Boolean(uploadedAudio?.audioUrl),
       createdAt: new Date().toISOString(),
     };
 
@@ -594,7 +599,8 @@ exports.sendVoiceMessage = async (req, res) => {
     return res.status(200).json({
       ...aiVoiceResponse,
       conversationId: chatId,
-      audioUrl: uploadedAudio.audioUrl,
+      audioUrl: uploadedAudio?.audioUrl || null,
+      audioStored: Boolean(uploadedAudio?.audioUrl),
       pronunciationScore: aiVoiceResponse?.pronunciationScore ?? null,
       ssmlText: aiVoiceResponse?.ssmlText ?? null,
       suggestedNextPrompts: aiVoiceResponse?.suggestedNextPrompts || [],
@@ -606,7 +612,7 @@ exports.sendVoiceMessage = async (req, res) => {
       clientMessageId: normalizedClientMessageId,
     });
 
-    if (chatRef && audioFile && uploadedAudio) {
+    if (chatRef && audioFile) {
       try {
         await persistFailedVoiceAttempt({
           chatRef,
@@ -918,11 +924,12 @@ async function persistFailedVoiceAttempt({
     type: 'voice',
     text: null,
     clientMessageId,
-    audioUrl: uploadedAudio.audioUrl,
+    audioUrl: uploadedAudio?.audioUrl || null,
     transcribedText: null,
     fallbackUsed: false,
     fallbackReason: null,
     audioMimeType: audioFile.mimetype,
+    audioStored: Boolean(uploadedAudio?.audioUrl),
     createdAt,
   };
 
@@ -1008,6 +1015,7 @@ function buildVoiceIdempotentResponse({
       null,
     conversationId: chatId,
     audioUrl: userMessage?.audioUrl || null,
+    audioStored: Boolean(userMessage?.audioUrl),
   };
 }
 

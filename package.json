@@ -3,7 +3,12 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\" \"cd ai-service && python -m uvicorn main:app --reload --port 8000\"",
-    "install:all": "npm install --prefix backend && npm install --prefix frontend && pip install -r ai-service/requirements.txt"
+    "install:all": "npm install --prefix backend && npm install --prefix frontend && pip install -r ai-service/requirements.txt",
+    "test:ai-service": "cd ai-service && python -m pytest -q",
+    "test:backend": "npm test --prefix backend && node --test backend/tests/voice-chat-route.test.js",
+    "test:frontend": "npm test --prefix frontend && npm run build --prefix frontend",
+    "eval:voice-stt": "cd ai-service && python evals/run_voice_stt_eval.py",
+    "verify:handoff": "npm run test:ai-service && npm run test:backend && npm run test:frontend && npm run eval:voice-stt"
   },
   "devDependencies": {
     "concurrently": "^9.0.0"
