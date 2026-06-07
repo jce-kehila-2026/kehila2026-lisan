@@ -258,8 +258,8 @@ function AdminDashboard() {
   };
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8">
-      <div className="mx-auto max-w-6xl" dir="rtl">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl" dir="rtl">
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-sm">
             <LayoutDashboard
@@ -281,7 +281,7 @@ function AdminDashboard() {
 
         <section className="mt-6 overflow-hidden rounded-[2rem] border border-white/70 bg-white/95 p-5 shadow-card sm:p-7">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-2xl">
+            <div className="max-w-4xl">
               <p className="text-sm font-black text-violet-700">
                 שלום {user?.name || 'מנהלת'}
               </p>

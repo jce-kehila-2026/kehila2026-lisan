@@ -21,6 +21,7 @@ import HomePage from './pages/home/HomePage.jsx';
 import TeacherHome from './pages/home/TeacherHome.jsx';
 import StudentLogin from './pages/student/Login.jsx';
 import TeacherLogin from './pages/teacher/Login.jsx';
+import DatasetUploader from './pages/teacher/DatasetUploader.jsx';
 import { getStoredUser } from './services/auth.js';
 
 const SKIP_AUTH = import.meta.env.VITE_SKIP_AUTH === 'true';
@@ -220,7 +221,7 @@ function App() {
           path="/teacher/stories/upload"
           element={
             <ProtectedRoute role="teacher">
-              <ExistingPlaceholderPage titleKey="teacherStoriesTitle" />
+              <DatasetUploader />
             </ProtectedRoute>
           }
         />

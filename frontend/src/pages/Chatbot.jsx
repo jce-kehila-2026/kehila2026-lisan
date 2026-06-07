@@ -204,10 +204,10 @@ function Chatbot({
 
   return (
     <main
-      className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_100%)] px-4 py-5"
+      className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_100%)] px-3 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8"
       translate="no"
     >
-      <div className="mx-auto max-w-2xl">
+      <div className="mx-auto w-full max-w-6xl">
         <PageHeader showBack backTo="/home" />
 
         <section className="mt-6 flex min-h-[calc(100vh-9rem)] flex-col rounded-3xl bg-white p-5 shadow-card sm:p-6">
@@ -232,7 +232,7 @@ function Chatbot({
               messages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`max-w-[70%] rounded-2xl px-4 py-3 text-sm leading-6 shadow-sm ${
+                  className={`max-w-[92%] rounded-2xl px-4 py-3 text-sm leading-6 shadow-sm sm:max-w-[78%] lg:max-w-[64%] ${
                     msg.role === 'user'
                       ? 'self-end bg-gradient-to-br from-violet-600 to-fuchsia-500 text-white'
                       : 'self-start bg-slate-100 text-slate-900'
@@ -274,7 +274,7 @@ function Chatbot({
             <button
               type="submit"
               disabled={sending}
-              className="shrink-0 rounded-2xl bg-violet-600 px-5 py-3 text-sm font-bold text-white disabled:opacity-60"
+              className="shrink-0 rounded-2xl bg-violet-600 px-3 py-3 text-sm font-bold text-white disabled:opacity-60 sm:px-5"
             >
               {sending ? 'Thinking...' : 'Send'}
             </button>

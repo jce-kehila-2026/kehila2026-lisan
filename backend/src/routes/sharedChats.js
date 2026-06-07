@@ -5,6 +5,7 @@ const { requireAuth } = require('../middleware/auth');
 const router = express.Router();
 
 const USER_CHAT_TYPE = 'user';
+const MAX_MESSAGE_LENGTH = 5000;
 
 const getCurrentUser = async (uid) => {
   const userDoc = await db.collection('users').doc(uid).get();
@@ -112,12 +113,8 @@ const canChatWith = (currentUser, targetUser) => {
 
   if (currentRole === 'teacher' && targetRole === 'student') {
     const teacherIds = [
-      ...(Array.isArray(targetUser.teacherIds)
-        ? targetUser.teacherIds
-        : []),
-      ...(targetUser.teacherId
-        ? [targetUser.teacherId]
-        : []),
+      ...(Array.isArray(targetUser.teacherIds) ? targetUser.teacherIds : []),
+      ...(targetUser.teacherId ? [targetUser.teacherId] : [])
     ];
 
     return teacherIds.includes(currentUser.id);
@@ -125,12 +122,8 @@ const canChatWith = (currentUser, targetUser) => {
 
   if (currentRole === 'student' && targetRole === 'teacher') {
     const teacherIds = [
-      ...(Array.isArray(currentUser.teacherIds)
-        ? currentUser.teacherIds
-        : []),
-      ...(currentUser.teacherId
-        ? [currentUser.teacherId]
-        : []),
+      ...(Array.isArray(currentUser.teacherIds) ? currentUser.teacherIds : []),
+      ...(currentUser.teacherId ? [currentUser.teacherId] : [])
     ];
 
     return teacherIds.includes(targetUser.id);
@@ -312,6 +305,10 @@ router.get('/my', requireAuth, async (req, res) => {
       }))
       .filter((chat) => (chat.type || USER_CHAT_TYPE) === USER_CHAT_TYPE);
 
+    chats.sort((a, b) => {
+      return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
+    });
+
     return res.status(200).json({
       chats
     });
@@ -332,6 +329,12 @@ router.post('/:id/messages', requireAuth, async (req, res) => {
     if (!text || !text.trim()) {
       return res.status(400).json({
         error: 'Message text is required'
+      });
+    }
+
+    if (text.length > MAX_MESSAGE_LENGTH) {
+      return res.status(400).json({
+        error: 'Message is too long'
       });
     }
 
@@ -377,8 +380,7 @@ router.post('/:id/messages', requireAuth, async (req, res) => {
       unreadBy
     });
 
-    const senderName =
-      chat.participantNames?.[req.user.uid] || 'משתמש';
+    const senderName = chat.participantNames?.[req.user.uid] || 'משתמש';
 
     await createNotificationsForParticipants({
       chat,
@@ -469,9 +471,7 @@ router.get('/:id', requireAuth, async (req, res) => {
     }
 
     const unreadBy = Array.isArray(chat.unreadBy)
-      ? chat.unreadBy.filter(
-        (participantId) => participantId !== req.user.uid
-      )
+      ? chat.unreadBy.filter((participantId) => participantId !== req.user.uid)
       : [];
 
     await chatRef.update({

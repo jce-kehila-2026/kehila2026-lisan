@@ -27,8 +27,8 @@ function PlaceholderPage({ titleKey = 'comingSoon', type }) {
   }, [id, titleKey, type]);
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8">
-      <div className="relative mx-auto min-h-[calc(100vh-2.5rem)] max-w-xl pb-28 sm:min-h-[720px]">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
+      <div className="relative mx-auto min-h-[calc(100vh-2rem)] w-full max-w-5xl pb-32 sm:min-h-[720px]">
         <PageHeader />
         <section className="mt-8 rounded-3xl bg-white p-7 text-center shadow-card sm:p-10">
           <p className="text-sm font-bold text-violet-700">{t(resolvedTitleKey)}</p>

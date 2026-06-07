@@ -126,8 +126,8 @@ function Notifications() {
   };
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8">
-      <div className="mx-auto max-w-4xl" dir="rtl">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
+      <div className="mx-auto w-full max-w-6xl" dir="rtl">
         <header className="flex flex-wrap items-center justify-between gap-3">
           <button
             type="button"
@@ -153,7 +153,7 @@ function Notifications() {
             ההתראות שלי
           </h1>
 
-          <p className="mt-3 max-w-2xl text-sm font-semibold leading-7 text-slate-600 sm:text-base">
+          <p className="mt-3 max-w-4xl text-sm font-semibold leading-7 text-slate-600 sm:text-base">
             כאן מופיעות התראות חדשות על הודעות ושיחות במערכת.
           </p>
 

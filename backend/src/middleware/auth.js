@@ -7,7 +7,7 @@ function requireAuth(req, res, next) {
     req.user = {
       uid: 'dev-user',
       email: process.env.SKIP_AUTH_EMAIL || 'dev@localhost',
-      role: process.env.SKIP_AUTH_ROLE || 'student',
+      role: process.env.SKIP_AUTH_ROLE || 'admin',
       name: process.env.SKIP_AUTH_NAME || 'Dev User',
     };
     return next();
