@@ -46,7 +46,7 @@ function LinksPage() {
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8">
-      <div className="relative mx-auto min-h-[calc(100vh-2.5rem)] max-w-xl pb-28 sm:min-h-[780px]">
+      <div className="relative mx-auto min-h-[calc(100vh-2.5rem)] w-full max-w-[1480px] pb-32 sm:min-h-[780px]">
         <PageHeader />
 
         <section className="mt-6 rounded-3xl bg-white p-5 shadow-card sm:p-6">
