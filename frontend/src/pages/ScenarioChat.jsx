@@ -3,6 +3,11 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import Chatbot from './Chatbot.jsx';
+import {
+  getStudentStoryById,
+  getStudentStorySubtitle,
+  getStudentStoryTitle,
+} from '../data/studentStories.jsx';
 
 const scenarioConfig = {
   'daily-word': {
@@ -45,18 +50,24 @@ const scenarioConfig = {
 
 function ScenarioChat() {
   const { id } = useParams();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const story = getStudentStoryById(id);
 
   const scenario = scenarioConfig[id] || {
-    titleKey: 'story',
-    subtitle: 'תרגול שיחה לפי הדיאלוג מהספר',
-    initialMessage: 'שלום! בואי נתרגל שיחה בעברית.',
+    titleKey: story ? null : 'story',
+    title: story ? getStudentStoryTitle(story, i18n.language) : '',
+    subtitle: story
+      ? getStudentStorySubtitle(story, i18n.language)
+      : 'תרגול שיחה לפי הדיאלוג מהספר',
+    initialMessage: story
+      ? `שלום! בואי נתרגל שיחה בנושא: ${getStudentStoryTitle(story, 'he')}.`
+      : 'שלום! בואי נתרגל שיחה בעברית.',
     placeholderResponse: 'אני מבין. בוא נמשיך את השיחה בעברית.',
   };
 
   return (
     <Chatbot
-      title={t(scenario.titleKey)}
+      title={scenario.title || t(scenario.titleKey)}
       subtitle={scenario.subtitle}
       initialMessage={scenario.initialMessage}
       placeholderResponse={scenario.placeholderResponse}

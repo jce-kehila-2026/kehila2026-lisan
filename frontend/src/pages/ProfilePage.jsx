@@ -1,13 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+  Award,
+  BadgeCheck,
   Bell,
-  Clock,
-  Flame,
+  Camera,
+  Gem,
   Languages,
-  MessageCircle,
-  Moon,
+  Rocket,
+  ShieldCheck,
   SlidersHorizontal,
-  Sun,
+  Sparkles,
+  Target,
+  Trophy,
   Type,
   Volume2,
 } from 'lucide-react';
@@ -40,6 +44,22 @@ const labels = {
     slow: 'איטי',
     normal: 'רגיל',
     notifications: 'התראות',
+    myProfile: 'הפרופיל שלי',
+    stepByStep: 'לומדת עברית צעד אחר צעד',
+    learningJourney: 'מסע הלמידה שלי',
+    nextTarget: 'היעד הבא',
+    complete: 'הושלם',
+    wordsGoal: 'ללמוד 100 מילים',
+    wordsLeft: 'נשארו {{count}} מילים',
+    totalProgress: 'התקדמות כוללת',
+    grammarLevel: 'רמת הנוכחית',
+    xpPoints: 'נקודות ניסיון',
+    achievements: 'ההישגים שלי',
+    firstLesson: 'שיעור ראשון',
+    firstStory: 'סיפור ראשון',
+    firstWords: '50 מילים ראשונות',
+    reachedLevel: 'הגעת לרמה A1',
+    accuracyBadge: 'דיוק {{value}}%',
   },
   ar: {
     title: 'الملف الشخصي',
@@ -62,6 +82,22 @@ const labels = {
     slow: 'بطيئة',
     normal: 'عادية',
     notifications: 'الإشعارات',
+    myProfile: 'ملفي الشخصي',
+    stepByStep: 'أتعلم العبرية خطوة بعد خطوة',
+    learningJourney: 'رحلة التعلم الخاصة بي',
+    nextTarget: 'الهدف التالي',
+    complete: 'مكتمل',
+    wordsGoal: 'تعلم 100 كلمة',
+    wordsLeft: 'بقيت {{count}} كلمة',
+    totalProgress: 'التقدم الكلي',
+    grammarLevel: 'المستوى الحالي',
+    xpPoints: 'نقاط خبرة',
+    achievements: 'إنجازاتي',
+    firstLesson: 'الدرس الأول',
+    firstStory: 'القصة الأولى',
+    firstWords: 'أول 50 كلمة',
+    reachedLevel: 'وصلت إلى مستوى A1',
+    accuracyBadge: 'دقة {{value}}%',
   },
 };
 
@@ -113,12 +149,12 @@ function ProfilePage() {
   const [loading, setLoading] = useState(true);
 
   const storedPreferences = useMemo(getStoredPreferences, []);
-  const [theme, setTheme] = useState(storedPreferences.theme);
+  const theme = 'light';
   const [textSize, setTextSize] = useState(storedPreferences.textSize);
   const [voiceSpeed, setVoiceSpeed] = useState(storedPreferences.voiceSpeed);
   const [notifications, setNotifications] = useState(storedPreferences.notifications);
 
-  const isDark = theme === 'dark';
+  const isDark = false;
   const isLargeText = textSize === 'large';
 
   useEffect(() => {
@@ -170,32 +206,62 @@ function ProfilePage() {
     window.dispatchEvent(new Event('lisan-student-preferences-changed'));
   }, [notifications, textSize, theme, voiceSpeed]);
 
-  const stats = [
+  const accuracy = Math.max(0, Math.min(100, Number(progress?.accuracy ?? 35)));
+  const learnedWords = Number(progress?.correctMeaningCount ?? 35);
+  const wordsGoal = 100;
+  const wordsLeft = Math.max(0, wordsGoal - learnedWords);
+  const xpPoints = Math.max(
+    0,
+    Number(progress?.totalAttempts ?? 0) * 10 + learnedWords * 5,
+  );
+
+  const achievementCards = [
     {
-      key: 'totalChats',
-      value: progress?.totalChats ?? 0,
-      icon: MessageCircle,
+      key: 'firstLesson',
+      icon: BadgeCheck,
+      color: 'text-rose-500',
+      bg: 'bg-rose-50',
+      border: 'border-rose-100',
+      done: true,
     },
     {
-      key: 'learnedWords',
-      value: progress?.correctMeaningCount ?? 0,
-      icon: Languages,
+      key: 'firstStory',
+      icon: Rocket,
+      color: 'text-violet-600',
+      bg: 'bg-violet-50',
+      border: 'border-violet-100',
+      done: true,
     },
     {
-      key: 'streakDays',
-      value: progress?.totalAttempts ?? 0,
-      icon: Flame,
+      key: 'firstWords',
+      icon: Gem,
+      color: 'text-amber-500',
+      bg: 'bg-amber-50',
+      border: 'border-amber-100',
+      done: learnedWords >= 50,
     },
     {
-      key: 'practiceMinutes',
-      value: progress?.pronunciationUsage?.usedThisMonth ?? 0,
-      icon: Clock,
+      key: 'reachedLevel',
+      icon: Award,
+      color: 'text-emerald-600',
+      bg: 'bg-emerald-50',
+      border: 'border-emerald-100',
+      done: true,
+    },
+    {
+      key: 'accuracyBadge',
+      icon: ShieldCheck,
+      color: 'text-violet-600',
+      bg: 'bg-violet-50',
+      border: 'border-violet-100',
+      done: accuracy >= 85,
+      labelValue: accuracy,
     },
   ];
 
   const pageClass = isDark
-    ? 'min-h-screen bg-slate-950 px-3 py-4 text-slate-100 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8'
-    : 'min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8';
+    ? 'min-h-screen bg-slate-950 text-slate-100'
+    : 'min-h-screen bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] text-slate-900';
 
   const surfaceClass = isDark ? 'bg-slate-900 text-slate-100 shadow-card' : 'bg-white text-slate-900 shadow-card';
   const panelClass = isDark ? 'border-slate-700 bg-slate-800' : 'border-slate-100 bg-slate-50';
@@ -208,75 +274,159 @@ function ProfilePage() {
 
   return (
     <main className={pageClass}>
-      <div className={`relative mx-auto min-h-[calc(100vh-2rem)] w-full max-w-6xl pb-32 sm:min-h-[780px] ${textScaleClass}`} dir="rtl">
+      <div className={`app-page-container relative ${textScaleClass}`} dir="rtl">
         <PageHeader showBack />
 
-        <section className={`mt-6 rounded-3xl p-5 sm:p-6 ${surfaceClass}`}>
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold text-violet-700">{text.title}</p>
-              <h1 className={`mt-2 text-2xl font-bold leading-tight sm:text-3xl ${headingTextClass}`}>
-                {user?.name || 'Lisan Student'}
-              </h1>
-              <p className={`mt-3 text-sm leading-6 ${mutedTextClass}`}>
-                {loading ? 'Loading...' : text.subtitle}
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-violet-50 px-4 py-3 text-center">
-              <p className="text-xs font-semibold text-slate-500">{text.level}</p>
-              <p className="mt-1 whitespace-nowrap text-sm font-bold text-violet-700">
-                {user?.level || 'A1'}
-              </p>
-            </div>
+        <section className={`relative mt-6 overflow-hidden rounded-[28px] border border-white/80 lg:min-h-[240px] ${surfaceClass}`}>
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.96)_0%,rgba(248,245,255,0.92)_42%,rgba(237,233,254,0.82)_100%)]" />
+          <div className="pointer-events-none absolute right-0 bottom-0 hidden h-full w-[34%] lg:block" aria-hidden="true">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_58%_54%,rgba(196,181,253,0.34)_0%,rgba(245,243,255,0.18)_46%,transparent_76%)]" />
+            <img
+              src="/images/profile-hebrew-learning.png"
+              alt="Hebrew learning study illustration with Hebrew letters, notebook and educational books"
+              className="absolute bottom-[-8px] right-0 h-[108%] w-full object-contain object-right opacity-95 mix-blend-multiply drop-shadow-[0_22px_36px_rgba(124,58,237,0.16)] [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_62%,rgba(0,0,0,0.72)_78%,transparent_100%)]"
+            />
+            <div className="absolute inset-y-0 left-0 w-28 bg-gradient-to-l from-transparent to-white/90" />
           </div>
-
-          <div className="mt-5 rounded-2xl border border-violet-100 bg-violet-50/70 p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-bold text-slate-800">{text.dailyProgress}</span>
-              <span className="text-sm font-bold text-violet-700">
-                {progress?.accuracy ?? 0}%
-              </span>
-            </div>
-            <div className="mt-3 h-3 overflow-hidden rounded-full bg-white">
-              <div
-                className="h-full rounded-full bg-violet-600"
-                style={{ width: `${progress?.accuracy ?? 0}%` }}
-              />
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-5 grid grid-cols-1 gap-3 min-[360px]:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat) => {
-            const Icon = stat.icon;
-            return (
-              <article key={stat.key} className={`rounded-3xl p-4 ${surfaceClass}`}>
-                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 via-pink-400 to-amber-300 text-white">
-                  <Icon className="h-5 w-5" aria-hidden="true" />
+          <div className="relative grid min-h-[240px] gap-6 p-6 sm:p-8 lg:grid-cols-[230px_minmax(340px,1fr)_34%]" dir="ltr">
+            <div className="order-3 flex items-center justify-center lg:order-1" aria-hidden="true">
+              <div className="relative flex h-44 w-44 items-center justify-center rounded-full bg-[radial-gradient(circle,#f8f5ff_0%,#ede9fe_68%,#ffffff_100%)] shadow-[inset_0_0_0_6px_rgba(255,255,255,0.88),0_20px_48px_rgba(124,58,237,0.12)] sm:h-52 sm:w-52">
+                <span className="text-8xl font-black text-violet-500 sm:text-9xl">א</span>
+                <span className="absolute -bottom-1 -right-1 flex h-12 w-12 items-center justify-center rounded-full bg-violet-600 text-white shadow-button">
+                  <Camera className="h-6 w-6" />
                 </span>
-                <p className={`mt-4 text-2xl font-bold ${headingTextClass}`}>{stat.value}</p>
-                <p className={`mt-1 text-xs font-semibold leading-5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                  {text[stat.key]}
-                </p>
-              </article>
-            );
-          })}
+              </div>
+            </div>
+
+            <div className="order-2 flex min-w-0 flex-col justify-center text-right lg:order-2" dir="rtl">
+              <h2 className={`text-3xl font-black leading-tight sm:text-4xl ${headingTextClass}`}>
+                {user?.name || 'Lisan Student'}
+              </h2>
+              <p className={`mt-3 flex items-center gap-2 text-base font-bold ${mutedTextClass}`}>
+                {loading ? 'Loading...' : text.subtitle}
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-100 text-violet-700">
+                  <Sparkles className="h-5 w-5" aria-hidden="true" />
+                </span>
+              </p>
+              <div className="mt-5 inline-flex w-fit items-center gap-3 rounded-full border border-violet-100 bg-white/80 px-5 py-2 text-sm font-black text-violet-700 shadow-[0_10px_24px_rgba(124,58,237,0.08)]">
+                <span>{text.level}</span>
+                <span className="text-lg">{user?.level || 'A1'}</span>
+              </div>
+            </div>
+
+            <div className="order-1 flex min-h-[190px] items-center justify-center lg:order-3 lg:opacity-0" aria-hidden="true">
+              <div className="relative h-full min-h-[190px] w-full overflow-hidden lg:hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_58%_52%,rgba(196,181,253,0.28)_0%,rgba(245,243,255,0.2)_48%,transparent_78%)]" />
+                <img
+                  src="/images/profile-hebrew-learning.png"
+                  alt="Hebrew learning study illustration with Hebrew letters, notebook and educational books"
+                  className="relative z-10 h-full max-h-[250px] w-full object-contain object-center opacity-95 mix-blend-multiply [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_64%,rgba(0,0,0,0.72)_82%,transparent_100%)]"
+                />
+              </div>
+            </div>
+          </div>
         </section>
 
-        <section className={`mt-5 rounded-3xl p-5 sm:p-6 ${surfaceClass}`}>
-          <div className="flex items-center gap-3">
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-50 text-violet-700">
+        <section className={`mt-5 rounded-[28px] border border-white/80 p-6 shadow-card sm:p-7 lg:min-h-[170px] ${surfaceClass}`}>
+          <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)_240px]">
+            <div className="flex items-center justify-center border-violet-100 lg:border-l">
+              <div
+                className="grid h-44 w-44 place-items-center rounded-full"
+                style={{
+                  background: `conic-gradient(#6d28d9 ${accuracy * 3.6}deg, #f1eafd 0deg)`,
+                }}
+              >
+                <div className="grid h-32 w-32 place-items-center rounded-full bg-white text-center shadow-inner">
+                  <div>
+                    <p className="text-3xl font-black text-slate-950">{accuracy}%</p>
+                    <p className="mt-1 text-xs font-black text-slate-600">{text.totalProgress}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col justify-center text-right">
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="text-4xl font-black text-violet-700">{user?.level || 'A1'}</p>
+                <div>
+                  <h2 className={`text-2xl font-black ${headingTextClass}`}>{text.learningJourney}</h2>
+                  <p className={`mt-1 text-base font-bold ${mutedTextClass}`}>{text.grammarLevel}</p>
+                </div>
+              </div>
+              <div className="mt-4 h-3 overflow-hidden rounded-full bg-violet-50">
+                <div className="h-full rounded-full bg-violet-600" style={{ width: `${accuracy}%` }} />
+              </div>
+              <p className={`mt-3 text-base font-bold ${mutedTextClass}`}>
+                {xpPoints} / 1000 {text.xpPoints}
+              </p>
+            </div>
+
+            <div className="flex flex-col justify-center border-violet-100 text-right lg:border-r lg:pr-6">
+              <div className="flex items-center gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-violet-50 text-violet-700">
+                  <Target className="h-6 w-6" aria-hidden="true" />
+                </span>
+                <div>
+                  <h2 className={`text-2xl font-black ${headingTextClass}`}>{text.nextTarget}</h2>
+                  <p className={`mt-1 text-base font-bold ${mutedTextClass}`}>{text.wordsGoal}</p>
+                </div>
+              </div>
+              <p className={`mt-5 text-xl font-black ${headingTextClass}`}>
+                {text.wordsLeft.replace('{{count}}', wordsLeft)}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className={`mt-5 rounded-[28px] border border-white/80 p-6 shadow-card sm:p-7 lg:min-h-[190px] ${surfaceClass}`}>
+          <div className="mb-5 flex items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-violet-50 text-violet-700">
+              <Trophy className="h-6 w-6" aria-hidden="true" />
+            </span>
+            <h2 className={`text-3xl font-black ${headingTextClass}`}>{text.achievements}</h2>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            {achievementCards.map((achievement) => {
+              const Icon = achievement.icon;
+              const label = achievement.key === 'accuracyBadge'
+                ? text.accuracyBadge.replace('{{value}}', achievement.labelValue)
+                : text[achievement.key];
+
+              return (
+                <article
+                  key={achievement.key}
+                  className={`rounded-[22px] border p-5 text-center shadow-[0_12px_28px_rgba(124,58,237,0.06)] ${achievement.bg} ${achievement.border}`}
+                >
+                  <span className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white/80 ${achievement.color}`}>
+                    <Icon className="h-9 w-9" aria-hidden="true" />
+                  </span>
+                  <h3 className={`mt-3 text-base font-black ${headingTextClass}`}>{label}</h3>
+                  <p className={`mt-1 text-sm font-bold ${mutedTextClass}`}>
+                    {achievement.done ? text.complete : text.wordsLeft.replace('{{count}}', wordsLeft)}
+                  </p>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className={`mt-5 rounded-[28px] border border-white/80 p-6 shadow-card sm:p-7 ${surfaceClass}`}>
+          <div className="mb-4 flex items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-violet-50 text-violet-700">
               <SlidersHorizontal className="h-6 w-6" aria-hidden="true" />
             </span>
-            <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{text.settings}</h2>
+            <h2 className={`text-3xl font-black ${headingTextClass}`}>{text.settings}</h2>
           </div>
 
-          <div className="mt-5 grid gap-5 lg:grid-cols-2">
-            <div className={`rounded-2xl border p-4 ${panelClass}`}>
-              <div className={`mb-3 flex items-center gap-2 text-sm font-bold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
-                <Languages className="h-5 w-5 text-violet-700" aria-hidden="true" />
-                {text.language}
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div className={`flex min-h-[104px] flex-wrap items-center justify-between gap-4 rounded-[22px] border p-4 ${panelClass}`}>
+              <div className={`flex items-center gap-3 text-base font-black ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
+                <Languages className="h-6 w-6 text-violet-700" aria-hidden="true" />
+                <div>
+                  <p>{text.language}</p>
+                  <p className={`mt-1 text-sm font-bold ${mutedTextClass}`}>{text.stepByStep}</p>
+                </div>
               </div>
               <SegmentedControl
                 value={i18n.language === 'he' ? 'he' : 'ar'}
@@ -288,55 +438,10 @@ function ProfilePage() {
               />
             </div>
 
-            <div className={`rounded-2xl border p-4 ${panelClass}`}>
-              <div className={`mb-3 flex items-center gap-2 text-sm font-bold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
-                {isDark ? <Moon className="h-5 w-5 text-violet-700" /> : <Sun className="h-5 w-5 text-violet-700" />}
-                {text.theme}
-              </div>
-              <SegmentedControl
-                value={theme}
-                onChange={setTheme}
-                options={[
-                  { value: 'light', label: text.light },
-                  { value: 'dark', label: text.dark },
-                ]}
-              />
-            </div>
-
-            <div className={`rounded-2xl border p-4 ${panelClass}`}>
-              <div className={`mb-3 flex items-center gap-2 text-sm font-bold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
-                <Type className="h-5 w-5 text-violet-700" aria-hidden="true" />
-                {text.textSize}
-              </div>
-              <SegmentedControl
-                value={textSize}
-                onChange={setTextSize}
-                options={[
-                  { value: 'regular', label: text.regular },
-                  { value: 'large', label: text.large },
-                ]}
-              />
-            </div>
-
-            <div className={`rounded-2xl border p-4 ${panelClass}`}>
-              <div className={`mb-3 flex items-center gap-2 text-sm font-bold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
-                <Volume2 className="h-5 w-5 text-violet-700" aria-hidden="true" />
-                {text.voiceSpeed}
-              </div>
-              <SegmentedControl
-                value={voiceSpeed}
-                onChange={setVoiceSpeed}
-                options={[
-                  { value: 'slow', label: text.slow },
-                  { value: 'normal', label: text.normal },
-                ]}
-              />
-            </div>
-
-            <div className={`flex items-center justify-between gap-4 rounded-2xl border p-4 ${panelClass}`}>
-              <div className={`flex items-center gap-2 text-sm font-bold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
-                <Bell className="h-5 w-5 text-violet-700" aria-hidden="true" />
-                {text.notifications}
+            <div className={`flex min-h-[104px] flex-wrap items-center justify-between gap-4 rounded-[22px] border p-4 ${panelClass}`}>
+              <div className={`flex items-center gap-3 text-base font-black ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
+                <Bell className="h-6 w-6 text-violet-700" aria-hidden="true" />
+                <span>{text.notifications}</span>
               </div>
               <button
                 type="button"
@@ -352,6 +457,36 @@ function ProfilePage() {
                   }`}
                 />
               </button>
+            </div>
+
+            <div className={`flex min-h-[104px] flex-wrap items-center justify-between gap-4 rounded-[22px] border p-4 ${panelClass}`}>
+              <div className={`flex items-center gap-3 text-base font-black ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
+                <Type className="h-6 w-6 text-violet-700" aria-hidden="true" />
+                <span>{text.textSize}</span>
+              </div>
+              <SegmentedControl
+                value={textSize}
+                onChange={setTextSize}
+                options={[
+                  { value: 'regular', label: text.regular },
+                  { value: 'large', label: text.large },
+                ]}
+              />
+            </div>
+
+            <div className={`flex min-h-[104px] flex-wrap items-center justify-between gap-4 rounded-[22px] border p-4 ${panelClass}`}>
+              <div className={`flex items-center gap-3 text-base font-black ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
+                <Volume2 className="h-6 w-6 text-violet-700" aria-hidden="true" />
+                <span>{text.voiceSpeed}</span>
+              </div>
+              <SegmentedControl
+                value={voiceSpeed}
+                onChange={setVoiceSpeed}
+                options={[
+                  { value: 'slow', label: text.slow },
+                  { value: 'normal', label: text.normal },
+                ]}
+              />
             </div>
           </div>
         </section>

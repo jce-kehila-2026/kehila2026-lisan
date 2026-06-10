@@ -159,7 +159,7 @@ function SharedChatRoom() {
     return (
         <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
             <div
-                className="relative mx-auto flex min-h-[calc(100vh-2rem)] w-full max-w-6xl flex-col pb-32 sm:min-h-[780px]"
+                className="relative mx-auto flex min-h-[calc(100vh-2rem)] w-full max-w-[1680px] flex-col pb-32 sm:min-h-[780px]"
                 dir="rtl"
             >
                 <PageHeader showBack />

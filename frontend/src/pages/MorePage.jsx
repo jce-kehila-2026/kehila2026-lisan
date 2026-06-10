@@ -1,15 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+  ArrowLeft,
+  BookOpen,
+  ChevronDown,
   Heart,
+  Headphones,
   MessageCircle,
+  PenLine,
   Search,
   Settings,
   Share2,
   Star,
   Trash2,
-  UsersRound,
 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import BottomNav from '../components/BottomNav.jsx';
@@ -38,6 +42,22 @@ const labels = {
     settings: 'קיצור להגדרות',
     settingsText: 'שפה, תצוגה, גודל טקסט והעדפות אישיות.',
     noChats: 'אין שיחות עדיין',
+    heroKicker: 'ריכוז משאבים',
+    continueReading: 'המשיכי מאיפה שהפסקת',
+    continueReadingMeta: 'לפני יומיים · סיפור 5',
+    continueReadingAction: 'המשיכי קריאה',
+    recentActivity: 'הפעילות האחרונה שלי',
+    recentActivityHint: 'חזרי למה שעשית לאחרונה',
+    viewFullHistory: 'הצג היסטוריה מלאה',
+    review: 'חזרה',
+    inProgress: 'בתהליך',
+    completed: 'הושלם',
+    savedMore: 'הצג עוד',
+    socialPractice: 'תרגול עם חברות',
+    socialPracticeText: 'תרגלי שיחות יומיומיות בעברית עם חברות ולומדות נוספות.',
+    startChat: 'פתחי צ׳אט',
+    pronunciation: 'תרגול האזנה',
+    shortQuiz: 'בוחן קצר',
   },
 
   ar: {
@@ -59,6 +79,22 @@ const labels = {
     settings: 'اختصار للإعدادات',
     settingsText: 'اللغة، العرض، حجم النص والتفضيلات.',
     noChats: 'لا توجد محادثات بعد',
+    heroKicker: 'مركز الموارد',
+    continueReading: 'تابعي من حيث توقفتِ',
+    continueReadingMeta: 'قبل يومين · قصة 5',
+    continueReadingAction: 'تابعي القراءة',
+    recentActivity: 'نشاطي الأخير',
+    recentActivityHint: 'عودي إلى ما تدربتِ عليه مؤخراً',
+    viewFullHistory: 'عرض السجل الكامل',
+    review: 'مراجعة',
+    inProgress: 'قيد التقدم',
+    completed: 'مكتمل',
+    savedMore: 'عرض المزيد',
+    socialPractice: 'تدريب مع الصديقات',
+    socialPracticeText: 'تدرّبي على محادثات يومية بالعبرية مع صديقات ومتعلمات أخريات.',
+    startChat: 'افتحي المحادثة',
+    pronunciation: 'تدريب الاستماع',
+    shortQuiz: 'اختبار قصير',
   },
 };
 
@@ -68,11 +104,15 @@ const savedWords = [
   'סליחה',
   'כמה זה עולה?',
   'אני צריכה עזרה',
+  'בית ספר',
+  'חברה',
+  'מים',
+  'בוקר טוב',
+  'להתראות',
 ];
 
 function MorePage() {
   const { i18n } = useTranslation();
-  const navigate = useNavigate();
 
   const text = labels[i18n.language === 'he' ? 'he' : 'ar'];
 
@@ -80,7 +120,8 @@ function MorePage() {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [shareStatus, setShareStatus] = useState('');
-  const [teacherChatStarted, setTeacherChatStarted] = useState('');
+  const [showRecentActivities, setShowRecentActivities] = useState(true);
+  const [showChatHistory, setShowChatHistory] = useState(true);
 
   useEffect(() => {
     const loadChats = async () => {
@@ -204,203 +245,151 @@ function MorePage() {
     }
   };
 
-  const openTeacherChat = async () => {
-    try {
-      const token = getStoredToken();
+  const recentActivities = [
+    { icon: MessageCircle, title: text.friendsChat, meta: `Yesterday · ${text.completed}`, action: text.continueChat },
+    { icon: BookOpen, title: 'סיפור 5', meta: `3 days ago · ${text.inProgress}`, action: text.continueChat },
+    { icon: Headphones, title: text.pronunciation, meta: `Last week · ${text.completed}`, action: text.review },
+    { icon: PenLine, title: text.shortQuiz, meta: text.completed, action: text.review },
+  ];
 
-      if (!token) {
-        return;
-      }
+  const fallbackHistory = recentActivities.map((activity, index) => ({
+    id: `fallback-${index}`,
+    title: activity.title,
+    preview: activity.meta,
+    time: index === 0 ? 'Yesterday' : index === 1 ? '3 days ago' : 'Last week',
+    favorite: index === 0,
+    fallback: true,
+  }));
 
-      setTeacherChatStarted(text.teacherChatStarted);
-
-      const usersResponse = await fetch(
-        `${API_BASE_URL}/shared-chats/available-users`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      const usersData = await usersResponse.json();
-
-      if (!usersResponse.ok) {
-        throw new Error(usersData.error || 'Failed to load teachers');
-      }
-
-      const teacher = (usersData.users || []).find(
-        (user) => user.role === 'teacher' || user.role === 'expert',
-      );
-
-      if (!teacher) {
-        setTeacherChatStarted(
-          i18n.language === 'he'
-            ? 'לא נמצאה מורה זמינה'
-            : 'لم يتم العثور على معلمة متاحة',
-        );
-        return;
-      }
-
-      const chatResponse = await fetch(`${API_BASE_URL}/shared-chats`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          participantIds: [teacher.id],
-        }),
-      });
-
-      const chatData = await chatResponse.json();
-
-      if (!chatResponse.ok) {
-        throw new Error(chatData.error || 'Failed to create chat');
-      }
-
-      navigate(`/shared-chat/${chatData.chatId}`);
-    } catch (error) {
-      console.error('Failed to open teacher chat:', error);
-      setTeacherChatStarted(
-        i18n.language === 'he'
-          ? 'אירעה שגיאה בפתיחת השיחה'
-          : 'حدث خطأ أثناء فتح المحادثة',
-      );
-    }
-  };
+  const visibleHistory = (filteredConversations.length > 0 ? filteredConversations : fallbackHistory).slice(0, 5);
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] text-slate-900">
       <div
-        className="relative mx-auto min-h-[calc(100vh-2rem)] w-full max-w-6xl pb-32 sm:min-h-[780px]"
+        className="app-page-container relative"
         dir="rtl"
       >
         <PageHeader showBack />
 
-        <section className="mt-6 rounded-3xl bg-white p-5 shadow-card sm:p-6">
-          <p className="text-sm font-semibold text-violet-700">
-            {text.title}
-          </p>
+        <section className="relative mt-6 overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(135deg,#FFFFFF_0%,#FBF8FF_50%,#F3ECFF_100%)] p-6 shadow-card sm:p-7 lg:min-h-[210px] lg:p-8">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_78%_42%,rgba(196,181,253,0.24)_0%,transparent_34%)]" />
+          <div className="pointer-events-none absolute -left-16 top-0 h-48 w-48 rounded-full bg-violet-100/60 blur-3xl" />
+          <div className="relative grid min-h-[170px] items-center gap-7 md:grid-cols-[minmax(0,1fr)_360px]" dir="ltr">
+            <div className="order-2 text-right md:order-1" dir="rtl">
+              <span className="inline-flex rounded-full bg-violet-50 px-4 py-2 text-sm font-black text-violet-700">
+                {text.heroKicker}
+              </span>
+              <h1 className="mt-4 text-4xl font-black leading-tight text-violet-700 lg:text-5xl">
+                {text.title}
+              </h1>
+              <p className="mt-3 max-w-2xl text-base font-bold leading-7 text-slate-600">
+                {text.subtitle}
+              </p>
+            </div>
 
-          <h1 className="mt-2 text-2xl font-bold leading-tight text-slate-950 sm:text-3xl">
-            {text.subtitle}
-          </h1>
+            <div className="order-1 flex min-h-[150px] items-center justify-center md:order-2" aria-hidden="true">
+              <img
+                src="/images/profile-hebrew-learning.png"
+                alt=""
+                className="h-[180px] w-full max-w-[360px] object-contain opacity-95 mix-blend-multiply [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_70%,rgba(0,0,0,0.68)_86%,transparent_100%)]"
+              />
+            </div>
+          </div>
         </section>
 
-        <section className="mt-5 rounded-3xl bg-white p-5 shadow-card sm:p-6">
-          <div className="flex items-center gap-3">
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 via-pink-400 to-amber-300 text-white">
-              <MessageCircle className="h-6 w-6" aria-hidden="true" />
+        <section className="mt-5 flex min-h-[96px] flex-wrap items-center justify-between gap-5 rounded-[24px] bg-white p-5 shadow-card sm:p-6">
+          <div className="flex items-center gap-5">
+            <span className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-violet-50 text-violet-700">
+              <BookOpen className="h-7 w-7" aria-hidden="true" />
             </span>
-
-            <h2 className="text-xl font-bold text-slate-900">
-              {text.chatHistory}
-            </h2>
+            <div>
+              <h2 className="text-2xl font-black text-slate-950">{text.continueReading}</h2>
+              <p className="mt-1 text-base font-bold text-slate-500">{text.continueReadingMeta}</p>
+            </div>
           </div>
 
-          <label className="mt-4 flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-            <Search className="h-5 w-5 text-slate-400" aria-hidden="true" />
-
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder={text.search}
-              className="min-w-0 flex-1 bg-transparent text-sm outline-none"
-            />
-          </label>
-
-          <div className="mt-4 grid gap-3">
-            {loading ? (
-              <div className="rounded-2xl bg-slate-50 p-4 text-center text-sm text-slate-500">
-                Loading chats...
-              </div>
-            ) : filteredConversations.length === 0 ? (
-              <div className="rounded-2xl bg-slate-50 p-4 text-center text-sm text-slate-500">
-                {text.noChats}
-              </div>
-            ) : (
-              filteredConversations.map((conversation) => (
-                <article
-                  key={conversation.id}
-                  className="rounded-2xl border border-slate-100 bg-violet-50/40 p-4"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h3 className="font-bold text-slate-900">
-                        {conversation.title}
-                      </h3>
-
-                      <p className="mt-1 text-sm leading-6 text-slate-600">
-                        {conversation.preview}
-                      </p>
-
-                      <p className="mt-2 text-xs font-semibold text-slate-500">
-                        {conversation.time}
-                      </p>
-                    </div>
-
-                    <Star
-                      className={`h-5 w-5 ${
-                        conversation.favorite
-                          ? 'fill-amber-300 text-amber-400'
-                          : 'text-slate-300'
-                      }`}
-                      aria-hidden="true"
-                    />
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <Link
-                      to={`/chatbot?chatId=${conversation.id}`}
-                      className="rounded-full bg-violet-600 px-4 py-2 text-xs font-bold text-white"
-                    >
-                      {text.continueChat}
-                    </Link>
-
-                    <button
-                      type="button"
-                      onClick={() => shareConversation(conversation)}
-                      className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-xs font-bold text-violet-700"
-                    >
-                      <Share2 className="h-4 w-4" aria-hidden="true" />
-                      {text.share}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => toggleFavorite(conversation.id)}
-                      className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-xs font-bold text-violet-700"
-                    >
-                      <Heart className="h-4 w-4" aria-hidden="true" />
-                      {text.favorite}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => deleteConversation(conversation.id)}
-                      className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-xs font-bold text-slate-600"
-                    >
-                      <Trash2 className="h-4 w-4" aria-hidden="true" />
-                      {text.delete}
-                    </button>
-                  </div>
-                </article>
-              ))
-            )}
-          </div>
+          <Link
+            to="/scenario/at-restaurant"
+            className="inline-flex h-11 items-center gap-2 rounded-full bg-violet-600 px-6 text-base font-black text-white shadow-button transition hover:-translate-y-0.5 hover:bg-violet-700"
+          >
+            {text.continueReadingAction}
+            <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+          </Link>
         </section>
 
-        <section className="mt-5 rounded-3xl bg-white p-5 shadow-card sm:p-6">
-          <h2 className="text-xl font-bold text-slate-900">
-            {text.savedTitle}
-          </h2>
+        <section className="mt-6">
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+            <div className="flex items-center gap-3 text-right">
+              <button
+                type="button"
+                onClick={() => setShowRecentActivities((current) => !current)}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-violet-700 shadow-card transition hover:-translate-y-0.5 hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                aria-expanded={showRecentActivities}
+                aria-label={text.recentActivity}
+              >
+                <ChevronDown
+                  className={`h-5 w-5 transition duration-300 ${
+                    showRecentActivities ? 'rotate-180' : ''
+                  }`}
+                  aria-hidden="true"
+                />
+              </button>
+              <div>
+                <h2 className="text-3xl font-black text-slate-950">{text.recentActivity}</h2>
+                <p className="mt-1 text-base font-semibold text-slate-500">{text.recentActivityHint}</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowRecentActivities((current) => !current)}
+              className="text-base font-black text-violet-700"
+            >
+              {text.viewFullHistory}
+            </button>
+          </div>
 
-          <div className="mt-4 flex flex-wrap gap-2">
+          {showRecentActivities ? (
+            <div className="grid gap-4 lg:grid-cols-2">
+              {recentActivities.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <article
+                    key={item.title}
+                    className="flex min-h-[106px] items-center justify-between gap-5 rounded-[24px] bg-white p-5 shadow-card transition hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(124,58,237,0.12)]"
+                  >
+                    <div className="flex min-w-0 items-center gap-5">
+                      <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-violet-50 text-violet-700">
+                        <Icon className="h-7 w-7" aria-hidden="true" />
+                      </span>
+                      <div className="min-w-0 text-right">
+                        <h3 className="truncate text-xl font-black text-slate-900">{item.title}</h3>
+                        <p className="mt-2 text-base font-bold text-slate-500">{item.meta}</p>
+                      </div>
+                    </div>
+                    <Link
+                      to="/chatbot"
+                      className="shrink-0 rounded-full border border-violet-200 px-6 py-3 text-base font-black text-violet-700 transition hover:bg-violet-600 hover:text-white"
+                    >
+                      {item.action}
+                    </Link>
+                  </article>
+                );
+              })}
+            </div>
+          ) : null}
+        </section>
+
+        <section className="mt-6 min-h-[118px] rounded-[26px] bg-white p-6 shadow-card">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2 className="text-3xl font-black text-slate-950">{text.savedTitle}</h2>
+            <span className="text-base font-black text-violet-700">{text.savedMore}</span>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
             {savedWords.map((word) => (
               <span
                 key={word}
-                className="rounded-full bg-violet-50 px-4 py-2 text-sm font-bold text-violet-700"
+                className="rounded-full bg-violet-50 px-5 py-2.5 text-base font-black text-violet-700"
               >
                 {word}
               </span>
@@ -408,70 +397,147 @@ function MorePage() {
           </div>
         </section>
 
-        <section className="mt-5 grid gap-3 lg:grid-cols-3">
+        <section className="mt-6 grid gap-5 lg:grid-cols-2">
           <Link
             to="/shared-chat"
-            className="flex items-center gap-3 rounded-3xl bg-white p-5 shadow-card"
+            className="group flex min-h-[150px] items-center justify-between gap-6 overflow-hidden rounded-[26px] bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(124,58,237,0.12)]"
           >
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-50 text-violet-700">
-              <UsersRound className="h-6 w-6" aria-hidden="true" />
-            </span>
-
-            <div>
-              <h2 className="font-bold text-slate-900">
-                {text.friendsChat}
-              </h2>
-
-              <p className="mt-1 text-sm leading-6 text-slate-600">
-                {text.friendsChatText}
+            <div className="text-right">
+              <h2 className="text-2xl font-black text-slate-950">{text.socialPractice}</h2>
+              <p className="mt-2 max-w-md text-base font-semibold leading-7 text-slate-600">
+                {text.socialPracticeText}
               </p>
+              <span className="mt-4 inline-flex rounded-full bg-violet-600 px-5 py-2.5 text-base font-black text-white shadow-button">
+                {text.startChat}
+              </span>
             </div>
+            <img
+              src="/images/friends-chat-image.png"
+              alt=""
+              className="hidden h-28 w-36 object-contain opacity-90 mix-blend-multiply transition group-hover:scale-105 sm:block"
+            />
           </Link>
-
-          <button
-            type="button"
-            onClick={openTeacherChat}
-            className="flex w-full items-center gap-3 rounded-3xl bg-white p-5 text-right shadow-card"
-          >
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-50 text-violet-700">
-              <MessageCircle className="h-6 w-6" aria-hidden="true" />
-            </span>
-
-            <span>
-              <span className="block font-bold text-slate-900">
-                {text.teacherChat}
-              </span>
-
-              <span className="mt-1 block text-sm leading-6 text-slate-600">
-                {text.teacherChatText}
-              </span>
-            </span>
-          </button>
-
-          {teacherChatStarted ? (
-            <div className="rounded-2xl bg-violet-50 p-4 text-sm font-semibold leading-6 text-violet-700">
-              {teacherChatStarted}
-            </div>
-          ) : null}
 
           <Link
             to="/profile"
-            className="flex items-center gap-3 rounded-3xl bg-white p-5 shadow-card"
+            className="flex min-h-[150px] items-center gap-5 rounded-[26px] bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(124,58,237,0.12)]"
           >
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-50 text-violet-700">
-              <Settings className="h-6 w-6" aria-hidden="true" />
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-violet-50 text-violet-700">
+              <Settings className="h-7 w-7" aria-hidden="true" />
             </span>
-
             <div>
-              <h2 className="font-bold text-slate-900">
-                {text.settings}
-              </h2>
-
-              <p className="mt-1 text-sm leading-6 text-slate-600">
+              <h2 className="text-2xl font-black text-slate-950">{text.settings}</h2>
+              <p className="mt-2 text-base font-semibold leading-7 text-slate-600">
                 {text.settingsText}
               </p>
             </div>
           </Link>
+        </section>
+
+        <section className="mt-6 min-h-[320px] rounded-[28px] bg-white p-6 shadow-card">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 via-pink-400 to-amber-300 text-white">
+                <Search className="h-6 w-6" aria-hidden="true" />
+              </span>
+              <h2 className="text-3xl font-black text-slate-950">{text.chatHistory}</h2>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowChatHistory((current) => !current)}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-50 text-violet-700 transition hover:-translate-y-0.5 hover:bg-violet-100 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+              aria-expanded={showChatHistory}
+              aria-label={text.chatHistory}
+            >
+              <ChevronDown
+                className={`h-5 w-5 transition duration-300 ${
+                  showChatHistory ? 'rotate-180' : ''
+                }`}
+                aria-hidden="true"
+              />
+            </button>
+          </div>
+
+          {showChatHistory ? (
+            <>
+              <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
+                <Search className="h-5 w-5 text-slate-400" aria-hidden="true" />
+                <input
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder={text.search}
+                  className="min-w-0 flex-1 bg-transparent text-base outline-none"
+                />
+              </label>
+
+              <div className="mt-5 grid gap-4 lg:grid-cols-2">
+                {loading ? (
+                  <div className="rounded-2xl bg-slate-50 p-6 text-center text-sm text-slate-500 lg:col-span-2">
+                    Loading chats...
+                  </div>
+                ) : (
+                  visibleHistory.map((conversation) => (
+                    <article
+                      key={conversation.id}
+                      className="min-h-[128px] rounded-[22px] border border-violet-100 bg-violet-50/40 p-4"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <h3 className="text-xl font-black text-slate-900">{conversation.title}</h3>
+                          <p className="mt-2 text-base font-semibold leading-7 text-slate-600">{conversation.preview}</p>
+                          <p className="mt-2 text-sm font-bold text-slate-500">{conversation.time}</p>
+                        </div>
+                        <Star
+                          className={`h-5 w-5 ${
+                            conversation.favorite ? 'fill-amber-300 text-amber-400' : 'text-slate-300'
+                          }`}
+                          aria-hidden="true"
+                        />
+                      </div>
+
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <Link
+                          to={`/chatbot?chatId=${conversation.id}`}
+                          className="rounded-full bg-violet-600 px-4 py-2 text-sm font-black text-white"
+                        >
+                          {text.continueChat}
+                        </Link>
+                        {!conversation.fallback ? (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => shareConversation(conversation)}
+                              className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-xs font-black text-violet-700"
+                            >
+                              <Share2 className="h-4 w-4" aria-hidden="true" />
+                              {text.share}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => toggleFavorite(conversation.id)}
+                              className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-xs font-black text-violet-700"
+                            >
+                              <Heart className="h-4 w-4" aria-hidden="true" />
+                              {text.favorite}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteConversation(conversation.id)}
+                              className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-xs font-black text-slate-600"
+                            >
+                              <Trash2 className="h-4 w-4" aria-hidden="true" />
+                              {text.delete}
+                            </button>
+                          </>
+                        ) : null}
+                      </div>
+                    </article>
+                  ))
+                )}
+              </div>
+            </>
+          ) : null}
         </section>
 
         {shareStatus ? (
