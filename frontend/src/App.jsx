@@ -237,7 +237,7 @@ function App() {
         <Route
           path="/admin/students"
           element={
-            <ProtectedRoute role="admin">
+            <ProtectedRoute role={['admin', 'teacher']}>
               <AdminStudents />
             </ProtectedRoute>
           }
@@ -245,7 +245,7 @@ function App() {
         <Route
           path="/admin/conversations"
           element={
-            <ProtectedRoute role="admin">
+            <ProtectedRoute role={['admin', 'teacher']}>
               <AdminConversations />
             </ProtectedRoute>
           }
@@ -253,7 +253,7 @@ function App() {
         <Route
           path="/admin/words"
           element={
-            <ProtectedRoute role="admin">
+            <ProtectedRoute role={['admin', 'teacher']}>
               <AdminWords />
             </ProtectedRoute>
           }
@@ -261,7 +261,7 @@ function App() {
         <Route
           path="/admin/progress"
           element={
-            <ProtectedRoute role="admin">
+            <ProtectedRoute role={['admin', 'teacher']}>
               <AdminProgress />
             </ProtectedRoute>
           }
@@ -269,7 +269,7 @@ function App() {
         <Route
           path="/admin/notifications"
           element={
-            <ProtectedRoute role="admin">
+            <ProtectedRoute role={['admin', 'teacher']}>
               <AdminNotifications />
             </ProtectedRoute>
           }
