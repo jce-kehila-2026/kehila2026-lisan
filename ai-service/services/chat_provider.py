@@ -127,17 +127,25 @@ class AllProvidersFailedError(ChatProviderError):
         return self.failures[-1].error if self.failures else ChatProviderError("All providers failed")
 
 
-# Free-tier mode: Gemini only. Anthropic/OpenAI were removed from the chain
-# because no API keys are provisioned for them — keeping them here just wasted
-# a request cycle failing on every fallback. The _call_anthropic/_call_openai
-# functions remain below so re-enabling is a one-line add to this list.
 PROVIDER_CHAIN: list[ProviderConfig] = [
     ProviderConfig(name="gemini", model="gemini-2.5-flash-lite", timeout_seconds=12.0),
 ]
 
-_PROVIDER_CIRCUITS: dict[str, CircuitBreaker] = {
-    config.name: CircuitBreaker() for config in PROVIDER_CHAIN
-}
+def _build_fallback_chain() -> list[ProviderConfig]:
+    chain = list(PROVIDER_CHAIN)
+    anthropic_key = os.getenv("ANTHROPIC_API_KEY", "").strip()
+    if anthropic_key:
+        chain.append(ProviderConfig(name="anthropic", model="claude-3-5-sonnet-20241022", timeout_seconds=10.0))
+    return chain
+
+_PROVIDER_CIRCUITS: dict[str, CircuitBreaker] = {}
+
+def _init_provider_circuits() -> None:
+    global _PROVIDER_CIRCUITS
+    chain = _build_fallback_chain()
+    _PROVIDER_CIRCUITS = {config.name: CircuitBreaker() for config in chain}
+
+_init_provider_circuits()
 _PROVIDER_LOG_LOCK = threading.Lock()
 _PROVIDER_LOGS: deque[ProviderAttemptLog] = deque(maxlen=DEFAULT_PROVIDER_LOG_LIMIT)
 
@@ -200,8 +208,20 @@ def call_provider(
     opts = options or ProviderCallOptions()
     attempts: list[ProviderAttemptLog] = []
     failures: list[ProviderFailure] = []
+    # Total wall-clock budget across ALL retries and providers. Without it,
+    # timeout-retry × hard-timeout × key-rotation compounded to a 22 s wait
+    # before the user even saw a fallback (measured in the live probe).
+    total_budget_seconds = float(os.getenv("PROVIDER_TOTAL_BUDGET_SECONDS", "10"))
+    call_started = time.monotonic()
+
+    def _budget_left() -> bool:
+        return (time.monotonic() - call_started) < total_budget_seconds
 
     for config in _build_provider_chain(provider, model, opts):
+        # Budget exhausted after at least one real attempt → degrade now
+        # rather than keep the user waiting on more providers/keys.
+        if failures and not _budget_left():
+            break
         circuit = get_provider_circuit(config.name)
         if not circuit.allow_request():
             attempt = ProviderAttemptLog(
@@ -223,26 +243,35 @@ def call_provider(
             )
             continue
 
-        try:
-            result = _call_provider_with_timeout(config, system_message, question, opts)
-            circuit.record_success()
-            success_attempt = ProviderAttemptLog(
-                provider=config.name,
-                model=config.model,
-                status="success",
-                latency_ms=int(round(result.latency_seconds * 1000)),
-            )
-            attempts.append(success_attempt)
-            _append_provider_log(success_attempt)
-            result.provider = config.name
-            result.model = config.model
-            result.attempts = attempts
-            return result
-        except Exception as raw_exc:
-            exc = _coerce_provider_exception(raw_exc)
-            # Quota (429) is a soft rate-limit, not a provider outage. Tripping
-            # the circuit on it would block requests even after the rate-limit
-            # window resets. Real failures (timeout/network/5xx) still open it.
+        last_timeout_exc = None
+        for retry_attempt in range(3):
+            try:
+                result = _call_provider_with_timeout(
+                    config, system_message, question, opts
+                )
+                result = _validate_and_fix_token_counts(result)
+                circuit.record_success()
+                success_attempt = ProviderAttemptLog(
+                    provider=config.name,
+                    model=config.model,
+                    status="success",
+                    latency_ms=int(round(result.latency_seconds * 1000)),
+                )
+                attempts.append(success_attempt)
+                _append_provider_log(success_attempt)
+                result.provider = config.name
+                result.model = config.model
+                result.attempts = attempts
+                return result
+            except ChatProviderTimeoutError as timeout_exc:
+                last_timeout_exc = timeout_exc
+                if retry_attempt < 2 and _budget_left():
+                    time.sleep(0.1 * (retry_attempt + 1))
+                    continue
+                exc = timeout_exc
+            except Exception as raw_exc:
+                exc = _coerce_provider_exception(raw_exc)
+
             if not isinstance(exc, ChatProviderQuotaError):
                 circuit.record_failure()
             failed_attempt = ProviderAttemptLog(
@@ -261,6 +290,7 @@ def call_provider(
                     error=exc,
                 )
             )
+            break
 
     raise AllProvidersFailedError(failures)
 
@@ -308,7 +338,8 @@ def _build_provider_chain(
         )
         seen_providers.add(requested_provider)
 
-    for base_config in PROVIDER_CHAIN:
+    fallback_chain = _build_fallback_chain()
+    for base_config in fallback_chain:
         if base_config.name in seen_providers:
             continue
         chain.append(
@@ -650,6 +681,39 @@ def _call_gemini(
     _classify_and_raise(last_exc or ChatProviderQuotaError("All Gemini keys rate-limited"))
 
 
+def _estimate_token_count(text: str) -> int:
+    """
+    Rough token estimate: ~4 chars per token.
+    Used as fallback when provider doesn't return token counts.
+    """
+    return max(1, len(text) // 4)
+
+
+def _validate_and_fix_token_counts(result: ProviderResult) -> ProviderResult:
+    """
+    Validate that input/output tokens are non-zero.
+    If both are zero (provider didn't return), estimate them to catch
+    silent billing/quota failures.
+    """
+    if result.input_tokens == 0 and result.output_tokens == 0:
+        est_input = _estimate_token_count(
+            "system" + result.answer  # rough estimate
+        )
+        est_output = _estimate_token_count(result.answer)
+        logger.warning(
+            {
+                "event": "token_count_fallback",
+                "provider": result.provider,
+                "reason": "provider_returned_zero",
+                "estimated_input": est_input,
+                "estimated_output": est_output,
+            }
+        )
+        result.input_tokens = est_input
+        result.output_tokens = est_output
+    return result
+
+
 def _parse_retry_delay_seconds(message: str) -> float | None:
     match = re.search(r"retry in ([0-9]+(?:\.[0-9]+)?)s", message, flags=re.IGNORECASE)
     if not match:
@@ -804,3 +868,36 @@ def _stream_gemini(
 
 
 provider_circuit = get_provider_circuit(DEFAULT_PROVIDER)
+
+
+def call_provider_structured(
+    provider: str,
+    model: str,
+    system_message: str,
+    question: str,
+    response_model: Any,
+    options: ProviderCallOptions | None = None,
+) -> Any:
+    """Uses Instructor to get structured outputs conforming to response_model Pydantic schema."""
+    import instructor
+    o = options or ProviderCallOptions()
+    
+    if provider == "openai":
+        client = instructor.from_openai(_create_openai_client(o.max_output_tokens if o else 10.0))
+        messages = [{"role": "system", "content": system_message}, {"role": "user", "content": question}]
+        return client.chat.completions.create(
+            model=model,
+            messages=messages,
+            response_model=response_model,
+        )
+    elif provider == "gemini":
+        keys = _get_gemini_keys()
+        api_key = keys[0] if keys else ""
+        raw_client = _create_gemini_client(10.0, api_key)
+        client = instructor.from_gemini(raw_client)
+        return client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": f"{system_message}\n\nQuestion: {question}"}],
+            response_model=response_model,
+        )
+    raise ValueError(f"Instructor not configured for provider {provider}")

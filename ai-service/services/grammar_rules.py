@@ -118,18 +118,31 @@ def detect_grammar_errors(text: str) -> list[GrammarError]:
     return errors[:1]   # return at most one error per message
 
 
-def build_grammar_hint(errors: list[GrammarError]) -> str:
+def build_grammar_hint(errors: list[GrammarError], repeated: bool = False) -> str:
     """
     Format detected errors as a one-line hidden instruction for the LLM.
     Returns an empty string when there are no errors.
+
+    The instruction demands an EXPLICIT correction — silently "modeling"
+    the right form let the model answer the meaning while the student kept
+    repeating the mistake, and sometimes even praise the wrong sentence.
+    When ``repeated`` is True the student has made this same mistake before
+    in the session, so the model is told to slow down and add an example.
     """
     if not errors:
         return ""
-    hints = "; ".join(e.hint for e in errors)
-    return (
-        f"[Grammar note — do not mention this to the student, "
-        f"but gently model the correct form in your reply: {hints}]"
+    hints = "; ".join(f'{e.found} → {e.expected}' for e in errors)
+    base = (
+        f"[The student made a grammar mistake: {hints}. "
+        f"You MUST correct it explicitly FIRST (e.g. אומרים: {errors[0].expected}) "
+        f"before anything else. Never praise the incorrect sentence.]"
     )
+    if repeated:
+        base += (
+            " [The student has repeated this same mistake in this session — "
+            "explain it clearly and give ONE extra simple example.]"
+        )
+    return base
 
 
 # ---------------------------------------------------------------------------

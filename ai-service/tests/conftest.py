@@ -33,6 +33,17 @@ def _clear_caches():
         RESPONSE_CACHE_MANAGER._misses = 0
     EXACT_RESPONSE_CACHE.clear()
 
+    # Reset semantic cache so previous tests don't bleed over
+    try:
+        from services.chat_cache import SEMANTIC_CACHE_MANAGER
+        import faiss
+        with SEMANTIC_CACHE_MANAGER._lock:
+            SEMANTIC_CACHE_MANAGER.keys = []
+            SEMANTIC_CACHE_MANAGER.index = faiss.IndexFlatIP(1024)
+            SEMANTIC_CACHE_MANAGER.disk_cache.clear()
+    except Exception:
+        pass
+
     # Reset rate limiter so previous tests don't bleed over
     RATE_LIMITER.reset()
 
@@ -58,5 +69,25 @@ def _clear_caches():
     # Reset analytics start time so uptime_seconds stays near 0 in tests
     import services.analytics as _analytics
     _analytics._START_TIME = __import__('time').time()
+
+    # Reset SetFit module-level globals so a model loaded by one test does
+    # NOT bleed into the next test and non-deterministically change intent
+    # classification results (was causing flaky vocabulary-leakage failures).
+    try:
+        import services.chat_intents as _chat_intents
+        _chat_intents._SETFIT_MODEL = None
+        _chat_intents._SETFIT_MODEL_LOADED = False
+    except (ImportError, AttributeError):
+        pass
+
+    # Clear the in-process intent-response cache so stored responses from one
+    # test (e.g. test_intent_cache_reuses_response_object) don't bleed into
+    # subsequent tests.
+    try:
+        from services.prompt_cache_by_intent import _CACHE as _intent_cache, _LOCK as _intent_lock
+        with _intent_lock:
+            _intent_cache.clear()
+    except (ImportError, AttributeError):
+        pass
 
     yield

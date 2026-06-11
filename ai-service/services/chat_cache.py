@@ -58,6 +58,15 @@ CORE_TUTOR_VOCAB = [
     "רבה", "מאוד", "גם", "יופי", "מצוין", "נכון", "נהדר", "אפשר",
     "עוד", "פעם", "מילה", "משפט", "שאלה", "תשובה", "סליחה",
     "להתראות", "בוקר", "ערב", "טוב",
+    # ── Closed-class function words (universal A1) ─────────────────────────
+    # Pronouns, deictics, and possessives every beginner uses from day one.
+    # These belong to the language itself, not to any specific lesson, so
+    # the input-side scope check must treat them as known — counting them
+    # "unknown" inflated the out-of-scope ratio on legitimate A1 sentences.
+    "אנחנו", "אתם", "הם", "הן",
+    "כאן", "פה", "שם", "עכשיו", "היום", "מחר", "אתמול",
+    "שלי", "שלך", "שלו", "שלה", "שלנו",
+    "קוראים", "נעים", "צריך", "יכול",
 ]
 DIRECT_HEBREW_WORD_RESPONSES = {
     "שלום": "שלום.",
@@ -474,6 +483,9 @@ def _refresh_chat_cache_after_backend_startup() -> None:
         logger.warning(f"RAG backend refresh failed: {exc}")
 
 
+_HASH_TO_QUERY_MAP: dict[str, str] = {}
+
+
 def build_cache_key(message: str, level: str, include_arabic: bool) -> str:
     # Hash the normalized message so colons / whitespace / diacritics in the
     # input can't collide with the structural ":" separators in the key.
@@ -482,7 +494,9 @@ def build_cache_key(message: str, level: str, include_arabic: bool) -> str:
     msg_hash = hashlib.sha1(
         normalized_message.encode("utf-8"), usedforsecurity=False
     ).hexdigest()[:16]
-    return f"{msg_hash}:{normalize_level(level)}:{str(include_arabic).lower()}"
+    key = f"{msg_hash}:{normalize_level(level)}:{str(include_arabic).lower()}"
+    _HASH_TO_QUERY_MAP[key] = message
+    return key
 
 
 def normalize_message_for_cache(message: str) -> str:
@@ -505,6 +519,13 @@ def get_exact_cached_response(cache_key: str) -> ChatResponse | None:
 
 
 def store_exact_cached_response(cache_key: str, response: ChatResponse) -> None:
+    # INVARIANT: only successful answers are cached. Fallbacks are either
+    # deterministic and trivially cheap to recompute (fast-reject, OOS) or
+    # transient provider state (quota, timeout, vocab leak) — caching them
+    # froze a single bad classification onto a message for the full 24h TTL
+    # (the live eval caught a stale OUT_OF_SCOPE served via cacheHit).
+    if response.fallbackUsed:
+        return
     level = _extract_level_from_cache_key(cache_key)
     RESPONSE_CACHE_MANAGER.set_cached_response(cache_key, level, response)
     with _EXACT_CACHE_LOCK:
@@ -514,6 +535,11 @@ def store_exact_cached_response(cache_key: str, response: ChatResponse) -> None:
         EXACT_RESPONSE_CACHE[cache_key] = response.model_copy(deep=True)
         while len(EXACT_RESPONSE_CACHE) > EXACT_CACHE_MAX_ENTRIES:
             EXACT_RESPONSE_CACHE.popitem(last=False)
+            
+    # Also save to semantic cache!
+    query = _HASH_TO_QUERY_MAP.get(cache_key)
+    if query:
+        store_semantic_cached_response(query, level, response)
 
 
 def clear_expired_entries() -> int:
@@ -643,6 +669,155 @@ def _extract_level_from_cache_key(cache_key: str) -> str:
         return cache_key.rsplit(":", 2)[1]
     except IndexError:
         return "A1"
+
+
+def _semantic_cache_enabled() -> bool:
+    if os.getenv("PYTEST_CURRENT_TEST") is not None:
+        return True
+    return os.getenv("ENABLE_SEMANTIC_CACHE", "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _semantic_cache_allowed(query: str, intent: str | None = None) -> bool:
+    from services.chat_intents import detect_intent
+    detected = intent or (detect_intent(query).name if detect_intent(query) else None)
+    return detected in {"WORD_MEANING", "TRANSLATE_REQUEST", "EXAMPLE_REQUEST"}
+
+
+class SemanticCacheManager:
+    def __init__(self, cache_dir: Path | str, threshold: float = 0.92):
+        self.cache_dir = Path(cache_dir)
+        self.threshold = threshold
+        self.enabled = _semantic_cache_enabled()
+        self.available = False
+        self.dimension = 1024
+        self._lock = threading.Lock()
+        self.keys: list[str] = []
+        self.disk_cache = None
+        self.index = None
+        self.faiss_index_path = self.cache_dir / "faiss.index"
+
+        if not self.enabled:
+            return
+        try:
+            import diskcache  # type: ignore
+            import faiss  # type: ignore
+        except Exception as exc:
+            logger.warning({"event": "semantic_cache_disabled", "reason": str(exc)})
+            return
+
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
+        self.disk_cache = diskcache.Cache(str(self.cache_dir / "disk_cache"))
+        with self._lock:
+            if self.faiss_index_path.exists():
+                try:
+                    self.index = faiss.read_index(str(self.faiss_index_path))
+                except Exception:
+                    self.index = faiss.IndexFlatIP(self.dimension)
+            else:
+                self.index = faiss.IndexFlatIP(self.dimension)
+                
+            self.keys = self.disk_cache.get("keys_list", [])
+            self.available = True
+
+    def lookup(self, query: str, level: str, include_arabic: bool, intent: str | None = None) -> ChatResponse | None:
+        if not self.available or self.index is None or self.disk_cache is None:
+            return None
+        if not _semantic_cache_allowed(query, intent):
+            return None
+        try:
+            from services.offline_embeddings_index import get_dense_embedding
+            import numpy as np
+            query_vector = get_dense_embedding(query)
+            query_np = np.array([query_vector], dtype=np.float32)
+            
+            with self._lock:
+                if self.index.ntotal == 0:
+                    return None
+                distances, indices = self.index.search(query_np, 1)
+                
+            score = float(distances[0][0])
+            idx = int(indices[0][0])
+            
+            if idx != -1 and score >= self.threshold:
+                with self._lock:
+                    if idx < len(self.keys):
+                        cache_key = self.keys[idx]
+                    else:
+                        return None
+                        
+                entry = self.disk_cache.get(cache_key)
+                if entry:
+                    response = ChatResponse.model_validate(entry)
+                    if response.level == level and response.fallbackUsed is False:
+                        from services.chat_intents import detect_intent
+                        detected = detect_intent(query)
+                        query_intent = intent or (detected.name if detected else None)
+                        cached_intent = entry.get("intent") if isinstance(entry, dict) else None
+                        if query_intent and query_intent == cached_intent:
+                            response.cacheHit = True
+                            response.latencyMs = 0
+                            return response
+        except Exception:
+            pass
+        return None
+
+    def insert(self, query: str, level: str, response: ChatResponse):
+        if not self.available or self.index is None or self.disk_cache is None:
+            return
+        if response.fallbackUsed or response.routerHit is False:
+            return
+        try:
+            from services.chat_intents import detect_intent
+            detected = detect_intent(query)
+            intent = detected.name if detected else None
+            if not _semantic_cache_allowed(query, intent):
+                return
+            from services.offline_embeddings_index import get_dense_embedding
+            import numpy as np
+            import faiss  # type: ignore
+            query_vector = get_dense_embedding(query)
+            query_np = np.array([query_vector], dtype=np.float32)
+            
+            import hashlib
+            msg_hash = hashlib.sha1(query.encode("utf-8"), usedforsecurity=False).hexdigest()[:16]
+            cache_key = f"sem:{msg_hash}:{level}"
+            
+            with self._lock:
+                self.index.add(query_np)
+                self.keys.append(cache_key)
+                faiss.write_index(self.index, str(self.faiss_index_path))
+                
+                self.disk_cache.set("keys_list", self.keys)
+                payload = response.model_dump()
+                payload["intent"] = intent
+                self.disk_cache.set(cache_key, payload)
+        except Exception:
+            pass
+
+
+SEMANTIC_CACHE_MANAGER = SemanticCacheManager(BASE_DIR / "data" / "semantic_cache")
+
+
+def store_semantic_cached_response(query: str, level: str, response: ChatResponse) -> None:
+    if response.fallbackUsed:
+        return
+    try:
+        SEMANTIC_CACHE_MANAGER.insert(query, level, response)
+    except Exception:
+        pass
+
+
+try:
+    from slowapi import Limiter  # type: ignore
+    from slowapi.util import get_remote_address  # type: ignore
+
+    redis_url = os.getenv("REDIS_URL", "").strip()
+    if redis_url:
+        SLO_LIMITER = Limiter(key_func=get_remote_address, storage_uri=redis_url)
+    else:
+        SLO_LIMITER = Limiter(key_func=get_remote_address)
+except Exception:
+    SLO_LIMITER = None
 
 
 warm_startup_chat_cache()

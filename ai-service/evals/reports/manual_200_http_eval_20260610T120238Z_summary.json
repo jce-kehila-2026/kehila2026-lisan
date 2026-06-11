@@ -1,0 +1,33 @@
+{
+  "startedAt": "2026-06-10T12:02:38.089384+00:00",
+  "completedAt": "2026-06-10T12:02:40.704904+00:00",
+  "datasetPath": "C:\\Users\\mshar\\Desktop\\lisan\\kehila2026-lisan\\ai-service\\evals\\manual_200_agent_messages.jsonl",
+  "totalCases": 1,
+  "okCases": 1,
+  "errorCases": 0,
+  "fallbackCases": 1,
+  "casesWithContext": 0,
+  "averageWallLatencyMs": 2614.18,
+  "categoryBreakdown": {
+    "intro": {
+      "total": 1,
+      "ok": 1,
+      "errors": 0,
+      "fallbacks": 1,
+      "withContext": 0
+    }
+  },
+  "failureCandidates": [
+    {
+      "id": "msg_001",
+      "category": "intro",
+      "message": "שלום קוראים לי אנס",
+      "reason": "fallback:OUT_OF_SCOPE",
+      "status": 200,
+      "answerHe": "זה לא בחומר שלנו עכשיו. נתרגל מילים מהשיעור.",
+      "answerAr": null,
+      "contextChunkIds": [],
+      "retrievalScores": []
+    }
+  ]
+}

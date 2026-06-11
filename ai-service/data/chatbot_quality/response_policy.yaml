@@ -1,0 +1,10 @@
+# Lightweight policy file parsed by services/response_policy.py.
+# Keep this file simple: "key: value" plus comma-separated lists only.
+allow_arabic_support: true
+max_context_chunks: 2
+min_retrieval_score: 0.15
+prompt_token_budget: 1200
+template_levels: A1,A2,B1,B2
+b2_formal_drafting: true
+cache_intent_templates: true
+offline_embeddings_enabled: false

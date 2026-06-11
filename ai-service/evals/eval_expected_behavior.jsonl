@@ -1,0 +1,8 @@
+{"id":"expect_001","message":"שלום","level":"A1","expected":{"fallbackUsed":false,"routerHit":true}}
+{"id":"expect_002","message":"נעים מאוד","level":"A1","expected":{"fallbackUsed":false,"routerHit":true}}
+{"id":"expect_003","message":"شو يعني בית؟","level":"A1","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true,"answerArNotNull":true}}
+{"id":"expect_004","message":"מה זה אומר תור?","level":"A2","expected":{"fallbackUsed":false,"routerHit":true}}
+{"id":"expect_005","message":"תתקן: אני רוצים מים","level":"A1","expected":{"fallbackUsed":false,"routerHit":true,"containsAny":["אומרים","אני רוצה"]}}
+{"id":"expect_006","message":"אני רוצה לכתוב תלונה קצרה בסגנון רשמי","level":"B1","expected":{"fallbackUsed":false,"routerHit":true}}
+{"id":"expect_007","message":"אלגוריתמים גנטיים ורשתות נוירונים","level":"A1","expected":{"fallbackUsed":true,"fallbackReason":"OUT_OF_SCOPE"}}
+{"id":"expect_008","message":"   ","level":"A1","expected":{"fallbackUsed":true,"fallbackReason":"EMPTY_MESSAGE"}}

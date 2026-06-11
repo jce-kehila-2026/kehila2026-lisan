@@ -84,7 +84,10 @@ FALLBACK_FAST_REJECT_DATASET = [
     {"message": "hello world", "reason": "MIXED_LANGUAGE"},
     {"message": "مرحبا", "reason": "MIXED_LANGUAGE"},
     {"message": "שלום hello", "reason": "MIXED_LANGUAGE"},
-    {"message": "שלום مرحبا", "reason": "MIXED_LANGUAGE"},
+    # NOTE: mixed Arabic+Hebrew is NO LONGER rejected — Arabic is the
+    # students' support language; the Hebrew part is processed instead.
+    # A Cyrillic mix still rejects (only Arabic gets support treatment).
+    {"message": "Привет שלום", "reason": "MIXED_LANGUAGE"},
     {"message": "תרגם לי hello", "reason": "MIXED_LANGUAGE"},
     {"message": "12345", "reason": "OUT_OF_SCOPE"},
     {"message": "!@#$%^&*()", "reason": "OUT_OF_SCOPE"},

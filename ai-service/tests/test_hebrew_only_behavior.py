@@ -13,6 +13,7 @@ from fastapi.testclient import TestClient
 
 from main import app
 from services.chat_cache import EXACT_RESPONSE_CACHE
+from services.chat_guardrails import ARABIC_RE, get_fallback_text_ar
 
 client = TestClient(app)
 CHAT_URL = "/api/ai/chat"
@@ -45,7 +46,9 @@ def test_arabic_input_is_rejected(message: str):
     assert response.status_code == 200
     assert data["fallbackUsed"] is True
     assert data["fallbackReason"] == "MIXED_LANGUAGE"
-    assert data["answerAr"] is None
+    # The learner wrote Arabic, so the rejection guidance is mirrored in
+    # answerAr — a Hebrew-only refusal they can't read teaches nothing.
+    assert data["answerAr"] == get_fallback_text_ar("MIXED_LANGUAGE")
 
 
 @pytest.mark.parametrize(
@@ -71,7 +74,6 @@ def test_english_input_is_rejected(message: str):
     "message",
     [
         "שלום hello",
-        "שלום مرحبا",
         "תודה thank you",
         "איך אומרים coffee?",
     ],
@@ -85,6 +87,31 @@ def test_mixed_language_input_is_rejected(message: str):
     assert data["fallbackUsed"] is True
     assert data["fallbackReason"] == "MIXED_LANGUAGE"
     assert data["answerAr"] is None
+
+
+def test_mixed_arabic_hebrew_is_processed_not_rejected():
+    # Arabic is the students' L1 — a mixed message must be answered for its
+    # Hebrew content, not punished for the Arabic.
+    EXACT_RESPONSE_CACHE.clear()
+    response = post_chat("שלום مرحبا")
+    data = response.json()
+
+    assert response.status_code == 200
+    assert data["fallbackUsed"] is False
+    assert data["answerHe"]
+
+
+def test_arabic_word_meaning_question_gets_teaching_answer():
+    # "What does X mean?" in Arabic is a core learning use case, not an
+    # error. The deterministic intent layer answers it without the LLM.
+    EXACT_RESPONSE_CACHE.clear()
+    response = post_chat("شو يعني בית?")
+    data = response.json()
+
+    assert response.status_code == 200
+    assert data["fallbackUsed"] is False
+    assert "בית" in data["answerHe"]
+    assert data["answerAr"]
 
 
 @pytest.mark.parametrize(

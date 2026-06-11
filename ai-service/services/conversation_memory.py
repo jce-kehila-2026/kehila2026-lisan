@@ -28,7 +28,7 @@ logger = logging.getLogger("lisan.chat")
 
 MAX_TURNS = 5          # keep last N user+assistant pairs = 2*N messages
 TTL_SECONDS = 1800     # 30 minutes of inactivity → evict session
-MAX_SESSIONS = 2000    # guard against unbounded growth
+MAX_SESSIONS = 10000   # increased from 2000 to support more concurrent users
 
 
 @dataclass
