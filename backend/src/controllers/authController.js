@@ -6,10 +6,13 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log('🔐 LOGIN ATTEMPT:', { env: process.env.NODE_ENV, email, password, match: password === '123456' });
+    console.log('🔐 LOGIN ATTEMPT:', {
+      env: process.env.NODE_ENV,
+      email,
+      devLogin: process.env.NODE_ENV === 'development',
+    });
 
-    if (process.env.NODE_ENV === 'development' && password === '123456') {
-        console.log('📌 DEV LOGIN MATCHED');
+    if (process.env.NODE_ENV === 'development') {
       const devUsers = {
         'admin': {
           uid: 'dev-admin',
@@ -35,8 +38,10 @@ exports.login = async (req, res) => {
       };
 
       const devUser = devUsers[email.trim().toLowerCase()];
+      const devPassword = email.trim().toLowerCase();
 
-      if (devUser) {
+      if (devUser && (password === '123456' || password === devPassword)) {
+        console.log('📌 DEV LOGIN MATCHED');
         const token = jwt.sign(
           {
             uid: devUser.uid,

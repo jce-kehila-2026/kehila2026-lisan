@@ -50,7 +50,9 @@ body {
   margin: 0;
   min-height: 100vh;
   color: var(--color-text);
-  background: var(--color-surface);
+  background:
+    radial-gradient(circle at 14% 8%, rgba(221, 214, 254, 0.42), transparent 32%),
+    linear-gradient(180deg, #fbf8ff 0%, #fff8fc 48%, #f5efff 100%);
   font-family: var(--font-body);
   font-size: var(--text-body);
 }
@@ -117,6 +119,294 @@ body {
 button,
 input {
   font: inherit;
+}
+
+:where(a, button, [role="button"], input, textarea, select) {
+  transition: all 0.25s ease;
+}
+
+.app-page-container,
+.lisan-page-shell,
+.lisan-home-shell {
+  width: min(calc(100% - 24px), 640px);
+  max-width: 640px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding-top: 24px;
+  padding-bottom: 140px;
+}
+
+@media (min-width: 640px) {
+  .app-page-container,
+  .lisan-page-shell,
+  .lisan-home-shell {
+    width: min(calc(100% - 40px), 900px);
+    max-width: 900px;
+    padding-top: 28px;
+  }
+
+}
+
+@media (min-width: 1024px) {
+  .app-page-container,
+  .lisan-page-shell,
+  .lisan-home-shell {
+    width: min(88vw, 1600px);
+    max-width: 1600px;
+    padding-top: 36px;
+  }
+
+}
+
+.app-page-container {
+  isolation: isolate;
+}
+
+.app-page-container > section,
+.app-page-container > div:not(.lisan-enter),
+.app-page-container section[class*="bg-white"],
+.app-page-container article[class*="bg-white"],
+.app-page-container a[class*="bg-white"],
+.app-page-container button[class*="bg-white"] {
+  border-color: rgba(255, 255, 255, 0.82) !important;
+  background-color: rgba(255, 255, 255, 0.82);
+  box-shadow:
+    0 22px 60px rgba(109, 40, 217, 0.1),
+    0 8px 24px rgba(15, 23, 42, 0.045);
+  backdrop-filter: blur(18px);
+}
+
+.app-page-container > section,
+.app-page-container section[class*="rounded-\\[28px\\]"],
+.app-page-container section[class*="rounded-3xl"] {
+  border-radius: 32px;
+}
+
+.app-page-container article,
+.app-page-container a,
+.app-page-container button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app-page-container :where(h1, h2, h3) {
+  letter-spacing: 0;
+}
+
+.app-page-container :where(p, span, a, button, input, td, th) {
+  text-rendering: optimizeLegibility;
+}
+
+.app-page-container :where(.bg-violet-50, .bg-violet-100) {
+  background-color: rgba(245, 243, 255, 0.88) !important;
+}
+
+.app-page-container :where(.rounded-full, .rounded-2xl, .rounded-\[20px\], .rounded-\[22px\]) > svg,
+.app-page-container :where(svg.text-violet-700, svg.text-violet-600, svg.text-violet-500) {
+  filter: drop-shadow(0 8px 16px rgba(124, 58, 237, 0.12));
+}
+
+.app-page-container :where(span, div).bg-violet-50,
+.app-page-container :where(span, div).bg-violet-100 {
+  box-shadow:
+    inset 0 0 0 1px rgba(221, 214, 254, 0.82),
+    0 10px 24px rgba(124, 58, 237, 0.08);
+}
+
+.app-page-container img {
+  filter: saturate(0.98) contrast(0.99) drop-shadow(0 20px 34px rgba(124, 58, 237, 0.1));
+}
+
+.app-page-container input {
+  background-color: rgba(250, 247, 255, 0.86) !important;
+  border-color: rgba(221, 214, 254, 0.9) !important;
+}
+
+@media (min-width: 1024px) {
+  .app-page-container > section + section,
+  .app-page-container > div + section {
+    margin-top: 36px;
+  }
+}
+
+.lisan-bottom-nav {
+  opacity: 1 !important;
+  transform: translateX(-50%) !important;
+  animation: none !important;
+  will-change: auto;
+}
+
+.lisan-enter {
+  opacity: 0;
+  transform: translate3d(0, 30px, 0) scale(0.98);
+  animation: lisan-enter-up var(--lisan-enter-duration, 700ms) cubic-bezier(0.22, 1, 0.36, 1) var(--lisan-enter-delay, 0ms) both;
+  will-change: transform, opacity;
+}
+
+@keyframes lisan-enter-up {
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes lisan-fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+.lisan-dictionary-row {
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+  animation: lisan-dictionary-row-in 360ms cubic-bezier(0.22, 1, 0.36, 1) var(--lisan-row-delay, 0ms) both;
+  will-change: transform, opacity;
+}
+
+.lisan-dictionary-art {
+  animation: lisan-dictionary-art-float 5.6s ease-in-out infinite;
+  will-change: transform;
+}
+
+.lisan-hero-art {
+  animation: lisan-hero-art-drift 8s ease-in-out infinite;
+  transform-origin: center;
+  will-change: transform;
+}
+
+@keyframes lisan-hero-art-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(0, -8px, 0) scale(1.025);
+  }
+}
+
+@keyframes lisan-dictionary-art-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -6px, 0);
+  }
+}
+
+@keyframes lisan-dictionary-row-in {
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lisan-enter {
+    transform: none;
+    animation: lisan-fade-in 200ms ease var(--lisan-enter-delay, 0ms) both;
+  }
+
+  .lisan-dictionary-row {
+    transform: none;
+    animation: lisan-fade-in 160ms ease var(--lisan-row-delay, 0ms) both;
+  }
+
+  .lisan-dictionary-art {
+    animation: none;
+  }
+
+  .lisan-hero-art {
+    animation: none;
+  }
+}
+
+.lisan-student-motion main > header:not(.lisan-enter),
+.lisan-student-motion main > div > header:not(.lisan-enter),
+.lisan-student-motion main > section:not(.lisan-enter),
+.lisan-student-motion main > div > section:not(.lisan-enter),
+.lisan-student-motion main > div > article:not(.lisan-enter),
+.lisan-student-motion main > div > div:not(.lisan-enter) {
+  opacity: 0;
+  transform: translate3d(0, 30px, 0) scale(0.98);
+  animation: lisan-enter-up 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform, opacity;
+}
+
+.lisan-student-motion main > header:not(.lisan-enter),
+.lisan-student-motion main > div > header:not(.lisan-enter) {
+  animation-delay: 0ms;
+}
+
+.lisan-student-motion main > section:nth-of-type(1):not(.lisan-enter),
+.lisan-student-motion main > div > section:nth-of-type(1):not(.lisan-enter) {
+  animation-delay: 150ms;
+}
+
+.lisan-student-motion main > section:nth-of-type(2):not(.lisan-enter),
+.lisan-student-motion main > div > section:nth-of-type(2):not(.lisan-enter) {
+  animation-delay: 300ms;
+}
+
+.lisan-student-motion main > section:nth-of-type(3):not(.lisan-enter),
+.lisan-student-motion main > div > section:nth-of-type(3):not(.lisan-enter) {
+  animation-delay: 450ms;
+}
+
+.lisan-student-motion main > section:nth-of-type(4):not(.lisan-enter),
+.lisan-student-motion main > div > section:nth-of-type(4):not(.lisan-enter) {
+  animation-delay: 600ms;
+}
+
+.lisan-student-motion main > section:nth-of-type(n + 5):not(.lisan-enter),
+.lisan-student-motion main > div > section:nth-of-type(n + 5):not(.lisan-enter),
+.lisan-student-motion main > div > article:not(.lisan-enter),
+.lisan-student-motion main > div > div:not(.lisan-enter) {
+  animation-delay: 700ms;
+}
+
+.lisan-student-motion :where(.shadow-card, .chat-page__surface, article[class*="rounded"], section[class*="rounded"], a[class*="rounded"]) {
+  transition: all 0.3s ease;
+}
+
+.lisan-student-motion :where(.shadow-card, .chat-page__surface, article[class*="rounded"], section[class*="rounded"], a[class*="rounded"]):hover {
+  transform: translate3d(0, -6px, 0);
+  box-shadow: 0 24px 56px rgba(124, 58, 237, 0.18);
+}
+
+.lisan-student-motion :where(button, a, [role="button"]).bg-violet-600:hover,
+.lisan-student-motion :where(button, a, [role="button"], .bg-violet-600):hover > .bg-violet-600 {
+  transform: translate3d(0, -2px, 0);
+  box-shadow: 0 12px 24px rgba(124, 58, 237, 0.25);
+}
+
+.lisan-student-motion :where(a, button):hover :where(svg) {
+  filter: drop-shadow(0 8px 16px rgba(124, 58, 237, 0.18));
+}
+
+.lisan-student-motion :where(a, button):hover > :where(.rounded-full) {
+  transform: scale(1.05);
+  box-shadow: 0 16px 32px rgba(124, 58, 237, 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lisan-student-motion main > header:not(.lisan-enter),
+  .lisan-student-motion main > div > header:not(.lisan-enter),
+  .lisan-student-motion main > section:not(.lisan-enter),
+  .lisan-student-motion main > div > section:not(.lisan-enter),
+  .lisan-student-motion main > div > article:not(.lisan-enter),
+  .lisan-student-motion main > div > div:not(.lisan-enter) {
+    transform: none;
+    animation: lisan-fade-in 200ms ease both;
+  }
+
+  .lisan-student-motion :where(.shadow-card, .chat-page__surface, article[class*="rounded"], section[class*="rounded"], a[class*="rounded"]):hover,
+  .lisan-student-motion :where(button, a, [role="button"]).bg-violet-600:hover,
+  .lisan-student-motion :where(button, a, [role="button"], .bg-violet-600):hover > .bg-violet-600,
+  .lisan-student-motion :where(a, button):hover > :where(.rounded-full) {
+    transform: none;
+  }
 }
 
 button {

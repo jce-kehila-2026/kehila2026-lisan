@@ -52,6 +52,7 @@ function StudentPreferenceSync() {
       }
 
       document.documentElement.classList.toggle('lisan-student-dark', isStudent && preferences.theme === 'dark');
+      document.documentElement.classList.toggle('lisan-student-motion', isStudent);
       document.documentElement.classList.toggle(
         'lisan-student-large-text',
         isStudent && preferences.textSize === 'large',
