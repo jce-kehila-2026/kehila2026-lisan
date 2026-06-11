@@ -157,7 +157,7 @@ function App() {
         <Route
           path="/shared-chat"
           element={
-            <ProtectedRoute role="student">
+            <ProtectedRoute role={['student', 'teacher']}>
               <SharedChat />
             </ProtectedRoute>
           }
@@ -229,7 +229,7 @@ function App() {
         <Route
           path="/admin/dashboard"
           element={
-            <ProtectedRoute role="admin">
+            <ProtectedRoute role={['admin', 'teacher']}>
               <AdminDashboard />
             </ProtectedRoute>
           }

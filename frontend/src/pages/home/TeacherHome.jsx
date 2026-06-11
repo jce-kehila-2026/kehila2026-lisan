@@ -125,32 +125,6 @@ function ActivityShortcut({ activity }) {
   );
 }
 
-function TeacherActionCard({ action }) {
-  const Icon = action.icon;
-
-  return (
-    <Link
-      to={action.to}
-      className="group flex min-h-[112px] w-[85%] shrink-0 snap-start items-center gap-3 rounded-[22px] border border-violet-100/80 bg-white/75 p-4 text-right shadow-[0_10px_24px_rgba(109,40,217,0.08)] transition hover:-translate-y-1 hover:scale-[1.03] hover:bg-white hover:shadow-[0_16px_30px_rgba(109,40,217,0.16)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:w-[320px] lg:w-[320px]"
-      aria-label={action.title}
-      dir="rtl"
-    >
-      <span className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-violet-50 text-violet-700 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.9)] transition group-hover:bg-violet-600 group-hover:text-white lg:h-14 lg:w-14">
-        <Icon className="h-6 w-6 lg:h-7 lg:w-7" aria-hidden="true" />
-      </span>
-
-      <span className="min-w-0">
-        <span className="block truncate text-xl font-black leading-6 text-slate-900">
-          {action.title}
-        </span>
-        <span className="mt-1 line-clamp-2 block text-base font-bold leading-6 text-slate-500">
-          {action.subtitle}
-        </span>
-      </span>
-    </Link>
-  );
-}
-
 function TeacherHome() {
   const { t, i18n } = useTranslation();
   const storedUser = getStoredUser();
@@ -165,6 +139,11 @@ function TeacherHome() {
   const dictionaryPlaceholder = isArabic ? 'بحث عن كلمة بالعبرية...' : 'חיפוש מילה בעברית...';
   const showMoreLabel = isArabic ? 'عرض المزيد من الكلمات' : 'הצג עוד מילים';
   const showLessLabel = isArabic ? 'عرض أقل' : 'הצג פחות';
+  const friendsChatTitle = isArabic ? 'دردشة مع الأصدقاء' : 'שיחה עם חברים';
+  const friendsChatDescription = isArabic
+    ? 'اختاري صديقات للتدريب المشترك والسريع'
+    : 'בחרי חברות לתרגול משותף ומהיר';
+  const openActionLabel = isArabic ? 'فتح' : t('openAction');
   const linksModalText = isArabic
     ? {
       title: 'فتح الروابط الخارجية',
@@ -180,27 +159,6 @@ function TeacherHome() {
       confirm: 'כן, פתח את הקישור',
       cancel: 'ביטול',
     };
-  const teacherActions = [
-    {
-      title: 'הוספה',
-      subtitle: 'הוספת פעילות או תוכן חדש',
-      icon: Plus,
-      to: '/teacher/stories/upload',
-    },
-    {
-      title: 'עריכה',
-      subtitle: 'עריכת תכנים קיימים',
-      icon: Pencil,
-      to: '/teacher/stories/upload',
-    },
-    {
-      title: 'מחיקה',
-      subtitle: 'מחיקת תכנים לא רלוונטיים',
-      icon: Trash2,
-      to: '/teacher/stories/upload',
-    },
-  ];
-
   const teacher = {
     name: storedUser?.name || storedUser?.email || t('teacherNameFallback'),
     level: mode === 'teacher' ? 'כיתה A1' : 'A1',
@@ -213,6 +171,19 @@ function TeacherHome() {
   const [dictionaryExpanded, setDictionaryExpanded] = useState(false);
   const [favoriteWords, setFavoriteWords] = useState([]);
   const [isLinksModalOpen, setIsLinksModalOpen] = useState(false);
+  const [isActivityPanelOpen, setIsActivityPanelOpen] = useState(false);
+  const [activityPanelMode, setActivityPanelMode] = useState('add');
+  const [selectedActivityId, setSelectedActivityId] = useState(studentStories[0]?.id || '');
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+
+  const manageableActivities = useMemo(() => {
+    return studentStories.map((activity) => {
+      return {
+        id: activity.id,
+        title: getStudentStoryTitle(activity, i18n.language),
+      };
+    });
+  }, [i18n.language]);
 
   const progressWidth = useMemo(() => {
     return `${normalizeProgress(teacher.progress)}%`;
@@ -360,15 +331,23 @@ function TeacherHome() {
             <h2 className="text-3xl font-black text-slate-900">
               {mode === 'teacher' ? t('teacherStoriesTitle') : t('storiesTitle')}
             </h2>
+
+            {mode === 'teacher' ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsActivityPanelOpen(true);
+                  setDeleteConfirmOpen(false);
+                }}
+                className="inline-flex min-h-11 items-center gap-2 rounded-full border border-violet-100 bg-white px-5 text-sm font-black text-violet-700 shadow-[0_10px_24px_rgba(109,40,217,0.08)] transition hover:-translate-y-0.5 hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+              >
+                <Pencil className="h-4 w-4" aria-hidden="true" />
+                ניהול פעילויות
+              </button>
+            ) : null}
           </div>
 
           <div className="mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain pb-2 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden">
-            {mode === 'teacher'
-              ? teacherActions.map((action) => (
-                <TeacherActionCard key={action.title} action={action} />
-              ))
-              : null}
-
             {studentStories.map((activity) => (
               <ActivityShortcut key={activity.id} activity={activity} />
             ))}
@@ -543,7 +522,7 @@ function TeacherHome() {
           <Link
             to="/shared-chat"
             className="lisan-enter group flex min-h-[190px] items-center justify-between gap-5 overflow-hidden rounded-[28px] border border-white/80 bg-white p-6 shadow-card transition hover:-translate-y-1.5 hover:shadow-[0_24px_56px_rgba(124,58,237,0.18)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
-            aria-label={t('teacherDialogTitle')}
+            aria-label={friendsChatTitle}
             dir="ltr"
             style={{ '--lisan-enter-delay': '600ms' }}
           >
@@ -553,15 +532,15 @@ function TeacherHome() {
 
             <div className="min-w-0 flex-1 text-right" dir="rtl">
               <h2 className="text-2xl font-black text-slate-900">
-                {t('teacherDialogTitle')}
+                {friendsChatTitle}
               </h2>
 
               <p className="mt-2 text-base leading-7 text-slate-600">
-                {t('teacherDialogDesc')}
+                {friendsChatDescription}
               </p>
 
               <div className="mt-4 inline-flex h-12 items-center gap-2 rounded-full bg-violet-600 px-6 text-base font-black text-white shadow-button transition hover:-translate-y-0.5 hover:scale-[1.03] hover:shadow-[0_12px_24px_rgba(124,58,237,0.25)] group-hover:bg-violet-700">
-                <span>{t('teacherTryDialog')}</span>
+                <span>{openActionLabel}</span>
                 <ArrowLeft className="h-5 w-5" aria-hidden="true" />
               </div>
             </div>
@@ -575,41 +554,43 @@ function TeacherHome() {
           </Link>
         </section>
 
-        <section className="mt-8 grid gap-6 lg:grid-cols-2">
-          <Link
-            to="/admin/dashboard"
-            className="lisan-enter group flex min-h-[190px] items-center justify-between gap-5 overflow-hidden rounded-[28px] border border-white/80 bg-white p-6 shadow-card transition hover:-translate-y-1.5 hover:shadow-[0_24px_56px_rgba(124,58,237,0.18)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
-            aria-label="ניהול מערכת"
-            dir="ltr"
-            style={{ '--lisan-enter-delay': '750ms' }}
-          >
-            <img
-              src={ADMIN_SETTINGS_IMAGE}
-              alt=""
-              className="h-auto max-h-[125px] w-[150px] shrink-0 object-contain object-left opacity-95 mix-blend-multiply transition group-hover:scale-105 sm:max-h-[160px] sm:w-[230px] [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_68%,rgba(0,0,0,0.62)_84%,transparent_100%)]"
-              aria-hidden="true"
-            />
+        {mode === 'teacher' ? (
+          <section className="mt-8 grid gap-6 lg:grid-cols-2">
+            <Link
+              to="/admin/dashboard"
+              className="lisan-enter group flex min-h-[190px] items-center justify-between gap-5 overflow-hidden rounded-[28px] border border-white/80 bg-white p-6 shadow-card transition hover:-translate-y-1.5 hover:shadow-[0_24px_56px_rgba(124,58,237,0.18)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+              aria-label="ניהול מערכת"
+              dir="ltr"
+              style={{ '--lisan-enter-delay': '750ms' }}
+            >
+              <img
+                src={ADMIN_SETTINGS_IMAGE}
+                alt=""
+                className="h-auto max-h-[125px] w-[150px] shrink-0 object-contain object-left opacity-95 mix-blend-multiply transition group-hover:scale-105 sm:max-h-[160px] sm:w-[230px] [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_68%,rgba(0,0,0,0.62)_84%,transparent_100%)]"
+                aria-hidden="true"
+              />
 
-            <div className="min-w-0 flex-1 text-right" dir="rtl">
-              <h2 className="text-2xl font-black text-slate-900">
-                ניהול מערכת
-              </h2>
+              <div className="min-w-0 flex-1 text-right" dir="rtl">
+                <h2 className="text-2xl font-black text-slate-900">
+                  ניהול מערכת
+                </h2>
 
-              <p className="mt-2 text-base leading-7 text-slate-600">
-                מעבר ללוח הניהול להוספה, עריכה ומחיקה של תכנים.
-              </p>
+                <p className="mt-2 text-base leading-7 text-slate-600">
+                  מעבר ללוח הניהול להוספה, עריכה ומחיקה של תכנים.
+                </p>
 
-              <div className="mt-4 inline-flex h-12 items-center gap-2 rounded-full bg-violet-600 px-6 text-base font-black text-white shadow-button transition hover:-translate-y-0.5 hover:scale-[1.03] hover:shadow-[0_12px_24px_rgba(124,58,237,0.25)] group-hover:bg-violet-700">
-                <span>כניסה לניהול</span>
-                <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+                <div className="mt-4 inline-flex h-12 items-center gap-2 rounded-full bg-violet-600 px-6 text-base font-black text-white shadow-button transition hover:-translate-y-0.5 hover:scale-[1.03] hover:shadow-[0_12px_24px_rgba(124,58,237,0.25)] group-hover:bg-violet-700">
+                  <span>כניסה לניהול</span>
+                  <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+                </div>
               </div>
-            </div>
 
-            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-700 transition group-hover:bg-violet-600 group-hover:text-white">
-              <LinkIcon className="h-7 w-7" aria-hidden="true" />
-            </span>
-          </Link>
-        </section>
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-700 transition group-hover:bg-violet-600 group-hover:text-white">
+                <LinkIcon className="h-7 w-7" aria-hidden="true" />
+              </span>
+            </Link>
+          </section>
+        ) : null}
 
         {isLinksModalOpen ? (
           <div
@@ -666,6 +647,167 @@ function TeacherHome() {
                   className="inline-flex h-11 items-center justify-center rounded-full bg-violet-600 px-5 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(124,58,237,0.25)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
                 >
                   {linksModalText.confirm}
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {isActivityPanelOpen ? (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-4 backdrop-blur-sm"
+            role="presentation"
+            onClick={() => setIsActivityPanelOpen(false)}
+          >
+            <div
+              className="lisan-enter w-full max-w-lg rounded-[24px] border border-white/80 bg-[linear-gradient(135deg,#FFFFFF_0%,#F7F1FF_100%)] p-6 text-right shadow-[0_28px_80px_rgba(35,22,58,0.28)]"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="activity-management-title"
+              dir="rtl"
+              style={{
+                '--lisan-enter-delay': '0ms',
+                '--lisan-enter-duration': '260ms',
+              }}
+              onClick={(event) => event.stopPropagation()}
+            >
+              <h2
+                id="activity-management-title"
+                className="text-xl font-black text-slate-950"
+              >
+                ניהול פעילויות
+              </h2>
+
+              <p className="mt-2 text-sm font-medium leading-7 text-slate-600">
+                ניהול מקומי לדוגמה של חומרי לימוד ופעילויות. החיבור לשרת יתווסף בהמשך.
+              </p>
+
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                {[
+                  { id: 'add', label: 'הוספה', icon: Plus },
+                  { id: 'edit', label: 'עריכה', icon: Pencil },
+                  { id: 'delete', label: 'מחיקה', icon: Trash2 },
+                ].map((action) => {
+                  const Icon = action.icon;
+                  const isActive = activityPanelMode === action.id;
+
+                  return (
+                    <button
+                      key={action.id}
+                      type="button"
+                      onClick={() => {
+                        setActivityPanelMode(action.id);
+                        setDeleteConfirmOpen(false);
+                      }}
+                      className={`flex min-h-[88px] flex-col items-center justify-center gap-2 rounded-[20px] border p-3 text-sm font-black transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
+                        isActive
+                          ? 'border-violet-300 bg-violet-600 text-white shadow-button'
+                          : 'border-violet-100 bg-white/80 text-violet-700 hover:-translate-y-0.5 hover:bg-violet-50'
+                      }`}
+                    >
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                      {action.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="mt-5 rounded-[20px] border border-violet-100 bg-white/75 p-4">
+                {activityPanelMode === 'add' ? (
+                  <div>
+                    <h3 className="text-base font-black text-slate-900">הוספת פעילות</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">
+                      כאן יוצג טופס להוספת חומר או פעילות חדשה. כרגע זו תצוגת דמה בלבד.
+                    </p>
+                  </div>
+                ) : null}
+
+                {activityPanelMode === 'edit' ? (
+                  <div>
+                    <h3 className="text-base font-black text-slate-900">עריכת פעילות</h3>
+                    <label className="mt-3 block text-sm font-bold text-slate-700">
+                      בחירת פעילות לעריכה
+                      <select
+                        value={selectedActivityId}
+                        onChange={(event) => setSelectedActivityId(event.target.value)}
+                        className="mt-2 h-12 w-full rounded-2xl border border-violet-100 bg-white px-4 text-right text-sm font-bold text-slate-800 outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
+                      >
+                        {manageableActivities.map((activity) => (
+                          <option key={activity.id} value={activity.id}>
+                            {activity.title}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <p className="mt-3 text-sm leading-6 text-slate-600">
+                      עריכה אמיתית תתחבר לשרת בהמשך.
+                    </p>
+                  </div>
+                ) : null}
+
+                {activityPanelMode === 'delete' ? (
+                  <div>
+                    <h3 className="text-base font-black text-slate-900">מחיקת פעילות</h3>
+                    <label className="mt-3 block text-sm font-bold text-slate-700">
+                      בחירת פעילות למחיקה
+                      <select
+                        value={selectedActivityId}
+                        onChange={(event) => {
+                          setSelectedActivityId(event.target.value);
+                          setDeleteConfirmOpen(false);
+                        }}
+                        className="mt-2 h-12 w-full rounded-2xl border border-violet-100 bg-white px-4 text-right text-sm font-bold text-slate-800 outline-none focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
+                      >
+                        {manageableActivities.map((activity) => (
+                          <option key={activity.id} value={activity.id}>
+                            {activity.title}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    {deleteConfirmOpen ? (
+                      <div className="mt-4 rounded-2xl border border-violet-100 bg-violet-50/80 p-4">
+                        <p className="text-sm font-bold leading-6 text-slate-800">
+                          האם למחוק את הפעילות שנבחרה? פעולה זו היא הדגמה בלבד ולא תמחק נתונים אמיתיים.
+                        </p>
+                        <div className="mt-3 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                          <button
+                            type="button"
+                            onClick={() => setDeleteConfirmOpen(false)}
+                            className="inline-flex h-10 items-center justify-center rounded-full border border-violet-100 bg-white px-4 text-sm font-black text-violet-700 transition hover:bg-violet-50"
+                          >
+                            ביטול
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDeleteConfirmOpen(false)}
+                            className="inline-flex h-10 items-center justify-center rounded-full bg-violet-600 px-4 text-sm font-black text-white shadow-button transition hover:bg-violet-700"
+                          >
+                            אישור מחיקה
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setDeleteConfirmOpen(true)}
+                        className="mt-4 inline-flex h-11 items-center justify-center rounded-full bg-violet-600 px-5 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                      >
+                        מחיקה
+                      </button>
+                    )}
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="mt-6 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsActivityPanelOpen(false)}
+                  className="inline-flex h-11 items-center justify-center rounded-full border border-violet-100 bg-white px-5 text-sm font-black text-violet-700 transition hover:-translate-y-0.5 hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                >
+                  סגירה
                 </button>
               </div>
             </div>
