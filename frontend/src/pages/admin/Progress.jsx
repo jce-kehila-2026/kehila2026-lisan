@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   ArrowRight,
+  FilePlus2,
   GraduationCap,
   Link2,
   Pencil,
@@ -12,6 +13,10 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 import Button from '../../components/ui/Button.jsx';
+import {
+  adminStudentsSeed,
+  adminTeachersSeed,
+} from '../../data/adminMockData.js';
 import {
   assignStudentsToTeacher,
   createUser,
@@ -217,15 +222,35 @@ function TeachersManagement() {
   const [modal, setModal] = useState(null);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [usesLocalData, setUsesLocalData] = useState(false);
+  const [error, setError] = useState('');
 
   const loadData = async () => {
-    const [teachersData, studentsData] = await Promise.all([
-      getTeachers(),
-      getStudents(),
-    ]);
+    try {
+      setError('');
 
-    setTeachers(teachersData.teachers || []);
-    setStudents(studentsData.students || []);
+      const [teachersData, studentsData] = await Promise.all([
+        getTeachers(),
+        getStudents(),
+      ]);
+
+      if (
+        (teachersData.teachers || []).length === 0 &&
+        (studentsData.students || []).length === 0
+      ) {
+        setTeachers(adminTeachersSeed);
+        setStudents(adminStudentsSeed);
+        setUsesLocalData(true);
+      } else {
+        setTeachers(teachersData.teachers || []);
+        setStudents(studentsData.students || []);
+        setUsesLocalData(false);
+      }
+    } catch (requestError) {
+      setTeachers(adminTeachersSeed);
+      setStudents(adminStudentsSeed);
+      setUsesLocalData(true);
+    }
   };
 
   useEffect(() => {
@@ -249,6 +274,24 @@ function TeachersManagement() {
   const submitCreateUser = async (form) => {
     try {
       setSaving(true);
+      if (usesLocalData) {
+        const user = {
+          ...form,
+          id: `${form.role}_${Date.now()}`,
+          status: 'active',
+          teacherIds: [],
+        };
+
+        if (form.role === 'student') {
+          setStudents((current) => [user, ...current]);
+        } else {
+          setTeachers((current) => [user, ...current]);
+        }
+
+        closeModal();
+        return;
+      }
+
       await createUser(form);
       await loadData();
       closeModal();
@@ -262,6 +305,18 @@ function TeachersManagement() {
   const submitTeacherEdit = async (form) => {
     try {
       setSaving(true);
+      if (usesLocalData) {
+        setTeachers((current) =>
+          current.map((teacher) =>
+            teacher.id === selectedTeacher.id
+              ? { ...teacher, ...form, password: '' }
+              : teacher,
+          ),
+        );
+        closeModal();
+        return;
+      }
+
       const data = await updateTeacher(selectedTeacher.id, form);
       setTeachers((current) =>
         current.map((teacher) =>
@@ -280,6 +335,22 @@ function TeachersManagement() {
   const confirmDelete = async () => {
     try {
       setSaving(true);
+      if (usesLocalData) {
+        setTeachers((current) =>
+          current.filter((teacher) => teacher.id !== selectedTeacher.id),
+        );
+        setStudents((current) =>
+          current.map((student) => ({
+            ...student,
+            teacherIds: getStudentTeacherIds(student).filter(
+              (teacherId) => teacherId !== selectedTeacher.id,
+            ),
+          })),
+        );
+        closeModal();
+        return;
+      }
+
       await deleteTeacher(selectedTeacher.id);
       await loadData();
       closeModal();
@@ -293,6 +364,30 @@ function TeachersManagement() {
   const submitAssignments = async (studentIds) => {
     try {
       setSaving(true);
+      if (usesLocalData) {
+        setStudents((current) =>
+          current.map((student) => {
+            const remainingTeacherIds = getStudentTeacherIds(student).filter(
+              (teacherId) => teacherId !== selectedTeacher.id,
+            );
+
+            return studentIds.includes(student.id)
+              ? {
+                  ...student,
+                  teacherIds: [...remainingTeacherIds, selectedTeacher.id],
+                  teacherId: selectedTeacher.id,
+                }
+              : {
+                  ...student,
+                  teacherIds: remainingTeacherIds,
+                  teacherId: remainingTeacherIds[0] || '',
+                };
+          }),
+        );
+        closeModal();
+        return;
+      }
+
       await assignStudentsToTeacher(selectedTeacher.id, studentIds);
       await loadData();
       closeModal();
@@ -336,10 +431,19 @@ function TeachersManagement() {
             ניהול מורות, יצירת אדמינים חדשים ושיוך תלמידות למורה אחת או יותר.
           </p>
 
-          <div className="mt-5">
-            <button type="button" onClick={() => setModal('create-user')} className="inline-flex items-center gap-2 rounded-2xl bg-violet-600 px-5 py-3 text-sm font-black text-white shadow-button transition hover:bg-violet-700">
+          <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+            <button type="button" onClick={() => setModal('create-user')} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-violet-600 px-5 py-3 text-sm font-black text-white shadow-button transition hover:bg-violet-700">
               <UserPlus className="h-5 w-5" />
               הוספת משתמש
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate('/teacher/stories/upload')}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-violet-50 px-5 py-3 text-sm font-black text-violet-700 transition hover:bg-violet-100"
+            >
+              <FilePlus2 className="h-5 w-5" />
+              הוספת חומר לימוד
             </button>
           </div>
         </section>

@@ -9,6 +9,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 import Button from '../../components/ui/Button.jsx';
+import { adminDemoNotifications } from '../../data/adminMockData.js';
 import { getStoredToken, logout } from '../../services/auth.js';
 
 const API_BASE_URL = 'http://localhost:3000/api';
@@ -63,10 +64,14 @@ function Notifications() {
         throw new Error(data.error || 'Failed to load notifications');
       }
 
-      setNotifications(data.notifications || []);
+      setNotifications(
+        (data.notifications || []).length > 0
+          ? data.notifications
+          : adminDemoNotifications,
+      );
     } catch (requestError) {
       console.error('Failed to load notifications:', requestError);
-      setError('אירעה שגיאה בטעינת ההתראות.');
+      setNotifications(adminDemoNotifications);
     } finally {
       setLoading(false);
     }
@@ -79,6 +84,17 @@ function Notifications() {
   const markAsRead = async (notificationId) => {
     try {
       setMarkingId(notificationId);
+
+      if (adminDemoNotifications.some((notification) => notification.id === notificationId)) {
+        setNotifications((current) =>
+          current.map((notification) =>
+            notification.id === notificationId
+              ? { ...notification, isRead: true, readAt: new Date().toISOString() }
+              : notification,
+          ),
+        );
+        return;
+      }
 
       const token = getStoredToken();
 

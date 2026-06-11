@@ -221,7 +221,7 @@ function App() {
         <Route
           path="/teacher/stories/upload"
           element={
-            <ProtectedRoute role="teacher">
+            <ProtectedRoute role={['admin', 'teacher']}>
               <DatasetUploader />
             </ProtectedRoute>
           }

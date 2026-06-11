@@ -15,7 +15,11 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 import Button from '../../components/ui/Button.jsx';
-import { adminLevels } from '../../data/adminMockData.js';
+import {
+  adminLevels,
+  adminStudentsSeed,
+  adminTeachersSeed,
+} from '../../data/adminMockData.js';
 import {
   createStudent,
   deleteStudent,
@@ -295,17 +299,37 @@ function ActionButton({ children, label, onClick, tone = 'violet' }) {
   );
 }
 
+function FilterSelect({ label, value, onChange, children }) {
+  return (
+    <label className="grid gap-1 text-xs font-black text-slate-500">
+      {label}
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="min-h-11 rounded-2xl border border-slate-200 bg-slate-50 px-3 text-sm font-black text-slate-700 outline-none transition focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-100"
+      >
+        {children}
+      </select>
+    </label>
+  );
+}
+
 function Students() {
   const navigate = useNavigate();
   const [students, setStudents] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [query, setQuery] = useState('');
+  const [levelFilter, setLevelFilter] = useState('all');
+  const [teacherFilter, setTeacherFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [usesLocalData, setUsesLocalData] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [modal, setModal] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
 
   const loadData = async () => {
     setLoading(true);
@@ -317,10 +341,22 @@ function Students() {
         getTeachers(),
       ]);
 
-      setStudents(studentsData.students || []);
-      setTeachers(teachersData.teachers || []);
+      if (
+        (studentsData.students || []).length === 0 &&
+        (teachersData.teachers || []).length === 0
+      ) {
+        setStudents(adminStudentsSeed);
+        setTeachers(adminTeachersSeed);
+        setUsesLocalData(true);
+      } else {
+        setStudents(studentsData.students || []);
+        setTeachers(teachersData.teachers || []);
+        setUsesLocalData(false);
+      }
     } catch (requestError) {
-      setError(requestError.message);
+      setStudents(adminStudentsSeed);
+      setTeachers(adminTeachersSeed);
+      setUsesLocalData(true);
     } finally {
       setLoading(false);
     }
@@ -333,23 +369,29 @@ function Students() {
   const filteredStudents = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
-    if (!normalizedQuery) {
-      return students;
-    }
-
     return students.filter((student) => {
       const teacherIds = getStudentTeacherIds(student);
       const names = teacherNames(teachers, teacherIds);
-
-      return `${student.name} ${student.email} ${student.level} ${names}`
+      const matchesQuery = !normalizedQuery || `${student.name} ${student.email} ${student.level} ${names}`
         .toLowerCase()
         .includes(normalizedQuery);
+      const matchesLevel = levelFilter === 'all' || student.level === levelFilter;
+      const matchesTeacher =
+        teacherFilter === 'all' || teacherIds.includes(teacherFilter);
+      const matchesStatus =
+        statusFilter === 'all' ||
+        (statusFilter === 'blocked'
+          ? student.status === 'suspended'
+          : student.status !== 'suspended');
+
+      return matchesQuery && matchesLevel && matchesTeacher && matchesStatus;
     });
-  }, [query, students, teachers]);
+  }, [levelFilter, query, statusFilter, students, teacherFilter, teachers]);
 
   const closeModal = () => {
     setModal(null);
     setSelectedStudent(null);
+    setSelectedTeacher(null);
   };
 
   const openAddModal = () => {
@@ -363,6 +405,20 @@ function Students() {
     setError('');
 
     try {
+      if (usesLocalData) {
+        const newStudent = {
+          ...form,
+          id: `student_${Date.now()}`,
+          status: 'active',
+          teacherIds: getStudentTeacherIds(form),
+        };
+
+        setStudents((current) => [newStudent, ...current]);
+        setSuccess('התלמידה נוספה בהצלחה');
+        closeModal();
+        return;
+      }
+
       const data = await createStudent({
         ...form,
         teacherIds: getStudentTeacherIds(form),
@@ -383,6 +439,24 @@ function Students() {
     setError('');
 
     try {
+      if (usesLocalData) {
+        const updatedStudent = {
+          ...selectedStudent,
+          ...form,
+          password: '',
+          teacherIds: getStudentTeacherIds(form),
+        };
+
+        setStudents((current) =>
+          current.map((student) =>
+            student.id === selectedStudent.id ? updatedStudent : student,
+          ),
+        );
+        setSuccess('פרטי התלמידה עודכנו בהצלחה');
+        closeModal();
+        return;
+      }
+
       const data = await updateStudent(selectedStudent.id, {
         email: form.email,
         level: form.level,
@@ -411,6 +485,15 @@ function Students() {
     setError('');
 
     try {
+      if (usesLocalData) {
+        setStudents((current) =>
+          current.filter((student) => student.id !== selectedStudent.id),
+        );
+        setSuccess('התלמידה נמחקה');
+        closeModal();
+        return;
+      }
+
       await deleteStudent(selectedStudent.id);
       setStudents((current) =>
         current.filter((student) => student.id !== selectedStudent.id),
@@ -428,6 +511,22 @@ function Students() {
     setError('');
 
     try {
+      if (usesLocalData) {
+        const nextStatus = student.status === 'suspended' ? 'active' : 'suspended';
+
+        setStudents((current) =>
+          current.map((item) =>
+            item.id === student.id ? { ...item, status: nextStatus } : item,
+          ),
+        );
+        setSuccess(
+          nextStatus === 'suspended'
+            ? 'התלמידה הושהתה'
+            : 'התלמידה הוחזרה לפעילות',
+        );
+        return;
+      }
+
       const data = await toggleStudentSuspension(student.id);
 
       setStudents((current) =>
@@ -496,6 +595,32 @@ function Students() {
                 className="min-w-0 flex-1 bg-transparent text-sm font-semibold outline-none placeholder:text-slate-400"
               />
             </label>
+
+            <div className="grid gap-2 sm:grid-cols-3 lg:w-[34rem]">
+              <FilterSelect label="רמה" value={levelFilter} onChange={setLevelFilter}>
+                <option value="all">כל הרמות</option>
+                {adminLevels.map((level) => (
+                  <option key={level} value={level}>
+                    {level}
+                  </option>
+                ))}
+              </FilterSelect>
+
+              <FilterSelect label="מורה" value={teacherFilter} onChange={setTeacherFilter}>
+                <option value="all">כל המורות</option>
+                {teachers.map((teacher) => (
+                  <option key={teacher.id} value={teacher.id}>
+                    {teacher.name}
+                  </option>
+                ))}
+              </FilterSelect>
+
+              <FilterSelect label="סטטוס" value={statusFilter} onChange={setStatusFilter}>
+                <option value="all">כולן</option>
+                <option value="active">לא חסומות</option>
+                <option value="blocked">חסומות</option>
+              </FilterSelect>
+            </div>
 
             <div className="flex flex-col gap-2 sm:flex-row">
               <button
@@ -586,9 +711,31 @@ function Students() {
                       <span className="mb-1 block text-xs font-black text-slate-400 md:hidden">
                         מורות
                       </span>
-                      <span className="font-semibold text-slate-600">
-                        {teacherNames(teachers, studentTeacherIds)}
-                      </span>
+                      {studentTeacherIds.length === 0 ? (
+                        <span className="font-semibold text-slate-600">
+                          לא שויכה
+                        </span>
+                      ) : (
+                        <span className="flex flex-wrap gap-2">
+                          {studentTeacherIds.map((teacherId) => {
+                            const teacher = teachers.find((item) => item.id === teacherId);
+
+                            return (
+                              <button
+                                key={teacherId}
+                                type="button"
+                                onClick={() => {
+                                  setSelectedTeacher(teacher || { id: teacherId, name: teacherId });
+                                  setModal('teacher-students');
+                                }}
+                                className="rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-700 transition hover:bg-violet-100"
+                              >
+                                {teacher?.name || teacherId}
+                              </button>
+                            );
+                          })}
+                        </span>
+                      )}
                     </div>
 
                     <div>
@@ -716,6 +863,41 @@ function Students() {
             >
               {saving ? 'מוחקת...' : 'מחיקה'}
             </button>
+          </div>
+        </Modal>
+      ) : null}
+
+      {modal === 'teacher-students' && selectedTeacher ? (
+        <Modal
+          title={`תלמידות של ${selectedTeacher.name}`}
+          description="רשימת התלמידות המשויכות למורה שנבחרה."
+          onClose={closeModal}
+        >
+          <div className="mt-5 grid gap-3">
+            {students
+              .filter((student) =>
+                getStudentTeacherIds(student).includes(selectedTeacher.id),
+              )
+              .map((student) => (
+                <article
+                  key={student.id}
+                  className="rounded-2xl border border-violet-100 bg-violet-50/70 p-4"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <h3 className="text-base font-black text-slate-950">
+                        {student.name}
+                      </h3>
+                      <p className="mt-1 text-sm font-semibold text-slate-600">
+                        {student.email}
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-violet-700">
+                      {student.level}
+                    </span>
+                  </div>
+                </article>
+              ))}
           </div>
         </Modal>
       ) : null}

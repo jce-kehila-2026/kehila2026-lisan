@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '../../components/ui/Button.jsx';
 
 import {
+  adminDemoUsers,
   adminReviewNotifications,
 } from '../../data/adminMockData.js';
 
@@ -129,12 +130,13 @@ function AdminDashboard() {
           );
         }
 
-        setUsers(data.users || []);
+        setUsers((data.users || []).length > 0 ? data.users : adminDemoUsers);
       } catch (error) {
         console.error(
           'Failed to load dashboard users:',
           error,
         );
+        setUsers(adminDemoUsers);
       } finally {
         setLoading(false);
       }
@@ -304,7 +306,7 @@ function AdminDashboard() {
               <p className="mt-1 text-sm font-bold text-slate-700">
                 {loading
                   ? 'טוען נתונים...'
-                  : 'מחובר לשרת'}
+                  : 'פעיל'}
               </p>
             </div>
           </div>

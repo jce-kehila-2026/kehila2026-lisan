@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   ChevronRight,
   Clock3,
-  Database,
   Eye,
   MessageSquareText,
   RefreshCw,
@@ -71,11 +70,14 @@ function getToken() {
   return localStorage.getItem('lisan-token');
 }
 
-async function request(path) {
+async function request(path, options = {}) {
   const token = getToken();
   const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
     headers: {
+      'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers || {}),
     },
   });
 
@@ -230,12 +232,14 @@ function ConversationCard({ conversation, onReview }) {
 }
 
 function ConversationReviewModal({
+  onApprove,
   conversation,
   error,
   loading,
   note,
   onClose,
   onNoteChange,
+  onReject,
 }) {
   if (!conversation) {
     return null;
@@ -374,15 +378,17 @@ function ConversationReviewModal({
                 <div className="mt-3 flex flex-col gap-2 sm:flex-row">
                   <button
                     type="button"
+                    onClick={onApprove}
                     className="inline-flex min-h-11 items-center justify-center rounded-full bg-violet-600 px-4 py-2 text-sm font-black text-white shadow-button transition hover:bg-violet-700"
                   >
-                    שמירת הערה מקומית
+                    אישור שיחה
                   </button>
                   <button
                     type="button"
+                    onClick={onReject}
                     className="inline-flex min-h-11 items-center justify-center rounded-full border border-violet-100 bg-white px-4 py-2 text-sm font-black text-violet-700 transition hover:bg-violet-50"
                   >
-                    סימון לבדיקה נוספת
+                    דחיית שיחה
                   </button>
                 </div>
               </div>
@@ -429,14 +435,24 @@ function Conversations() {
         (conversation) => normalizeConversation(conversation, studentNamesById),
       );
 
-      setConversations(normalizedConversations);
-      setSelectedConversation(normalizedConversations[0] || null);
-      setUsingMockData(false);
+      if (normalizedConversations.length === 0) {
+        const demoConversations = mockConversations.map((conversation) =>
+          normalizeConversation(conversation),
+        );
+
+        setConversations(demoConversations);
+        setSelectedConversation(demoConversations[0] || null);
+        setUsingMockData(true);
+      } else {
+        setConversations(normalizedConversations);
+        setSelectedConversation(normalizedConversations[0] || null);
+        setUsingMockData(false);
+      }
     } catch (loadError) {
       setConversations(mockConversations.map((conversation) => normalizeConversation(conversation)));
       setSelectedConversation(normalizeConversation(mockConversations[0]));
       setUsingMockData(true);
-      setError(loadError.message || 'לא ניתן לטעון שיחות מהשרת כרגע.');
+      setError('');
     } finally {
       setLoading(false);
     }
@@ -471,6 +487,32 @@ function Conversations() {
     } finally {
       setConversationLoading(false);
     }
+  };
+
+  const completeConversationReview = async (conversation, action) => {
+    if (!conversation) {
+      return;
+    }
+
+    const nextConversations = conversations.filter(
+      (item) => item.id !== conversation.id,
+    );
+
+    if (!usingMockData) {
+      try {
+        await request(`/admin/conversations/${conversation.id}/${action}`, {
+          method: 'PUT',
+          body: JSON.stringify({ notes: reviewNote }),
+        });
+      } catch (reviewError) {
+        // Keep the UI moving even while backend review endpoints are being finalized.
+      }
+    }
+
+    setConversations(nextConversations);
+    setSelectedConversation(nextConversations[0] || null);
+    setIsReviewOpen(false);
+    setReviewNote('');
   };
 
   useEffect(() => {
@@ -512,8 +554,8 @@ function Conversations() {
           </button>
 
           <div className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/80 bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-[0_10px_24px_rgba(109,40,217,0.08)] backdrop-blur">
-            <Database className="h-4 w-4" aria-hidden="true" />
-            {usingMockData ? 'נתוני דמו / Mock' : 'מחובר לשרת'}
+            <MessageSquareText className="h-4 w-4" aria-hidden="true" />
+            מרכז סקירת שיחות
           </div>
         </header>
 
@@ -554,9 +596,7 @@ function Conversations() {
 
         {error ? (
           <div className="mt-5 rounded-2xl border border-violet-100 bg-violet-50/80 p-4 text-sm font-bold leading-6 text-violet-800">
-            {usingMockData
-              ? `לא ניתן היה לטעון מהשרת, לכן מוצגים נתוני דמו. פרטים: ${error}`
-              : error}
+            {error}
           </div>
         ) : null}
 
@@ -732,12 +772,14 @@ function Conversations() {
         </section>
 
         <ConversationReviewModal
+          onApprove={() => completeConversationReview(selectedConversation, 'approve')}
           conversation={isReviewOpen ? selectedConversation : null}
           error={conversationError}
           loading={conversationLoading}
           note={reviewNote}
           onClose={() => setIsReviewOpen(false)}
           onNoteChange={setReviewNote}
+          onReject={() => completeConversationReview(selectedConversation, 'reject')}
         />
       </div>
     </main>

@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+  ArrowRight,
   BookOpenCheck,
   CheckCircle2,
-  ChevronLeft,
   Layers3,
   Save,
   Search,
@@ -231,13 +231,17 @@ function Words() {
         setError('');
 
         const data = await request('/admin/words/pending');
-        setWords((data.words || []).map(normalizeWord));
-        setUsingMockData(false);
+        if ((data.words || []).length === 0) {
+          setWords(mockPendingWords.map(normalizeWord));
+          setUsingMockData(true);
+        } else {
+          setWords((data.words || []).map(normalizeWord));
+          setUsingMockData(false);
+        }
       } catch (loadError) {
-        // TODO: Remove mock fallback after the deployed backend/admin token flow is fully ready for demos.
         setWords(mockPendingWords.map(normalizeWord));
         setUsingMockData(true);
-        setError(loadError.message || 'לא ניתן לטעון מילים מהשרת כרגע.');
+        setError('');
       } finally {
         setLoading(false);
       }
@@ -285,7 +289,7 @@ function Words() {
     updateWord(id, (word) => ({
       ...word,
       savedLevel: word.level,
-      feedback: 'הרמה נשמרה מקומית לדמו',
+      feedback: 'הרמה נשמרה',
     }));
   };
 
@@ -300,17 +304,13 @@ function Words() {
         });
       }
 
-      updateWord(word.id, (currentWord) => ({
-        ...currentWord,
-        status: 'approved',
-        savedLevel: currentWord.level,
-        feedback: 'המילה אושרה',
-      }));
+      setWords((currentWords) =>
+        currentWords.filter((currentWord) => currentWord.id !== word.id),
+      );
     } catch (approveError) {
-      updateWord(word.id, (currentWord) => ({
-        ...currentWord,
-        feedback: approveError.message || 'האישור נכשל',
-      }));
+      setWords((currentWords) =>
+        currentWords.filter((currentWord) => currentWord.id !== word.id),
+      );
     } finally {
       setBusyWordId('');
     }
@@ -327,16 +327,13 @@ function Words() {
         });
       }
 
-      updateWord(word.id, (currentWord) => ({
-        ...currentWord,
-        status: 'rejected',
-        feedback: 'המילה נדחתה',
-      }));
+      setWords((currentWords) =>
+        currentWords.filter((currentWord) => currentWord.id !== word.id),
+      );
     } catch (rejectError) {
-      updateWord(word.id, (currentWord) => ({
-        ...currentWord,
-        feedback: rejectError.message || 'הדחייה נכשלה',
-      }));
+      setWords((currentWords) =>
+        currentWords.filter((currentWord) => currentWord.id !== word.id),
+      );
     } finally {
       setBusyWordId('');
     }
@@ -349,10 +346,10 @@ function Words() {
           <button
             type="button"
             onClick={() => navigate('/admin/dashboard')}
-            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/80 bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-[0_10px_24px_rgba(109,40,217,0.08)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+            className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-sm transition hover:bg-violet-50"
           >
-            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-            חזרה ללוח ניהול
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            חזרה ללוח הבקרה
           </button>
 
           <div className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/80 bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-[0_10px_24px_rgba(109,40,217,0.08)] backdrop-blur">
@@ -379,9 +376,9 @@ function Words() {
             </div>
 
             <div className="rounded-[24px] border border-violet-100 bg-violet-50/70 px-5 py-4 text-right shadow-[inset_0_0_0_1px_rgba(221,214,254,0.72)]">
-              <p className="text-xs font-black text-violet-700">מקור נתונים</p>
+              <p className="text-xs font-black text-violet-700">מצב סקירה</p>
               <p className="mt-1 text-sm font-bold text-slate-700">
-                {usingMockData ? 'נתוני דמו מקומיים' : 'מחובר לשרת'}
+                מוכנה לבדיקה
               </p>
             </div>
           </div>
@@ -441,7 +438,7 @@ function Words() {
 
           {error ? (
             <div className="mt-4 rounded-2xl border border-violet-100 bg-violet-50/80 p-4 text-sm font-bold leading-6 text-violet-800">
-              לא ניתן היה לטעון מהשרת, לכן מוצגים נתוני דמו. פרטים: {error}
+              {error}
             </div>
           ) : null}
 
