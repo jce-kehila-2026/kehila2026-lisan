@@ -75,6 +75,126 @@ function statusClass(status) {
   return 'bg-violet-50 text-violet-700 border-violet-100';
 }
 
+function LevelSelect({ level, onChange }) {
+  return (
+    <select
+      value={level}
+      onChange={(event) => onChange(event.target.value)}
+      className="h-11 w-full rounded-full border border-violet-100 bg-violet-50/80 px-4 text-center text-sm font-black text-violet-800 outline-none transition focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-100 sm:w-auto"
+    >
+      {LEVELS.map((levelOption) => (
+        <option key={levelOption} value={levelOption}>
+          {levelOption}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+function WordActions({ isBusy, onApprove, onReject, onSaveLevel }) {
+  return (
+    <div className="grid gap-2 sm:flex sm:flex-wrap">
+      <button
+        type="button"
+        disabled={isBusy}
+        onClick={onApprove}
+        className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-violet-600 px-4 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:bg-violet-700 disabled:opacity-50 sm:h-10"
+      >
+        <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+        אישור
+      </button>
+
+      <button
+        type="button"
+        disabled={isBusy}
+        onClick={onReject}
+        className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-violet-100 bg-white px-4 text-sm font-black text-violet-700 transition hover:-translate-y-0.5 hover:bg-violet-50 disabled:opacity-50 sm:h-10"
+      >
+        <XCircle className="h-4 w-4" aria-hidden="true" />
+        דחייה
+      </button>
+
+      <button
+        type="button"
+        onClick={onSaveLevel}
+        className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-violet-100 bg-violet-50 px-4 text-sm font-black text-violet-700 transition hover:-translate-y-0.5 hover:bg-violet-100 sm:h-10"
+      >
+        <Save className="h-4 w-4" aria-hidden="true" />
+        שמירת רמה
+      </button>
+    </div>
+  );
+}
+
+function WordReviewCard({
+  isBusy,
+  onApprove,
+  onReject,
+  onSaveLevel,
+  onSetLevel,
+  word,
+}) {
+  return (
+    <article className="rounded-[24px] border border-white/80 bg-white/90 p-4 shadow-[0_18px_42px_rgba(109,40,217,0.12)] transition hover:-translate-y-1 hover:shadow-[0_24px_56px_rgba(124,58,237,0.16)]">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs font-black text-violet-700">מילה חדשה</p>
+          <h3 className="mt-1 break-words text-2xl font-black leading-tight text-slate-950">
+            {word.word}
+          </h3>
+        </div>
+
+        <span className={`shrink-0 rounded-full border px-3 py-1 text-xs font-black ${statusClass(word.status)}`}>
+          {statusLabel(word.status)}
+        </span>
+      </div>
+
+      <div className="mt-4 grid gap-3">
+        <div className="rounded-[18px] bg-violet-50/70 p-3">
+          <p className="text-xs font-black text-violet-700">תרגום / משמעות</p>
+          <p className="mt-1 break-words text-base font-bold leading-7 text-slate-800">
+            {word.translation}
+          </p>
+        </div>
+
+        <div className="rounded-[18px] bg-white/80 p-3 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.65)]">
+          <p className="text-xs font-black text-violet-700">משפט לדוגמה</p>
+          <p className="mt-1 break-words text-sm font-semibold leading-7 text-slate-600">
+            {word.example || 'אין משפט לדוגמה'}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <label className="block text-xs font-black text-violet-700">
+          רמת למידה
+          <span className="mt-2 block">
+            <LevelSelect
+              level={word.level}
+              onChange={(level) => onSetLevel(word.id, level)}
+            />
+          </span>
+        </label>
+      </div>
+
+      {word.feedback ? (
+        <p className="mt-3 rounded-2xl bg-violet-50 px-3 py-2 text-xs font-bold leading-5 text-violet-700">
+          {word.feedback}
+        </p>
+      ) : null}
+
+      <div className="mt-4">
+        <WordActions
+          isBusy={isBusy}
+          onApprove={() => onApprove(word)}
+          onReject={() => onReject(word)}
+          onSaveLevel={() => onSaveLevel(word.id)}
+        />
+      </div>
+    </article>
+  );
+}
+
 function Words() {
   const navigate = useNavigate();
   const [words, setWords] = useState([]);
@@ -223,39 +343,42 @@ function Words() {
   };
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
-      <div className="mx-auto w-full max-w-7xl" dir="rtl">
+    <main className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl pb-12" dir="rtl">
         <header className="flex flex-wrap items-center justify-between gap-3">
           <button
             type="button"
             onClick={() => navigate('/admin/dashboard')}
-            className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-sm transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/80 bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-[0_10px_24px_rgba(109,40,217,0.08)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
           >
             <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             חזרה ללוח ניהול
           </button>
 
-          <div className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-sm">
+          <div className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/80 bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-[0_10px_24px_rgba(109,40,217,0.08)] backdrop-blur">
             <BookOpenCheck className="h-4 w-4" aria-hidden="true" />
             בדיקת מילים
           </div>
         </header>
 
-        <section className="mt-6 overflow-hidden rounded-[2rem] border border-white/70 bg-white/95 p-5 shadow-card sm:p-7">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+        <section className="relative mt-6 overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(135deg,#F3ECFF_0%,#FFFFFF_58%,#F8F2FF_100%)] p-5 shadow-[0_26px_70px_rgba(91,33,182,0.14)] transition hover:-translate-y-1 hover:shadow-[0_32px_80px_rgba(124,58,237,0.2)] sm:p-7">
+          <div className="pointer-events-none absolute -left-20 -top-24 h-48 w-48 rounded-full bg-violet-200/35 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-20 right-8 h-44 w-44 rounded-full bg-fuchsia-100/60 blur-3xl" />
+
+          <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-4xl">
-              <p className="text-sm font-black text-violet-700">
+              <p className="inline-flex rounded-full bg-violet-100 px-4 py-2 text-sm font-black text-violet-700">
                 תור בדיקה
               </p>
-              <h1 className="mt-2 text-2xl font-black leading-tight text-slate-950 sm:text-4xl">
+              <h1 className="mt-4 text-[clamp(2rem,4vw,4rem)] font-black leading-tight text-slate-950">
                 בדיקת מילים חדשות
               </h1>
-              <p className="mt-3 text-sm font-semibold leading-7 text-slate-600 sm:text-base">
+              <p className="mt-4 max-w-3xl text-[clamp(1rem,1.1vw,1.2rem)] font-medium leading-8 text-slate-600">
                 אשרי מילים חדשות, דחי מילים לא מתאימות וסווגי כל מילה לפי רמת הלמידה.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-violet-100 bg-violet-50 px-4 py-3 text-right">
+            <div className="rounded-[24px] border border-violet-100 bg-violet-50/70 px-5 py-4 text-right shadow-[inset_0_0_0_1px_rgba(221,214,254,0.72)]">
               <p className="text-xs font-black text-violet-700">מקור נתונים</p>
               <p className="mt-1 text-sm font-bold text-slate-700">
                 {usingMockData ? 'נתוני דמו מקומיים' : 'מחובר לשרת'}
@@ -263,7 +386,7 @@ function Words() {
             </div>
           </div>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          <div className="relative mt-7 grid gap-4 sm:grid-cols-3">
             {[
               { label: 'ממתינות', value: pendingCount, icon: Layers3 },
               { label: 'אושרו', value: approvedCount, icon: CheckCircle2 },
@@ -274,22 +397,22 @@ function Words() {
               return (
                 <article
                   key={stat.label}
-                  className="rounded-[1.5rem] border border-violet-100/70 bg-white p-4 shadow-card"
+                  className="group rounded-[24px] border border-violet-100 bg-white/75 p-5 shadow-[0_10px_24px_rgba(109,40,217,0.08)] backdrop-blur transition hover:-translate-y-1 hover:bg-white hover:shadow-[0_16px_30px_rgba(109,40,217,0.16)]"
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-50 text-violet-700">
-                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 text-violet-700 transition group-hover:bg-violet-600 group-hover:text-white">
+                      <Icon className="h-6 w-6" aria-hidden="true" />
                     </span>
-                    <span className="text-3xl font-black text-slate-950">{stat.value}</span>
+                    <span className="text-4xl font-black text-slate-950">{stat.value}</span>
                   </div>
-                  <p className="mt-3 text-sm font-black text-slate-700">{stat.label}</p>
+                  <p className="mt-4 text-base font-black text-slate-700">{stat.label}</p>
                 </article>
               );
             })}
           </div>
         </section>
 
-        <section className="mt-5 rounded-[2rem] border border-white/70 bg-white/95 p-4 shadow-card sm:p-6">
+        <section className="mt-5 rounded-[2rem] border border-white/70 bg-white/90 p-4 shadow-[0_22px_60px_rgba(91,33,182,0.11)] backdrop-blur sm:p-6">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <h2 className="text-xl font-black text-slate-950">
@@ -322,8 +445,28 @@ function Words() {
             </div>
           ) : null}
 
-          <div className="mt-5 overflow-x-auto rounded-[1.5rem] border border-violet-100/70">
-            <table className="w-full min-w-[980px] border-collapse bg-white text-right">
+          <div className="mt-5 grid gap-4 lg:hidden">
+            {filteredWords.map((word) => (
+              <WordReviewCard
+                key={word.id}
+                word={word}
+                isBusy={busyWordId === word.id}
+                onApprove={approveWord}
+                onReject={rejectWord}
+                onSaveLevel={saveLevel}
+                onSetLevel={setWordLevel}
+              />
+            ))}
+
+            {!loading && filteredWords.length === 0 ? (
+              <div className="rounded-[24px] border border-violet-100 bg-white/90 p-8 text-center text-sm font-bold text-slate-500 shadow-[0_14px_36px_rgba(109,40,217,0.1)]">
+                אין מילים להצגה כרגע.
+              </div>
+            ) : null}
+          </div>
+
+          <div className="mt-5 hidden overflow-hidden rounded-[1.5rem] border border-violet-100/70 shadow-[0_14px_34px_rgba(109,40,217,0.08)] lg:block">
+            <table className="w-full border-collapse bg-white/95 text-right">
               <thead>
                 <tr className="bg-violet-50/80 text-sm font-black text-violet-800">
                   <th className="px-4 py-4">מילה</th>
@@ -361,49 +504,18 @@ function Words() {
                         </span>
                       </td>
                       <td className="px-4 py-4">
-                        <select
-                          value={word.level}
-                          onChange={(event) => setWordLevel(word.id, event.target.value)}
-                          className="h-11 rounded-full border border-violet-100 bg-violet-50/80 px-4 text-sm font-black text-violet-800 outline-none transition focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-100"
-                        >
-                          {LEVELS.map((level) => (
-                            <option key={level} value={level}>
-                              {level}
-                            </option>
-                          ))}
-                        </select>
+                        <LevelSelect
+                          level={word.level}
+                          onChange={(level) => setWordLevel(word.id, level)}
+                        />
                       </td>
                       <td className="px-4 py-4">
-                        <div className="flex flex-wrap gap-2">
-                          <button
-                            type="button"
-                            disabled={isBusy}
-                            onClick={() => approveWord(word)}
-                            className="inline-flex h-10 items-center gap-1.5 rounded-full bg-violet-600 px-4 text-sm font-black text-white shadow-button transition hover:bg-violet-700 disabled:opacity-50"
-                          >
-                            <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
-                            אישור
-                          </button>
-
-                          <button
-                            type="button"
-                            disabled={isBusy}
-                            onClick={() => rejectWord(word)}
-                            className="inline-flex h-10 items-center gap-1.5 rounded-full border border-violet-100 bg-white px-4 text-sm font-black text-violet-700 transition hover:bg-violet-50 disabled:opacity-50"
-                          >
-                            <XCircle className="h-4 w-4" aria-hidden="true" />
-                            דחייה
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => saveLevel(word.id)}
-                            className="inline-flex h-10 items-center gap-1.5 rounded-full border border-violet-100 bg-violet-50 px-4 text-sm font-black text-violet-700 transition hover:bg-violet-100"
-                          >
-                            <Save className="h-4 w-4" aria-hidden="true" />
-                            שמירת רמה
-                          </button>
-                        </div>
+                        <WordActions
+                          isBusy={isBusy}
+                          onApprove={() => approveWord(word)}
+                          onReject={() => rejectWord(word)}
+                          onSaveLevel={() => saveLevel(word.id)}
+                        />
                       </td>
                     </tr>
                   );
