@@ -9,6 +9,7 @@ import {
   Search,
   Sparkles,
   UserRound,
+  X,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -228,12 +229,180 @@ function ConversationCard({ conversation, onReview }) {
   );
 }
 
+function ConversationReviewModal({
+  conversation,
+  error,
+  loading,
+  note,
+  onClose,
+  onNoteChange,
+}) {
+  if (!conversation) {
+    return null;
+  }
+
+  const status = statusLabel(conversation);
+  const messages = Array.isArray(conversation.messages) ? conversation.messages : [];
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-3 backdrop-blur-sm sm:p-6"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="conversation-review-title"
+      dir="rtl"
+    >
+      <div className="max-h-[92vh] w-full max-w-4xl overflow-hidden rounded-[2rem] border border-white/80 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.28)]">
+        <div className="flex items-start justify-between gap-4 border-b border-violet-100 bg-[linear-gradient(135deg,#F3ECFF_0%,#FFFFFF_65%,#F8F2FF_100%)] p-4 sm:p-6">
+          <div>
+            <p className="inline-flex rounded-full bg-violet-100 px-3 py-1 text-xs font-black text-violet-700">
+              צפייה / בדיקה
+            </p>
+            <h2
+              id="conversation-review-title"
+              className="mt-3 text-2xl font-black leading-tight text-slate-950 sm:text-3xl"
+            >
+              {conversation.title}
+            </h2>
+            <p className="mt-2 text-sm font-bold text-slate-600">
+              {conversation.studentName} · {formatDate(conversation.updatedAt)}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-violet-100 bg-white text-violet-700 shadow-sm transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500"
+            aria-label="סגירת חלון בדיקה"
+          >
+            <X className="h-5 w-5" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="max-h-[calc(92vh-140px)] overflow-y-auto p-4 sm:p-6">
+          {loading ? (
+            <div className="flex min-h-[220px] items-center justify-center rounded-[24px] bg-violet-50/70 text-sm font-black text-violet-700">
+              טוען את פרטי השיחה...
+            </div>
+          ) : (
+            <>
+              {error ? (
+                <div className="mb-4 rounded-2xl border border-rose-100 bg-rose-50 p-4 text-sm font-bold leading-6 text-rose-700">
+                  {error}
+                </div>
+              ) : null}
+
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl bg-violet-50/80 p-4">
+                  <p className="text-xs font-black text-violet-700">רמה</p>
+                  <p className="mt-1 text-2xl font-black text-slate-950">{conversation.level}</p>
+                </div>
+                <div className="rounded-2xl bg-violet-50/80 p-4">
+                  <p className="text-xs font-black text-violet-700">סטטוס</p>
+                  <span className={`mt-2 inline-flex rounded-full border px-3 py-1 text-xs font-black ${statusClass(status)}`}>
+                    {status}
+                  </span>
+                </div>
+                <div className="rounded-2xl bg-violet-50/80 p-4">
+                  <p className="text-xs font-black text-violet-700">הודעות</p>
+                  <p className="mt-1 text-2xl font-black text-slate-950">
+                    {conversation.messagesCount || messages.length}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 rounded-[24px] border border-violet-100 bg-white p-4 shadow-[0_12px_30px_rgba(109,40,217,0.08)]">
+                <p className="text-xs font-black text-violet-700">תקציר</p>
+                <p className="mt-2 text-sm font-semibold leading-7 text-slate-700">
+                  {conversation.preview}
+                </p>
+              </div>
+
+              <div className="mt-4 rounded-[24px] border border-violet-100 bg-white p-4 shadow-[0_12px_30px_rgba(109,40,217,0.08)]">
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <h3 className="text-lg font-black text-slate-950">שיחה מלאה</h3>
+                  <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-700">
+                    {messages.length} הודעות
+                  </span>
+                </div>
+
+                {messages.length === 0 ? (
+                  <p className="rounded-2xl bg-violet-50/70 p-4 text-sm font-bold leading-6 text-slate-600">
+                    אין הודעות זמינות לשיחה הזו. אם זו שיחה מהשרת, נסי שוב או בדקי שהשיחה נשמרה עם הודעות.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {messages.map((message, index) => {
+                      const isStudent =
+                        message.sender === 'user' ||
+                        message.role === 'user' ||
+                        message.senderRole === 'student';
+
+                      return (
+                        <div
+                          key={`${conversation.id}-modal-${index}`}
+                          className={`rounded-2xl p-4 ${
+                            isStudent
+                              ? 'bg-violet-50 text-slate-900'
+                              : 'bg-slate-50 text-slate-900'
+                          }`}
+                        >
+                          <p className="mb-1 text-xs font-black text-violet-700">
+                            {isStudent ? 'תלמידה' : 'AI'}
+                          </p>
+                          <p className="whitespace-pre-wrap text-sm font-semibold leading-7">
+                            {message.text || message.transcribedText || 'הודעה קולית / ללא טקסט'}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-4 rounded-[24px] border border-violet-100 bg-violet-50/70 p-4">
+                <label className="block text-sm font-black text-violet-800">
+                  הערות מנהלת
+                  <textarea
+                    value={note}
+                    onChange={(event) => onNoteChange(event.target.value)}
+                    placeholder="כתבי הערה לבדיקה פנימית של השיחה..."
+                    className="mt-2 min-h-24 w-full resize-none rounded-2xl border border-violet-100 bg-white p-3 text-sm font-semibold leading-6 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
+                  />
+                </label>
+
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                  <button
+                    type="button"
+                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-violet-600 px-4 py-2 text-sm font-black text-white shadow-button transition hover:bg-violet-700"
+                  >
+                    שמירת הערה מקומית
+                  </button>
+                  <button
+                    type="button"
+                    className="inline-flex min-h-11 items-center justify-center rounded-full border border-violet-100 bg-white px-4 py-2 text-sm font-black text-violet-700 transition hover:bg-violet-50"
+                  >
+                    סימון לבדיקה נוספת
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Conversations() {
   const navigate = useNavigate();
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [conversationLoading, setConversationLoading] = useState(false);
+  const [conversationError, setConversationError] = useState('');
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [reviewNote, setReviewNote] = useState('');
   const [usingMockData, setUsingMockData] = useState(false);
   const [error, setError] = useState('');
   const [query, setQuery] = useState('');
@@ -274,8 +443,12 @@ function Conversations() {
   };
 
   const openConversation = async (conversation) => {
+    setSelectedConversation(conversation);
+    setConversationError('');
+    setReviewNote('');
+    setIsReviewOpen(true);
+
     if (usingMockData) {
-      setSelectedConversation(conversation);
       return;
     }
 
@@ -284,9 +457,16 @@ function Conversations() {
       setError('');
 
       const data = await request(`/admin/conversations/${conversation.id}`);
-      setSelectedConversation(normalizeConversation(data.conversation));
+      setSelectedConversation(
+        normalizeConversation({
+          ...conversation,
+          ...data.conversation,
+          studentName: conversation.studentName,
+          status: data.conversation?.status || conversation.status,
+        }),
+      );
     } catch (openError) {
-      setError(openError.message || 'לא ניתן לטעון את פרטי השיחה.');
+      setConversationError(openError.message || 'לא ניתן לטעון את פרטי השיחה.');
       setSelectedConversation(conversation);
     } finally {
       setConversationLoading(false);
@@ -550,6 +730,15 @@ function Conversations() {
             )}
           </aside>
         </section>
+
+        <ConversationReviewModal
+          conversation={isReviewOpen ? selectedConversation : null}
+          error={conversationError}
+          loading={conversationLoading}
+          note={reviewNote}
+          onClose={() => setIsReviewOpen(false)}
+          onNoteChange={setReviewNote}
+        />
       </div>
     </main>
   );
