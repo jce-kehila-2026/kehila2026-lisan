@@ -4,8 +4,11 @@ import {
   ChevronDown,
   Link as LinkIcon,
   MessageCircle,
+  Pencil,
+  Plus,
   Search,
   Star,
+  Trash2,
   Volume2,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -19,6 +22,10 @@ import {
   studentStories,
 } from '../../data/studentStories.jsx';
 import { getStoredUser } from '../../services/auth.js';
+
+const USEFUL_LINKS_DRIVE_URL =
+  'https://drive.google.com/drive/folders/1AOGvvic8O2K_MzjUJIXMQwGg80unCad8';
+const ADMIN_SETTINGS_IMAGE = '/images/admin-settings-card.png';
 
 const dictionaryWords = [
   { hebrew: 'שלום', arabic: 'مرحباً' },
@@ -118,6 +125,32 @@ function ActivityShortcut({ activity }) {
   );
 }
 
+function TeacherActionCard({ action }) {
+  const Icon = action.icon;
+
+  return (
+    <Link
+      to={action.to}
+      className="group flex min-h-[112px] w-[85%] shrink-0 snap-start items-center gap-3 rounded-[22px] border border-violet-100/80 bg-white/75 p-4 text-right shadow-[0_10px_24px_rgba(109,40,217,0.08)] transition hover:-translate-y-1 hover:scale-[1.03] hover:bg-white hover:shadow-[0_16px_30px_rgba(109,40,217,0.16)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:w-[320px] lg:w-[320px]"
+      aria-label={action.title}
+      dir="rtl"
+    >
+      <span className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-violet-50 text-violet-700 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.9)] transition group-hover:bg-violet-600 group-hover:text-white lg:h-14 lg:w-14">
+        <Icon className="h-6 w-6 lg:h-7 lg:w-7" aria-hidden="true" />
+      </span>
+
+      <span className="min-w-0">
+        <span className="block truncate text-xl font-black leading-6 text-slate-900">
+          {action.title}
+        </span>
+        <span className="mt-1 line-clamp-2 block text-base font-bold leading-6 text-slate-500">
+          {action.subtitle}
+        </span>
+      </span>
+    </Link>
+  );
+}
+
 function TeacherHome() {
   const { t, i18n } = useTranslation();
   const storedUser = getStoredUser();
@@ -147,6 +180,26 @@ function TeacherHome() {
       confirm: 'כן, פתח את הקישור',
       cancel: 'ביטול',
     };
+  const teacherActions = [
+    {
+      title: 'הוספה',
+      subtitle: 'הוספת פעילות או תוכן חדש',
+      icon: Plus,
+      to: '/teacher/stories/upload',
+    },
+    {
+      title: 'עריכה',
+      subtitle: 'עריכת תכנים קיימים',
+      icon: Pencil,
+      to: '/teacher/stories/upload',
+    },
+    {
+      title: 'מחיקה',
+      subtitle: 'מחיקת תכנים לא רלוונטיים',
+      icon: Trash2,
+      to: '/teacher/stories/upload',
+    },
+  ];
 
   const teacher = {
     name: storedUser?.name || storedUser?.email || t('teacherNameFallback'),
@@ -310,6 +363,12 @@ function TeacherHome() {
           </div>
 
           <div className="mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain pb-2 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden">
+            {mode === 'teacher'
+              ? teacherActions.map((action) => (
+                <TeacherActionCard key={action.title} action={action} />
+              ))
+              : null}
+
             {studentStories.map((activity) => (
               <ActivityShortcut key={activity.id} activity={activity} />
             ))}
@@ -516,6 +575,42 @@ function TeacherHome() {
           </Link>
         </section>
 
+        <section className="mt-8 grid gap-6 lg:grid-cols-2">
+          <Link
+            to="/admin/dashboard"
+            className="lisan-enter group flex min-h-[190px] items-center justify-between gap-5 overflow-hidden rounded-[28px] border border-white/80 bg-white p-6 shadow-card transition hover:-translate-y-1.5 hover:shadow-[0_24px_56px_rgba(124,58,237,0.18)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+            aria-label="ניהול מערכת"
+            dir="ltr"
+            style={{ '--lisan-enter-delay': '750ms' }}
+          >
+            <img
+              src={ADMIN_SETTINGS_IMAGE}
+              alt=""
+              className="h-auto max-h-[125px] w-[150px] shrink-0 object-contain object-left opacity-95 mix-blend-multiply transition group-hover:scale-105 sm:max-h-[160px] sm:w-[230px] [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_68%,rgba(0,0,0,0.62)_84%,transparent_100%)]"
+              aria-hidden="true"
+            />
+
+            <div className="min-w-0 flex-1 text-right" dir="rtl">
+              <h2 className="text-2xl font-black text-slate-900">
+                ניהול מערכת
+              </h2>
+
+              <p className="mt-2 text-base leading-7 text-slate-600">
+                מעבר ללוח הניהול להוספה, עריכה ומחיקה של תכנים.
+              </p>
+
+              <div className="mt-4 inline-flex h-12 items-center gap-2 rounded-full bg-violet-600 px-6 text-base font-black text-white shadow-button transition hover:-translate-y-0.5 hover:scale-[1.03] hover:shadow-[0_12px_24px_rgba(124,58,237,0.25)] group-hover:bg-violet-700">
+                <span>כניסה לניהול</span>
+                <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+              </div>
+            </div>
+
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-700 transition group-hover:bg-violet-600 group-hover:text-white">
+              <LinkIcon className="h-7 w-7" aria-hidden="true" />
+            </span>
+          </Link>
+        </section>
+
         {isLinksModalOpen ? (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-4 backdrop-blur-sm"
@@ -561,6 +656,11 @@ function TeacherHome() {
                 <button
                   type="button"
                   onClick={() => {
+                    window.open(
+                      USEFUL_LINKS_DRIVE_URL,
+                      '_blank',
+                      'noopener,noreferrer',
+                    );
                     setIsLinksModalOpen(false);
                   }}
                   className="inline-flex h-11 items-center justify-center rounded-full bg-violet-600 px-5 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(124,58,237,0.25)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
