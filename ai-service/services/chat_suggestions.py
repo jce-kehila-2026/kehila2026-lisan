@@ -252,6 +252,13 @@ def get_suggestions(
                     recovery suggestions instead of topic suggestions.
     """
     if fallback_used:
+        # Even after a fallback, suggest prompts from the TOPIC the student
+        # was trying to talk about — a fixed recovery pack repeated on every
+        # rejection felt generic and taught nothing. Only when no topic is
+        # detectable do we use the recovery pack.
+        topic = _detect_topic("", message)
+        if topic != "generic":
+            return list(_SUGGESTIONS.get(topic, _FALLBACK_RECOVERY))[:_MAX_SUGGESTIONS]
         return list(_FALLBACK_RECOVERY)
 
     topic = _detect_topic(answer_he, message)

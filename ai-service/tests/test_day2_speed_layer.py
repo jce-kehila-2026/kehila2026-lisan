@@ -181,10 +181,13 @@ class TestExactCache:
         assert data["answerAr"] is None
         assert data["cacheHit"] is True
 
-    def test_fallback_also_cached(self):
+    def test_fallback_is_never_cached(self):
+        # Fallbacks must NOT be cached: a transient misclassification or
+        # provider hiccup would otherwise freeze a canned reply onto that
+        # message for the full cache TTL (caught live by the 200-msg eval).
         post_chat("")
         r2 = post_chat("")
-        assert r2.json()["cacheHit"] is True
+        assert r2.json()["cacheHit"] is False
         assert r2.json()["fallbackUsed"] is True
 
     def test_cached_response_latency_zero(self):

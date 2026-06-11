@@ -1,0 +1,33 @@
+# Optional chatbot enhancement dependencies.
+# Install only when enabling the matching feature flags in production.
+
+# Text normalization / tokenization experiments
+ftfy
+hebrew-tokenizer
+
+# Local observability integrations
+sentry-sdk
+opentelemetry-api
+opentelemetry-sdk
+langfuse
+
+# SlowAPI IP rate limit layer. The built-in user rate limiter works without it.
+slowapi
+
+# Semantic cache. Requires ENABLE_SEMANTIC_CACHE=true.
+diskcache
+faiss-cpu
+
+# Dense retrieval / reranking. Requires ENABLE_DENSE_RETRIEVAL=true or ENABLE_RERANKER=true.
+sqlite-vec
+sentence-transformers
+
+# Optional SetFit intent classifier. Requires ENABLE_SETFIT_INTENT=true and a local model.
+setfit
+datasets
+
+# Structured-output experiments. Requires explicit call sites / flags.
+instructor
+
+# Offline eval experiments, not required for runtime.
+ragas

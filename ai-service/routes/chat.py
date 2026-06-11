@@ -28,8 +28,10 @@ from services.speech_to_text import (
 # Engine is selected at call time via STT_ENGINE (whisper [default] | azure).
 from services.stt import transcribe_audio
 
-# Max seconds to wait for pronunciation assessment alongside chat engine
-_PRON_TIMEOUT_SECONDS = 10.0
+# Max seconds to wait for pronunciation assessment alongside chat engine.
+# Voice mode latency budget is <3s; pronunciation is best-effort &
+# non-critical. Reduced from 10s to avoid blocking on slow assessments.
+_PRON_TIMEOUT_SECONDS = 1.5
 
 # Pronunciation scoring is Azure-only and OFF by default (free-tier mode).
 # Set USE_AZURE_PRONUNCIATION=true (and provide AZURE_SPEECH_KEY) to enable
@@ -175,13 +177,14 @@ async def chat_stream(
     x_user_id: str | None = Header(default=None),
 ) -> StreamingResponse:
     """
-    SSE streaming endpoint — yields tokens as they arrive from the LLM.
+    SSE streaming endpoint.
+
+    The engine buffers LLM tokens and validates the complete answer against
+    the guardrails BEFORE emitting, so every "data:" event the client sees
+    is already safe to render — no discard/correction protocol is needed.
 
     Event format (text/event-stream):
-      data: <token text>\n\n
-
-    Special sentinel token "\x00FALLBACK\x00<text>" signals that post-stream
-    guardrails failed; the client should discard buffered tokens and show <text>.
+      data: <validated text>\n\n
 
     A final "data: [DONE]\n\n" event marks the end of the stream.
     """

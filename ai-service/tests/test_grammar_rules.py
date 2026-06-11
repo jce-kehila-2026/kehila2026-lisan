@@ -215,15 +215,26 @@ class TestBuildGrammarHint:
     def test_empty_list_returns_empty_string(self):
         assert build_grammar_hint([]) == ""
 
-    def test_hint_contains_grammar_note_prefix(self):
+    def test_hint_is_bracketed_instruction(self):
         errors = detect_grammar_errors("היא גר")
         hint = build_grammar_hint(errors)
-        assert hint.startswith("[Grammar note")
+        assert hint.startswith("[")
+        assert hint.endswith("]")
 
-    def test_hint_instructs_not_to_mention_to_student(self):
+    def test_hint_demands_explicit_correction(self):
+        # The old hint told the model to "gently model" the right form
+        # WITHOUT mentioning the mistake — students kept repeating it and
+        # sometimes even got praised for wrong sentences. The hint must now
+        # demand an explicit correction first.
         errors = detect_grammar_errors("היא גר")
         hint = build_grammar_hint(errors)
-        assert "do not mention" in hint
+        assert "MUST correct it explicitly" in hint
+        assert "Never praise" in hint
+
+    def test_repeated_flag_adds_stronger_instruction(self):
+        errors = detect_grammar_errors("היא גר")
+        hint = build_grammar_hint(errors, repeated=True)
+        assert "repeated this same mistake" in hint
 
     def test_hint_contains_correction(self):
         errors = detect_grammar_errors("היא גר")
@@ -289,5 +300,5 @@ class TestGrammarHintInjection:
                 pass
 
         assert "system_message" in captured, "call_provider was never reached"
-        assert "Grammar note" in captured["system_message"]
+        assert "grammar mistake" in captured["system_message"]
         assert "גרה" in captured["system_message"]

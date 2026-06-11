@@ -49,6 +49,26 @@ _LEVEL_CONFIGS: dict[str, _LevelConfig] = {
         oos_advanced_no_known=4,
         vocab_strict=False,
     ),
+    # B levels exist so formal/workplace/municipality content is allowed at
+    # the level it belongs to. Before these configs, B1/B2 requests silently
+    # fell back to the STRICTEST A1 config — the exact opposite of intent —
+    # rejecting legitimate B-level messages as out-of-scope.
+    "B1": _LevelConfig(
+        max_hebrew_words=35,
+        max_message_length=600,
+        oos_all_unknown_min=7,
+        oos_unknown_ratio=0.85,
+        oos_advanced_no_known=8,
+        vocab_strict=False,
+    ),
+    "B2": _LevelConfig(
+        max_hebrew_words=50,
+        max_message_length=800,
+        oos_all_unknown_min=9,
+        oos_unknown_ratio=0.92,
+        oos_advanced_no_known=12,
+        vocab_strict=False,
+    ),
 }
 
 _DEFAULT_CONFIG = _LEVEL_CONFIGS["A1"]
@@ -58,18 +78,40 @@ def _get_config(level: str | None) -> _LevelConfig:
     return _LEVEL_CONFIGS.get(normalize_level(level), _DEFAULT_CONFIG)
 
 FALLBACK_RESPONSES = {
-    "EMPTY_MESSAGE": "כתוב שאלה קצרה בעברית.",
-    "MIXED_LANGUAGE": "נסה לשאול בעברית פשוטה.",
-    "OUT_OF_SCOPE": "זה לא בחומר שלנו עכשיו. נתרגל מילים מהשיעור.",
-    "VOCAB_LEAKAGE": "בוא נתרגל משפט פשוט מהשיעור.",
+    "EMPTY_MESSAGE": "כתוב שאלה קצרה בעברית. למשל: מה זה בית?",
+    "MIXED_LANGUAGE": "נסה לכתוב בעברית. אפשר מילה אחת, למשל: שלום.",
+    # Teaching fallback: tell the student HOW to fix the question, with a
+    # concrete example, instead of a bare rejection.
+    "OUT_OF_SCOPE": "זה לא בחומר שלנו עכשיו. נסה שאלה פשוטה, למשל: מה זה בית?",
+    "VOCAB_LEAKAGE": "בוא נתרגל משפט פשוט מהשיעור. למשל: אני רוצה קפה.",
     "MESSAGE_TOO_LONG": "נסה שוב עם שאלה קצרה.",
     "MODEL_TIMEOUT": "נסה שוב עם שאלה קצרה.",
     "MODEL_ERROR": "נסה שוב עם שאלה קצרה.",
     "EMPTY_RESPONSE": "נסה שוב עם שאלה קצרה.",
-    "PROVIDER_QUOTA": "נסה שוב עם שאלה קצרה.",
+    # Quota is a server-side condition, not a user error — the message must
+    # not blame the question ("try a shorter question" was misleading).
+    "PROVIDER_QUOTA": "יש עומס עכשיו. נסה שוב עוד מעט.",
     "PROVIDER_AUTH": "נסה שוב עם שאלה קצרה.",
     "PROVIDER_NETWORK": "נסה שוב עם שאלה קצרה.",
     "CIRCUIT_OPEN": "נסה שוב עוד כמה דקות.",
+}
+# Arabic translations of the fallback texts. Served in answerAr ONLY when
+# the student's own message contained Arabic script — a learner who writes
+# Arabic demonstrably reads it, and a Hebrew-only rejection they cannot
+# understand teaches nothing.
+FALLBACK_RESPONSES_AR = {
+    "EMPTY_MESSAGE": "اكتب سؤالًا قصيرًا بالعبرية. مثلًا: מה זה בית؟",
+    "MIXED_LANGUAGE": "حاول أن تكتب بالعبرية. كلمة واحدة تكفي، مثلًا: שלום.",
+    "OUT_OF_SCOPE": "هذا ليس ضمن دروسنا الآن. جرّب سؤالًا بسيطًا، مثلًا: מה זה בית؟",
+    "VOCAB_LEAKAGE": "هيا نتدرّب على جملة بسيطة من الدرس. مثلًا: אני רוצה קפה.",
+    "MESSAGE_TOO_LONG": "حاول مرة أخرى بسؤال أقصر.",
+    "MODEL_TIMEOUT": "حاول مرة أخرى بسؤال قصير.",
+    "MODEL_ERROR": "حاول مرة أخرى بسؤال قصير.",
+    "EMPTY_RESPONSE": "حاول مرة أخرى بسؤال قصير.",
+    "PROVIDER_QUOTA": "الخدمة مشغولة الآن. حاول مرة أخرى بعد قليل.",
+    "PROVIDER_AUTH": "حاول مرة أخرى بسؤال قصير.",
+    "PROVIDER_NETWORK": "حاول مرة أخرى بسؤال قصير.",
+    "CIRCUIT_OPEN": "حاول مرة أخرى بعد بضع دقائق.",
 }
 FALLBACK_CODES = frozenset(FALLBACK_RESPONSES.keys())
 
@@ -126,7 +168,12 @@ def sanitize_input(text: str) -> str:
     """
     if not text:
         return ""
-    cleaned = _ZERO_WIDTH_RE.sub("", text)
+    try:
+        import ftfy  # type: ignore
+        fixed = ftfy.fix_text(text)
+    except Exception:
+        fixed = text
+    cleaned = _ZERO_WIDTH_RE.sub("", fixed)
     cleaned = _DIRECTIONAL_RE.sub("", cleaned)
     cleaned = cleaned.replace(_HEBREW_MAQAF, " ")
     return re.sub(r"\s+", " ", cleaned).strip()
@@ -138,14 +185,18 @@ def classify_fast_reject(message: str) -> str | None:
         return "EMPTY_MESSAGE"
     if len(stripped_message) > MAX_MESSAGE_LENGTH:
         return "MESSAGE_TOO_LONG"
-    # Any non-Hebrew letter (Latin, Cyrillic, Greek, ...) or Arabic script
-    # → mixed language. NON_HEBREW_LETTER_RE generalises the old Latin-only
-    # check so homoglyph attacks (e.g. a Cyrillic "а") are caught too.
-    if ARABIC_RE.search(stripped_message) or NON_HEBREW_LETTER_RE.search(stripped_message):
+    has_arabic = bool(ARABIC_RE.search(stripped_message))
+    has_hebrew = bool(hebrew_words(stripped_message))
+    # Arabic+Hebrew mixed messages (e.g. "شو يعني בית?") are a valid learning
+    # pattern — the student writes their L1 Arabic alongside the Hebrew word
+    # they're asking about.  Let these through to the intent router; only
+    # pure-Arabic or Arabic-without-Hebrew messages are rejected here.
+    if has_arabic and not has_hebrew:
         return "MIXED_LANGUAGE"
-    if not hebrew_words(stripped_message):
-        return "OUT_OF_SCOPE"
-    if NON_HEBREW_SCRIPT_RE.search(stripped_message) and not hebrew_words(stripped_message):
+    # Non-Hebrew scripts other than Arabic (Latin, Cyrillic, Greek, ...)
+    if not has_arabic and NON_HEBREW_LETTER_RE.search(stripped_message):
+        return "MIXED_LANGUAGE"
+    if not has_hebrew:
         return "OUT_OF_SCOPE"
     return None
 
@@ -205,6 +256,62 @@ def is_precise_fallback_reason(reason: str | None) -> bool:
     return bool(reason and reason in FALLBACK_CODES)
 
 
+# Hebrew bound prefixes (definite article, conjunction, prepositions):
+# ו (and), ה (the), ב (in), ל (to), מ (from), כ (as), ש (that).
+# They attach directly to the word: הבית = ה+בית, בנצרת = ב+נצרת.
+# Vocabulary matching must strip them, otherwise every prefixed form of a
+# known curriculum word counts as "unknown" and inflates the OOS ratio.
+HEBREW_PREFIX_LETTERS = "והבלמכש"
+_MAX_PREFIX_STRIP = 2  # e.g. וה / וב / שה stacks
+
+# Common inflection suffixes (plural, possessive, feminine, 1st person).
+# Stripping ONE of these for the "is this word known?" check lets natural
+# conjugations match their base form (ילדים → ילד, ספרי → ספר). This is the
+# benefit-of-the-doubt direction only: a false "known" merely sends the
+# message to the LLM, whose OUTPUT is still vocabulary-guarded.
+_HEBREW_SUFFIXES = ("ים", "ות", "תי", "נו", "כם", "כן", "הם", "הן", "ה", "י", "ך", "ו", "ת")
+
+# Proper nouns every Israeli learner uses from day one: cities and towns.
+# Hebrew has no capitalization, so a gazetteer is the only reliable way to
+# keep place names from counting as "unknown vocabulary" (live evals showed
+# נצרת/עכו/חיפה pushing legitimate sentences over the out-of-scope ratio).
+KNOWN_PROPER_NOUNS = frozenset({
+    "ישראל", "ירושלים", "אביב", "חיפה", "נצרת", "עכו", "לוד", "רמלה",
+    "חולון", "אשדוד", "אשקלון", "אילת", "טבריה", "צפת", "חדרה", "נתניה",
+    "רעננה", "הרצליה", "באר", "שבע", "יפו", "בת", "ים", "רמת", "גן",
+    "כרמיאל", "עפולה", "שפרעם", "סכנין", "טמרה", "אום", "אלפחם",
+})
+
+
+def is_known_token(token: str, vocabulary: set[str]) -> bool:
+    """
+    Morphology-aware vocabulary membership for a normalized Hebrew token:
+    exact match, known proper noun, bound-prefix stripping (up to 2), and
+    one inflection-suffix strip on each prefix variant.
+    """
+    variants = [token]
+    stripped = token
+    for _ in range(_MAX_PREFIX_STRIP):
+        if len(stripped) > 2 and stripped[0] in HEBREW_PREFIX_LETTERS:
+            stripped = stripped[1:]
+            variants.append(stripped)
+        else:
+            break
+
+    for variant in variants:
+        if variant in vocabulary or variant in KNOWN_PROPER_NOUNS:
+            return True
+        for suffix in _HEBREW_SUFFIXES:
+            # Base must keep >= 3 letters: shorter remainders over-match
+            # (e.g. prefix-stripping כלכלה to כלה, then suffix-stripping to
+            # כל — "economics" must not count as the known word "all").
+            if len(variant) - len(suffix) >= 3 and variant.endswith(suffix):
+                base = variant[: -len(suffix)]
+                if base in vocabulary or base in KNOWN_PROPER_NOUNS:
+                    return True
+    return False
+
+
 def is_clearly_out_of_scope(
     message: str,
     known_vocabulary: set[str],
@@ -216,13 +323,17 @@ def is_clearly_out_of_scope(
     if not tokens:
         return False
 
-    known_count = sum(1 for token in tokens if token in known_vocabulary)
+    known_count = sum(1 for token in tokens if is_known_token(token, known_vocabulary))
     advanced_count = sum(1 for token in tokens if token in advanced_only_tokens)
     unknown_count = len(tokens) - known_count
 
     if len(tokens) >= cfg.oos_all_unknown_min and known_count == 0:
         return True
-    if len(tokens) >= cfg.oos_all_unknown_min + 1 and unknown_count / len(tokens) >= cfg.oos_unknown_ratio:
+    # Strictly greater: "dominated by unknown vocabulary" means MORE than the
+    # threshold. At exactly 50% (e.g. a known greeting + an unknown proper
+    # name) the message gets the benefit of the doubt — output-side vocab
+    # guardrails still constrain whatever the model answers.
+    if len(tokens) >= cfg.oos_all_unknown_min + 1 and unknown_count / len(tokens) > cfg.oos_unknown_ratio:
         return True
     if advanced_count >= cfg.oos_advanced_no_known and known_count == 0:
         return True
@@ -231,6 +342,9 @@ def is_clearly_out_of_scope(
 
 def find_blocked_tokens(answer: str, vocabulary: list[str]) -> list[str]:
     approved_tokens = set(vocabulary)
+    # Place names are always sayable — the tutor must be able to echo the
+    # city a student mentioned without tripping the vocabulary guard.
+    approved_tokens.update(KNOWN_PROPER_NOUNS)
     for fallback_text in FALLBACK_RESPONSES.values():
         approved_tokens.update(hebrew_words(fallback_text))
 
@@ -296,3 +410,8 @@ def get_max_message_length_for_level(level: str | None) -> int:
 def get_fallback_text(reason: str | None) -> str:
     normalized_reason = reason if is_precise_fallback_reason(reason) else DEFAULT_FALLBACK_REASON
     return FALLBACK_RESPONSES.get(normalized_reason, FALLBACK_RESPONSES[DEFAULT_FALLBACK_REASON])
+
+
+def get_fallback_text_ar(reason: str | None) -> str:
+    normalized_reason = reason if is_precise_fallback_reason(reason) else DEFAULT_FALLBACK_REASON
+    return FALLBACK_RESPONSES_AR.get(normalized_reason, FALLBACK_RESPONSES_AR[DEFAULT_FALLBACK_REASON])

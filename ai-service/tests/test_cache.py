@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+import pytest
 from fastapi.testclient import TestClient
 
 from main import app
 from services.chat_cache import CacheManager, build_cache_key
 from services.chat_schemas import ChatResponse, GuardrailReport
 
-import pytest
 
 client = TestClient(app)
 
@@ -14,6 +14,7 @@ client = TestClient(app)
 @pytest.fixture(autouse=True)
 def mock_provider_call(monkeypatch):
     from services.chat_provider import ProviderResult
+
     def fake_call(config, system_message, question, opts=None):
         return ProviderResult(
             answer="אני גר.",
@@ -23,11 +24,11 @@ def mock_provider_call(monkeypatch):
             provider=config.name,
             model=config.model,
         )
+
     monkeypatch.setattr("services.chat_provider._call_provider_with_timeout", fake_call)
 
 
-
-def make_response(answer: str = "שלום.") -> ChatResponse:
+def make_response(answer: str = "שלום.", *, router_hit: bool = False) -> ChatResponse:
     return ChatResponse(
         answerHe=answer,
         answerAr=None,
@@ -38,7 +39,7 @@ def make_response(answer: str = "שלום.") -> ChatResponse:
         provider="test-provider",
         latencyMs=12,
         cacheHit=False,
-        routerHit=False,
+        routerHit=router_hit,
         contextChunkIds=[],
         guardrail=GuardrailReport(),
         suggestedNextPrompts=[],
@@ -90,3 +91,36 @@ def test_cache_stats_endpoint_returns_response_cache_metrics():
     after_stats = after.json()
     assert after_stats["hits"] >= before_stats["hits"] + 1
     assert after_stats["size"] >= before_stats["size"] + 1
+
+
+def test_semantic_cache_manager_low_risk_only():
+    from services.chat_cache import SEMANTIC_CACHE_MANAGER
+
+    if not SEMANTIC_CACHE_MANAGER.available:
+        pytest.skip("optional semantic cache dependencies are not installed")
+
+    import faiss
+
+    SEMANTIC_CACHE_MANAGER.keys = []
+    SEMANTIC_CACHE_MANAGER.index = faiss.IndexFlatIP(1024)
+    SEMANTIC_CACHE_MANAGER.disk_cache.clear()
+
+    msg1 = "מה זה אומר בית?"
+    resp1 = make_response("בית הוא מקום שגרים בו.", router_hit=True)
+    SEMANTIC_CACHE_MANAGER.insert(msg1, "A1", resp1)
+
+    cached = SEMANTIC_CACHE_MANAGER.lookup(msg1, "A1", False)
+    assert cached is not None
+    assert cached.answerHe == "בית הוא מקום שגרים בו."
+
+    msg2 = "מה זה אומר בית"
+    cached2 = SEMANTIC_CACHE_MANAGER.lookup(msg2, "A1", False)
+    assert cached2 is not None
+    assert cached2.answerHe == "בית הוא מקום שגרים בו."
+
+    cached3 = SEMANTIC_CACHE_MANAGER.lookup(msg1, "A2", False)
+    assert cached3 is None
+
+    risky_msg = "מה שלומך היום?"
+    SEMANTIC_CACHE_MANAGER.insert(risky_msg, "A1", make_response("הכול בסדר.", router_hit=True))
+    assert SEMANTIC_CACHE_MANAGER.lookup(risky_msg, "A1", False) is None

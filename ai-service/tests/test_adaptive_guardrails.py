@@ -44,8 +44,16 @@ class TestLevelConfigLookup:
         cfg = _get_config("A2")
         assert cfg is _LEVEL_CONFIGS["A2"]
 
-    def test_unknown_level_returns_a1_config(self):
+    def test_b1_has_its_own_config(self):
+        # B1/B2 used to silently fall back to the STRICTEST A1 config,
+        # rejecting legitimate B-level content as out-of-scope.
         cfg = _get_config("B1")
+        assert cfg is _LEVEL_CONFIGS["B1"]
+        assert cfg.vocab_strict is False
+        assert cfg.max_hebrew_words > _LEVEL_CONFIGS["A1"].max_hebrew_words
+
+    def test_truly_unknown_level_returns_a1_config(self):
+        cfg = _get_config("C9")
         assert cfg is _LEVEL_CONFIGS["A1"]
 
     def test_none_level_returns_a1_config(self):

@@ -266,22 +266,21 @@ class TestB14AnalyticsPercentile:
 
 
 # ---------------------------------------------------------------------------
-# B15 — Streaming sentinel must use a stronger marker
+# B15 — Streaming must not need a fallback sentinel at all
 # ---------------------------------------------------------------------------
 
 class TestB15StreamingSentinel:
-    def test_fallback_sentinel_is_unique(self):
-        """The fallback sentinel must be unlikely to appear in LLM output."""
+    def test_no_sentinel_protocol_in_streaming(self):
+        """
+        The stream buffers tokens and validates the COMPLETE answer before
+        yielding anything, so no sentinel/correction protocol exists — the
+        client never receives output that later needs to be discarded.
+        """
         from services import chat_engine
-        # Read source to check sentinel
         import inspect
         src = inspect.getsource(chat_engine.stream_chat_response)
-        # New marker must be unique enough that LLM output won't collide
-        assert "__LISAN_FALLBACK_" in src
-        # And the legacy NULL-byte sentinel must NOT be used anymore
-        assert "\x00FALLBACK\x00" not in src.replace(
-            '"\\x00FALLBACK\\x00"', ""
-        )
+        assert "__LISAN_FALLBACK_" not in src
+        assert "\x00FALLBACK\x00" not in src
 
 
 # ---------------------------------------------------------------------------

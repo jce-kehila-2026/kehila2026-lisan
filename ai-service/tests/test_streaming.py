@@ -11,8 +11,9 @@ Covers:
   - stream_chat_response yields fallback for fast-reject (non-Hebrew)
   - stream_chat_response yields fallback for out-of-scope
   - stream_chat_response yields routed answer for known greeting
-  - stream_chat_response streams tokens for a normal LLM call
-  - stream_chat_response appends FALLBACK sentinel when vocab check fails
+  - stream_chat_response buffers tokens and yields the validated answer
+  - stream_chat_response yields ONLY the fallback text when guardrails fail
+    (raw model output must never reach the client)
   - SSE endpoint returns text/event-stream content-type
   - SSE endpoint body contains data: lines and [DONE]
   - SSE endpoint returns data: line for cache-hit path
@@ -174,16 +175,18 @@ class TestStreamChatResponse:
         assert len(chunks) == 1
         assert chunks[0]
 
-    def test_streams_tokens_for_normal_llm_call(self):
+    def test_validated_answer_yielded_after_buffering(self):
+        # Guardrails now run BEFORE anything reaches the client: tokens are
+        # buffered, validated, and the full answer is yielded as one chunk.
         from services.chat_engine import stream_chat_response
 
-        expected_tokens = ["שלום", " ", "טוב."]
+        provider_tokens = ["שלום", " ", "טוב."]
 
         with (
             unittest.mock.patch("services.chat_engine.get_exact_cached_response", return_value=None),
             unittest.mock.patch("services.chat_engine.route_message", return_value=None),
             unittest.mock.patch("services.chat_engine.is_clearly_out_of_scope", return_value=False),
-            unittest.mock.patch("services.chat_engine.stream_provider", return_value=iter(expected_tokens)),
+            unittest.mock.patch("services.chat_engine.stream_provider", return_value=iter(provider_tokens)),
             unittest.mock.patch("services.chat_engine.is_hebrew_only_answer", return_value=True),
             unittest.mock.patch(
                 "services.chat_engine.evaluate_vocabulary",
@@ -192,11 +195,11 @@ class TestStreamChatResponse:
         ):
             chunks = list(stream_chat_response(ChatRequest(message="מה שמך?", level="A1")))
 
-        assert expected_tokens[0] in chunks
-        assert expected_tokens[-1] in chunks
+        assert chunks == ["שלום טוב."]
 
-    def test_fallback_sentinel_emitted_on_vocab_failure(self):
+    def test_fallback_text_on_vocab_failure_without_leaking_tokens(self):
         from services.chat_engine import stream_chat_response
+        from services.chat_guardrails import get_fallback_text
 
         with (
             unittest.mock.patch("services.chat_engine.get_exact_cached_response", return_value=None),
@@ -211,11 +214,12 @@ class TestStreamChatResponse:
         ):
             chunks = list(stream_chat_response(ChatRequest(message="מה שמך?", level="A1")))
 
-        sentinel_chunks = [c for c in chunks if c.startswith("__LISAN_FALLBACK_b6a7d3f1__")]
-        assert len(sentinel_chunks) == 1
+        # The raw model output must never reach the client — only the fallback.
+        assert chunks == [get_fallback_text("VOCAB_LEAKAGE")]
 
-    def test_fallback_sentinel_on_non_hebrew_answer(self):
+    def test_fallback_text_on_non_hebrew_answer_without_leaking_tokens(self):
         from services.chat_engine import stream_chat_response
+        from services.chat_guardrails import get_fallback_text
 
         with (
             unittest.mock.patch("services.chat_engine.get_exact_cached_response", return_value=None),
@@ -226,8 +230,8 @@ class TestStreamChatResponse:
         ):
             chunks = list(stream_chat_response(ChatRequest(message="מה שמך?", level="A1")))
 
-        sentinel_chunks = [c for c in chunks if c.startswith("__LISAN_FALLBACK_b6a7d3f1__")]
-        assert len(sentinel_chunks) == 1
+        assert chunks == [get_fallback_text("VOCAB_LEAKAGE")]
+        assert all("hello" not in c for c in chunks)
 
     def test_model_error_yields_fallback(self):
         from services.chat_engine import stream_chat_response

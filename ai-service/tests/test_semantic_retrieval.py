@@ -48,7 +48,9 @@ def test_semantic_retrieval_returns_high_similarity_match():
 
 
 def test_semantic_retrieval_falls_back_when_threshold_not_met():
-    query = "\u05de\u05d8\u05d5\u05e1"
+    # Query shares one token with greeting-1 but is too weak for the
+    # semantic threshold \u2014 the keyword fallback should still find it.
+    query = "\u05de\u05d8\u05d5\u05e1 \u05e8\u05db\u05d1\u05ea \u05e9\u05dc\u05d5\u05dd"
     chunks = [
         _chunk(
             "greeting-1",
@@ -69,7 +71,28 @@ def test_semantic_retrieval_falls_back_when_threshold_not_met():
 
     context = build_retrieval_context(query, chunks, limit=1)
     assert context.chunk_ids == ["greeting-1"]
-    assert context.relevance_scores == [0.0]
+
+
+def test_retrieval_returns_empty_for_fully_irrelevant_query():
+    # A query with ZERO lexical overlap must yield NO context \u2014 padding the
+    # prompt with arbitrary chunks polluted answers and reported meaningless
+    # contextChunkIds (caught by the live 200-message eval).
+    query = "\u05de\u05d8\u05d5\u05e1"
+    chunks = [
+        _chunk(
+            "greeting-1",
+            "greeting.txt",
+            "\u05e9\u05dc\u05d5\u05dd \u05ea\u05d5\u05d3\u05d4 \u05d1\u05d1\u05e7\u05e9\u05d4",
+            {"\u05e9\u05dc\u05d5\u05dd", "\u05ea\u05d5\u05d3\u05d4", "\u05d1\u05d1\u05e7\u05e9\u05d4"},
+        ),
+    ]
+
+    selected = retrieve_relevant_chunks(query, chunks, limit=1)
+    assert selected == []
+
+    context = build_retrieval_context(query, chunks, limit=1)
+    assert context.chunk_ids == []
+    assert context.relevance_scores == []
 
 
 class _MockHttpResponse:

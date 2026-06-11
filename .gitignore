@@ -26,12 +26,12 @@ dist-ssr
 backend/privateKey.json
 .env*
 
+# Runtime/generated AI-service artifacts
+ai-service/data/semantic_cache/
+ai-service/data/setfit_intent_model/
+ai-service/data/chatbot_quality/*.sqlite-shm
+ai-service/data/chatbot_quality/*.sqlite-wal
+
 # Firebase
 .firebase/
 .firebaserc
-
-project-secrets/
-
-# Local secrets
-ai-service/.env
-backend/.env

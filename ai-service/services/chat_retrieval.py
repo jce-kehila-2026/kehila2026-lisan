@@ -380,7 +380,7 @@ def retrieve_relevant_chunks(message: str, chunks: list[Chunk], limit: int = 5) 
     semantic_matches = SEMANTIC_RETRIEVER.retrieve(message, chunks, top_k=limit)
     if semantic_matches:
         return [match.chunk for match in semantic_matches]
-    return _retrieve_keyword_chunks(message, chunks, limit=limit)
+    return [chunk for chunk, _ in _retrieve_keyword_chunks_scored(message, chunks, limit=limit)]
 
 
 def render_context(chunks: list[Chunk]) -> str:
@@ -393,8 +393,12 @@ def build_retrieval_context(message: str, chunks: list[Chunk], limit: int = 5) -
         selected_chunks = [match.chunk for match in semantic_matches]
         scores = [round(match.score, 4) for match in semantic_matches]
     else:
-        selected_chunks = _retrieve_keyword_chunks(message, chunks, limit=limit)
-        scores = [0.0 for _ in selected_chunks]
+        # Keyword fallback now reports its REAL coverage score (overlap
+        # fraction of the query) instead of a flat 0.0, so consumers and
+        # eval reports can tell useful context from noise.
+        scored = _retrieve_keyword_chunks_scored(message, chunks, limit=limit)
+        selected_chunks = [chunk for chunk, _ in scored]
+        scores = [round(score, 4) for _, score in scored]
 
     return RetrievalContext(
         chunk_ids=[chunk.chunk_id for chunk in selected_chunks],
@@ -421,14 +425,28 @@ def cosine_similarity(left: dict[str, float], right: dict[str, float]) -> float:
 
 
 def _retrieve_keyword_chunks(message: str, chunks: list[Chunk], limit: int = 5) -> list[Chunk]:
+    return [chunk for chunk, _ in _retrieve_keyword_chunks_scored(message, chunks, limit=limit)]
+
+
+def _retrieve_keyword_chunks_scored(
+    message: str,
+    chunks: list[Chunk],
+    limit: int = 5,
+) -> list[tuple[Chunk, float]]:
+    """
+    Lexical-overlap retrieval returning (chunk, coverage) pairs, where
+    coverage is the fraction of query tokens found in the chunk (0..1).
+    """
     message_tokens = _extract_chunk_tokens(message)
     normalized_message = _normalize_text(message)
     message_bigrams = _ordered_token_bigrams(message)
     scored_chunks: list[tuple[float, int, int, Chunk]] = []
+    coverage_by_chunk_id: dict[str, float] = {}
 
     for chunk in chunks:
         overlap_count = len(message_tokens & chunk.tokens)
-        coverage_score = (overlap_count / max(1, len(message_tokens))) * 10
+        coverage = overlap_count / max(1, len(message_tokens))
+        coverage_by_chunk_id[chunk.chunk_id] = coverage
         exact_phrase_bonus = 100.0 if normalized_message and normalized_message in chunk.normalized_content else 0.0
         all_tokens_bonus = 20.0 if message_tokens and message_tokens.issubset(chunk.tokens) else 0.0
         bigram_score = len(message_bigrams & _ordered_token_bigrams(chunk.content)) * 6.0
@@ -438,7 +456,7 @@ def _retrieve_keyword_chunks(message: str, chunks: list[Chunk], limit: int = 5) 
             exact_phrase_bonus
             + all_tokens_bonus
             + (overlap_count * 12.0)
-            + coverage_score
+            + (coverage * 10)
             + bigram_score
             + source_overlap_score
             + short_chunk_bonus
@@ -446,10 +464,12 @@ def _retrieve_keyword_chunks(message: str, chunks: list[Chunk], limit: int = 5) 
         scored_chunks.append((total_score, overlap_count, -chunk.line_count, chunk))
 
     scored_chunks.sort(key=lambda item: (item[0], item[1], item[2], item[3].chunk_id), reverse=True)
-    top_chunks = _pick_diverse_chunks(scored_chunks, limit)
-    if top_chunks:
-        return top_chunks
-    return chunks[:limit]
+    # No arbitrary padding: if nothing overlaps the query, an empty context
+    # is the honest answer. Padding with unrelated chunks polluted the LLM
+    # prompt and reported meaningless contextChunkIds (the live eval showed
+    # 108/133 responses carrying all-zero relevance scores).
+    selected = _pick_diverse_chunks(scored_chunks, limit)
+    return [(chunk, coverage_by_chunk_id.get(chunk.chunk_id, 0.0)) for chunk in selected]
 
 
 def _extract_chunk_tokens(content: str) -> set[str]:

@@ -16,19 +16,24 @@ THANKS_RESPONSES = {
     "תודה": "בבקשה.",
     "תודה רבה": "בבקשה.",
 }
+# The tutor must never invent a human persona (a name, a city, a job).
+# Previous fabricated answers ("אני עמל", "אני גר בתל אביב") taught the
+# student false facts and leaked curriculum examples as the bot's identity.
+# The tutor presents itself as the teacher and turns questions back to the
+# student — which is also better pedagogy.
 CURRICULUM_RESPONSES = {
-    "מי את": "אני עמל.",
-    "מי אתה": "אני עידו.",
-    "מה שלומך": "הכל בסדר.",
-    "מה נשמע": "הכל בסדר.",
+    "מי את": "אני המורה שלך. מי אתה?",
+    "מי אתה": "אני המורה שלך. מי אתה?",
+    "מה שלומך": "הכל בסדר. מה שלומך?",
+    "מה נשמע": "הכל בסדר. מה נשמע?",
     "אני רוצה קפה": "בסדר. קפה אחד.",
-    "איפה אתה גר": "אני גר בתל אביב.",
-    "איפה את גרה": "אני גרה בירושלים.",
-    "מה השם שלך": "אני עמל.",
-    "מה אתה עושה": "אני עובד.",
-    "מה את עושה": "אני עובדת.",
-    "מה זה": "זה ספר.",
-    "מה זאת": "זאת חנות.",
+    "איפה אתה גר": "אני המורה שלך, לא גר בעיר. איפה אתה גר?",
+    "איפה את גרה": "אני המורה שלך, לא גרה בעיר. איפה את גרה?",
+    "מה השם שלך": "אני המורה שלך. איך קוראים לך?",
+    "מה אתה עושה": "אני מלמד עברית. מה אתה עושה?",
+    "מה את עושה": "אני מלמד עברית. מה את עושה?",
+    "מה זה": "על מה אתה שואל? תראה לי מילה.",
+    "מה זאת": "על מה אתה שואל? תראה לי מילה.",
     "כן": "כן.",
     "לא": "לא.",
 }
@@ -109,8 +114,13 @@ def _build_router_response(
 
 
 def _normalize_question_key(text: str) -> str:
+    from services.chat_guardrails import HEBREW_WORD_RE
+    # Only include tokens that contain at least one Hebrew character.
+    # This lets mixed Arabic+Hebrew messages (e.g. "שלום مرحبا") normalise
+    # to their Hebrew content ("שלום") and match greeting/curriculum entries.
     return " ".join(
         normalize_hebrew_token(part)
         for part in text.split()
-        if normalize_hebrew_token(part)
+        if HEBREW_WORD_RE.search(part) and normalize_hebrew_token(part)
     ).strip()
+

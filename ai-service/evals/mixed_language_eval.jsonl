@@ -1,0 +1,40 @@
+{"id":"mix_001","message":"شو يعني בית؟","level":"A1","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true,"answerArNotNull":true,"primaryLanguage":"mixed_arabic_hebrew"}}
+{"id":"mix_002","message":"ما معنى תור؟","level":"A2","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true,"answerArNotNull":true,"primaryLanguage":"mixed_arabic_hebrew"}}
+{"id":"mix_003","message":"شو معنى רופא","level":"A2","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true,"answerArNotNull":true}}
+{"id":"mix_004","message":"ما معنى מרפאה","level":"B1","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true,"answerArNotNull":true}}
+{"id":"mix_005","message":"شو يعني מים؟","level":"A1","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true,"answerArNotNull":true}}
+{"id":"mix_006","message":"شو يعني קפה؟","level":"A1","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true,"answerArNotNull":true}}
+{"id":"mix_007","message":"ما معنى תחנה؟","level":"A2","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true,"answerArNotNull":true}}
+{"id":"mix_008","message":"شو يعني אוטובוס؟","level":"A2","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true,"answerArNotNull":true}}
+{"id":"mix_009","message":"شو يعني עירייה؟","level":"B1","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true,"answerArNotNull":true}}
+{"id":"mix_010","message":"ما معنى תלונה؟","level":"B1","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true,"answerArNotNull":true}}
+{"id":"mix_011","message":"מה זה אומר בית?","level":"A1","expected":{"fallbackUsed":false,"routerHit":true,"primaryLanguage":"hebrew"}}
+{"id":"mix_012","message":"מה זה אומר תור?","level":"A2","expected":{"fallbackUsed":false,"routerHit":true,"primaryLanguage":"hebrew"}}
+{"id":"mix_013","message":"מה הפירוש של רופא?","level":"A2","expected":{"fallbackUsed":false,"routerHit":true,"primaryLanguage":"hebrew"}}
+{"id":"mix_014","message":"מה המשמעות של חשבון?","level":"B1","expected":{"fallbackUsed":false,"routerHit":true,"primaryLanguage":"hebrew"}}
+{"id":"mix_015","message":"תרגם בית לערבית","level":"A1","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true}}
+{"id":"mix_016","message":"كيف بنقول תור بالعربي؟","level":"A2","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true}}
+{"id":"mix_017","message":"איך אומרים מים בערבית?","level":"A1","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true}}
+{"id":"mix_018","message":"ترجم מרפאה","level":"B1","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true}}
+{"id":"mix_019","message":"صحح: אני רוצים מים","level":"A1","expected":{"fallbackUsed":false,"routerHit":true,"containsAny":["אומרים","אני רוצה"]}}
+{"id":"mix_020","message":"תתקן: היא גר בבית","level":"A1","expected":{"fallbackUsed":false,"routerHit":true,"containsAny":["גרה"]}}
+{"id":"mix_021","message":"صلح לי: אתה גרה","level":"A1","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true,"containsAny":["אתה גר"]}}
+{"id":"mix_022","message":"صحح الجملة אני רוצה מים","level":"A1","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true,"containsAny":["נכון"]}}
+{"id":"mix_023","message":"اعطني مثال עם בית","level":"A1","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true,"containsAny":["דוגמה"]}}
+{"id":"mix_024","message":"תן דוגמה עם תור","level":"A2","expected":{"fallbackUsed":false,"routerHit":true,"containsAny":["דוגמה"]}}
+{"id":"mix_025","message":"اعطني مثال مع רופא","level":"A2","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true,"containsAny":["דוגמה"]}}
+{"id":"mix_026","message":"اسألني سؤال","level":"A1","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true}}
+{"id":"mix_027","message":"שאל אותי","level":"A2","expected":{"fallbackUsed":false,"routerHit":true}}
+{"id":"mix_028","message":"נעים מאוד","level":"A1","expected":{"fallbackUsed":false,"routerHit":true}}
+{"id":"mix_029","message":"תודה","level":"A1","expected":{"fallbackUsed":false,"routerHit":true,"containsAny":["בבקשה"]}}
+{"id":"mix_030","message":"אפשר לדבר לאט","level":"A2","expected":{"fallbackUsed":false,"routerHit":true}}
+{"id":"mix_031","message":"אני רוצה לכתוב תלונה קצרה בסגנון רשמי","level":"B1","expected":{"fallbackUsed":false,"routerHit":true}}
+{"id":"mix_032","message":"صياغة رسمية לתלונה קצרה","level":"B1","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true}}
+{"id":"mix_033","message":"אני רוצה לערער באופן רשמי","level":"B2","expected":{"fallbackUsed":false,"routerHit":true}}
+{"id":"mix_034","message":"אלגוריתמים גנטיים ורשתות נוירונים","level":"A1","expected":{"fallbackUsed":true,"fallbackReason":"OUT_OF_SCOPE"}}
+{"id":"mix_035","message":"شو أخبار البورصة وקריפטו؟","level":"A1","includeArabic":true,"expected":{"fallbackUsed":true}}
+{"id":"mix_036","message":"   ","level":"A1","expected":{"fallbackUsed":true,"fallbackReason":"EMPTY_MESSAGE","primaryLanguage":"unknown"}}
+{"id":"mix_037","message":"hello what is בית","level":"A1","expected":{"fallbackUsed":false,"routerHit":true}}
+{"id":"mix_038","message":"شو يعني מסמך؟","level":"B2","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true,"answerArNotNull":true}}
+{"id":"mix_039","message":"מה זה אומר שירות?","level":"B2","expected":{"fallbackUsed":false,"routerHit":true}}
+{"id":"mix_040","message":"ترجم עבודה","level":"B1","includeArabic":true,"expected":{"fallbackUsed":false,"routerHit":true}}

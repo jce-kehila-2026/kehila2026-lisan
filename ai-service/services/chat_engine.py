@@ -15,6 +15,7 @@ from services.chat_cache import (
     store_exact_cached_response,
 )
 from services.chat_guardrails import (
+    ARABIC_RE,
     MAX_VOICE_WORDS,
     classify_fast_reject,
     classify_fast_reject_voice,
@@ -22,6 +23,7 @@ from services.chat_guardrails import (
     enforce_hebrew_only_scope,
     evaluate_vocabulary,
     get_fallback_text,
+    get_fallback_text_ar,
     is_clearly_out_of_scope,
     is_hebrew_only_answer,
     is_short_hebrew_answer,
@@ -74,18 +76,43 @@ VOICE_OUTPUT_TOKENS = int(os.getenv("CHAT_VOICE_MAX_TOKENS", "128"))
 
 def generate_chat_response(payload: ChatRequest) -> ChatResponse:
     request_context = _build_request_context(payload)
-    session_sensitive = _is_session_sensitive_message(request_context.normalized_message)
-
-    cached_response = None if session_sensitive else get_exact_cached_response(request_context.cache_key)
-    if cached_response is not None:
-        hydrated_response = _hydrate_cached_response(cached_response, request_context)
-        _remember_successful_turn(request_context, hydrated_response)
-        _log_response(hydrated_response, request_context.provider, 0)
-        return hydrated_response
-
     bundle = get_level_bundle(request_context.requested_level)
     resolved_level = bundle.level
 
+    from services.language_profile import detect_language_profile
+    lang_profile = detect_language_profile(request_context.message)
+    if lang_profile.has_arabic or (lang_profile.has_latin and lang_profile.has_hebrew):
+        from services.llm_gatekeeper import decide_local_answer
+        gatekeeper_decision = decide_local_answer(
+            request_context.message, resolved_level, lang_profile
+        )
+        if gatekeeper_decision is not None and not gatekeeper_decision.needs_llm:
+            tmpl = gatekeeper_decision.template
+            gatekeeper_response = ChatResponse(
+                answerHe=tmpl.answer_he,
+                answerAr=tmpl.answer_ar,
+                fallbackUsed=False,
+                fallbackReason=None,
+                level=resolved_level,
+                model=request_context.model,
+                provider=request_context.provider,
+                latencyMs=0,
+                cacheHit=False,
+                routerHit=True,
+                contextChunkIds=[],
+                guardrail=GuardrailReport(vocabularyLeakage=False, blockedTokens=[]),
+                suggestedNextPrompts=get_suggestions(
+                    answer_he=tmpl.answer_he,
+                    message=request_context.message,
+                    level=resolved_level,
+                ),
+            )
+            store_exact_cached_response(request_context.cache_key, gatekeeper_response)
+            _remember_successful_turn(request_context, gatekeeper_response)
+            _log_response(gatekeeper_response, request_context.provider, 0)
+            return gatekeeper_response
+
+    # 1. Fast-reject check FIRST
     fast_reject = classify_fast_reject_voice if request_context.voice_mode else classify_fast_reject
     fallback_reason = fast_reject(request_context.message)
 
@@ -99,6 +126,50 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
         _log_response(response, request_context.provider, 0)
         return response
 
+    # 2. Exact Cache lookup NEXT
+    session_sensitive = _is_session_sensitive_message(request_context.normalized_message)
+    cached_response = None if session_sensitive else get_exact_cached_response(request_context.cache_key)
+    if cached_response is not None:
+        hydrated_response = _hydrate_cached_response(cached_response, request_context)
+        _remember_successful_turn(request_context, hydrated_response)
+        _log_response(hydrated_response, request_context.provider, 0)
+        return hydrated_response
+
+    # 3. LLM Gatekeeper — intent-based local answers (WORD_MEANING, TRANSLATE,
+    #    CORRECTION, known phrases, etc.). Runs BEFORE the simple rule router so
+    #    that richer intent patterns (including mixed Arabic+Hebrew questions like
+    #    "شو يعني בית?") are handled here without calling the remote LLM.
+    from services.llm_gatekeeper import decide_local_answer
+    gatekeeper_decision = decide_local_answer(
+        request_context.message, resolved_level, lang_profile
+    )
+    if gatekeeper_decision is not None and not gatekeeper_decision.needs_llm:
+        tmpl = gatekeeper_decision.template
+        gatekeeper_response = ChatResponse(
+            answerHe=tmpl.answer_he,
+            answerAr=tmpl.answer_ar,
+            fallbackUsed=False,
+            fallbackReason=None,
+            level=resolved_level,
+            model=request_context.model,
+            provider=request_context.provider,
+            latencyMs=0,
+            cacheHit=False,
+            routerHit=True,
+            contextChunkIds=[],
+            guardrail=GuardrailReport(vocabularyLeakage=False, blockedTokens=[]),
+            suggestedNextPrompts=get_suggestions(
+                answer_he=tmpl.answer_he,
+                message=request_context.message,
+                level=resolved_level,
+            ),
+        )
+        store_exact_cached_response(request_context.cache_key, gatekeeper_response)
+        _remember_successful_turn(request_context, gatekeeper_response)
+        _log_response(gatekeeper_response, request_context.provider, 0)
+        return gatekeeper_response
+
+    # 3b. Simple deterministic router (greetings, thanks, curriculum phrases, glossary)
     routed_response = route_message(
         message=request_context.normalized_message,
         bundle=bundle,
@@ -128,6 +199,25 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
         _remember_successful_turn(request_context, pre_llm_response)
         _log_response(pre_llm_response, request_context.provider, 0)
         return pre_llm_response
+
+
+    # 4. Semantic Cache lookup
+    if not session_sensitive:
+        try:
+            from services.chat_cache import SEMANTIC_CACHE_MANAGER
+            semantic_cached = SEMANTIC_CACHE_MANAGER.lookup(
+                query=request_context.message,
+                level=resolved_level,
+                include_arabic=request_context.include_arabic,
+            )
+            if semantic_cached is not None:
+                hydrated = _hydrate_cached_response(semantic_cached, request_context)
+                hydrated.cacheHit = True
+                _remember_successful_turn(request_context, hydrated)
+                _log_response(hydrated, request_context.provider, 0)
+                return hydrated
+        except Exception as exc:
+            logger.warning(f"Semantic cache lookup failed: {exc}")
 
     if is_clearly_out_of_scope(request_context.message, set(bundle.vocab_set), set(bundle.advanced_only_tokens), level=resolved_level):
         response = _build_fallback_response_from_request(
@@ -444,21 +534,15 @@ def stream_chat_response(payload: ChatRequest) -> Iterator[str]:
     Runs the same pre-LLM pipeline (cache, guardrails, retrieval, grammar)
     then yields raw text tokens from the LLM as they arrive.
 
-    Pre-LLM exits (cache hit, fast-reject, router, out-of-scope) yield the
-    full fallback/cached answer as a single chunk so callers always get at
-    least one yield.  Post-LLM guardrails (vocab, Hebrew-only) are applied
-    on the accumulated answer after streaming completes; if they fail the
-    fallback text is yielded as a final correction chunk prefixed with
-    the sentinel "__LISAN_FALLBACK_b6a7d3f1__" so the SSE layer can signal the client.
+    LLM tokens are buffered internally and the post-LLM guardrails
+    (Hebrew-only, vocabulary) run on the COMPLETE answer before anything is
+    yielded — the client only ever receives a validated answer or the
+    fallback text, never raw unvalidated model output.
+
+    Pre-LLM exits (cache hit, fast-reject, router, out-of-scope, semantic cache hit) yield
+    a single chunk, so callers always get at least one yield.
     """
     request_context = _build_request_context(payload)
-
-    # ── cache hit ────────────────────────────────────────────────────────────
-    cached = get_exact_cached_response(request_context.cache_key)
-    if cached is not None:
-        yield cached.answerHe or get_fallback_text(cached.fallbackReason)
-        return
-
     bundle = get_level_bundle(request_context.requested_level)
     resolved_level = bundle.level
     fast_reject = (
@@ -466,13 +550,19 @@ def stream_chat_response(payload: ChatRequest) -> Iterator[str]:
         else classify_fast_reject
     )
 
-    # ── fast-reject ──────────────────────────────────────────────────────────
+    # 1. Fast-reject check FIRST
     fallback_reason = fast_reject(request_context.message)
     if fallback_reason:
         yield get_fallback_text(fallback_reason)
         return
 
-    # ── rule-based router ────────────────────────────────────────────────────
+    # 2. Exact Cache lookup NEXT
+    cached = get_exact_cached_response(request_context.cache_key)
+    if cached is not None:
+        yield cached.answerHe or get_fallback_text(cached.fallbackReason)
+        return
+
+    # 3. Rule-based router
     routed = route_message(
         message=request_context.normalized_message,
         bundle=bundle,
@@ -484,7 +574,7 @@ def stream_chat_response(payload: ChatRequest) -> Iterator[str]:
         yield routed.answerHe or get_fallback_text(None)
         return
 
-    # ── out-of-scope ─────────────────────────────────────────────────────────
+    # 4. Out-of-scope check
     if is_clearly_out_of_scope(
         request_context.message,
         set(bundle.vocab_set),
@@ -493,6 +583,21 @@ def stream_chat_response(payload: ChatRequest) -> Iterator[str]:
     ):
         yield get_fallback_text("OUT_OF_SCOPE")
         return
+
+    # 5. Semantic Cache lookup
+    if not _is_session_sensitive_message(request_context.normalized_message):
+        try:
+            from services.chat_cache import SEMANTIC_CACHE_MANAGER
+            semantic_cached = SEMANTIC_CACHE_MANAGER.lookup(
+                query=request_context.message,
+                level=resolved_level,
+                include_arabic=request_context.include_arabic,
+            )
+            if semantic_cached is not None:
+                yield semantic_cached.answerHe or get_fallback_text(semantic_cached.fallbackReason)
+                return
+        except Exception:
+            pass
 
     # ── retrieval + grammar hint ─────────────────────────────────────────────
     retrieval_context = build_retrieval_context(
@@ -532,7 +637,6 @@ def stream_chat_response(payload: ChatRequest) -> Iterator[str]:
             call_opts,
         ):
             accumulated.append(token)
-            yield token
     except Exception:
         yield get_fallback_text("MODEL_ERROR")
         return
@@ -542,7 +646,7 @@ def stream_chat_response(payload: ChatRequest) -> Iterator[str]:
         "".join(accumulated), voice_mode=request_context.voice_mode
     )
     if not answer_he or not is_hebrew_only_answer(answer_he):
-        yield "__LISAN_FALLBACK_b6a7d3f1__" + get_fallback_text("VOCAB_LEAKAGE")
+        yield get_fallback_text("VOCAB_LEAKAGE")
         return
 
     allowed_vocab = build_allowed_vocabulary(
@@ -551,7 +655,7 @@ def stream_chat_response(payload: ChatRequest) -> Iterator[str]:
     )
     vocab_decision = evaluate_vocabulary(answer_he, allowed_vocab, level=resolved_level)
     if vocab_decision.fallback_used:
-        yield "__LISAN_FALLBACK_b6a7d3f1__" + get_fallback_text("VOCAB_LEAKAGE")
+        yield get_fallback_text("VOCAB_LEAKAGE")
         return
 
     # ── persist to conversation memory ───────────────────────────────────────
@@ -561,6 +665,8 @@ def stream_chat_response(payload: ChatRequest) -> Iterator[str]:
             user_message=request_context.message,
             assistant_message=answer_he,
         )
+    
+    yield answer_he
 
 
 def _build_request_context(payload: ChatRequest) -> ChatRequestContext:
@@ -926,9 +1032,14 @@ def _build_fallback_response(
     input_tokens: int | None = None,
     output_tokens: int | None = None,
 ) -> ChatResponse:
+    # When the student wrote in Arabic, they demonstrably read Arabic.
+    # A Hebrew-only rejection teaches nothing; mirror guidance in answerAr.
+    answer_ar: str | None = None
+    if ARABIC_RE.search(message):
+        answer_ar = get_fallback_text_ar(fallback_reason)
     return ChatResponse(
         answerHe=get_fallback_text(fallback_reason),
-        answerAr=None,
+        answerAr=answer_ar,
         fallbackUsed=True,
         fallbackReason=fallback_reason,
         level=level,
