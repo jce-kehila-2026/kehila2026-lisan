@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   ArrowRight,
   Ban,
+  GraduationCap,
   Pencil,
   Plus,
   RefreshCw,
@@ -110,6 +111,7 @@ function StudentForm({ initialValue, mode, onCancel, onSubmit, saving, teachers 
     ...initialValue,
     teacherIds: getStudentTeacherIds(initialValue),
   });
+  const [teachersOpen, setTeachersOpen] = useState(false);
 
   const isEdit = mode === 'edit';
 
@@ -188,58 +190,70 @@ function StudentForm({ initialValue, mode, onCancel, onSubmit, saving, teachers 
         </Field>
       </div>
 
-      <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-        <p className="text-sm font-black text-slate-700">מורות משויכות</p>
-        <p className="mt-1 text-xs font-semibold text-slate-500">
-          אפשר לבחור יותר ממורה אחת עבור אותה תלמידה.
-        </p>
+      <div className="rounded-3xl border border-[#EEE5FF] bg-white p-4 shadow-sm">
+        <p className="text-sm font-black text-slate-800">מורות שנבחרו</p>
 
-        <div className="mt-4 grid gap-2 sm:grid-cols-2">
-          {teachers.length === 0 ? (
-            <p className="text-sm font-bold text-slate-500">
-              אין מורות זמינות.
-            </p>
-          ) : (
-            teachers.map((teacher) => {
-              const selected = form.teacherIds.includes(teacher.id);
-
-              return (
-                <button
-                  key={teacher.id}
-                  type="button"
-                  onClick={() => toggleTeacher(teacher.id)}
-                  className={`rounded-2xl border px-4 py-3 text-right text-sm font-black transition ${
-                    selected
-                      ? 'border-violet-300 bg-violet-600 text-white'
-                      : 'border-slate-200 bg-white text-slate-700 hover:bg-violet-50 hover:text-violet-700'
-                  }`}
-                >
-                  {teacher.name}
-                </button>
-              );
-            })
-          )}
-        </div>
-
-        <div className="mt-3 flex flex-wrap gap-2">
-          {form.teacherIds.length === 0 ? (
-            <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-slate-500">
-              לא שויכה
+        <div className="relative mt-3">
+          <button
+            type="button"
+            onClick={() => setTeachersOpen((current) => !current)}
+            className="flex min-h-12 w-full items-center justify-between gap-3 rounded-2xl border border-[#EEE5FF] bg-slate-50 px-4 text-right text-sm font-black text-slate-700 transition hover:bg-violet-50 focus:outline-none focus:ring-4 focus:ring-violet-100"
+            aria-expanded={teachersOpen}
+          >
+            <span>
+              {form.teacherIds.length > 0
+                ? `${form.teacherIds.length} מורות נבחרו`
+                : 'בחרי מורות'}
             </span>
-          ) : (
-            form.teacherIds.map((teacherId) => {
-              const teacher = teachers.find((item) => item.id === teacherId);
+            <span className="text-lg leading-none text-violet-600" aria-hidden="true">
+              {teachersOpen ? '−' : '+'}
+            </span>
+          </button>
 
-              return (
-                <span
-                  key={teacherId}
-                  className="rounded-full bg-violet-100 px-3 py-1 text-xs font-black text-violet-700"
-                >
-                  {teacher?.name || teacherId}
-                </span>
-              );
-            })
-          )}
+          {teachersOpen ? (
+            <div className="absolute left-0 right-0 top-full z-10 mt-2 max-h-56 overflow-y-auto rounded-2xl border border-[#EEE5FF] bg-white shadow-xl">
+              {teachers.length === 0 ? (
+                <div className="px-4 py-3 text-sm font-bold text-slate-500">
+                  אין מורות זמינות
+                </div>
+              ) : (
+                <div className="divide-y divide-[#EEE5FF]">
+                  {teachers.map((teacher) => {
+                    const selected = form.teacherIds.includes(teacher.id);
+
+                    return (
+                      <button
+                        key={teacher.id}
+                        type="button"
+                        onClick={() => toggleTeacher(teacher.id)}
+                        className={`grid min-h-12 w-full grid-cols-[1fr_auto_auto] items-center gap-3 px-4 py-2 text-right text-sm transition ${
+                          selected
+                            ? 'bg-violet-50 text-violet-800'
+                            : 'bg-white text-slate-700 hover:bg-violet-50/70'
+                        }`}
+                      >
+                        <span className="truncate font-black">{teacher.name}</span>
+                        <GraduationCap
+                          className="h-4 w-4 text-violet-600"
+                          aria-hidden="true"
+                        />
+                        <span
+                          className={`flex h-5 w-5 items-center justify-center rounded-md border text-xs font-black ${
+                            selected
+                              ? 'border-violet-500 bg-violet-600 text-white'
+                              : 'border-slate-300 bg-white text-transparent'
+                          }`}
+                          aria-hidden="true"
+                        >
+                          ✓
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ) : null}
         </div>
       </div>
 
@@ -551,7 +565,7 @@ function Students() {
   };
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-7xl" dir="rtl">
         <header className="flex flex-wrap items-center justify-between gap-3">
           <button
@@ -568,22 +582,39 @@ function Students() {
           </Button>
         </header>
 
-        <section className="mt-6 overflow-hidden rounded-[2rem] border border-white/70 bg-white/95 p-5 shadow-card sm:p-7">
-          <p className="inline-flex items-center gap-2 text-sm font-black text-violet-700">
-            <Users className="h-4 w-4" aria-hidden="true" />
-            ניהול תלמידות
-          </p>
+        <section className="relative mt-6 overflow-hidden rounded-[2rem] border border-[#EEE5FF] bg-white/75 shadow-card backdrop-blur-[8px]">
+          <div
+            className="absolute left-0 top-0 h-full w-1/2 bg-violet-200/25 blur-3xl"
+            aria-hidden="true"
+          />
 
-          <h1 className="mt-2 text-2xl font-black text-slate-950 sm:text-4xl">
-            תלמידות במערכת
-          </h1>
+          <div className="relative flex flex-col lg:min-h-80 lg:flex-row lg:items-stretch">
+            <div className="flex flex-col justify-center p-5 sm:p-7 lg:w-[52%] lg:py-10">
+              <p className="inline-flex items-center gap-2 text-sm font-black text-violet-700">
+                <Users className="h-4 w-4" aria-hidden="true" />
+                ניהול תלמידות
+              </p>
 
-          <p className="mt-3 max-w-4xl text-sm font-semibold leading-7 text-slate-600 sm:text-base">
-            ניהול תלמידות, רמות, שיוך למורות, עריכה, מחיקה והשהיה דרך המערכת.
-          </p>
+              <h1 className="mt-2 text-2xl font-black text-slate-950 sm:text-4xl">
+                תלמידות במערכת
+              </h1>
+
+              <p className="mt-3 text-sm font-semibold leading-7 text-slate-600 sm:text-base">
+                ניהול תלמידות, רמות, שיוך למורות, עריכה, מחיקה והשהיה דרך המערכת.
+              </p>
+            </div>
+
+            <div className="relative flex min-h-64 items-center justify-center overflow-hidden bg-violet-50/35 lg:min-h-80 lg:w-[48%] lg:bg-violet-50/20">
+              <img
+                src="/addS.png"
+                alt="Add Student"
+                className="h-full w-full scale-110 object-contain object-center sm:scale-[1.15] lg:scale-125"
+              />
+            </div>
+          </div>
         </section>
 
-        <section className="mt-5 rounded-[2rem] border border-white/70 bg-white/95 p-5 shadow-card sm:p-6">
+        <section className="mt-5 rounded-[2rem] border border-[#EEE5FF] bg-white/75 p-5 shadow-card backdrop-blur-[8px] sm:p-6">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <label className="flex min-h-12 flex-1 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 transition focus-within:border-violet-300 focus-within:bg-white focus-within:ring-4 focus-within:ring-violet-100">
               <Search className="h-5 w-5 shrink-0 text-slate-400" aria-hidden="true" />
@@ -650,7 +681,7 @@ function Students() {
           {error ? <StatusMessage type="error">{error}</StatusMessage> : null}
           {success ? <StatusMessage type="success">{success}</StatusMessage> : null}
 
-          <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-slate-100 bg-white">
+          <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-[#EEE5FF] bg-white">
             <div className="hidden grid-cols-[1fr_1.25fr_0.6fr_1.2fr_0.7fr_1.1fr] gap-3 bg-violet-50 px-4 py-3 text-xs font-black text-violet-700 md:grid">
               <span>שם</span>
               <span>אימייל</span>
@@ -680,43 +711,39 @@ function Students() {
                 return (
                   <div
                     key={student.id}
-                    className="grid gap-3 border-t border-slate-100 px-4 py-4 text-sm transition hover:bg-violet-50/30 md:grid-cols-[1fr_1.25fr_0.6fr_1.2fr_0.7fr_1.1fr] md:items-center"
+                    className="grid grid-cols-3 gap-x-2 gap-y-2 border-t border-[#EEE5FF] px-3 py-3 text-sm transition hover:bg-violet-50/30 md:grid-cols-[1fr_1.25fr_0.6fr_1.2fr_0.7fr_1.1fr] md:items-center md:gap-3 md:px-4 md:py-4"
                   >
-                    <div>
-                      <span className="mb-1 block text-xs font-black text-slate-400 md:hidden">
-                        שם
+                    <div className="col-span-3 md:col-span-1">
+                      <span className="block font-black leading-5 text-slate-900">
+                        {student.name}
                       </span>
-                      <span className="font-black text-slate-900">{student.name}</span>
                     </div>
 
-                    <div className="min-w-0">
-                      <span className="mb-1 block text-xs font-black text-slate-400 md:hidden">
-                        אימייל
-                      </span>
-                      <span className="block truncate font-semibold text-slate-600">
+                    <div className="col-span-3 min-w-0 md:col-span-1">
+                      <span className="block whitespace-normal break-all text-xs font-semibold leading-5 text-slate-600 md:truncate md:whitespace-nowrap md:break-normal md:text-sm md:leading-normal">
                         {student.email}
                       </span>
                     </div>
 
-                    <div>
-                      <span className="mb-1 block text-xs font-black text-slate-400 md:hidden">
+                    <div className="min-w-0">
+                      <span className="mb-0.5 block text-[10px] font-black text-slate-400 md:hidden">
                         רמה
                       </span>
-                      <span className="inline-flex rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-700">
+                      <span className="inline-flex max-w-full rounded-full bg-violet-50 px-2 py-0.5 text-[11px] font-black text-violet-700 md:px-3 md:py-1 md:text-xs">
                         {student.level}
                       </span>
                     </div>
 
-                    <div>
-                      <span className="mb-1 block text-xs font-black text-slate-400 md:hidden">
+                    <div className="min-w-0">
+                      <span className="mb-0.5 block text-[10px] font-black text-slate-400 md:hidden">
                         מורות
                       </span>
                       {studentTeacherIds.length === 0 ? (
-                        <span className="font-semibold text-slate-600">
+                        <span className="block truncate text-xs font-semibold text-slate-600 md:text-sm">
                           לא שויכה
                         </span>
                       ) : (
-                        <span className="flex flex-wrap gap-2">
+                        <span className="flex max-h-9 flex-wrap gap-1 overflow-hidden md:max-h-none md:gap-2 md:overflow-visible">
                           {studentTeacherIds.map((teacherId) => {
                             const teacher = teachers.find((item) => item.id === teacherId);
 
@@ -728,7 +755,7 @@ function Students() {
                                   setSelectedTeacher(teacher || { id: teacherId, name: teacherId });
                                   setModal('teacher-students');
                                 }}
-                                className="rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-700 transition hover:bg-violet-100"
+                                className="max-w-full truncate rounded-full bg-violet-50 px-2 py-0.5 text-[11px] font-black text-violet-700 transition hover:bg-violet-100 md:px-3 md:py-1 md:text-xs"
                               >
                                 {teacher?.name || teacherId}
                               </button>
@@ -738,12 +765,12 @@ function Students() {
                       )}
                     </div>
 
-                    <div>
-                      <span className="mb-1 block text-xs font-black text-slate-400 md:hidden">
+                    <div className="min-w-0">
+                      <span className="mb-0.5 block text-[10px] font-black text-slate-400 md:hidden">
                         סטטוס
                       </span>
                       <span
-                        className={`inline-flex rounded-full px-3 py-1 text-xs font-black ${
+                        className={`inline-flex max-w-full rounded-full px-2 py-0.5 text-[11px] font-black md:px-3 md:py-1 md:text-xs ${
                           student.status === 'suspended'
                             ? 'bg-amber-50 text-amber-700'
                             : 'bg-green-50 text-green-700'
@@ -753,12 +780,8 @@ function Students() {
                       </span>
                     </div>
 
-                    <div>
-                      <span className="mb-1 block text-xs font-black text-slate-400 md:hidden">
-                        פעולות
-                      </span>
-
-                      <span className="flex flex-wrap gap-2">
+                    <div className="col-span-3 md:col-span-1">
+                      <span className="flex flex-wrap justify-end gap-2 md:justify-start">
                         <ActionButton
                           label="עריכת תלמידה"
                           onClick={() => {
