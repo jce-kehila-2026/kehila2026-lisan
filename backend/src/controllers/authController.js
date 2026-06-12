@@ -5,70 +5,7 @@ const jwt = require('jsonwebtoken');
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    console.log('🔐 LOGIN ATTEMPT:', {
-      env: process.env.NODE_ENV,
-      email,
-      devLogin: process.env.NODE_ENV === 'development',
-    });
-
-    if (process.env.NODE_ENV === 'development') {
-      const devUsers = {
-        'admin': {
-          uid: 'dev-admin',
-          role: 'admin',
-          name: 'Dev Admin',
-          level: '',
-          teacherIds: []
-        },
-        'teacher': {
-          uid: 'dev-teacher',
-          role: 'teacher',
-          name: 'Dev Teacher',
-          level: '',
-          teacherIds: []
-        },
-        'student': {
-          uid: 'dev-student',
-          role: 'student',
-          name: 'Dev Student',
-          level: 'A1',
-          teacherIds: ['dev-teacher']
-        }
-      };
-
-      const devUser = devUsers[email.trim().toLowerCase()];
-      const devPassword = email.trim().toLowerCase();
-
-      if (devUser && (password === '123456' || password === devPassword)) {
-        console.log('📌 DEV LOGIN MATCHED');
-        const token = jwt.sign(
-          {
-            uid: devUser.uid,
-            role: devUser.role
-          },
-          process.env.JWT_SECRET || 'dev-secret',
-          {
-            expiresIn: '24h'
-          }
-        );
-
-        return res.status(200).json({
-          token,
-          user: {
-            id: devUser.uid,
-            uid: devUser.uid,
-            name: devUser.name,
-            email: email.trim().toLowerCase(),
-            role: devUser.role,
-            language: 'ar',
-            level: devUser.level,
-            teacherId: '',
-            teacherIds: devUser.teacherIds
-          }
-        });
-      }
-    }
+    
 
     if (!email || !password) {
       return res.status(400).json({
@@ -76,9 +13,11 @@ exports.login = async (req, res) => {
       });
     }
 
+    const normalizedEmail = String(email).trim().toLowerCase();
+
     const userSnapshot = await db
       .collection('users')
-      .where('email', '==', email)
+      .where('email', '==', normalizedEmail)
       .limit(1)
       .get();
 
@@ -92,6 +31,12 @@ exports.login = async (req, res) => {
     const user = userDoc.data();
     const uid = userDoc.id;
 
+    if (user.isActive === false) {
+      return res.status(403).json({
+        error: 'User account is inactive'
+      });
+    }
+
     const now = new Date();
 
     if (user.lockedUntil && user.lockedUntil.toDate() > now) {
@@ -101,7 +46,7 @@ exports.login = async (req, res) => {
       });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash || '');
 
     if (!isPasswordValid) {
       const failedAttempts = (user.failedLoginAttempts || 0) + 1;
@@ -135,11 +80,11 @@ exports.login = async (req, res) => {
       {
         uid,
         role: user.role,
-        level: user.level || 'A1',
+        level: user.level || 'A1'
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: '24h'
+        expiresIn: process.env.JWT_EXPIRES_IN || '24h'
       }
     );
 
@@ -149,7 +94,7 @@ exports.login = async (req, res) => {
         id: uid,
         uid,
         name: user.name || '',
-        email: user.email || '',
+        email: user.email || normalizedEmail,
         role: user.role || '',
         language: user.language || 'ar',
         level: user.level || '',
