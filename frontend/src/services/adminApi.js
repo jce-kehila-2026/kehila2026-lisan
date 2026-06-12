@@ -53,6 +53,9 @@ const mapUserToTeacher = (user) => ({
   name: user.name || '',
   email: user.email || '',
   role: user.role || 'teacher',
+  level: user.level || '',
+  levels: Array.isArray(user.levels) ? user.levels : [],
+  levelFocus: user.levelFocus || '',
   language: user.language || 'ar',
   status: user.isActive === false ? 'suspended' : 'active',
   createdAt: user.createdAt || null,
@@ -172,6 +175,10 @@ export const updateTeacher = async (id, teacher) => {
     name: teacher.name,
     email: teacher.email,
     role: teacher.role || 'teacher',
+    levels: Array.isArray(teacher.levels) ? teacher.levels : [],
+    levelFocus: Array.isArray(teacher.levels)
+      ? teacher.levels.join(', ')
+      : teacher.levelFocus,
     language: teacher.language,
     isActive: teacher.status ? teacher.status !== 'suspended' : undefined
   };
@@ -279,6 +286,8 @@ export const createUser = async (user) => {
       role: user.role,
       language: user.language || 'ar',
       level: user.level || 'A1',
+      levels: Array.isArray(user.levels) ? user.levels : [],
+      levelFocus: Array.isArray(user.levels) ? user.levels.join(', ') : '',
       teacherIds: Array.isArray(user.teacherIds)
         ? user.teacherIds
         : []

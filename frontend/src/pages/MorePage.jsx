@@ -24,7 +24,7 @@ const API_BASE_URL = 'http://localhost:3000/api';
 
 const labels = {
   he: {
-    title: 'עוד',
+    title: 'היסטוריה',
     subtitle: 'היסטוריית שיחות, מילים שמורות וקיצורים שימושיים',
     chatHistory: 'היסטוריית שיחות',
     search: 'חיפוש שיחות',
@@ -48,11 +48,11 @@ const labels = {
     continueReadingAction: 'המשיכי קריאה',
     recentActivity: 'הפעילות האחרונה שלי',
     recentActivityHint: 'חזרי למה שעשית לאחרונה',
-    viewFullHistory: 'הצג היסטוריה מלאה',
+    viewFullHistory: 'היסטוריה',
     review: 'חזרה',
     inProgress: 'בתהליך',
     completed: 'הושלם',
-    savedMore: 'הצג עוד',
+    savedMore: 'היסטוריה',
     socialPractice: 'תרגול עם חברות',
     socialPracticeText: 'תרגלי שיחות יומיומיות בעברית עם חברות ולומדות נוספות.',
     startChat: 'פתחי צ׳אט',
@@ -61,7 +61,7 @@ const labels = {
   },
 
   ar: {
-    title: 'المزيد',
+    title: 'السجل',
     subtitle: 'سجل المحادثات، كلمات محفوظة واختصارات مفيدة',
     chatHistory: 'سجل المحادثات',
     search: 'بحث في المحادثات',
@@ -85,11 +85,11 @@ const labels = {
     continueReadingAction: 'تابعي القراءة',
     recentActivity: 'نشاطي الأخير',
     recentActivityHint: 'عودي إلى ما تدربتِ عليه مؤخراً',
-    viewFullHistory: 'عرض السجل الكامل',
+    viewFullHistory: 'السجل',
     review: 'مراجعة',
     inProgress: 'قيد التقدم',
     completed: 'مكتمل',
-    savedMore: 'عرض المزيد',
+    savedMore: 'السجل',
     socialPractice: 'تدريب مع الصديقات',
     socialPracticeText: 'تدرّبي على محادثات يومية بالعبرية مع صديقات ومتعلمات أخريات.',
     startChat: 'افتحي المحادثة',
@@ -98,7 +98,7 @@ const labels = {
   },
 };
 
-const savedWords = [
+const defaultSavedWords = [
   'שלום',
   'תודה',
   'סליחה',
@@ -262,6 +262,35 @@ function MorePage() {
   }));
 
   const visibleHistory = (filteredConversations.length > 0 ? filteredConversations : fallbackHistory).slice(0, 5);
+  const [storedSavedWords, setStoredSavedWords] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('lisan-saved-words') || '[]');
+    } catch {
+      return [];
+    }
+  });
+  const visibleSavedWords = useMemo(
+    () => [...new Set([...defaultSavedWords, ...storedSavedWords])],
+    [storedSavedWords],
+  );
+
+  useEffect(() => {
+    const syncSavedWords = () => {
+      try {
+        setStoredSavedWords(JSON.parse(localStorage.getItem('lisan-saved-words') || '[]'));
+      } catch {
+        setStoredSavedWords([]);
+      }
+    };
+
+    window.addEventListener('storage', syncSavedWords);
+    window.addEventListener('lisan-saved-words-changed', syncSavedWords);
+
+    return () => {
+      window.removeEventListener('storage', syncSavedWords);
+      window.removeEventListener('lisan-saved-words-changed', syncSavedWords);
+    };
+  }, []);
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] text-slate-900">
@@ -271,10 +300,10 @@ function MorePage() {
       >
         <PageHeader showBack />
 
-        <section className="relative mt-6 overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(135deg,#FFFFFF_0%,#FBF8FF_50%,#F3ECFF_100%)] p-6 shadow-card sm:p-7 lg:min-h-[210px] lg:p-8">
+        <section className="relative mt-6 overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(135deg,#FFFFFF_0%,#FBF8FF_50%,#F3ECFF_100%)] p-6 shadow-card sm:p-7 lg:min-h-[260px] lg:p-8">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_78%_42%,rgba(196,181,253,0.24)_0%,transparent_34%)]" />
           <div className="pointer-events-none absolute -left-16 top-0 h-48 w-48 rounded-full bg-violet-100/60 blur-3xl" />
-          <div className="relative grid min-h-[170px] items-center gap-7 md:grid-cols-[minmax(0,1fr)_360px]" dir="ltr">
+          <div className="relative grid min-h-[220px] items-center gap-7 md:grid-cols-[minmax(0,1fr)_430px]" dir="ltr">
             <div className="order-2 text-right md:order-1" dir="rtl">
               <span className="inline-flex rounded-full bg-violet-50 px-4 py-2 text-sm font-black text-violet-700">
                 {text.heroKicker}
@@ -287,11 +316,11 @@ function MorePage() {
               </p>
             </div>
 
-            <div className="order-1 flex min-h-[150px] items-center justify-center md:order-2" aria-hidden="true">
+            <div className="order-1 flex min-h-[220px] items-center justify-center md:order-2" aria-hidden="true">
               <img
                 src="/images/profile-hebrew-learning.png"
                 alt=""
-                className="h-[180px] w-full max-w-[360px] object-contain opacity-95 mix-blend-multiply [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_70%,rgba(0,0,0,0.68)_86%,transparent_100%)]"
+                className="h-[250px] w-full max-w-[460px] object-contain opacity-95 mix-blend-multiply md:h-[270px] [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_72%,rgba(0,0,0,0.72)_88%,transparent_100%)]"
               />
             </div>
           </div>
@@ -386,7 +415,7 @@ function MorePage() {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            {savedWords.map((word) => (
+            {visibleSavedWords.map((word) => (
               <span
                 key={word}
                 className="rounded-full bg-violet-50 px-5 py-2.5 text-base font-black text-violet-700"
@@ -477,10 +506,16 @@ function MorePage() {
                     Loading chats...
                   </div>
                 ) : (
-                  visibleHistory.map((conversation) => (
+                  visibleHistory.map((conversation, index) => {
+                    const isLastSingle =
+                      visibleHistory.length % 2 === 1 && index === visibleHistory.length - 1;
+
+                    return (
                     <article
                       key={conversation.id}
-                      className="min-h-[128px] rounded-[22px] border border-violet-100 bg-violet-50/40 p-4"
+                      className={`min-h-[128px] rounded-[22px] border border-violet-100 bg-violet-50/40 p-4 ${
+                        isLastSingle ? 'lg:col-span-2 lg:mx-auto lg:w-[calc(50%_-_0.5rem)]' : ''
+                      }`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>
@@ -533,7 +568,8 @@ function MorePage() {
                         ) : null}
                       </div>
                     </article>
-                  ))
+                    );
+                  })
                 )}
               </div>
             </>

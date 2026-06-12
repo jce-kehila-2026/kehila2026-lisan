@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Button from '../components/Button.jsx';
 import Input from '../components/Input.jsx';
 import LanguageToggle from '../components/LanguageToggle.jsx';
-import Logo from '../components/Logo.jsx';
+import LisanLogo from '../components/LisanLogo.jsx';
 import { getLandingPathForRole, login, storeSession } from '../services/auth.js';
 
 function Login() {
@@ -39,7 +39,7 @@ function Login() {
         </div>
 
         <section className="rounded-3xl bg-white p-6 shadow-card sm:p-8">
-          <Logo />
+          <LisanLogo />
           <div className="mt-9">
             <p className="text-sm font-bold text-violet-700">{t('loginWelcome')}</p>
             <h1 className="mt-2 text-3xl font-bold leading-tight text-slate-950">{t('startLearning')}</h1>

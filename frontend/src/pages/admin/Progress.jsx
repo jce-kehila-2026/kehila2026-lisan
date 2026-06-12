@@ -6,12 +6,16 @@ import {
   Pencil,
   Trash2,
   UserPlus,
-  Users,
   X,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import Button from '../../components/ui/Button.jsx';
+import {
+  adminLevels,
+  adminStudentsSeed,
+  adminTeachersSeed,
+} from '../../data/adminMockData.js';
 import {
   assignStudentsToTeacher,
   createUser,
@@ -29,6 +33,49 @@ function getStudentTeacherIds(student) {
   if (Array.isArray(student.teacherIds)) return student.teacherIds;
   if (student.teacherId) return [student.teacherId];
   return [];
+}
+
+function getTeacherLevels(teacher) {
+  if (Array.isArray(teacher?.levels) && teacher.levels.length > 0) {
+    return teacher.levels;
+  }
+
+  if (teacher?.level) {
+    return [teacher.level];
+  }
+
+  if (teacher?.levelFocus) {
+    return teacher.levelFocus
+      .split(',')
+      .map((level) => level.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
+function getTeachersLayoutClass() {
+  return 'flex flex-wrap justify-center';
+}
+
+function getTeacherCardClass(count) {
+  if (count <= 1) {
+    return 'w-full';
+  }
+
+  if (count === 2) {
+    return 'w-full flex-none md:basis-[calc(50%_-_0.5rem)]';
+  }
+
+  if (count === 3) {
+    return 'w-full flex-none lg:basis-[calc((100%_-_2rem)/3)]';
+  }
+
+  if (count === 4) {
+    return 'w-full flex-none md:basis-[calc(50%_-_0.5rem)] xl:basis-[calc((100%_-_3rem)/4)]';
+  }
+
+  return 'w-full flex-none md:basis-[calc(50%_-_0.5rem)] lg:basis-[calc((100%_-_2rem)/3)]';
 }
 
 function Modal({ children, onClose, title, description }) {
@@ -118,10 +165,24 @@ function CreateUserForm({ onCancel, onSubmit, saving }) {
 }
 
 function TeacherForm({ initialValue, onCancel, onSubmit, saving }) {
-  const [form, setForm] = useState(initialValue);
+  const [form, setForm] = useState({
+    ...initialValue,
+    levels: getTeacherLevels(initialValue),
+  });
 
   const setField = (field) => (event) => {
     setForm((current) => ({ ...current, [field]: event.target.value }));
+  };
+
+  const toggleLevel = (level) => {
+    setForm((current) => {
+      const currentLevels = Array.isArray(current.levels) ? current.levels : [];
+      const levels = currentLevels.includes(level)
+        ? currentLevels.filter((item) => item !== level)
+        : [...currentLevels, level];
+
+      return { ...current, levels };
+    });
   };
 
   return (
@@ -139,13 +200,33 @@ function TeacherForm({ initialValue, onCancel, onSubmit, saving }) {
         <input type="email" value={form.email || ''} onChange={setField('email')} className={fieldClass} required />
       </label>
 
-      <label className="grid gap-2 text-sm font-black text-slate-700">
-        תפקיד
-        <select value={form.role || 'teacher'} onChange={setField('role')} className={fieldClass}>
-          <option value="teacher">Teacher</option>
-          <option value="admin">Admin</option>
-        </select>
-      </label>
+      <div className="grid gap-2 text-sm font-black text-slate-700">
+        רמות
+        <div className="grid gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:grid-cols-3">
+          {adminLevels.map((level) => {
+            const checked = (form.levels || []).includes(level);
+
+            return (
+              <label
+                key={level}
+                className={`flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm font-black transition ${
+                  checked
+                    ? 'bg-violet-600 text-white'
+                    : 'bg-white text-slate-700 hover:bg-violet-50'
+                }`}
+              >
+                <span>{level}</span>
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => toggleLevel(level)}
+                  className="h-4 w-4"
+                />
+              </label>
+            );
+          })}
+        </div>
+      </div>
 
       <label className="grid gap-2 text-sm font-black text-slate-700">
         סיסמה חדשה optional
@@ -165,7 +246,16 @@ function TeacherForm({ initialValue, onCancel, onSubmit, saving }) {
 }
 
 function AssignmentForm({ allStudents, assignedIds, onCancel, onSubmit, saving, teacher }) {
-  const [selectedIds, setSelectedIds] = useState(assignedIds);
+  const teacherLevels = getTeacherLevels(teacher);
+  const allowedLevels = teacherLevels;
+  const allowedStudentIds = allStudents
+    .filter((student) => allowedLevels.includes(student.level))
+    .map((student) => student.id);
+  const [selectedIds, setSelectedIds] = useState(
+    assignedIds.filter((studentId) => allowedStudentIds.includes(studentId)),
+  );
+  const [activeLevel, setActiveLevel] = useState(allowedLevels[0] || '');
+  const visibleStudents = allStudents.filter((student) => student.level === activeLevel);
 
   const toggleStudent = (id) => {
     setSelectedIds((current) =>
@@ -180,8 +270,29 @@ function AssignmentForm({ allStudents, assignedIds, onCancel, onSubmit, saving, 
       event.preventDefault();
       onSubmit(selectedIds);
     }}>
+      <div className="flex flex-wrap gap-2">
+        {allowedLevels.map((level) => (
+          <button
+            key={level}
+            type="button"
+            onClick={() => setActiveLevel(level)}
+            className={`rounded-full px-4 py-2 text-xs font-black transition ${
+              activeLevel === level
+                ? 'bg-violet-600 text-white'
+                : 'bg-violet-50 text-violet-700 hover:bg-violet-100'
+            }`}
+          >
+            {level}
+          </button>
+        ))}
+      </div>
+
       <div className="grid max-h-80 gap-2 overflow-y-auto rounded-2xl border border-slate-100 bg-slate-50 p-3">
-        {allStudents.map((student) => {
+        {visibleStudents.length === 0 ? (
+          <p className="rounded-2xl bg-white px-4 py-3 text-sm font-bold text-slate-500">
+            אין תלמידות ברמה זו.
+          </p>
+        ) : visibleStudents.map((student) => {
           const checked = selectedIds.includes(student.id);
 
           return (
@@ -217,15 +328,36 @@ function TeachersManagement() {
   const [modal, setModal] = useState(null);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [usesLocalData, setUsesLocalData] = useState(false);
+  const [error, setError] = useState('');
+  const [expandedLevel, setExpandedLevel] = useState('');
 
   const loadData = async () => {
-    const [teachersData, studentsData] = await Promise.all([
-      getTeachers(),
-      getStudents(),
-    ]);
+    try {
+      setError('');
 
-    setTeachers(teachersData.teachers || []);
-    setStudents(studentsData.students || []);
+      const [teachersData, studentsData] = await Promise.all([
+        getTeachers(),
+        getStudents(),
+      ]);
+
+      if (
+        (teachersData.teachers || []).length === 0 &&
+        (studentsData.students || []).length === 0
+      ) {
+        setTeachers(adminTeachersSeed);
+        setStudents(adminStudentsSeed);
+        setUsesLocalData(true);
+      } else {
+        setTeachers(teachersData.teachers || []);
+        setStudents(studentsData.students || []);
+        setUsesLocalData(false);
+      }
+    } catch (requestError) {
+      setTeachers(adminTeachersSeed);
+      setStudents(adminStudentsSeed);
+      setUsesLocalData(true);
+    }
   };
 
   useEffect(() => {
@@ -249,6 +381,24 @@ function TeachersManagement() {
   const submitCreateUser = async (form) => {
     try {
       setSaving(true);
+      if (usesLocalData) {
+        const user = {
+          ...form,
+          id: `${form.role}_${Date.now()}`,
+          status: 'active',
+          teacherIds: [],
+        };
+
+        if (form.role === 'student') {
+          setStudents((current) => [user, ...current]);
+        } else {
+          setTeachers((current) => [user, ...current]);
+        }
+
+        closeModal();
+        return;
+      }
+
       await createUser(form);
       await loadData();
       closeModal();
@@ -262,6 +412,25 @@ function TeachersManagement() {
   const submitTeacherEdit = async (form) => {
     try {
       setSaving(true);
+      if (usesLocalData) {
+        setTeachers((current) =>
+          current.map((teacher) =>
+            teacher.id === selectedTeacher.id
+              ? {
+                  ...teacher,
+                  ...form,
+                  levelFocus: Array.isArray(form.levels)
+                    ? form.levels.join(', ')
+                    : teacher.levelFocus,
+                  password: '',
+                }
+              : teacher,
+          ),
+        );
+        closeModal();
+        return;
+      }
+
       const data = await updateTeacher(selectedTeacher.id, form);
       setTeachers((current) =>
         current.map((teacher) =>
@@ -280,6 +449,22 @@ function TeachersManagement() {
   const confirmDelete = async () => {
     try {
       setSaving(true);
+      if (usesLocalData) {
+        setTeachers((current) =>
+          current.filter((teacher) => teacher.id !== selectedTeacher.id),
+        );
+        setStudents((current) =>
+          current.map((student) => ({
+            ...student,
+            teacherIds: getStudentTeacherIds(student).filter(
+              (teacherId) => teacherId !== selectedTeacher.id,
+            ),
+          })),
+        );
+        closeModal();
+        return;
+      }
+
       await deleteTeacher(selectedTeacher.id);
       await loadData();
       closeModal();
@@ -293,6 +478,30 @@ function TeachersManagement() {
   const submitAssignments = async (studentIds) => {
     try {
       setSaving(true);
+      if (usesLocalData) {
+        setStudents((current) =>
+          current.map((student) => {
+            const remainingTeacherIds = getStudentTeacherIds(student).filter(
+              (teacherId) => teacherId !== selectedTeacher.id,
+            );
+
+            return studentIds.includes(student.id)
+              ? {
+                  ...student,
+                  teacherIds: [...remainingTeacherIds, selectedTeacher.id],
+                  teacherId: selectedTeacher.id,
+                }
+              : {
+                  ...student,
+                  teacherIds: remainingTeacherIds,
+                  teacherId: remainingTeacherIds[0] || '',
+                };
+          }),
+        );
+        closeModal();
+        return;
+      }
+
       await assignStudentsToTeacher(selectedTeacher.id, studentIds);
       await loadData();
       closeModal();
@@ -309,7 +518,7 @@ function TeachersManagement() {
   };
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-7xl" dir="rtl">
         <header className="flex flex-wrap items-center justify-between gap-3">
           <button type="button" onClick={() => navigate('/admin/dashboard')} className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-sm transition hover:bg-violet-50">
@@ -322,34 +531,53 @@ function TeachersManagement() {
           </Button>
         </header>
 
-        <section className="mt-6 overflow-hidden rounded-[2rem] border border-white/70 bg-white/95 p-5 shadow-card sm:p-7">
-          <p className="inline-flex items-center gap-2 text-sm font-black text-violet-700">
-            <GraduationCap className="h-4 w-4" />
-            ניהול משתמשים ומורות
-          </p>
+        <section className="relative mt-6 overflow-hidden rounded-[2rem] border border-[#EEE5FF] bg-white/75 shadow-card backdrop-blur-[8px]">
+          <div className="absolute left-0 top-0 h-full w-1/2 bg-violet-200/25 blur-3xl" aria-hidden="true" />
 
-          <h1 className="mt-2 text-2xl font-black text-slate-950 sm:text-4xl">
-            מורות, אדמינים ושיוך תלמידות
-          </h1>
+          <div className="relative flex flex-col lg:min-h-80 lg:flex-row lg:items-stretch">
+            <div className="flex flex-col justify-center p-5 sm:p-7 lg:w-[52%] lg:py-10">
+              <p className="inline-flex items-center gap-2 text-sm font-black text-violet-700">
+                <GraduationCap className="h-4 w-4" />
+                ניהול משתמשים ומורות
+              </p>
 
-          <p className="mt-3 max-w-4xl text-sm font-semibold leading-7 text-slate-600 sm:text-base">
-            ניהול מורות, יצירת אדמינים חדשים ושיוך תלמידות למורה אחת או יותר.
-          </p>
+              <h1 className="mt-2 text-[clamp(2.2rem,4.2vw,4.25rem)] font-black leading-tight text-slate-950">
+                מורות, אדמינים ושיוך תלמידות
+              </h1>
 
-          <div className="mt-5">
-            <button type="button" onClick={() => setModal('create-user')} className="inline-flex items-center gap-2 rounded-2xl bg-violet-600 px-5 py-3 text-sm font-black text-white shadow-button transition hover:bg-violet-700">
-              <UserPlus className="h-5 w-5" />
-              הוספת משתמש
-            </button>
+              <p className="mt-3 text-sm font-semibold leading-7 text-slate-600 sm:text-base">
+                ניהול מורות, יצירת אדמינים חדשים ושיוך תלמידות למורה אחת או יותר.
+              </p>
+
+              <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+                <button type="button" onClick={() => setModal('create-user')} className="inline-flex items-center justify-center gap-2 rounded-2xl bg-violet-600 px-5 py-3 text-sm font-black text-white shadow-button transition hover:bg-violet-700">
+                  <UserPlus className="h-5 w-5" />
+                  הוספת משתמש
+                </button>
+              </div>
+            </div>
+
+            <div className="relative flex min-h-64 items-center justify-center overflow-hidden bg-violet-50/35 lg:min-h-80 lg:w-[48%] lg:bg-violet-50/20">
+              <img
+                src="/addS.png"
+                alt="Teachers Management"
+                className="h-full w-full scale-110 object-contain object-center sm:scale-[1.15] lg:scale-125"
+              />
+            </div>
           </div>
         </section>
 
-        <section className="mt-5 grid gap-4 lg:grid-cols-3">
+        <section className={`mt-5 gap-4 ${getTeachersLayoutClass()}`}>
           {teachers.map((teacher) => {
             const assignedStudents = studentsByTeacher[teacher.id] || [];
+            const teacherLevels = getTeacherLevels(teacher);
+            const visibleLevels = teacherLevels;
 
             return (
-              <article key={teacher.id} className="rounded-[1.75rem] border border-violet-100/70 bg-white/95 p-5 shadow-card">
+              <article
+                key={teacher.id}
+                className={`rounded-[1.75rem] border border-[#EEE5FF] bg-white p-5 shadow-card ${getTeacherCardClass(teachers.length)}`}
+              >
                 <div className="flex items-start justify-between gap-4">
                   <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 text-violet-700">
                     <GraduationCap className="h-6 w-6" />
@@ -368,20 +596,51 @@ function TeachersManagement() {
                   {teacher.email}
                 </p>
 
-                <p className="mt-1 text-sm font-bold text-violet-700">
-                  תפקיד: {teacher.role}
-                </p>
-
                 <div className="mt-4 rounded-2xl bg-slate-50 px-4 py-3">
                   <p className="text-xs font-black text-slate-400">
-                    תלמידות משויכות
+                    רמות לימוד
                   </p>
 
-                  <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
-                    {assignedStudents.length
-                      ? assignedStudents.map((student) => `${student.name} (${student.level})`).join(', ')
-                      : 'אין תלמידות משויכות'}
-                  </p>
+                  <div className="mt-2 grid gap-2">
+                    {visibleLevels.length === 0 ? (
+                      <p className="text-sm font-semibold text-slate-500">
+                        לא הוגדרו רמות למורה זו.
+                      </p>
+                    ) : visibleLevels.map((level) => {
+                      const levelKey = `${teacher.id}:${level}`;
+                      const open = expandedLevel === levelKey;
+                      const studentsForLevel = assignedStudents.filter(
+                        (student) => student.level === level,
+                      );
+
+                      return (
+                        <div key={level} className="rounded-2xl bg-white px-3 py-2">
+                          <button
+                            type="button"
+                            onClick={() => setExpandedLevel(open ? '' : levelKey)}
+                            className="flex w-full items-center justify-between gap-3 text-sm font-black text-violet-700"
+                          >
+                            <span>{level}</span>
+                            <span className="rounded-full bg-violet-50 px-2 py-0.5 text-[11px]">
+                              {studentsForLevel.length}
+                            </span>
+                          </button>
+
+                          {open ? (
+                            <ul className="mt-2 grid gap-1 text-sm font-semibold text-slate-600">
+                              {studentsForLevel.length > 0 ? (
+                                studentsForLevel.map((student) => (
+                                  <li key={student.id}>- {student.name}</li>
+                                ))
+                              ) : (
+                                <li>אין תלמידות ברמה זו</li>
+                              )}
+                            </ul>
+                          ) : null}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <div className="mt-5 flex flex-wrap gap-2">
@@ -412,34 +671,6 @@ function TeachersManagement() {
               </article>
             );
           })}
-        </section>
-
-        <section className="mt-5 rounded-[1.75rem] border border-violet-100/70 bg-white/95 p-5 shadow-card">
-          <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-50 text-violet-700">
-              <Users className="h-5 w-5" />
-            </span>
-
-            <h2 className="text-lg font-black text-slate-950">
-              מבט כללי על שיוכים
-            </h2>
-          </div>
-
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
-            {students.map((student) => {
-              const teacherIds = getStudentTeacherIds(student);
-              const teacherNames = teacherIds
-                .map((id) => teachers.find((teacher) => teacher.id === id)?.name)
-                .filter(Boolean);
-
-              return (
-                <div key={student.id} className="rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
-                  {student.name} · {student.level} ·{' '}
-                  {teacherNames.length > 0 ? teacherNames.join(', ') : 'לא שויכה'}
-                </div>
-              );
-            })}
-          </div>
         </section>
       </div>
 

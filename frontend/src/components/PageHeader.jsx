@@ -4,9 +4,9 @@ import { ArrowRight, LogOut } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import LanguageToggle from './LanguageToggle.jsx';
-import Logo from './Logo.jsx';
+import LisanLogo from './LisanLogo.jsx';
 
-function PageHeader({ backTo, showBack = false, showLogout = false }) {
+function PageHeader({ backTo, controlsSlot = null, showBack = false, showLogout = false }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -19,10 +19,12 @@ function PageHeader({ backTo, showBack = false, showLogout = false }) {
         aria-label="דף הבית"
         title="דף הבית"
       >
-        <Logo />
+        <LisanLogo />
       </button>
 
       <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+        {controlsSlot}
+
         <LanguageToggle />
 
         {showBack ? (

@@ -128,7 +128,13 @@ function Home() {
   const [loading, setLoading] = useState(true);
   const [dictionaryQuery, setDictionaryQuery] = useState('');
   const [dictionaryExpanded, setDictionaryExpanded] = useState(false);
-  const [favoriteWords, setFavoriteWords] = useState([]);
+  const [favoriteWords, setFavoriteWords] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('lisan-saved-words') || '[]');
+    } catch {
+      return [];
+    }
+  });
   const [isLinksModalOpen, setIsLinksModalOpen] = useState(false);
 
   useEffect(() => {
@@ -280,10 +286,16 @@ function Home() {
   const toggleFavoriteWord = (hebrewWord) => {
     setFavoriteWords((currentWords) => {
       if (currentWords.includes(hebrewWord)) {
-        return currentWords.filter((word) => word !== hebrewWord);
+        const nextWords = currentWords.filter((word) => word !== hebrewWord);
+        localStorage.setItem('lisan-saved-words', JSON.stringify(nextWords));
+        window.dispatchEvent(new Event('lisan-saved-words-changed'));
+        return nextWords;
       }
 
-      return [...currentWords, hebrewWord];
+      const nextWords = [...currentWords, hebrewWord];
+      localStorage.setItem('lisan-saved-words', JSON.stringify(nextWords));
+      window.dispatchEvent(new Event('lisan-saved-words-changed'));
+      return nextWords;
     });
   };
 

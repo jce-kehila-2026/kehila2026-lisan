@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Award,
   BadgeCheck,
@@ -60,6 +60,11 @@ const labels = {
     firstWords: '50 מילים ראשונות',
     reachedLevel: 'הגעת לרמה A1',
     accuracyBadge: 'דיוק {{value}}%',
+    openCamera: 'פתיחת מצלמה',
+    takePhoto: 'צילום',
+    uploadImage: 'העלאת תמונה',
+    cancel: 'ביטול',
+    cameraFallback: 'לא ניתן לפתוח מצלמה. אפשר להעלות תמונה מהמכשיר.',
   },
   ar: {
     title: 'الملف الشخصي',
@@ -98,6 +103,11 @@ const labels = {
     firstWords: 'أول 50 كلمة',
     reachedLevel: 'وصلت إلى مستوى A1',
     accuracyBadge: 'دقة {{value}}%',
+    openCamera: 'فتح الكاميرا',
+    takePhoto: 'التقاط صورة',
+    uploadImage: 'رفع صورة',
+    cancel: 'إلغاء',
+    cameraFallback: 'تعذر فتح الكاميرا. يمكنك رفع صورة من الجهاز.',
   },
 };
 
@@ -142,11 +152,18 @@ function SegmentedControl({ options, value, onChange }) {
 function ProfilePage() {
   const { i18n, t } = useTranslation();
   const text = labels[i18n.language === 'he' ? 'he' : 'ar'];
+  const fileInputRef = useRef(null);
+  const videoRef = useRef(null);
+  const [cameraMenuOpen, setCameraMenuOpen] = useState(false);
+  const [cameraStream, setCameraStream] = useState(null);
+  const [cameraActive, setCameraActive] = useState(false);
+  const [cameraError, setCameraError] = useState('');
 
   const storedUser = getStoredUser();
   const [user, setUser] = useState(storedUser);
   const [progress, setProgress] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [profileImage, setProfileImage] = useState(() => localStorage.getItem('lisan-profile-image') || '');
 
   const storedPreferences = useMemo(getStoredPreferences, []);
   const theme = 'light';
@@ -205,6 +222,109 @@ function ProfilePage() {
     );
     window.dispatchEvent(new Event('lisan-student-preferences-changed'));
   }, [notifications, textSize, theme, voiceSpeed]);
+
+  const openCamera = () => {
+    setCameraMenuOpen(true);
+  };
+
+  const closeCameraMenu = () => {
+    setCameraMenuOpen(false);
+  };
+
+  const openFilePicker = () => {
+    closeCameraMenu();
+    fileInputRef.current?.click();
+  };
+
+  const stopCamera = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach((track) => track.stop());
+      setCameraStream(null);
+    }
+    setCameraActive(false);
+  };
+
+  useEffect(() => {
+    if (videoRef.current && cameraStream) {
+      videoRef.current.srcObject = cameraStream;
+      videoRef.current.play().catch(() => {});
+    }
+  }, [cameraStream]);
+
+  useEffect(() => {
+    return () => {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [cameraStream]);
+
+  const startCamera = async () => {
+    closeCameraMenu();
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setCameraError(text.cameraFallback);
+      openFilePicker();
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' },
+      });
+
+      setCameraError('');
+      setCameraStream(stream);
+      setCameraActive(true);
+    } catch (error) {
+      console.error('Camera start failed:', error);
+      setCameraError(text.cameraFallback);
+      openFilePicker();
+    }
+  };
+
+  const capturePhoto = () => {
+    if (!videoRef.current) {
+      return;
+    }
+
+    const videoElement = videoRef.current;
+    const canvas = document.createElement('canvas');
+    canvas.width = videoElement.videoWidth || 640;
+    canvas.height = videoElement.videoHeight || 480;
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) {
+      return;
+    }
+
+    ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+    const imageData = canvas.toDataURL('image/png');
+    saveProfileImage(imageData);
+    stopCamera();
+  };
+
+  const saveProfileImage = (imageData) => {
+    setProfileImage(imageData);
+    localStorage.setItem('lisan-profile-image', imageData);
+  };
+
+  const uploadProfileImage = (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        saveProfileImage(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
+  };
 
   const accuracy = Math.max(0, Math.min(100, Number(progress?.accuracy ?? 35)));
   const learnedWords = Number(progress?.correctMeaningCount ?? 35);
@@ -275,27 +395,130 @@ function ProfilePage() {
   return (
     <main className={pageClass}>
       <div className={`app-page-container relative ${textScaleClass}`} dir="rtl">
-        <PageHeader showBack />
+        <div className="lisan-enter profile-page-header" style={{ '--lisan-enter-delay': '0ms' }}>
+          <PageHeader showLogout />
+        </div>
 
         <section className={`relative mt-6 overflow-hidden rounded-[28px] border border-white/80 lg:min-h-[240px] ${surfaceClass}`}>
           <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.96)_0%,rgba(248,245,255,0.92)_42%,rgba(237,233,254,0.82)_100%)]" />
-          <div className="pointer-events-none absolute right-0 bottom-0 hidden h-full w-[34%] lg:block" aria-hidden="true">
+          <div className="pointer-events-none absolute bottom-0 right-0 hidden h-full w-[34%] lg:block" aria-hidden="true">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_58%_54%,rgba(196,181,253,0.34)_0%,rgba(245,243,255,0.18)_46%,transparent_76%)]" />
             <img
               src="/images/profile-hebrew-learning.png"
               alt="Hebrew learning study illustration with Hebrew letters, notebook and educational books"
-              className="absolute bottom-[-8px] right-0 h-[108%] w-full object-contain object-right opacity-95 mix-blend-multiply drop-shadow-[0_22px_36px_rgba(124,58,237,0.16)] [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_62%,rgba(0,0,0,0.72)_78%,transparent_100%)]"
+              className="absolute bottom-[-18px] right-[-18px] h-[122%] w-[112%] object-contain object-right opacity-95 mix-blend-multiply drop-shadow-[0_22px_36px_rgba(124,58,237,0.16)] [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_64%,rgba(0,0,0,0.76)_82%,transparent_100%)]"
             />
             <div className="absolute inset-y-0 left-0 w-28 bg-gradient-to-l from-transparent to-white/90" />
           </div>
-          <div className="relative grid min-h-[240px] gap-6 p-6 sm:p-8 lg:grid-cols-[230px_minmax(340px,1fr)_34%]" dir="ltr">
-            <div className="order-3 flex items-center justify-center lg:order-1" aria-hidden="true">
-              <div className="relative flex h-44 w-44 items-center justify-center rounded-full bg-[radial-gradient(circle,#f8f5ff_0%,#ede9fe_68%,#ffffff_100%)] shadow-[inset_0_0_0_6px_rgba(255,255,255,0.88),0_20px_48px_rgba(124,58,237,0.12)] sm:h-52 sm:w-52">
-                <span className="text-8xl font-black text-violet-500 sm:text-9xl">א</span>
-                <span className="absolute -bottom-1 -right-1 flex h-12 w-12 items-center justify-center rounded-full bg-violet-600 text-white shadow-button">
-                  <Camera className="h-6 w-6" />
-                </span>
+          <div className="relative grid min-h-[260px] gap-6 p-6 sm:p-8 lg:grid-cols-[280px_minmax(320px,1fr)_34%]" dir="ltr">
+            <div className="order-3 flex flex-col items-center justify-center lg:order-1">
+              <div className="relative flex h-44 w-44 items-center justify-center overflow-hidden rounded-full bg-[radial-gradient(circle,#f8f5ff_0%,#ede9fe_68%,#ffffff_100%)] shadow-[inset_0_0_0_6px_rgba(255,255,255,0.88),0_20px_48px_rgba(124,58,237,0.12)] sm:h-52 sm:w-52 lg:h-56 lg:w-56">
+                {profileImage ? (
+                  <img src={profileImage} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <span className="text-9xl font-black text-violet-500 sm:text-[7rem]">א</span>
+                )}
               </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={uploadProfileImage}
+              />
+              <div className="mt-4 flex justify-center" dir="rtl">
+                <button
+                  type="button"
+                  onClick={openCamera}
+                  className="inline-flex h-12 items-center gap-2 rounded-full bg-violet-600 px-5 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                  aria-label={text.openCamera}
+                >
+                  <Camera className="h-5 w-5" aria-hidden="true" />
+                  {text.openCamera}
+                </button>
+              </div>
+
+              {cameraMenuOpen ? (
+                <div
+                  className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 px-4 py-6"
+                  role="dialog"
+                  aria-modal="true"
+                  onClick={closeCameraMenu}
+                >
+                  <div
+                    className="w-full max-w-sm rounded-[28px] border border-white/80 bg-white p-5 shadow-card"
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    <p className="text-right text-base font-black text-slate-900">
+                      {text.openCamera}
+                    </p>
+                    <div className="mt-4 grid gap-3">
+                      <button
+                        type="button"
+                        onClick={startCamera}
+                        className="inline-flex h-12 items-center justify-center rounded-full bg-violet-600 px-4 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                      >
+                        {text.takePhoto}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={openFilePicker}
+                        className="inline-flex h-12 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-black text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                      >
+                        {text.uploadImage}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={closeCameraMenu}
+                        className="inline-flex h-12 items-center justify-center rounded-full bg-slate-100 px-4 text-sm font-black text-slate-700 transition hover:-translate-y-0.5 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                      >
+                        {text.cancel}
+                      </button>
+                    </div>
+                    {cameraError ? (
+                      <p className="mt-4 text-sm text-red-600">{cameraError}</p>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
+
+              {cameraActive && cameraStream ? (
+                <div
+                  className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 px-4 py-6"
+                  role="dialog"
+                  aria-modal="true"
+                  onClick={stopCamera}
+                >
+                  <div
+                    className="w-full max-w-2xl overflow-hidden rounded-[28px] bg-slate-950 p-4 shadow-card"
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    <video
+                      ref={videoRef}
+                      className="h-[320px] w-full rounded-3xl bg-black object-cover"
+                      autoPlay
+                      muted
+                      playsInline
+                    />
+                    <div className="mt-4 flex flex-wrap justify-end gap-3">
+                      <button
+                        type="button"
+                        onClick={capturePhoto}
+                        className="inline-flex h-12 items-center justify-center rounded-full bg-violet-600 px-5 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                      >
+                        {text.takePhoto}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={stopCamera}
+                        className="inline-flex h-12 items-center justify-center rounded-full bg-slate-100 px-5 text-sm font-black text-slate-700 transition hover:-translate-y-0.5 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                      >
+                        {text.cancel}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
             </div>
 
             <div className="order-2 flex min-w-0 flex-col justify-center text-right lg:order-2" dir="rtl">
@@ -320,23 +543,24 @@ function ProfilePage() {
                 <img
                   src="/images/profile-hebrew-learning.png"
                   alt="Hebrew learning study illustration with Hebrew letters, notebook and educational books"
-                  className="relative z-10 h-full max-h-[250px] w-full object-contain object-center opacity-95 mix-blend-multiply [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_64%,rgba(0,0,0,0.72)_82%,transparent_100%)]"
+                  className="relative z-10 h-full max-h-[280px] w-full object-contain object-center opacity-95 mix-blend-multiply [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_64%,rgba(0,0,0,0.72)_82%,transparent_100%)]"
                 />
               </div>
             </div>
           </div>
         </section>
 
+
         <section className={`mt-5 rounded-[28px] border border-white/80 p-6 shadow-card sm:p-7 lg:min-h-[170px] ${surfaceClass}`}>
-          <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)_240px]">
-            <div className="flex items-center justify-center border-violet-100 lg:border-l">
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-[240px_minmax(0,1fr)_240px]">
+            <div className="flex items-center justify-center border-violet-100 md:col-span-2 xl:col-span-1 xl:border-l">
               <div
-                className="grid h-44 w-44 place-items-center rounded-full"
+                className="grid h-36 w-36 place-items-center rounded-full sm:h-44 sm:w-44"
                 style={{
                   background: `conic-gradient(#6d28d9 ${accuracy * 3.6}deg, #f1eafd 0deg)`,
                 }}
               >
-                <div className="grid h-32 w-32 place-items-center rounded-full bg-white text-center shadow-inner">
+                <div className="grid h-28 w-28 place-items-center rounded-full bg-white text-center shadow-inner sm:h-32 sm:w-32">
                   <div>
                     <p className="text-3xl font-black text-slate-950">{accuracy}%</p>
                     <p className="mt-1 text-xs font-black text-slate-600">{text.totalProgress}</p>
@@ -361,7 +585,7 @@ function ProfilePage() {
               </p>
             </div>
 
-            <div className="flex flex-col justify-center border-violet-100 text-right lg:border-r lg:pr-6">
+            <div className="flex flex-col justify-center border-violet-100 text-right md:col-span-2 xl:col-span-1 xl:border-r xl:pr-6">
               <div className="flex items-center gap-3">
                 <span className="flex h-11 w-11 items-center justify-center rounded-full bg-violet-50 text-violet-700">
                   <Target className="h-6 w-6" aria-hidden="true" />
@@ -386,7 +610,7 @@ function ProfilePage() {
             <h2 className={`text-3xl font-black ${headingTextClass}`}>{text.achievements}</h2>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="flex flex-wrap justify-center gap-4">
             {achievementCards.map((achievement) => {
               const Icon = achievement.icon;
               const label = achievement.key === 'accuracyBadge'
@@ -396,7 +620,7 @@ function ProfilePage() {
               return (
                 <article
                   key={achievement.key}
-                  className={`rounded-[22px] border p-5 text-center shadow-[0_12px_28px_rgba(124,58,237,0.06)] ${achievement.bg} ${achievement.border}`}
+                  className={`w-full max-w-[320px] flex-1 rounded-[22px] border p-5 text-center shadow-[0_12px_28px_rgba(124,58,237,0.06)] ${achievement.bg} ${achievement.border} sm:basis-[calc(50%-1rem)] lg:basis-[calc(33.333%-1rem)] xl:basis-[calc(20%-1rem)]`}
                 >
                   <span className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white/80 ${achievement.color}`}>
                     <Icon className="h-9 w-9" aria-hidden="true" />

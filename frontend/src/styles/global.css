@@ -671,6 +671,7 @@ a {
 }
 
 .lisan-logo {
+  --lisan-logo-font-size: clamp(3.4rem, 5.4vw, 5.2rem);
   display: grid;
   justify-items: center;
   margin: 0 auto clamp(28px, 4.2vh, 44px);
@@ -682,8 +683,13 @@ a {
 
 .lisan-logo span,
 .lisan-logo strong {
-  font-size: clamp(3.4rem, 5.4vw, 5.2rem);
+  font-size: var(--lisan-logo-font-size);
   letter-spacing: 0;
+}
+
+.profile-page-header .lisan-logo span,
+.profile-page-header .lisan-logo strong {
+  font-size: var(--lisan-logo-font-size) !important;
 }
 
 .login-form {
@@ -1934,12 +1940,8 @@ a {
   }
 
   .lisan-logo {
+    --lisan-logo-font-size: clamp(3rem, 12vw, 4.4rem);
     display: grid;
-  }
-
-  .lisan-logo span,
-  .lisan-logo strong {
-    font-size: clamp(3rem, 12vw, 4.4rem);
   }
 
   .login-panel__inner {
@@ -2012,12 +2014,8 @@ a {
   }
 
   .lisan-logo {
+    --lisan-logo-font-size: clamp(3.2rem, 16vw, 4.45rem);
     margin-bottom: 26px;
-  }
-
-  .lisan-logo span,
-  .lisan-logo strong {
-    font-size: clamp(3.2rem, 16vw, 4.45rem);
   }
 
   .login-panel .ui-field__control {
@@ -2058,12 +2056,8 @@ a {
   }
 
   .lisan-logo {
+    --lisan-logo-font-size: clamp(2.8rem, 15vw, 3.7rem);
     margin-bottom: 20px;
-  }
-
-  .lisan-logo span,
-  .lisan-logo strong {
-    font-size: clamp(2.8rem, 15vw, 3.7rem);
   }
 
   .login-form {

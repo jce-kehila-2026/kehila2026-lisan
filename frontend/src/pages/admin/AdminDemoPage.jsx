@@ -2,11 +2,23 @@ import React from 'react';
 import { ArrowRight, CheckCircle2, Clock, LayoutDashboard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+function demoCardClass(count) {
+  if (count === 3) {
+    return 'w-full flex-none lg:basis-[calc((100%_-_2rem)/3)]';
+  }
+
+  if (count === 4) {
+    return 'w-full flex-none md:basis-[calc(50%_-_0.5rem)] xl:basis-[calc((100%_-_3rem)/4)]';
+  }
+
+  return 'w-full flex-none md:basis-[calc(50%_-_0.5rem)] lg:basis-[calc((100%_-_2rem)/3)]';
+}
+
 function AdminDemoPage({ accentLabel, cards, description, icon: Icon, title }) {
   const navigate = useNavigate();
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-7xl" dir="rtl">
         <header className="flex flex-wrap items-center justify-between gap-3">
           <button
@@ -23,14 +35,14 @@ function AdminDemoPage({ accentLabel, cards, description, icon: Icon, title }) {
           </div>
         </header>
 
-        <section className="mt-6 overflow-hidden rounded-[2rem] border border-white/70 bg-white/95 p-5 shadow-card sm:p-7">
+        <section className="mt-6 overflow-hidden rounded-[2rem] border border-[#EEE5FF] bg-white/75 p-5 shadow-card backdrop-blur-[8px] sm:p-7">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-4xl">
               <p className="inline-flex items-center gap-2 text-sm font-black text-violet-700">
                 <Icon className="h-4 w-4" aria-hidden="true" />
                 {accentLabel}
               </p>
-              <h1 className="mt-2 text-2xl font-black leading-tight text-slate-950 sm:text-4xl">
+              <h1 className="mt-2 text-[clamp(2.2rem,4.2vw,4.25rem)] font-black leading-tight text-slate-950">
                 {title}
               </h1>
               <p className="mt-3 text-sm font-semibold leading-7 text-slate-600 sm:text-base">
@@ -44,14 +56,14 @@ function AdminDemoPage({ accentLabel, cards, description, icon: Icon, title }) {
           </div>
         </section>
 
-        <section className="mt-5 grid gap-4 lg:grid-cols-3">
+        <section className="mt-5 flex flex-wrap justify-center gap-4">
           {cards.map((card) => {
             const CardIcon = card.icon || Clock;
 
             return (
               <article
                 key={card.title}
-                className="rounded-[1.75rem] border border-violet-100/70 bg-white/95 p-5 shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-lg"
+                className={`rounded-[1.75rem] border border-violet-100/70 bg-white/95 p-5 shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-lg ${demoCardClass(cards.length)}`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 via-fuchsia-400 to-amber-300 text-white shadow-button">
