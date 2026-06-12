@@ -595,7 +595,7 @@ function Students() {
                 ניהול תלמידות
               </p>
 
-              <h1 className="mt-2 text-2xl font-black text-slate-950 sm:text-4xl">
+              <h1 className="mt-2 text-[clamp(2.2rem,4.2vw,4.25rem)] font-black leading-tight text-slate-950">
                 תלמידות במערכת
               </h1>
 

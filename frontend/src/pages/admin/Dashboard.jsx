@@ -79,9 +79,9 @@ function OverviewCard({ stat }) {
   const Icon = stat.icon;
 
   return (
-    <article className="rounded-[1.6rem] border border-violet-100/70 bg-white/95 p-4 shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-lg">
+    <article className="rounded-[1.6rem] border border-violet-100/80 bg-[linear-gradient(145deg,rgba(255,255,255,0.92)_0%,rgba(245,240,255,0.9)_48%,rgba(255,241,248,0.88)_100%)] p-4 shadow-card transition duration-200 hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-lg">
       <div className="flex items-start justify-between gap-3">
-        <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 via-fuchsia-400 to-amber-300 text-white shadow-button">
+        <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 via-fuchsia-400 to-pink-300 text-white shadow-button">
           <Icon className="h-6 w-6" aria-hidden="true" />
         </span>
 
@@ -94,7 +94,7 @@ function OverviewCard({ stat }) {
         {stat.title}
       </h2>
 
-      <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">
+      <p className="mt-1 text-xs font-semibold leading-5 text-slate-600">
         {stat.detail}
       </p>
     </article>
@@ -122,7 +122,7 @@ function DashboardSection({
     <button
       type="button"
       onClick={handleClick}
-      className={`group flex min-h-[190px] flex-col justify-between rounded-[30px] border border-violet-100/80 bg-white/95 p-5 text-right shadow-[0_18px_46px_rgba(109,40,217,0.11)] transition duration-300 hover:-translate-y-1.5 hover:border-violet-200 hover:bg-white hover:shadow-[0_26px_64px_rgba(109,40,217,0.17)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:p-6 lg:col-span-2 ${layoutClass}`}
+      className={`group flex min-h-[190px] flex-col justify-between rounded-[30px] border border-violet-100/80 bg-white/95 p-5 text-right shadow-[0_18px_46px_rgba(109,40,217,0.11)] transition duration-300 hover:-translate-y-1.5 hover:border-violet-200 hover:bg-white hover:shadow-[0_26px_64px_rgba(109,40,217,0.17)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:p-6 ${layoutClass}`}
     >
       <div className="flex items-start justify-between gap-5">
         <span className="flex h-[74px] w-[74px] shrink-0 items-center justify-center rounded-[22px] bg-gradient-to-br from-violet-50 to-fuchsia-50 text-violet-700 shadow-[inset_0_0_0_1px_rgba(124,58,237,0.06)] transition duration-300 group-hover:bg-gradient-to-br group-hover:from-violet-600 group-hover:to-fuchsia-500 group-hover:text-white group-hover:shadow-[0_18px_34px_rgba(124,58,237,0.24)]">
@@ -382,23 +382,17 @@ function AdminDashboard() {
           </div>
         </section>
 
-        <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
           {stats.map((stat) => (
             <OverviewCard key={stat.title} stat={stat} />
           ))}
         </section>
 
-        <section className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-6">
-          {dashboardSections.map((section, index) => (
+        <section className="mt-6 flex flex-wrap justify-center gap-5">
+          {dashboardSections.map((section) => (
             <DashboardSection
               key={section.title}
-              layoutClass={
-                index === 3
-                  ? 'lg:col-start-2'
-                  : index === 4
-                    ? 'lg:col-start-4'
-                    : ''
-              }
+              layoutClass="w-full flex-none md:basis-[calc(50%_-_0.625rem)] lg:basis-[calc((100%_-_2.5rem)/3)]"
               navigate={navigate}
               onOpenTeacherCode={() => {
                 setTeacherCodeOpen(true);

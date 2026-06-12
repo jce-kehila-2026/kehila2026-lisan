@@ -124,6 +124,14 @@ function statusClass(status) {
   return 'border-violet-100 bg-violet-50 text-violet-700';
 }
 
+function conversationCardClass(count) {
+  if (count === 3) {
+    return 'w-full flex-none';
+  }
+
+  return 'w-full flex-none md:basis-[calc(50%_-_0.5rem)]';
+}
+
 function previewFromConversation(conversation) {
   if (conversation.preview) return conversation.preview;
   if (conversation.lastMessage) return conversation.lastMessage;
@@ -187,11 +195,11 @@ function ReviewButton({ onClick }) {
   );
 }
 
-function ConversationCard({ conversation, onReview }) {
+function ConversationCard({ conversation, conversationCount, onReview }) {
   const status = statusLabel(conversation);
 
   return (
-    <article className="rounded-[24px] border border-white/80 bg-white/90 p-4 shadow-[0_18px_42px_rgba(109,40,217,0.12)] transition hover:-translate-y-1 hover:shadow-[0_24px_56px_rgba(124,58,237,0.16)]">
+    <article className={`rounded-[24px] border border-white/80 bg-white/90 p-4 shadow-[0_18px_42px_rgba(109,40,217,0.12)] transition hover:-translate-y-1 hover:shadow-[0_24px_56px_rgba(124,58,237,0.16)] ${conversationCardClass(conversationCount)}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-black text-violet-700">תלמידה</p>
@@ -246,7 +254,6 @@ function ConversationReviewModal({
   }
 
   const status = statusLabel(conversation);
-  const messages = Array.isArray(conversation.messages) ? conversation.messages : [];
 
   return (
     <div
@@ -256,11 +263,11 @@ function ConversationReviewModal({
       aria-labelledby="conversation-review-title"
       dir="rtl"
     >
-      <div className="max-h-[92vh] w-full max-w-4xl overflow-hidden rounded-[2rem] border border-white/80 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.28)]">
+      <div className="max-h-[92vh] w-full max-w-2xl overflow-hidden rounded-[2rem] border border-white/80 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.28)]">
         <div className="flex items-start justify-between gap-4 border-b border-violet-100 bg-[linear-gradient(135deg,#F3ECFF_0%,#FFFFFF_65%,#F8F2FF_100%)] p-4 sm:p-6">
           <div>
             <p className="inline-flex rounded-full bg-violet-100 px-3 py-1 text-xs font-black text-violet-700">
-              צפייה / בדיקה
+              בדיקת שיחה
             </p>
             <h2
               id="conversation-review-title"
@@ -283,9 +290,9 @@ function ConversationReviewModal({
           </button>
         </div>
 
-        <div className="max-h-[calc(92vh-140px)] overflow-y-auto p-4 sm:p-6">
+        <div className="p-4 sm:p-6">
           {loading ? (
-            <div className="flex min-h-[220px] items-center justify-center rounded-[24px] bg-violet-50/70 text-sm font-black text-violet-700">
+            <div className="flex min-h-[180px] items-center justify-center rounded-[24px] bg-violet-50/70 text-sm font-black text-violet-700">
               טוען את פרטי השיחה...
             </div>
           ) : (
@@ -310,87 +317,36 @@ function ConversationReviewModal({
                 <div className="rounded-2xl bg-violet-50/80 p-4">
                   <p className="text-xs font-black text-violet-700">הודעות</p>
                   <p className="mt-1 text-2xl font-black text-slate-950">
-                    {conversation.messagesCount || messages.length}
+                    {conversation.messagesCount}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-4 rounded-[24px] border border-violet-100 bg-white p-4 shadow-[0_12px_30px_rgba(109,40,217,0.08)]">
-                <p className="text-xs font-black text-violet-700">תקציר</p>
-                <p className="mt-2 text-sm font-semibold leading-7 text-slate-700">
-                  {conversation.preview}
-                </p>
-              </div>
+              <label className="mt-4 block rounded-[24px] border border-violet-100 bg-violet-50/70 p-4 text-sm font-black text-violet-800">
+                הערות מנהלת
+                <textarea
+                  value={note}
+                  onChange={(event) => onNoteChange(event.target.value)}
+                  placeholder="כתבי הערה לבדיקה פנימית של השיחה..."
+                  className="mt-2 min-h-24 w-full resize-none rounded-2xl border border-violet-100 bg-white p-3 text-sm font-semibold leading-6 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
+                />
+              </label>
 
-              <div className="mt-4 rounded-[24px] border border-violet-100 bg-white p-4 shadow-[0_12px_30px_rgba(109,40,217,0.08)]">
-                <div className="mb-4 flex items-center justify-between gap-3">
-                  <h3 className="text-lg font-black text-slate-950">שיחה מלאה</h3>
-                  <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-700">
-                    {messages.length} הודעות
-                  </span>
-                </div>
-
-                {messages.length === 0 ? (
-                  <p className="rounded-2xl bg-violet-50/70 p-4 text-sm font-bold leading-6 text-slate-600">
-                    אין הודעות זמינות לשיחה הזו. אם זו שיחה מהשרת, נסי שוב או בדקי שהשיחה נשמרה עם הודעות.
-                  </p>
-                ) : (
-                  <div className="space-y-3">
-                    {messages.map((message, index) => {
-                      const isStudent =
-                        message.sender === 'user' ||
-                        message.role === 'user' ||
-                        message.senderRole === 'student';
-
-                      return (
-                        <div
-                          key={`${conversation.id}-modal-${index}`}
-                          className={`rounded-2xl p-4 ${
-                            isStudent
-                              ? 'bg-violet-50 text-slate-900'
-                              : 'bg-slate-50 text-slate-900'
-                          }`}
-                        >
-                          <p className="mb-1 text-xs font-black text-violet-700">
-                            {isStudent ? 'תלמידה' : 'AI'}
-                          </p>
-                          <p className="whitespace-pre-wrap text-sm font-semibold leading-7">
-                            {message.text || message.transcribedText || 'הודעה קולית / ללא טקסט'}
-                          </p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-4 rounded-[24px] border border-violet-100 bg-violet-50/70 p-4">
-                <label className="block text-sm font-black text-violet-800">
-                  הערות מנהלת
-                  <textarea
-                    value={note}
-                    onChange={(event) => onNoteChange(event.target.value)}
-                    placeholder="כתבי הערה לבדיקה פנימית של השיחה..."
-                    className="mt-2 min-h-24 w-full resize-none rounded-2xl border border-violet-100 bg-white p-3 text-sm font-semibold leading-6 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
-                  />
-                </label>
-
-                <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-                  <button
-                    type="button"
-                    onClick={onApprove}
-                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-violet-600 px-4 py-2 text-sm font-black text-white shadow-button transition hover:bg-violet-700"
-                  >
-                    אישור שיחה
-                  </button>
-                  <button
-                    type="button"
-                    onClick={onReject}
-                    className="inline-flex min-h-11 items-center justify-center rounded-full border border-violet-100 bg-white px-4 py-2 text-sm font-black text-violet-700 transition hover:bg-violet-50"
-                  >
-                    דחיית שיחה
-                  </button>
-                </div>
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={onApprove}
+                  className="inline-flex min-h-11 items-center justify-center rounded-full bg-violet-600 px-4 py-2 text-sm font-black text-white shadow-button transition hover:bg-violet-700"
+                >
+                  אישור
+                </button>
+                <button
+                  type="button"
+                  onClick={onReject}
+                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-violet-100 bg-white px-4 py-2 text-sm font-black text-violet-700 transition hover:bg-violet-50"
+                >
+                  דחייה
+                </button>
               </div>
             </>
           )}
@@ -441,16 +397,13 @@ function Conversations() {
         );
 
         setConversations(demoConversations);
-        setSelectedConversation(demoConversations[0] || null);
         setUsingMockData(true);
       } else {
         setConversations(normalizedConversations);
-        setSelectedConversation(normalizedConversations[0] || null);
         setUsingMockData(false);
       }
     } catch (loadError) {
       setConversations(mockConversations.map((conversation) => normalizeConversation(conversation)));
-      setSelectedConversation(normalizeConversation(mockConversations[0]));
       setUsingMockData(true);
       setError('');
     } finally {
@@ -559,35 +512,44 @@ function Conversations() {
           </div>
         </header>
 
-        <section className="relative mt-6 overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(135deg,#F3ECFF_0%,#FFFFFF_58%,#F8F2FF_100%)] p-5 shadow-[0_26px_70px_rgba(91,33,182,0.14)] sm:p-7">
-          <div className="pointer-events-none absolute -left-20 -top-24 h-48 w-48 rounded-full bg-violet-200/35 blur-3xl" />
+        <section className="relative mt-6 overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] shadow-[0_26px_70px_rgba(91,33,182,0.14)]">
+          <div className="pointer-events-none absolute left-0 top-0 h-full w-1/2 bg-violet-200/35 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-20 right-8 h-44 w-44 rounded-full bg-fuchsia-100/60 blur-3xl" />
 
-          <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-4xl">
-              <p className="inline-flex rounded-full bg-violet-100 px-4 py-2 text-sm font-black text-violet-700">
+          <div className="relative grid gap-0 lg:min-h-80 lg:grid-cols-[minmax(320px,0.9fr)_minmax(0,1fr)]" dir="ltr">
+            <div className="relative flex min-h-64 items-center justify-center overflow-hidden bg-violet-50/30 p-3 sm:min-h-72 lg:min-h-80">
+              <div className="pointer-events-none absolute inset-6 rounded-full bg-violet-300/35 blur-3xl" />
+              <img
+                src="/ai.png"
+                alt="AI Conversations"
+                className="relative h-full w-full scale-110 object-contain object-center sm:scale-[1.16] lg:scale-125"
+              />
+              <button
+                type="button"
+                onClick={loadConversations}
+                className="absolute bottom-4 left-4 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-violet-600 px-5 py-3 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:bg-violet-700 disabled:opacity-60"
+                disabled={loading}
+              >
+                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} aria-hidden="true" />
+                רענון
+              </button>
+            </div>
+
+            <div className="flex flex-col justify-center p-5 text-right sm:p-7 lg:py-10" dir="rtl">
+              <p className="inline-flex items-center gap-2 text-sm font-black text-violet-700">
+                <MessageSquareText className="h-4 w-4" aria-hidden="true" />
                 בדיקת שיחות
               </p>
-              <h1 className="mt-4 text-[clamp(2rem,4vw,4rem)] font-black leading-tight text-slate-950">
+              <h1 className="mt-2 text-[clamp(2.2rem,4.2vw,4.25rem)] font-black leading-tight text-slate-950">
                 שיחות AI לבדיקה
               </h1>
-              <p className="mt-4 max-w-3xl text-[clamp(1rem,1.1vw,1.2rem)] font-medium leading-8 text-slate-600">
+              <p className="mt-3 text-sm font-semibold leading-7 text-slate-600 sm:text-base">
                 סקירת שיחות לימודיות, זיהוי שיחות שמצריכות תשומת לב ומעבר מהיר לפרטי השיחה.
               </p>
             </div>
-
-            <button
-              type="button"
-              onClick={loadConversations}
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-violet-600 px-5 py-3 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:bg-violet-700 disabled:opacity-60"
-              disabled={loading}
-            >
-              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} aria-hidden="true" />
-              רענון
-            </button>
           </div>
 
-          <div className="relative mt-7 grid gap-4 sm:grid-cols-3">
+          <div className="relative grid grid-cols-1 gap-4 p-5 pt-0 lg:grid-cols-3 sm:p-7 sm:pt-0">
             <SummaryCard icon={MessageSquareText} label="שיחות מוצגות" value={conversations.length} />
             <SummaryCard icon={Sparkles} label="ממתינות לבדיקה" value={pendingCount} />
             <SummaryCard icon={Clock3} label="נבדקו" value={reviewedCount} />
@@ -600,7 +562,7 @@ function Conversations() {
           </div>
         ) : null}
 
-        <section className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_420px]">
+        <section className="mt-5">
           <div className="rounded-[2rem] border border-white/70 bg-white/90 p-4 shadow-[0_22px_60px_rgba(91,33,182,0.11)] backdrop-blur sm:p-6">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div>
@@ -626,11 +588,12 @@ function Conversations() {
               </label>
             </div>
 
-            <div className="mt-5 grid gap-4 lg:hidden">
+            <div className="mt-5 flex flex-wrap justify-center gap-4 lg:hidden">
               {filteredConversations.map((conversation) => (
                 <ConversationCard
                   key={conversation.id}
                   conversation={conversation}
+                  conversationCount={filteredConversations.length}
                   onReview={openConversation}
                 />
               ))}
@@ -700,75 +663,6 @@ function Conversations() {
               </div>
             ) : null}
           </div>
-
-          <aside className="rounded-[2rem] border border-white/70 bg-white/90 p-4 shadow-[0_22px_60px_rgba(91,33,182,0.11)] backdrop-blur sm:p-6">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-sm font-black text-violet-700">תצוגת בדיקה</p>
-                <h2 className="mt-1 text-xl font-black text-slate-950">פרטי שיחה</h2>
-              </div>
-              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 text-violet-700">
-                <MessageSquareText className="h-6 w-6" aria-hidden="true" />
-              </span>
-            </div>
-
-            {conversationLoading ? (
-              <div className="mt-6 flex min-h-[260px] items-center justify-center text-sm font-bold text-slate-500">
-                טוען הודעות...
-              </div>
-            ) : selectedConversation ? (
-              <div className="mt-6">
-                <div className="rounded-[24px] bg-violet-50/70 p-4">
-                  <h3 className="text-lg font-black text-slate-950">
-                    {selectedConversation.title}
-                  </h3>
-                  <p className="mt-2 text-sm font-bold text-slate-600">
-                    {selectedConversation.studentName} · רמה {selectedConversation.level} · {formatDate(selectedConversation.updatedAt)}
-                  </p>
-                  <p className="mt-3 text-sm font-semibold leading-6 text-slate-700">
-                    {selectedConversation.preview}
-                  </p>
-                </div>
-
-                <div className="mt-4 space-y-3">
-                  {(selectedConversation.messages || []).length === 0 ? (
-                    <p className="rounded-2xl bg-white p-4 text-sm font-bold text-slate-500 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.65)]">
-                      אין הודעות זמינות בתצוגה המקוצרת. לחצי צפייה / בדיקה כדי לנסות לטעון את השיחה המלאה מהשרת.
-                    </p>
-                  ) : (
-                    selectedConversation.messages.map((message, index) => {
-                      const isStudent =
-                        message.sender === 'user' ||
-                        message.role === 'user' ||
-                        message.senderRole === 'student';
-
-                      return (
-                        <div
-                          key={`${selectedConversation.id}-${index}`}
-                          className={`rounded-2xl p-4 ${
-                            isStudent
-                              ? 'bg-violet-50 text-slate-900'
-                              : 'bg-white text-slate-900 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.65)]'
-                          }`}
-                        >
-                          <p className="mb-1 text-xs font-black text-violet-700">
-                            {isStudent ? 'תלמידה' : 'AI'}
-                          </p>
-                          <p className="whitespace-pre-wrap text-sm font-semibold leading-7">
-                            {message.text || message.transcribedText || 'הודעה קולית / ללא טקסט'}
-                          </p>
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="mt-6 flex min-h-[260px] items-center justify-center rounded-[24px] bg-violet-50/70 p-6 text-center text-sm font-bold leading-6 text-slate-500">
-                בחרי שיחה מהרשימה כדי לראות פרטי בדיקה.
-              </div>
-            )}
-          </aside>
         </section>
 
         <ConversationReviewModal

@@ -4,7 +4,6 @@ import {
   BookOpenCheck,
   CheckCircle2,
   Layers3,
-  Save,
   Search,
   XCircle,
 } from 'lucide-react';
@@ -75,6 +74,14 @@ function statusClass(status) {
   return 'bg-violet-50 text-violet-700 border-violet-100';
 }
 
+function reviewCardClass(count) {
+  if (count === 3) {
+    return 'w-full flex-none';
+  }
+
+  return 'w-full flex-none md:basis-[calc(50%_-_0.5rem)]';
+}
+
 function LevelSelect({ level, onChange }) {
   return (
     <select
@@ -91,7 +98,7 @@ function LevelSelect({ level, onChange }) {
   );
 }
 
-function WordActions({ isBusy, onApprove, onReject, onSaveLevel }) {
+function WordActions({ isBusy, onApprove, onReject }) {
   return (
     <div className="grid gap-2 sm:flex sm:flex-wrap">
       <button
@@ -113,15 +120,6 @@ function WordActions({ isBusy, onApprove, onReject, onSaveLevel }) {
         <XCircle className="h-4 w-4" aria-hidden="true" />
         דחייה
       </button>
-
-      <button
-        type="button"
-        onClick={onSaveLevel}
-        className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-violet-100 bg-violet-50 px-4 text-sm font-black text-violet-700 transition hover:-translate-y-0.5 hover:bg-violet-100 sm:h-10"
-      >
-        <Save className="h-4 w-4" aria-hidden="true" />
-        שמירת רמה
-      </button>
     </div>
   );
 }
@@ -130,12 +128,12 @@ function WordReviewCard({
   isBusy,
   onApprove,
   onReject,
-  onSaveLevel,
   onSetLevel,
   word,
+  wordCount,
 }) {
   return (
-    <article className="rounded-[24px] border border-white/80 bg-white/90 p-4 shadow-[0_18px_42px_rgba(109,40,217,0.12)] transition hover:-translate-y-1 hover:shadow-[0_24px_56px_rgba(124,58,237,0.16)]">
+    <article className={`rounded-[24px] border border-white/80 bg-white/90 p-4 shadow-[0_18px_42px_rgba(109,40,217,0.12)] transition hover:-translate-y-1 hover:shadow-[0_24px_56px_rgba(124,58,237,0.16)] ${reviewCardClass(wordCount)}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-black text-violet-700">מילה חדשה</p>
@@ -188,7 +186,6 @@ function WordReviewCard({
           isBusy={isBusy}
           onApprove={() => onApprove(word)}
           onReject={() => onReject(word)}
-          onSaveLevel={() => onSaveLevel(word.id)}
         />
       </div>
     </article>
@@ -358,32 +355,35 @@ function Words() {
           </div>
         </header>
 
-        <section className="relative mt-6 overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(135deg,#F3ECFF_0%,#FFFFFF_58%,#F8F2FF_100%)] p-5 shadow-[0_26px_70px_rgba(91,33,182,0.14)] transition hover:-translate-y-1 hover:shadow-[0_32px_80px_rgba(124,58,237,0.2)] sm:p-7">
-          <div className="pointer-events-none absolute -left-20 -top-24 h-48 w-48 rounded-full bg-violet-200/35 blur-3xl" />
+        <section className="relative mt-6 overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] shadow-[0_26px_70px_rgba(91,33,182,0.14)] transition hover:-translate-y-1 hover:shadow-[0_32px_80px_rgba(124,58,237,0.2)]">
+          <div className="pointer-events-none absolute left-0 top-0 h-full w-1/2 bg-violet-200/35 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-20 right-8 h-44 w-44 rounded-full bg-fuchsia-100/60 blur-3xl" />
 
-          <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-4xl">
-              <p className="inline-flex rounded-full bg-violet-100 px-4 py-2 text-sm font-black text-violet-700">
-                תור בדיקה
-              </p>
-              <h1 className="mt-4 text-[clamp(2rem,4vw,4rem)] font-black leading-tight text-slate-950">
-                בדיקת מילים חדשות
-              </h1>
-              <p className="mt-4 max-w-3xl text-[clamp(1rem,1.1vw,1.2rem)] font-medium leading-8 text-slate-600">
-                אשרי מילים חדשות, דחי מילים לא מתאימות וסווגי כל מילה לפי רמת הלמידה.
-              </p>
+          <div className="relative grid gap-0 lg:min-h-80 lg:grid-cols-[minmax(320px,0.9fr)_minmax(0,1fr)]" dir="ltr">
+            <div className="relative flex min-h-64 items-center justify-center overflow-hidden bg-violet-50/30 p-1 sm:min-h-72 lg:min-h-80">
+              <div className="pointer-events-none absolute inset-4 rounded-full bg-violet-300/35 blur-3xl" />
+              <img
+                src="/ai.png"
+                alt="AI Words Review"
+                className="relative h-full w-full scale-[1.18] object-contain object-center sm:scale-125 lg:scale-[1.34]"
+              />
             </div>
 
-            <div className="rounded-[24px] border border-violet-100 bg-violet-50/70 px-5 py-4 text-right shadow-[inset_0_0_0_1px_rgba(221,214,254,0.72)]">
-              <p className="text-xs font-black text-violet-700">מצב סקירה</p>
-              <p className="mt-1 text-sm font-bold text-slate-700">
-                מוכנה לבדיקה
+            <div className="flex flex-col justify-center p-5 text-right sm:p-7 lg:py-10" dir="rtl">
+              <p className="inline-flex items-center gap-2 text-sm font-black text-violet-700">
+                <BookOpenCheck className="h-4 w-4" aria-hidden="true" />
+                בדיקת מילים
+              </p>
+              <h1 className="mt-2 text-[clamp(2.2rem,4.2vw,4.25rem)] font-black leading-tight text-slate-950">
+                בדיקת מילים חדשות
+              </h1>
+              <p className="mt-3 text-sm font-semibold leading-7 text-slate-600 sm:text-base">
+                אשרי מילים חדשות, דחי מילים לא מתאימות וסווגי כל מילה לפי רמת הלמידה.
               </p>
             </div>
           </div>
 
-          <div className="relative mt-7 grid gap-4 sm:grid-cols-3">
+          <div className="relative grid grid-cols-1 gap-4 p-5 pt-0 lg:grid-cols-3 sm:p-7 sm:pt-0">
             {[
               { label: 'ממתינות', value: pendingCount, icon: Layers3 },
               { label: 'אושרו', value: approvedCount, icon: CheckCircle2 },
@@ -442,7 +442,7 @@ function Words() {
             </div>
           ) : null}
 
-          <div className="mt-5 grid gap-4 lg:hidden">
+          <div className="mt-5 flex flex-wrap justify-center gap-4 lg:hidden">
             {filteredWords.map((word) => (
               <WordReviewCard
                 key={word.id}
@@ -450,8 +450,8 @@ function Words() {
                 isBusy={busyWordId === word.id}
                 onApprove={approveWord}
                 onReject={rejectWord}
-                onSaveLevel={saveLevel}
                 onSetLevel={setWordLevel}
+                wordCount={filteredWords.length}
               />
             ))}
 
@@ -511,7 +511,6 @@ function Words() {
                           isBusy={isBusy}
                           onApprove={() => approveWord(word)}
                           onReject={() => rejectWord(word)}
-                          onSaveLevel={() => saveLevel(word.id)}
                         />
                       </td>
                     </tr>

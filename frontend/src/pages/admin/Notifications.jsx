@@ -33,6 +33,18 @@ function formatTime(value) {
   });
 }
 
+function notificationCardClass(count) {
+  if (count === 3) {
+    return 'w-full flex-none lg:basis-[calc((100%_-_1.5rem)/3)]';
+  }
+
+  if (count === 4) {
+    return 'w-full flex-none md:basis-[calc(50%_-_0.375rem)] xl:basis-[calc((100%_-_2.25rem)/4)]';
+  }
+
+  return 'w-full flex-none md:basis-[calc(50%_-_0.375rem)] lg:basis-[calc((100%_-_1.5rem)/3)]';
+}
+
 function Notifications() {
   const navigate = useNavigate();
 
@@ -142,7 +154,7 @@ function Notifications() {
   };
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-6xl" dir="rtl">
         <header className="flex flex-wrap items-center justify-between gap-3">
           <button
@@ -159,13 +171,13 @@ function Notifications() {
           </Button>
         </header>
 
-        <section className="mt-6 overflow-hidden rounded-[2rem] border border-white/70 bg-white/95 p-5 shadow-card sm:p-7">
+        <section className="mt-6 overflow-hidden rounded-[2rem] border border-[#EEE5FF] bg-white/75 p-5 shadow-card backdrop-blur-[8px] sm:p-7">
           <p className="inline-flex items-center gap-2 text-sm font-black text-violet-700">
             <Bell className="h-4 w-4" aria-hidden="true" />
             התראות מערכת
           </p>
 
-          <h1 className="mt-2 text-2xl font-black text-slate-950 sm:text-4xl">
+          <h1 className="mt-2 text-[clamp(2.2rem,4.2vw,4.25rem)] font-black leading-tight text-slate-950">
             ההתראות שלי
           </h1>
 
@@ -199,7 +211,7 @@ function Notifications() {
           </p>
         ) : null}
 
-        <section className="mt-5 grid gap-3">
+        <section className="mt-5 flex flex-wrap justify-center gap-3">
           {loading ? (
             <div className="rounded-[1.75rem] border border-white/70 bg-white/95 p-8 text-center text-sm font-black text-slate-500 shadow-card">
               טוען התראות...
@@ -212,7 +224,7 @@ function Notifications() {
             notifications.map((notification) => (
               <article
                 key={notification.id}
-                className={`rounded-[1.75rem] border p-5 shadow-card transition ${
+                className={`rounded-[1.75rem] border p-5 shadow-card transition ${notificationCardClass(notifications.length)} ${
                   notification.isRead
                     ? 'border-slate-100 bg-white/95'
                     : 'border-violet-200 bg-violet-50'
