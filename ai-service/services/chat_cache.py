@@ -96,8 +96,22 @@ DEFAULT_RESPONSE_CACHE_TTL_SECONDS = int(
 DEFAULT_RESPONSE_CACHE_MAX_ENTRIES = int(
     os.getenv("RESPONSE_CACHE_MAX_ENTRIES", "2000")
 )
-DEFAULT_RATE_LIMIT_MAX_REQUESTS = 10
-DEFAULT_RATE_LIMIT_WINDOW_SECONDS = 60
+# Request-level limit (all paths, including the free local ones). Generous,
+# because local answers cost nothing — this only stops outright flooding.
+DEFAULT_RATE_LIMIT_MAX_REQUESTS = int(os.getenv("RATE_LIMIT_MAX_REQUESTS", "10"))
+DEFAULT_RATE_LIMIT_WINDOW_SECONDS = int(
+    os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60")
+)
+# LLM-path budget (only requests that actually reach the provider). Tighter,
+# because THIS is what burns the free Gemini quota. A single identity can ask
+# many questions a minute as long as cache/router/templates answer them; only
+# the ones that fall through to the model are counted here.
+DEFAULT_LLM_RATE_LIMIT_MAX_REQUESTS = int(
+    os.getenv("LLM_RATE_LIMIT_MAX_REQUESTS", "4")
+)
+DEFAULT_LLM_RATE_LIMIT_WINDOW_SECONDS = int(
+    os.getenv("LLM_RATE_LIMIT_WINDOW_SECONDS", "60")
+)
 
 
 @dataclass(frozen=True)
@@ -375,6 +389,13 @@ EXACT_CACHE_MAX_ENTRIES = 512
 EXACT_RESPONSE_CACHE: "OrderedDict[str, ChatResponse]" = OrderedDict()
 RESPONSE_CACHE_MANAGER = CacheManager()
 RATE_LIMITER = RateLimiter()
+# Separate, tighter limiter for the LLM path only. Same sliding-window
+# implementation, smaller budget. Consulted right before call_provider so
+# local/cache/router answers never touch it.
+LLM_RATE_LIMITER = RateLimiter(
+    max_requests=DEFAULT_LLM_RATE_LIMIT_MAX_REQUESTS,
+    window_seconds=DEFAULT_LLM_RATE_LIMIT_WINDOW_SECONDS,
+)
 
 
 def warm_startup_chat_cache(force: bool = False) -> None:
@@ -572,6 +593,14 @@ def is_startup_cache_ready() -> bool:
 
 def check_rate_limit(user_id: str) -> tuple[bool, int]:
     return RATE_LIMITER.check_request(user_id)
+
+
+def check_llm_rate_limit(identity: str) -> tuple[bool, int]:
+    """Consume one unit of the tighter LLM-path budget for this identity.
+
+    Returns (allowed, retry_after_seconds). Call ONLY when a request is about
+    to reach the provider — local/cache/router answers must not count."""
+    return LLM_RATE_LIMITER.check_request(identity)
 
 
 def get_rate_limit_status(user_id: str) -> dict[str, int | bool | str]:

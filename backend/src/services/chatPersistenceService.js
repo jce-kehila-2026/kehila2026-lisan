@@ -8,6 +8,23 @@ const DEFAULT_CHAT_TITLE = 'New Chat';
 const DEFAULT_VOICE_CHAT_TITLE = 'Voice Chat';
 const AUTO_TITLE_MAX_WORDS = 10;
 
+// Quick-activity scenario ids. Must match scenario_engine.py in the ai-service
+// and the route ids in frontend/src/pages/ScenarioChat.jsx. Anything else is
+// stored as null (normal chat) so a bad client value can't change behaviour.
+const ALLOWED_SCENARIOS = new Set([
+  'speaking',
+  'daily-word',
+  'letters',
+  'listening',
+  'quiz',
+  'culture',
+]);
+
+function normalizeScenarioId(value) {
+  const id = typeof value === 'string' ? value.trim() : '';
+  return ALLOWED_SCENARIOS.has(id) ? id : null;
+}
+
 function ensureStorageBucketConfigured() {
   if (!bucket?.name) {
     throw {
@@ -105,6 +122,7 @@ async function createChatSession({
   firstUserMessageText = null,
   defaultIncludeArabic = false,
   defaultTitle = DEFAULT_CHAT_TITLE,
+  scenario = null,
 }) {
   const normalizedTitle = typeof title === 'string' ? title.trim() : '';
   const chatTitle =
@@ -116,6 +134,9 @@ async function createChatSession({
     title: chatTitle,
     level,
     defaultIncludeArabic: defaultIncludeArabic === true,
+    // Active quick-activity mode for the whole conversation (null = normal
+    // chat). Set once at creation so every turn carries it to the ai-service.
+    scenario: normalizeScenarioId(scenario),
     isArchived: false,
     archivedAt: null,
     startedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -267,6 +288,7 @@ module.exports = {
   createChatSession,
   DEFAULT_CHAT_TITLE,
   DEFAULT_VOICE_CHAT_TITLE,
+  normalizeScenarioId,
   sanitizeFileName,
   uploadStudentVoiceAudio,
   verifyVoiceStorageBucketAvailable,

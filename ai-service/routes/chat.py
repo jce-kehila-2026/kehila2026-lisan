@@ -31,7 +31,9 @@ from services.stt import transcribe_audio
 # Max seconds to wait for pronunciation assessment alongside chat engine.
 # Voice mode latency budget is <3s; pronunciation is best-effort &
 # non-critical. Reduced from 10s to avoid blocking on slow assessments.
-_PRON_TIMEOUT_SECONDS = 1.5
+# Tunable via PRONUNCIATION_TIMEOUT_SECONDS for deployments that trade a
+# little latency for more reliable scoring (e.g. B2 assessment mode).
+_PRON_TIMEOUT_SECONDS = float(os.getenv("PRONUNCIATION_TIMEOUT_SECONDS", "1.5"))
 
 # Pronunciation scoring is Azure-only and OFF by default (free-tier mode).
 # Set USE_AZURE_PRONUNCIATION=true (and provide AZURE_SPEECH_KEY) to enable
@@ -273,6 +275,37 @@ async def provider_logs(
         "status": status,
         "count": len(logs),
         "items": logs,
+    }
+
+
+@router.get("/scenario/{scenario_id}")
+async def scenario_opening_endpoint(
+    scenario_id: str,
+    level: str = "A1",
+    includeArabic: bool = False,
+    x_internal_service_secret: str | None = Header(default=None),
+) -> dict[str, object]:
+    """Opening line + title for a quick-activity scenario.
+
+    The frontend uses this so the visible opening matches the in-character
+    behaviour the model will continue with (instead of a hardcoded greeting),
+    and it is level-aware (e.g. the role-play scene differs per level).
+    Returns valid=False for an unknown id so the client can fall back.
+    """
+    require_internal_service_secret(x_internal_service_secret)
+    from services.scenario_engine import is_scenario, scenario_opening, scenario_title
+
+    if not is_scenario(scenario_id):
+        return {"valid": False, "scenarioId": scenario_id}
+
+    opening_he, opening_ar = scenario_opening(scenario_id, level, includeArabic)
+    return {
+        "valid": True,
+        "scenarioId": scenario_id,
+        "level": level,
+        "titleHe": scenario_title(scenario_id),
+        "openingHe": opening_he,
+        "openingAr": opening_ar,
     }
 
 

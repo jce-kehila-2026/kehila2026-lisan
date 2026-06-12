@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi.testclient import TestClient
 
 from main import app
-from services.chat_cache import reset_rate_limit
+from services.chat_cache import RATE_LIMITER, reset_rate_limit
 
 client = TestClient(app)
 
@@ -15,7 +15,7 @@ def _headers(user_id: str) -> dict[str, str]:
 def test_eleventh_request_is_rate_limited():
     reset_rate_limit("test-user")
 
-    for _ in range(10):
+    for _ in range(RATE_LIMITER.max_requests):
         response = client.get("/api/ai/cache/stats", headers=_headers("test-user"))
         assert response.status_code == 200
 
@@ -29,7 +29,7 @@ def test_different_users_have_independent_limits():
     reset_rate_limit("user-a")
     reset_rate_limit("user-b")
 
-    for _ in range(10):
+    for _ in range(RATE_LIMITER.max_requests):
         response = client.get("/api/ai/cache/stats", headers=_headers("user-a"))
         assert response.status_code == 200
 
@@ -52,5 +52,5 @@ def test_rate_limit_status_endpoint_reports_usage_without_consuming_budget():
     body = status.json()
     assert body["userId"] == "status-user"
     assert body["requestsInWindow"] == 3
-    assert body["remainingRequests"] == 7
+    assert body["remainingRequests"] == RATE_LIMITER.max_requests - 3
     assert body["allowed"] is True

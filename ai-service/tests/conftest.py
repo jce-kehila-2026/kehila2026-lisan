@@ -47,6 +47,13 @@ def _clear_caches():
     # Reset rate limiter so previous tests don't bleed over
     RATE_LIMITER.reset()
 
+    # Reset the tighter LLM-path limiter too.
+    try:
+        from services.chat_cache import LLM_RATE_LIMITER
+        LLM_RATE_LIMITER.reset()
+    except (ImportError, AttributeError):
+        pass
+
     # Clear all conversation sessions
     with CONVERSATION_MEMORY._lock:
         CONVERSATION_MEMORY._sessions.clear()
@@ -69,6 +76,21 @@ def _clear_caches():
     # Reset analytics start time so uptime_seconds stays near 0 in tests
     import services.analytics as _analytics
     _analytics._START_TIME = __import__('time').time()
+
+    # Reset request-path metrics so per-path counts don't bleed across tests.
+    try:
+        from services.request_path_metrics import REQUEST_PATH_METRICS
+        REQUEST_PATH_METRICS.reset()
+    except (ImportError, AttributeError):
+        pass
+
+    # Clear the canonical (phrasing-invariant) cache so a stored answer from
+    # one test doesn't turn another test's first request into a cache hit.
+    try:
+        from services.canonical_cache import CANONICAL_CACHE
+        CANONICAL_CACHE.clear()
+    except (ImportError, AttributeError):
+        pass
 
     # Reset SetFit module-level globals so a model loaded by one test does
     # NOT bleed into the next test and non-deterministically change intent

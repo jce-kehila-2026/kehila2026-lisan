@@ -30,7 +30,10 @@ USER lisan
 
 EXPOSE 8000
 
-# Readiness probe drives K8s/compose health checks
+# Liveness probe — confirms the process is up and responsive. Intentionally
+# uses /health (not /ready): a HEALTHCHECK that flapped on a transient Redis
+# or LLM blip would needlessly restart the container. Orchestrators should
+# point their *readiness* gate at /api/ai/ready separately.
 HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=3 \
     CMD curl -fsS http://127.0.0.1:8000/api/ai/health || exit 1
 

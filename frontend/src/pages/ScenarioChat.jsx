@@ -71,6 +71,7 @@ function ScenarioChat() {
       subtitle={scenario.subtitle}
       initialMessage={scenario.initialMessage}
       placeholderResponse={scenario.placeholderResponse}
+      scenario={id}
     />
   );
 }

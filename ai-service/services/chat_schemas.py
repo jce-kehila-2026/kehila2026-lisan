@@ -12,6 +12,10 @@ class ChatRequest(BaseModel):
     voiceMode: bool = Field(default=False)
     sessionId: str | None = Field(default=None)
     userId: str | None = Field(default=None)
+    # Active "quick activity" mode (speaking/daily-word/letters/listening/quiz/
+    # culture). When set, the engine runs an interactive role-play/activity that
+    # leads the learner, instead of the generic tutor reply. None = normal chat.
+    scenario: str | None = Field(default=None)
 
 
 class GuardrailReport(BaseModel):
@@ -98,6 +102,7 @@ class ChatRequestContext:
     voice_mode: bool = False
     session_id: str | None = None
     user_id: str | None = None
+    scenario: str | None = None
 
 
 @dataclass(frozen=True)

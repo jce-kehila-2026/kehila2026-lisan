@@ -17,12 +17,16 @@ This checklist is for the final delivery pass, separate from feature work.
 - `AI_SERVICE_INTERNAL_SECRET` is configured.
 - Provider keys are configured, but startup live LLM validation remains off unless explicitly needed.
 - Redis is either configured or intentionally left `not_configured`.
+- `SENTRY_TRACES_SAMPLE_RATE=0.0` unless you intentionally spend observability quota.
+- `ENABLE_OTEL=false` unless an OpenTelemetry exporter is configured.
+- `ENABLE_SLOWAPI_RATE_LIMIT=false` for school/classroom traffic behind shared IPs.
 - Health endpoint returns 200: `/api/ai/health`.
 - Readiness endpoint is understood: `/api/ai/ready` may be degraded if provider keys are missing in local/dev.
 
 ## Safety And Stability
 
 - Rate limiting is active.
+- Prefer user-id rate limiting over IP rate limiting for classrooms.
 - Provider quota fallback is not cached permanently.
 - Optional heavy features are behind env flags.
 - `ENABLE_SETFIT_INTENT=false` unless a local SetFit model is bundled and tested.

@@ -2,9 +2,19 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
+import pytest
+
 from services.chat_cache import EXACT_RESPONSE_CACHE
 from services.chat_engine import generate_chat_response
 from services.chat_schemas import ChatRequest
+
+
+@pytest.fixture(autouse=True)
+def _enable_local_shortcuts(monkeypatch):
+    # These tests assert the deterministic / fully-local paths (no provider
+    # call). They validate the opt-in local mode; default mode sends free
+    # conversation to the LLM (see test_conversation_routes_to_llm.py).
+    monkeypatch.setenv("ENABLE_LOCAL_CONVERSATION_SHORTCUTS", "true")
 
 
 def _no_provider(*args, **kwargs):

@@ -23,7 +23,7 @@ function shouldStoreVoiceAudio() {
 
 exports.createChat = async (req, res) => {
   try {
-    const { title } = req.body;
+    const { title, scenario } = req.body;
 
     const userId = req.user.uid;
     const userPreferences = await getUserChatPreferences(userId);
@@ -34,6 +34,7 @@ exports.createChat = async (req, res) => {
       title,
       defaultIncludeArabic: userPreferences.defaultIncludeArabic,
       defaultTitle: DEFAULT_CHAT_TITLE,
+      scenario,
     });
 
     return res.status(201).json({
@@ -44,6 +45,7 @@ exports.createChat = async (req, res) => {
         title: chat.title,
         level: chat.level,
         defaultIncludeArabic: chat.defaultIncludeArabic === true,
+        scenario: chat.scenario || null,
         messages: [],
         startedAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -248,6 +250,7 @@ exports.sendAiMessage = async (req, res) => {
       userId,
       sessionId: chatId,
       userToken,
+      scenario: chat.scenario || null,
     });
 
 

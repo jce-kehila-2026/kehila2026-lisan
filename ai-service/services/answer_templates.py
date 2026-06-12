@@ -35,7 +35,7 @@ def render_word_meaning(word: str | None) -> TemplateAnswer | None:
     ar = str(entry.get("ar") or "").strip() or None
     if not he:
         return None
-    answer_he = f"{normalized}: {he}. לדוגמה: {normalized} טוב."
+    answer_he = f"{normalized}: {he}. לדוגמה: {normalized} טוב. תוכל לכתוב משפט עם {normalized}?"
     answer_ar = f"{normalized}: {ar}" if ar else None
     return TemplateAnswer(answer_he=answer_he, answer_ar=answer_ar, reason="LOCAL_WORD_MEANING", cache_intent=f"meaning:{normalized}")
 
@@ -85,7 +85,11 @@ def render_correction(message: str) -> TemplateAnswer | None:
     }
     for wrong, answer in corrections.items():
         if _compact(wrong) in normalized:
-            return TemplateAnswer(answer_he=answer, reason="LOCAL_CORRECTION", cache_intent=f"correction:{wrong}")
+            return TemplateAnswer(
+                answer_he=_with_followup(answer),
+                reason="LOCAL_CORRECTION",
+                cache_intent=f"correction:{wrong}",
+            )
     return None
 
 
@@ -167,3 +171,10 @@ def _last_hebrew_word(text: str) -> str | None:
 
 def _compact(text: str) -> str:
     return re.sub(r"\s+", " ", (text or "").strip())
+
+
+def _with_followup(answer: str) -> str:
+    clean = (answer or "").strip()
+    if not clean or "?" in clean:
+        return clean
+    return f"{clean} עכשיו תנסה משפט דומה?"

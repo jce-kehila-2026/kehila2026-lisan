@@ -28,6 +28,9 @@ These flags should exist and default to safe values:
 - `ENABLE_INSTRUCTOR=false`
 - `ENABLE_SETFIT_INTENT=false`
 - `ENABLE_RAGAS_EVAL=false`
+- `ENABLE_OTEL=false`
+- `ENABLE_SLOWAPI_RATE_LIMIT=false`
+- `SENTRY_TRACES_SAMPLE_RATE=0.0`
 - `CHAT_DEBUG_TRACE=false`
 
 ## Dependency Risk Checks

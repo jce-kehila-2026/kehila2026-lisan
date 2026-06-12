@@ -1,0 +1,11 @@
+{
+  "version": "v2",
+  "_comment": "Topic blacklists were replaced by level-aware vocabulary complexity. Keep this file as policy documentation for non-engineers.",
+  "complexity_rules": {
+    "A1": "daily life only, simple high-frequency words",
+    "A2": "daily life plus simple appointments, directions, and basic health",
+    "B1": "health, work, services, and longer practical conversations",
+    "B2": "general public life, abstract topics, finance, politics, and nuanced discussion"
+  },
+  "decision_model": "Reject only when vocabulary complexity is above the student's CEFR level. Do not reject because of the topic name alone."
+}
