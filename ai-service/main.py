@@ -17,30 +17,39 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
+def _env_enabled(name: str, default: bool = False) -> bool:
+    raw = os.getenv(name, "").strip().lower()
+    if not raw:
+        return default
+    return raw in {"1", "true", "yes", "on"}
+
 # Sentry initialization
 sentry_dsn = os.getenv("SENTRY_DSN", "").strip()
 if sentry_dsn:
     try:
         import sentry_sdk
         from sentry_sdk.integrations.fastapi import FastApiIntegration
+        traces_sample_rate = float(os.getenv("SENTRY_TRACES_SAMPLE_RATE", "0.0"))
         sentry_sdk.init(
             dsn=sentry_dsn,
             integrations=[FastApiIntegration()],
-            traces_sample_rate=1.0,
+            traces_sample_rate=traces_sample_rate,
         )
         logging.getLogger("lisan.main").info("Sentry initialized successfully")
     except Exception as exc:
         logging.getLogger("lisan.main").warning(f"Sentry initialization failed: {exc}")
 
 # OpenTelemetry initialization
-try:
-    from opentelemetry import trace
-    from opentelemetry.sdk.trace import TracerProvider
-    provider = TracerProvider()
-    trace.set_tracer_provider(provider)
-    logging.getLogger("lisan.main").info("OpenTelemetry initialized successfully")
-except Exception as exc:
-    pass
+if _env_enabled("ENABLE_OTEL"):
+    try:
+        from opentelemetry import trace
+        from opentelemetry.sdk.trace import TracerProvider
+        provider = TracerProvider()
+        trace.set_tracer_provider(provider)
+        logging.getLogger("lisan.main").info("OpenTelemetry initialized successfully")
+    except Exception as exc:
+        logging.getLogger("lisan.main").warning(f"OpenTelemetry initialization failed: {exc}")
 
 from routes.chat import router as chat_router
 from routes.evaluation import router as evaluation_router
@@ -150,6 +159,47 @@ def _validate_model_configuration() -> None:
 _validate_model_configuration()
 
 
+def _validate_prompt_files() -> None:
+    """
+    Fail fast if the system prompt files are missing.
+
+    _load_prompt() reads these lazily on the first chat request; without this
+    check a bad image/deploy (prompt file not copied) would boot "healthy" and
+    only crash when the first student sends a message. The voice prompt is
+    optional — it falls back to the text prompt — so only the base prompt
+    (v2 OR v1) is mandatory.
+    """
+    from services.chat_engine import (
+        PROMPT_V1_PATH,
+        PROMPT_V2_PATH,
+        PROMPT_VOICE_PATH,
+    )
+
+    env_mode = os.getenv("ENV_MODE", "development").strip().lower()
+    is_production = env_mode == "production"
+
+    if not PROMPT_V2_PATH.exists() and not PROMPT_V1_PATH.exists():
+        msg = (
+            "FATAL: ai-service cannot start. No base system prompt found "
+            f"(looked for {PROMPT_V2_PATH.name} and {PROMPT_V1_PATH.name} in "
+            f"{PROMPT_V2_PATH.parent}). The deploy is missing the prompts/ dir."
+        )
+        logger.error(msg)
+        if is_production:
+            print(msg, file=sys.stderr, flush=True)
+            sys.exit(1)
+        else:
+            logger.warning(msg + " (continuing in development mode)")
+    elif not PROMPT_VOICE_PATH.exists():
+        logger.warning(
+            f"Voice system prompt missing ({PROMPT_VOICE_PATH.name}); "
+            "voice mode will fall back to the text prompt."
+        )
+
+
+_validate_prompt_files()
+
+
 # ── CORS origins from env var ────────────────────────────────────────────────
 
 def _parse_cors_origins() -> list[str]:
@@ -178,15 +228,17 @@ app = FastAPI(
     description="AI endpoints for Hebrew/Arabic language learning",
 )
 
-# Register SlowAPI
-try:
-    from services.chat_cache import SLO_LIMITER
-    from slowapi.errors import RateLimitExceeded
-    from slowapi import _rate_limit_exceeded_handler
-    app.state.limiter = SLO_LIMITER
-    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-except Exception:
-    pass
+# Register optional IP-based SlowAPI limits. Keep this opt-in: school NATs can
+# put many students behind one IP, so user-id limits are the safer default.
+if _env_enabled("ENABLE_SLOWAPI_RATE_LIMIT"):
+    try:
+        from services.chat_cache import SLO_LIMITER
+        from slowapi.errors import RateLimitExceeded
+        from slowapi import _rate_limit_exceeded_handler
+        app.state.limiter = SLO_LIMITER
+        app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+    except Exception as exc:
+        logger.warning(f"SlowAPI registration skipped: {exc}")
 
 app.add_middleware(
     CORSMiddleware,
@@ -202,6 +254,25 @@ app.include_router(evaluation_router, prefix="/api/ai")
 app.include_router(pronunciation_router, prefix="/api/ai")
 
 
+def _resolve_rate_identity(request: Request) -> str:
+    """Resolve a stable rate-limit identity: X-User-ID → X-Session-ID → IP.
+
+    Falling back to the real client IP (rather than one shared "anonymous"
+    bucket) prevents a single un-authenticated caller from throttling every
+    other anonymous student. The raw value is returned (no type prefix) so the
+    /rate-limit/status endpoint, which is queried by raw user_id, stays
+    consistent with the bucket the middleware fills.
+    """
+    user_id = (request.headers.get("X-User-ID") or "").strip()
+    if user_id:
+        return user_id
+    session_id = (request.headers.get("X-Session-ID") or "").strip()
+    if session_id:
+        return session_id
+    client_ip = request.client.host if request.client else None
+    return (client_ip or "anonymous").strip() or "anonymous"
+
+
 @app.middleware("http")
 async def rate_limit_middleware(request: Request, call_next):
     if _is_rate_limit_exempt_path(request.url.path):
@@ -209,7 +280,11 @@ async def rate_limit_middleware(request: Request, call_next):
 
     # Programmatic IP-based rate limiting via SlowAPI for chat endpoints
     is_test = "pytest" in sys.modules or os.getenv("PYTEST_CURRENT_TEST") is not None
-    if not is_test and request.url.path in {"/api/ai/chat", "/api/ai/chat/stream"}:
+    if (
+        _env_enabled("ENABLE_SLOWAPI_RATE_LIMIT")
+        and not is_test
+        and request.url.path in {"/api/ai/chat", "/api/ai/chat/stream"}
+    ):
         try:
             from services.chat_cache import SLO_LIMITER
             if SLO_LIMITER is not None:
@@ -217,7 +292,7 @@ async def rate_limit_middleware(request: Request, call_next):
                 from limits import parse
                 
                 ip_address = get_remote_address(request) or "127.0.0.1"
-                limit = parse("10/minute")
+                limit = parse(os.getenv("SLOWAPI_CHAT_LIMIT", "10/minute"))
                 
                 if not SLO_LIMITER.limiter.hit(limit, "chat_ip_limit", ip_address):
                     window_stats = SLO_LIMITER.limiter.get_window_stats(limit, "chat_ip_limit", ip_address)
@@ -235,15 +310,19 @@ async def rate_limit_middleware(request: Request, call_next):
         except Exception as exc:
             logger.warning(f"Programmatic SlowAPI rate limit check failed: {exc}")
 
-    # Custom User-ID based rate limiting (for stats, etc.)
-    user_id = request.headers.get("X-User-ID", "anonymous")
-    allowed, retry_after_seconds = check_rate_limit(user_id)
+    # Identity-based rate limiting with a fallback hierarchy:
+    #   X-User-ID  → X-Session-ID  → client IP
+    # Falling back to the real client IP (instead of a single shared
+    # "anonymous" bucket) means one un-authenticated caller can't exhaust the
+    # limit for every other anonymous student behind the service.
+    rate_identity = _resolve_rate_identity(request)
+    allowed, retry_after_seconds = check_rate_limit(rate_identity)
     if not allowed:
         return JSONResponse(
             status_code=429,
             content={
                 "detail": "Rate limit exceeded",
-                "userId": (user_id or "anonymous").strip() or "anonymous",
+                "userId": rate_identity,
                 "retryAfterSeconds": retry_after_seconds,
             },
             headers={"Retry-After": str(retry_after_seconds)},
@@ -336,6 +415,17 @@ def readiness():
     else:
         checks[f"llm:{provider}"] = "missing_key"
         overall_ok = False
+
+    # 2b. Active failover chain (visibility): which free providers are wired,
+    # in order. Lets ops confirm the no-interruption tiers at a glance.
+    try:
+        from services.chat_provider import _build_fallback_chain, _get_gemini_keys
+        checks["provider_chain"] = " -> ".join(
+            c.name for c in _build_fallback_chain()
+        )
+        checks["gemini_keys"] = str(len(_get_gemini_keys()))
+    except Exception as exc:
+        checks["provider_chain"] = f"error: {exc}"
 
     # 3. Redis (only if configured — otherwise N/A is fine)
     redis_url = os.getenv("REDIS_URL", "").strip()

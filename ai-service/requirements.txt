@@ -27,6 +27,10 @@ pycparser==3.0
 pydantic==2.13.4
 pydantic_core==2.46.4
 PyJWT==2.13.0
+# Required for multi-instance deployments (shared conversation memory + cache).
+# Single-instance/dev falls back to in-process memory, but any deploy with
+# >1 worker/replica needs this — without it redis_client import would fail.
+redis==5.2.1
 lingua-language-detector==2.2.0
 rapidfuzz==3.14.5
 python-dotenv==1.1.0

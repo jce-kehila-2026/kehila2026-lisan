@@ -1,0 +1,252 @@
+### Lisan AI Service — Manual Testing
+### استخدم REST Client extension في VS Code
+### اضغط "Send Request" على كل واحد
+
+@base_url = http://localhost:8000
+@secret = lisan-dev-secret-2026
+
+###################################
+# 1️⃣ BASIC TESTS
+###################################
+
+### 1.1 Health Check
+GET {{base_url}}/api/ai/health
+
+### 1.2 Greeting (Router Hit)
+POST {{base_url}}/api/ai/chat
+X-Internal-Service-Secret: {{secret}}
+Content-Type: application/json
+
+{
+  "message": "שלום",
+  "level": "A1"
+}
+
+###################################
+# 2️⃣ CANONICAL CACHE TESTS
+###################################
+
+### 2.1 Word Meaning - Arabic Phrasing (First Request)
+POST {{base_url}}/api/ai/chat
+X-Internal-Service-Secret: {{secret}}
+Content-Type: application/json
+
+{
+  "message": "שו יעני בית",
+  "level": "A1",
+  "includeArabic": true
+}
+
+### 2.2 Word Meaning - Hebrew Phrasing (Cache Hit Expected)
+POST {{base_url}}/api/ai/chat
+X-Internal-Service-Secret: {{secret}}
+Content-Type: application/json
+
+{
+  "message": "מה זה בית",
+  "level": "A1"
+}
+
+### 2.3 Different Word (Not Cache Hit)
+POST {{base_url}}/api/ai/chat
+X-Internal-Service-Secret: {{secret}}
+Content-Type: application/json
+
+{
+  "message": "מה זה אבא",
+  "level": "A1"
+}
+
+###################################
+# 3️⃣ OUT-OF-SCOPE TESTS
+###################################
+
+### 3.1 Blocked Topic - בורסה (Stocks)
+POST {{base_url}}/api/ai/chat
+X-Internal-Service-Secret: {{secret}}
+Content-Type: application/json
+
+{
+  "message": "בורסה",
+  "level": "A1"
+}
+
+### 3.2 Blocked Topic - קריפטו (Crypto)
+POST {{base_url}}/api/ai/chat
+X-Internal-Service-Secret: {{secret}}
+Content-Type: application/json
+
+{
+  "message": "קריפטו וביטקוין",
+  "level": "A1"
+}
+
+### 3.3 Blocked Topic - פוליטיקה (Politics)
+POST {{base_url}}/api/ai/chat
+X-Internal-Service-Secret: {{secret}}
+Content-Type: application/json
+
+{
+  "message": "פוליטיקה",
+  "level": "A1"
+}
+
+###################################
+# 4️⃣ LEVEL EXCEPTIONS
+###################################
+
+### 4.1 מניות in A1 (Should be Blocked)
+POST {{base_url}}/api/ai/chat
+X-Internal-Service-Secret: {{secret}}
+Content-Type: application/json
+
+{
+  "message": "מה זה מניות",
+  "level": "A1"
+}
+
+### 4.2 מניות in B2 (Should be Allowed)
+POST {{base_url}}/api/ai/chat
+X-Internal-Service-Secret: {{secret}}
+Content-Type: application/json
+
+{
+  "message": "מה זה מניות",
+  "level": "B2"
+}
+
+###################################
+# 5️⃣ EXACT CACHE TESTS
+###################################
+
+### 5.1 Exact Cache - First Request
+POST {{base_url}}/api/ai/chat
+X-Internal-Service-Secret: {{secret}}
+Content-Type: application/json
+
+{
+  "message": "שלום מה שלומך",
+  "level": "A1"
+}
+
+### 5.2 Exact Cache - Second Request (Should Hit Cache)
+POST {{base_url}}/api/ai/chat
+X-Internal-Service-Secret: {{secret}}
+Content-Type: application/json
+
+{
+  "message": "שלום מה שלומך",
+  "level": "A1"
+}
+
+###################################
+# 6️⃣ VOICE MODE
+###################################
+
+### 6.1 Voice Mode Request
+POST {{base_url}}/api/ai/chat
+X-Internal-Service-Secret: {{secret}}
+Content-Type: application/json
+
+{
+  "message": "שלום",
+  "level": "A1",
+  "voiceMode": true
+}
+
+###################################
+# 7️⃣ MIXED ARABIC-HEBREW
+###################################
+
+### 7.1 Mixed Language - Arabic+Hebrew
+POST {{base_url}}/api/ai/chat
+X-Internal-Service-Secret: {{secret}}
+Content-Type: application/json
+
+{
+  "message": "شو يعني בית",
+  "level": "A1",
+  "includeArabic": true
+}
+
+###################################
+# 8️⃣ ANALYTICS & REPORTING
+###################################
+
+### 8.1 Analytics Report
+GET {{base_url}}/api/ai/analytics
+X-Internal-Service-Secret: {{secret}}
+
+### 8.2 Health & Readiness
+GET {{base_url}}/api/ai/ready
+X-Internal-Service-Secret: {{secret}}
+
+###################################
+# 9️⃣ RATE LIMITING
+###################################
+
+### 9.1 With User ID Header
+POST {{base_url}}/api/ai/chat
+X-Internal-Service-Secret: {{secret}}
+X-User-ID: test-user-123
+Content-Type: application/json
+
+{
+  "message": "שלום",
+  "level": "A1"
+}
+
+### 9.2 With Session ID Header
+POST {{base_url}}/api/ai/chat
+X-Internal-Service-Secret: {{secret}}
+X-Session-ID: session-abc-def
+Content-Type: application/json
+
+{
+  "message": "שלום",
+  "level": "A1"
+}
+
+###################################
+# 🔟 EDGE CASES
+###################################
+
+### 10.1 Empty Message
+POST {{base_url}}/api/ai/chat
+X-Internal-Service-Secret: {{secret}}
+Content-Type: application/json
+
+{
+  "message": "",
+  "level": "A1"
+}
+
+### 10.2 Very Long Message
+POST {{base_url}}/api/ai/chat
+X-Internal-Service-Secret: {{secret}}
+Content-Type: application/json
+
+{
+  "message": "שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום שלום",
+  "level": "A1"
+}
+
+### 10.3 Different Levels
+POST {{base_url}}/api/ai/chat
+X-Internal-Service-Secret: {{secret}}
+Content-Type: application/json
+
+{
+  "message": "מה זה בית",
+  "level": "A2"
+}
+
+### 10.4 Arabic Only (Should be Rejected)
+POST {{base_url}}/api/ai/chat
+X-Internal-Service-Secret: {{secret}}
+Content-Type: application/json
+
+{
+  "message": "مرحبا",
+  "level": "A1"
+}

@@ -73,6 +73,7 @@ async function sendChatMessageToAi({
   userId = null,
   sessionId = null,
   userToken = null,
+  scenario = null,
 }) {
   try {
     const response = await axios.post(
@@ -84,6 +85,7 @@ async function sendChatMessageToAi({
         voiceMode: false,
         ...(userId && { userId }),
         ...(sessionId && { sessionId }),
+        ...(scenario && { scenario }),
       },
       createAiRequestConfig({
         headers: {

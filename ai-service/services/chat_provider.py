@@ -5,6 +5,9 @@ import queue
 import re
 import threading
 import time
+import json
+import urllib.error
+import urllib.request
 from collections import deque
 from dataclasses import dataclass, field
 from typing import Any, Iterator
@@ -133,6 +136,30 @@ PROVIDER_CHAIN: list[ProviderConfig] = [
 
 def _build_fallback_chain() -> list[ProviderConfig]:
     chain = list(PROVIDER_CHAIN)
+    groq_key = os.getenv("GROQ_API_KEY", "").strip()
+    if groq_key:
+        chain.append(
+            ProviderConfig(
+                name="groq",
+                model=os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile").strip()
+                or "llama-3.3-70b-versatile",
+                timeout_seconds=float(os.getenv("GROQ_TIMEOUT_SECONDS", "8.0")),
+            )
+        )
+    cloudflare_token = os.getenv("CLOUDFLARE_API_TOKEN", "").strip()
+    cloudflare_account = os.getenv("CLOUDFLARE_ACCOUNT_ID", "").strip()
+    if cloudflare_token and cloudflare_account:
+        chain.append(
+            ProviderConfig(
+                name="cloudflare",
+                model=os.getenv(
+                    "CLOUDFLARE_AI_MODEL",
+                    "@cf/meta/llama-4-scout-17b-16e-instruct",
+                ).strip()
+                or "@cf/meta/llama-4-scout-17b-16e-instruct",
+                timeout_seconds=float(os.getenv("CLOUDFLARE_AI_TIMEOUT_SECONDS", "8.0")),
+            )
+        )
     anthropic_key = os.getenv("ANTHROPIC_API_KEY", "").strip()
     if anthropic_key:
         chain.append(ProviderConfig(name="anthropic", model="claude-3-5-sonnet-20241022", timeout_seconds=10.0))
@@ -469,6 +496,10 @@ def _dispatch_provider_call(
         return _call_anthropic(config.model, system_message, question, config.timeout_seconds, o)
     if config.name == "gemini":
         return _call_gemini(config.model, system_message, question, config.timeout_seconds, o)
+    if config.name == "groq":
+        return _call_groq(config.model, system_message, question, config.timeout_seconds, o)
+    if config.name == "cloudflare":
+        return _call_cloudflare_workers_ai(config.model, system_message, question, config.timeout_seconds, o)
     raise ChatProviderError(f"Unsupported provider: {config.name}")
 
 
@@ -479,6 +510,20 @@ def _create_openai_client(timeout_seconds: float) -> Any:
     if OpenAI is None:
         raise ChatProviderError("openai package is not installed. Run pip install -r requirements.txt")
     return OpenAI(api_key=api_key, timeout=timeout_seconds, max_retries=DEFAULT_MAX_RETRIES)
+
+
+def _create_groq_client(timeout_seconds: float) -> Any:
+    api_key = os.getenv("GROQ_API_KEY", "").strip()
+    if not api_key:
+        raise ChatProviderError("GROQ_API_KEY is missing from ai-service/.env")
+    if OpenAI is None:
+        raise ChatProviderError("openai package is not installed. Run pip install -r requirements.txt")
+    return OpenAI(
+        api_key=api_key,
+        base_url="https://api.groq.com/openai/v1",
+        timeout=timeout_seconds,
+        max_retries=DEFAULT_MAX_RETRIES,
+    )
 
 
 def _create_anthropic_client(timeout_seconds: float) -> Any:
@@ -603,6 +648,174 @@ def _call_anthropic(
     )
 
 
+def _call_groq(
+    model: str,
+    system_message: str,
+    question: str,
+    timeout_seconds: float,
+    opts: ProviderCallOptions | None = None,
+) -> ProviderResult:
+    o = opts or ProviderCallOptions()
+    client = _create_groq_client(timeout_seconds)
+    started_at = time.perf_counter()
+    messages = (
+        [{"role": "system", "content": system_message}]
+        + list(o.history)
+        + [{"role": "user", "content": question}]
+    )
+    response = client.chat.completions.create(
+        model=model,
+        messages=messages,
+        max_tokens=o.max_output_tokens,
+        temperature=o.temperature,
+    )
+    answer = (response.choices[0].message.content or "").strip()
+    usage = response.usage
+    return ProviderResult(
+        answer=answer,
+        latency_seconds=time.perf_counter() - started_at,
+        input_tokens=getattr(usage, "prompt_tokens", 0) if usage else 0,
+        output_tokens=getattr(usage, "completion_tokens", 0) if usage else 0,
+        provider="groq",
+        model=model,
+    )
+
+
+def _call_cloudflare_workers_ai(
+    model: str,
+    system_message: str,
+    question: str,
+    timeout_seconds: float,
+    opts: ProviderCallOptions | None = None,
+) -> ProviderResult:
+    o = opts or ProviderCallOptions()
+    token = os.getenv("CLOUDFLARE_API_TOKEN", "").strip()
+    account_id = os.getenv("CLOUDFLARE_ACCOUNT_ID", "").strip()
+    if not token or not account_id:
+        raise ChatProviderError(
+            "CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID are required for Cloudflare Workers AI"
+        )
+
+    messages = (
+        [{"role": "system", "content": system_message}]
+        + list(o.history)
+        + [{"role": "user", "content": question}]
+    )
+    body = json.dumps(
+        {
+            "messages": messages,
+            "max_tokens": o.max_output_tokens,
+            "temperature": o.temperature,
+        },
+        ensure_ascii=False,
+    ).encode("utf-8")
+    request = urllib.request.Request(
+        f"https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/{model}",
+        data=body,
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+
+    started_at = time.perf_counter()
+    try:
+        with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        body_text = exc.read().decode("utf-8", errors="replace")
+        raise ChatProviderError(f"Cloudflare Workers AI HTTP {exc.code}: {body_text[:300]}") from exc
+    except TimeoutError as exc:
+        raise ChatProviderTimeoutError("Cloudflare Workers AI request timed out") from exc
+
+    if not payload.get("success", False):
+        raise ChatProviderError(f"Cloudflare Workers AI error: {payload.get('errors') or payload}")
+
+    result = payload.get("result") or {}
+    answer = (result.get("response") or "").strip()
+    if not answer:
+        choices = result.get("choices") or []
+        if choices:
+            answer = (((choices[0].get("message") or {}).get("content")) or "").strip()
+
+    usage = result.get("usage") or {}
+    return ProviderResult(
+        answer=answer,
+        latency_seconds=time.perf_counter() - started_at,
+        input_tokens=usage.get("prompt_tokens", 0) or usage.get("input_tokens", 0) or 0,
+        output_tokens=usage.get("completion_tokens", 0) or usage.get("output_tokens", 0) or 0,
+        provider="cloudflare",
+        model=model,
+    )
+
+
+def _gemini_supports_disable_thinking(model: str) -> bool:
+    """gemini-2.5 flash & flash-lite allow thinking_budget=0 (full disable).
+
+    2.5-pro cannot fully disable thinking, so we only target flash models. A
+    short tutor reply needs no chain-of-thought, and on 2.5 the hidden thinking
+    tokens are billed against max_output_tokens.
+    """
+    return "flash" in (model or "").lower()
+
+
+def _build_gemini_config(
+    system_message: str,
+    o: ProviderCallOptions,
+    model: str,
+) -> "genai_types.GenerateContentConfig":
+    """GenerateContentConfig with thinking disabled for flash models.
+
+    Root cause this addresses: on gemini-2.5 'thinking' is ON by default and its
+    hidden reasoning tokens consume max_output_tokens. That truncated the
+    visible answer mid-word, and when thinking ate the whole budget the response
+    had no visible text at all (which surfaced downstream as MODEL_ERROR and
+    tripped the provider circuit). Disabling it gives the full token budget to
+    the actual reply — and is faster and cheaper, which suits the free tier.
+    """
+    kwargs: dict[str, Any] = dict(
+        system_instruction=system_message,
+        temperature=o.temperature,
+        max_output_tokens=o.max_output_tokens,
+    )
+    if _gemini_supports_disable_thinking(model):
+        try:
+            kwargs["thinking_config"] = genai_types.ThinkingConfig(thinking_budget=0)
+        except Exception:  # noqa: BLE001 — older SDK without ThinkingConfig
+            pass
+    return genai_types.GenerateContentConfig(**kwargs)
+
+
+def _safe_response_text(response: Any) -> str:
+    """Extract text WITHOUT letting the SDK raise on an empty/blocked candidate.
+
+    When a candidate finishes with no visible text part (e.g. MAX_TOKENS spent
+    on thinking, or a safety block) the genai `response.text` accessor can raise.
+    Turning that into a provider exception was wrong: it became a MODEL_ERROR
+    that tripped the circuit. An empty answer must instead degrade to
+    EMPTY_RESPONSE upstream (which never trips the circuit). Returns "" when no
+    text is present.
+    """
+    try:
+        text = response.text
+        if text:
+            return text
+    except Exception:  # noqa: BLE001 — empty/blocked candidate; fall through
+        pass
+    try:
+        collected: list[str] = []
+        for candidate in getattr(response, "candidates", None) or []:
+            content = getattr(candidate, "content", None)
+            for part in getattr(content, "parts", None) or []:
+                part_text = getattr(part, "text", None)
+                if part_text:
+                    collected.append(part_text)
+        return "".join(collected)
+    except Exception:  # noqa: BLE001
+        return ""
+
+
 def _call_gemini(
     model: str,
     system_message: str,
@@ -637,11 +850,7 @@ def _call_gemini(
     else:
         contents = question
 
-    config = genai_types.GenerateContentConfig(
-        system_instruction=system_message,
-        temperature=o.temperature,
-        max_output_tokens=o.max_output_tokens,
-    )
+    config = _build_gemini_config(system_message, o, model)
 
     # Round-robin across keys; on a 429 (rate-limit) move to the NEXT key
     # instead of sleeping. Each key is a separate project with its own quota,
@@ -662,7 +871,7 @@ def _call_gemini(
             )
             usage = getattr(response, "usage_metadata", None)
             return ProviderResult(
-                answer=(response.text or "").strip(),
+                answer=_safe_response_text(response).strip(),
                 latency_seconds=time.perf_counter() - started_at,
                 input_tokens=getattr(usage, "prompt_token_count", 0) if usage else 0,
                 output_tokens=getattr(usage, "candidates_token_count", 0) if usage else 0,
@@ -780,6 +989,18 @@ def _stream_provider_impl(
         yield from _stream_anthropic(config.model, system_message, question, config.timeout_seconds, opts)
     elif config.name == "gemini":
         yield from _stream_gemini(config.model, system_message, question, config.timeout_seconds, opts)
+    elif config.name == "groq":
+        yield from _stream_groq(config.model, system_message, question, config.timeout_seconds, opts)
+    elif config.name == "cloudflare":
+        result = _call_cloudflare_workers_ai(
+            config.model,
+            system_message,
+            question,
+            config.timeout_seconds,
+            opts,
+        )
+        if result.answer:
+            yield result.answer
     else:
         raise ChatProviderError(f"Unsupported provider for streaming: {config.name}")
 
@@ -827,6 +1048,32 @@ def _stream_anthropic(
             yield text
 
 
+def _stream_groq(
+    model: str,
+    system_message: str,
+    question: str,
+    timeout_seconds: float,
+    opts: ProviderCallOptions,
+) -> Iterator[str]:
+    client = _create_groq_client(timeout_seconds)
+    messages = (
+        [{"role": "system", "content": system_message}]
+        + list(opts.history)
+        + [{"role": "user", "content": question}]
+    )
+    stream = client.chat.completions.create(
+        model=model,
+        messages=messages,
+        max_tokens=opts.max_output_tokens,
+        temperature=opts.temperature,
+        stream=True,
+    )
+    for chunk in stream:
+        delta = chunk.choices[0].delta.content
+        if delta:
+            yield delta
+
+
 def _stream_gemini(
     model: str,
     system_message: str,
@@ -857,11 +1104,7 @@ def _stream_gemini(
     for chunk in client.models.generate_content_stream(
         model=model,
         contents=contents,
-        config=genai_types.GenerateContentConfig(
-            system_instruction=system_message,
-            temperature=opts.temperature,
-            max_output_tokens=opts.max_output_tokens,
-        ),
+        config=_build_gemini_config(system_message, opts, model),
     ):
         if chunk.text:
             yield chunk.text
@@ -883,7 +1126,15 @@ def call_provider_structured(
     o = options or ProviderCallOptions()
     
     if provider == "openai":
-        client = instructor.from_openai(_create_openai_client(o.max_output_tokens if o else 10.0))
+        client = instructor.from_openai(_create_openai_client(10.0))
+        messages = [{"role": "system", "content": system_message}, {"role": "user", "content": question}]
+        return client.chat.completions.create(
+            model=model,
+            messages=messages,
+            response_model=response_model,
+        )
+    if provider == "groq":
+        client = instructor.from_openai(_create_groq_client(10.0))
         messages = [{"role": "system", "content": system_message}, {"role": "user", "content": question}]
         return client.chat.completions.create(
             model=model,

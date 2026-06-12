@@ -118,9 +118,12 @@ def _normalize_question_key(text: str) -> str:
     # Only include tokens that contain at least one Hebrew character.
     # This lets mixed Arabic+Hebrew messages (e.g. "שלום مرحبا") normalise
     # to their Hebrew content ("שלום") and match greeting/curriculum entries.
-    return " ".join(
+    tokens = [
         normalize_hebrew_token(part)
         for part in text.split()
         if HEBREW_WORD_RE.search(part) and normalize_hebrew_token(part)
-    ).strip()
+    ]
+    if tokens and len(set(tokens)) == 1:
+        return tokens[0]
+    return " ".join(tokens).strip()
 

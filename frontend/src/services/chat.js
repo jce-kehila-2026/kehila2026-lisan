@@ -60,6 +60,7 @@ export function buildChatRequest({
   level = DEFAULT_CHAT_LEVEL,
   includeArabic = false,
   clientMessageId = null,
+  scenario = null,
 }) {
   return {
     message: typeof message === 'string' ? message.trim() : '',
@@ -67,6 +68,7 @@ export function buildChatRequest({
     level,
     includeArabic: includeArabic === true,
     clientMessageId,
+    scenario: scenario || null,
   };
 }
 
@@ -186,13 +188,14 @@ function createChatApiError(response, responseBody = {}, fallbackMessage) {
   });
 }
 
-async function createConversation({ title, level = DEFAULT_CHAT_LEVEL }) {
+async function createConversation({ title, level = DEFAULT_CHAT_LEVEL, scenario = null }) {
   const response = await fetch(CHAT_API_PATH, {
     method: 'POST',
     headers: getChatHeaders(),
     body: JSON.stringify({
       title: title || 'Hebrew practice',
       level,
+      ...(scenario ? { scenario } : {}),
     }),
   });
 
@@ -232,6 +235,7 @@ export async function sendChatMessage({
   conversationId = null,
   level = DEFAULT_CHAT_LEVEL,
   includeArabic = false,
+  scenario = null,
 }) {
   const trimmedMessage = typeof message === 'string' ? message.trim() : '';
   let activeConversationId = conversationId;
@@ -240,6 +244,7 @@ export async function sendChatMessage({
     const conversation = await createConversation({
       title: trimmedMessage || 'Hebrew practice',
       level,
+      scenario,
     });
     activeConversationId = conversation?.id || null;
   }

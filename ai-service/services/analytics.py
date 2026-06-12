@@ -35,6 +35,7 @@ def get_analytics_snapshot() -> dict[str, Any]:
         "fallbacks": _fallback_metrics(),
         "guardrails": _guardrail_metrics(),
         "rate_limits": _rate_limit_metrics(),
+        "request_paths": _request_path_metrics(),
     }
 
 
@@ -134,6 +135,17 @@ def _guardrail_metrics() -> dict[str, Any]:
     return {
         "vocabulary_leakage_events": vocab_leakage_count,
     }
+
+
+def _request_path_metrics() -> dict[str, Any]:
+    """How requests were resolved: local / cache / local_reject / llm.
+
+    The headline number is `llm_reached_rate` — the share of traffic that
+    actually consumed model quota. Everything else is served for free.
+    """
+    from services.request_path_metrics import REQUEST_PATH_METRICS
+
+    return REQUEST_PATH_METRICS.snapshot()
 
 
 def _rate_limit_metrics() -> dict[str, Any]:

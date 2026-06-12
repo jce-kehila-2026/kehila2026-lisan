@@ -30,6 +30,10 @@ def _result(provider: str, model: str) -> ProviderResult:
 
 
 def test_default_provider_chain_is_gemini_only(monkeypatch):
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    monkeypatch.delenv("CLOUDFLARE_API_TOKEN", raising=False)
+    monkeypatch.delenv("CLOUDFLARE_ACCOUNT_ID", raising=False)
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     clear_provider_runtime_state()
     calls: list[str] = []
 
@@ -56,6 +60,10 @@ def test_default_provider_chain_is_gemini_only(monkeypatch):
 
 
 def test_requested_non_default_provider_falls_back_to_gemini(monkeypatch):
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    monkeypatch.delenv("CLOUDFLARE_API_TOKEN", raising=False)
+    monkeypatch.delenv("CLOUDFLARE_ACCOUNT_ID", raising=False)
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     clear_provider_runtime_state()
 
     def fake_call(
@@ -81,6 +89,10 @@ def test_requested_non_default_provider_falls_back_to_gemini(monkeypatch):
 
 
 def test_all_configured_providers_failed_raises_aggregate_error(monkeypatch):
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    monkeypatch.delenv("CLOUDFLARE_API_TOKEN", raising=False)
+    monkeypatch.delenv("CLOUDFLARE_ACCOUNT_ID", raising=False)
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     clear_provider_runtime_state()
 
     def fake_call(
@@ -123,6 +135,11 @@ def test_logs_endpoint_filters_failed_provider_attempts(monkeypatch):
     ), patch(
         "services.chat_engine.classify_fast_reject", return_value=None
     ), patch(
+        # Defer the deterministic pre-LLM local-answer path so this message
+        # reaches the provider — the point of this test is provider-failure
+        # logging, not local routing.
+        "services.chat_engine._build_pre_llm_response", return_value=None
+    ), patch(
         "services.chat_engine.is_hebrew_only_answer", return_value=True
     ), patch(
         "services.chat_engine.evaluate_vocabulary"
@@ -152,3 +169,69 @@ def test_logs_endpoint_filters_failed_provider_attempts(monkeypatch):
     assert body["count"] >= 1
     assert all(item["provider"] == "gemini" for item in body["items"])
     assert all(item["status"] == "failed" for item in body["items"])
+
+
+def test_groq_key_adds_free_fallback_after_gemini(monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "test-groq-key")
+    monkeypatch.setenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+    monkeypatch.delenv("CLOUDFLARE_API_TOKEN", raising=False)
+    monkeypatch.delenv("CLOUDFLARE_ACCOUNT_ID", raising=False)
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    clear_provider_runtime_state()
+
+    calls: list[str] = []
+
+    def fake_call(
+        config: ProviderConfig,
+        system_message: str,
+        question: str,
+        options=None,
+    ) -> ProviderResult:
+        calls.append(config.name)
+        if config.name == "gemini":
+            raise ChatProviderError("gemini quota")
+        if config.name == "groq":
+            return _result(config.name, config.model)
+        raise AssertionError(f"unexpected provider {config.name}")
+
+    monkeypatch.setattr("services.chat_provider._call_provider_with_timeout", fake_call)
+
+    result = call_provider("gemini", "gemini-2.5-flash-lite", "system", "question")
+
+    assert result.provider == "groq"
+    assert result.model == "llama-3.3-70b-versatile"
+    assert calls == ["gemini", "groq"]
+    assert [attempt.provider for attempt in result.attempts] == ["gemini", "groq"]
+
+
+def test_cloudflare_credentials_add_workers_ai_fallback(monkeypatch):
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    monkeypatch.setenv("CLOUDFLARE_API_TOKEN", "test-cloudflare-token")
+    monkeypatch.setenv("CLOUDFLARE_ACCOUNT_ID", "test-cloudflare-account")
+    monkeypatch.setenv("CLOUDFLARE_AI_MODEL", "@cf/meta/llama-4-scout-17b-16e-instruct")
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    clear_provider_runtime_state()
+
+    calls: list[str] = []
+
+    def fake_call(
+        config: ProviderConfig,
+        system_message: str,
+        question: str,
+        options=None,
+    ) -> ProviderResult:
+        calls.append(config.name)
+        if config.name == "gemini":
+            raise ChatProviderError("gemini quota")
+        if config.name == "cloudflare":
+            return _result(config.name, config.model)
+        raise AssertionError(f"unexpected provider {config.name}")
+
+    monkeypatch.setattr("services.chat_provider._call_provider_with_timeout", fake_call)
+
+    result = call_provider("gemini", "gemini-2.5-flash-lite", "system", "question")
+
+    assert result.provider == "cloudflare"
+    assert result.model == "@cf/meta/llama-4-scout-17b-16e-instruct"
+    assert calls == ["gemini", "cloudflare"]
+    assert [attempt.provider for attempt in result.attempts] == ["gemini", "cloudflare"]

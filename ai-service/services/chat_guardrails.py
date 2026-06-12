@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+import json
+import logging
 import os
 import re
 from dataclasses import dataclass
+from pathlib import Path
 from typing import NamedTuple
+
+logger = logging.getLogger("lisan.chat")
 
 DEFAULT_LEVEL = "A1"
 DEFAULT_FALLBACK_REASON = "OUT_OF_SCOPE"
@@ -94,6 +99,9 @@ FALLBACK_RESPONSES = {
     "PROVIDER_AUTH": "נסה שוב עם שאלה קצרה.",
     "PROVIDER_NETWORK": "נסה שוב עם שאלה קצרה.",
     "CIRCUIT_OPEN": "נסה שוב עוד כמה דקות.",
+    # Per-user LLM budget exhausted — a soft, self-resetting rate limit, not an
+    # error. Same learner-facing wording as a server-side quota.
+    "LLM_RATE_LIMITED": "יש עומס עכשיו. נסה שוב עוד מעט.",
 }
 # Arabic translations of the fallback texts. Served in answerAr ONLY when
 # the student's own message contained Arabic script — a learner who writes
@@ -112,6 +120,7 @@ FALLBACK_RESPONSES_AR = {
     "PROVIDER_AUTH": "حاول مرة أخرى بسؤال قصير.",
     "PROVIDER_NETWORK": "حاول مرة أخرى بسؤال قصير.",
     "CIRCUIT_OPEN": "حاول مرة أخرى بعد بضع دقائق.",
+    "LLM_RATE_LIMITED": "الخدمة مشغولة الآن. حاول مرة أخرى بعد قليل.",
 }
 FALLBACK_CODES = frozenset(FALLBACK_RESPONSES.keys())
 
@@ -134,6 +143,64 @@ MAX_VOICE_WORDS = 10
 
 # STT output sometimes includes stray punctuation or digits \u2014 only hard-reject Arabic script
 _STT_ARABIC_RE = re.compile(r"[\u0600-\u06FF]")
+
+# ── Back-compat topic-policy helpers ────────────────────────────────────────
+# Static topic blocking was replaced by level-aware complexity checks. These
+# helpers remain for older tests/tools that import them directly, but the chat
+# pipeline no longer rejects merely because a topic word appears.
+_TOPIC_POLICY_PATH = (
+    Path(__file__).resolve().parents[1]
+    / "data" / "chatbot_quality" / "topic_policy.json"
+)
+
+_FALLBACK_BLOCKED_TOPIC_TERMS = {
+    "בורסה", "קריפטו", "מניות", "השקעות", "ביטקוין",
+    "פוליטיקה", "פילוסופיה", "אלגוריתמים", "נוירונים",
+}
+
+
+def _load_topic_policy() -> dict:
+    try:
+        with open(_TOPIC_POLICY_PATH, encoding="utf-8") as fh:
+            return json.load(fh)
+    except Exception as exc:
+        logger.warning(
+            f"topic_policy.json unreadable ({exc}); using built-in fallback."
+        )
+        return {}
+
+
+def _flatten_blocked_terms(policy: dict) -> set[str]:
+    groups = policy.get("blocked_topics")
+    if not isinstance(groups, dict):
+        return set(_FALLBACK_BLOCKED_TOPIC_TERMS)
+    terms: set[str] = set()
+    for group_terms in groups.values():
+        if isinstance(group_terms, list):
+            terms.update(t for t in group_terms if isinstance(t, str) and t.strip())
+    # Never let an empty/malformed file disable the guardrail entirely.
+    return terms or set(_FALLBACK_BLOCKED_TOPIC_TERMS)
+
+
+_TOPIC_POLICY = _load_topic_policy()
+_BLOCKED_TOPIC_TERMS = _flatten_blocked_terms(_TOPIC_POLICY)
+_LEVEL_TOPIC_EXCEPTIONS = {
+    (level or "").strip().upper(): {t for t in terms if isinstance(t, str)}
+    for level, terms in (_TOPIC_POLICY.get("level_exceptions") or {}).items()
+    if isinstance(terms, list)
+}
+
+
+def blocked_topic_terms(level: str | None = None) -> set[str]:
+    """Legacy term list kept for compatibility.
+
+    New code should use services.complexity_checker; this set is not a topic
+    blacklist anymore.
+    """
+    if not level:
+        return set(_BLOCKED_TOPIC_TERMS)
+    exceptions = _LEVEL_TOPIC_EXCEPTIONS.get(level.strip().upper(), set())
+    return _BLOCKED_TOPIC_TERMS - exceptions
 
 
 @dataclass
@@ -179,12 +246,14 @@ def sanitize_input(text: str) -> str:
     return re.sub(r"\s+", " ", cleaned).strip()
 
 
-def classify_fast_reject(message: str) -> str | None:
+def classify_fast_reject(message: str, level: str | None = None) -> str | None:
     stripped_message = (message or "").strip()
     if not stripped_message:
         return "EMPTY_MESSAGE"
     if len(stripped_message) > MAX_MESSAGE_LENGTH:
         return "MESSAGE_TOO_LONG"
+    if re.fullmatch(r"[\?\u061f]+", stripped_message):
+        return "EMPTY_MESSAGE"
     has_arabic = bool(ARABIC_RE.search(stripped_message))
     has_hebrew = bool(hebrew_words(stripped_message))
     # Arabic+Hebrew mixed messages (e.g. "شو يعني בית?") are a valid learning
@@ -197,6 +266,12 @@ def classify_fast_reject(message: str) -> str | None:
     if not has_arabic and NON_HEBREW_LETTER_RE.search(stripped_message):
         return "MIXED_LANGUAGE"
     if not has_hebrew:
+        return "OUT_OF_SCOPE"
+    tokens = [normalize_hebrew_token(token) for token in hebrew_words(stripped_message) if normalize_hebrew_token(token)]
+    if len(tokens) == 1 and len(tokens[0]) == 1:
+        return "EMPTY_MESSAGE"
+    from services.complexity_checker import is_too_complex_for_level
+    if is_too_complex_for_level(stripped_message, level):
         return "OUT_OF_SCOPE"
     return None
 
@@ -322,6 +397,10 @@ def is_clearly_out_of_scope(
     tokens = [normalize_hebrew_token(token) for token in hebrew_words(message) if normalize_hebrew_token(token)]
     if not tokens:
         return False
+
+    from services.complexity_checker import is_too_complex_for_level
+    if is_too_complex_for_level(message, level):
+        return True
 
     known_count = sum(1 for token in tokens if is_known_token(token, known_vocabulary))
     advanced_count = sum(1 for token in tokens if token in advanced_only_tokens)

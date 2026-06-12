@@ -36,6 +36,7 @@ function Chatbot({
   title,
   subtitle,
   initialMessage = 'שלום! איך אפשר לעזור לך היום?',
+  scenario = null,
 }) {
   const { t } = useTranslation();
 
@@ -124,6 +125,9 @@ function Chatbot({
           body: JSON.stringify({
             title: title || t('chatbot'),
             level: 'A1',
+            // Binds this conversation to a quick-activity mode (role-play,
+            // quiz ...) so every turn drives that activity in the ai-service.
+            ...(scenario ? { scenario } : {}),
           }),
         });
 
