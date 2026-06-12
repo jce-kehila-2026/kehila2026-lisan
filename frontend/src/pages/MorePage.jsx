@@ -24,7 +24,7 @@ const API_BASE_URL = 'http://localhost:3000/api';
 
 const labels = {
   he: {
-    title: 'עוד',
+    title: 'היסטוריה',
     subtitle: 'היסטוריית שיחות, מילים שמורות וקיצורים שימושיים',
     chatHistory: 'היסטוריית שיחות',
     search: 'חיפוש שיחות',
@@ -48,11 +48,11 @@ const labels = {
     continueReadingAction: 'המשיכי קריאה',
     recentActivity: 'הפעילות האחרונה שלי',
     recentActivityHint: 'חזרי למה שעשית לאחרונה',
-    viewFullHistory: 'הצג היסטוריה מלאה',
+    viewFullHistory: 'היסטוריה',
     review: 'חזרה',
     inProgress: 'בתהליך',
     completed: 'הושלם',
-    savedMore: 'הצג עוד',
+    savedMore: 'היסטוריה',
     socialPractice: 'תרגול עם חברות',
     socialPracticeText: 'תרגלי שיחות יומיומיות בעברית עם חברות ולומדות נוספות.',
     startChat: 'פתחי צ׳אט',
@@ -61,7 +61,7 @@ const labels = {
   },
 
   ar: {
-    title: 'المزيد',
+    title: 'السجل',
     subtitle: 'سجل المحادثات، كلمات محفوظة واختصارات مفيدة',
     chatHistory: 'سجل المحادثات',
     search: 'بحث في المحادثات',
@@ -85,11 +85,11 @@ const labels = {
     continueReadingAction: 'تابعي القراءة',
     recentActivity: 'نشاطي الأخير',
     recentActivityHint: 'عودي إلى ما تدربتِ عليه مؤخراً',
-    viewFullHistory: 'عرض السجل الكامل',
+    viewFullHistory: 'السجل',
     review: 'مراجعة',
     inProgress: 'قيد التقدم',
     completed: 'مكتمل',
-    savedMore: 'عرض المزيد',
+    savedMore: 'السجل',
     socialPractice: 'تدريب مع الصديقات',
     socialPracticeText: 'تدرّبي على محادثات يومية بالعبرية مع صديقات ومتعلمات أخريات.',
     startChat: 'افتحي المحادثة',
