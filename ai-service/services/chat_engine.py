@@ -522,46 +522,51 @@ def _generate_chat_response_impl(payload: ChatRequest) -> ChatResponse:
         _log_response(response, active_provider, retrieval_context.chunks_count, llm_called=True)
         return response
 
-    allowed_vocab = build_allowed_vocabulary(
-        bundle, _resolve_selected_chunks(bundle, retrieval_context.chunk_ids)
-    )
-    vocabulary_decision = evaluate_vocabulary(
-        answer_he, allowed_vocab, level=resolved_level,
-    )
-    if vocabulary_decision.fallback_used:
-        # A single out-of-vocab word used to nuke the whole reply and swap in
-        # a canned fallback — which, being cached, made the bot loop forever
-        # on the same sentence. Instead, ask the model ONCE to rephrase using
-        # only the allowed vocabulary; most leaks are one stray word and a
-        # guided retry recovers a real, in-scope answer.
-        retry = _retry_within_vocabulary(
-            provider=request_context.provider,
-            model=request_context.model,
-            base_system_message=system_message,
-            question=request_context.message,
-            blocked_tokens=vocabulary_decision.blocked_tokens,
-            allowed_vocab=allowed_vocab,
-            options=call_opts,
-            level=resolved_level,
+    # Strict A1 whitelist enforcement on the OUTPUT only makes sense in the
+    # fully-local lesson mode. In conversational mode it nuked real replies
+    # (a doctor saying "כואב"/"נפלת") into a canned fallback — the robotic
+    # behaviour the learner reported. The prompt already tells the model to
+    # stay at level and the Hebrew-only check already ran, so we trust the
+    # reply here and skip the whitelist.
+    if _local_conversation_shortcuts_enabled():
+        allowed_vocab = build_allowed_vocabulary(
+            bundle, _resolve_selected_chunks(bundle, retrieval_context.chunk_ids)
         )
-        if retry is not None:
-            answer_he, provider_result = retry  # validated; fall through
-        else:
-            response = _build_fallback_response_from_request(
-                request_context=request_context,
-                level=resolved_level,
-                fallback_reason=vocabulary_decision.fallback_reason,
-                latency_ms=int(round(provider_result.latency_seconds * 1000)),
-                context_chunk_ids=retrieval_context.chunk_ids,
+        vocabulary_decision = evaluate_vocabulary(
+            answer_he, allowed_vocab, level=resolved_level,
+        )
+        if vocabulary_decision.fallback_used:
+            # A single out-of-vocab word used to nuke the whole reply and swap
+            # in a canned fallback. Ask the model ONCE to rephrase using only
+            # the allowed vocabulary before giving up.
+            retry = _retry_within_vocabulary(
+                provider=request_context.provider,
+                model=request_context.model,
+                base_system_message=system_message,
+                question=request_context.message,
                 blocked_tokens=vocabulary_decision.blocked_tokens,
-                input_tokens=provider_result.input_tokens,
-                output_tokens=provider_result.output_tokens,
+                allowed_vocab=allowed_vocab,
+                options=call_opts,
+                level=resolved_level,
             )
-            # Deliberately NOT cached: a transient leak must not permanently
-            # freeze this input on the canned fallback (root of the loop).
-            response.retrievalScores = retrieval_context.relevance_scores
-            _log_response(response, active_provider, retrieval_context.chunks_count, llm_called=True)
-            return response
+            if retry is not None:
+                answer_he, provider_result = retry  # validated; fall through
+            else:
+                response = _build_fallback_response_from_request(
+                    request_context=request_context,
+                    level=resolved_level,
+                    fallback_reason=vocabulary_decision.fallback_reason,
+                    latency_ms=int(round(provider_result.latency_seconds * 1000)),
+                    context_chunk_ids=retrieval_context.chunk_ids,
+                    blocked_tokens=vocabulary_decision.blocked_tokens,
+                    input_tokens=provider_result.input_tokens,
+                    output_tokens=provider_result.output_tokens,
+                )
+                # Deliberately NOT cached: a transient leak must not permanently
+                # freeze this input on the canned fallback (root of the loop).
+                response.retrievalScores = retrieval_context.relevance_scores
+                _log_response(response, active_provider, retrieval_context.chunks_count, llm_called=True)
+                return response
 
     response = ChatResponse(
         answerHe=answer_he,
@@ -2160,25 +2165,35 @@ def _build_system_message(
     grammar_hint: str = "",
 ) -> str:
     vocabulary_block = ", ".join(vocabulary)
+    # Reinforce the two rules the model most often slips on, right next to the
+    # turn the way the base prompt establishes them: feminine address and
+    # staying inside the learner's scene/role.
     if voice_mode:
         msg = (
             f"{base_prompt}\n"
-            f"Lead the lesson: correct gently if needed, then ask ONE short question.\n"
+            "Reminder: the learner is FEMALE — use את and feminine verb forms, "
+            "never אתה. Stay inside the current scene/role; continue what she "
+            "just said, do not jump topics.\n"
+            "If she erred, correct briefly with the reason, then continue in "
+            "character with one short spoken line or question.\n"
             f"Keep it to 1-2 short spoken sentences, up to {VOICE_MAX_WORDS} Hebrew words.\n"
             "No punctuation except a final period or question mark.\n"
             "Use Hebrew only. No Arabic, no English, no digits.\n\n"
-            f"Approved vocabulary:\n{vocabulary_block}\n\n"
-            f"Approved curriculum context:\n{context}"
+            f"Vocabulary to prefer (simplify harder words to these):\n{vocabulary_block}\n\n"
+            f"Curriculum context (optional, for grounding):\n{context}"
         )
     else:
         msg = (
             f"{base_prompt}\n"
-            f"Lead the lesson: if the student erred, correct gently and show the "
-            f"right form; praise if correct; then ALWAYS end with ONE short question.\n"
+            "Reminder: the learner is FEMALE — use את and feminine verb forms, "
+            "never אתה. Stay inside the current scene/role she set up; build on "
+            "what she just said and do not jump to an unrelated topic.\n"
+            "If she erred, correct briefly WITH a one-clause reason, then "
+            "continue the conversation in character.\n"
             f"Keep it to 2-3 short Hebrew sentences, up to {TEXT_MAX_WORDS} Hebrew words.\n"
             "Use Hebrew only. Do not add Arabic or English.\n\n"
-            f"Approved vocabulary:\n{vocabulary_block}\n\n"
-            f"Approved curriculum context:\n{context}"
+            f"Vocabulary to prefer (simplify harder words to these):\n{vocabulary_block}\n\n"
+            f"Curriculum context (optional, for grounding):\n{context}"
         )
     if grammar_hint:
         msg += f"\n\n{grammar_hint}"

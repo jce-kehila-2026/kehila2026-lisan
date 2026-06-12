@@ -171,14 +171,87 @@ _SCENARIOS: dict[str, _ScenarioSpec] = {
 }
 
 
+# ── Home-page "story" topics → real role-play characters ────────────────────
+# Each home-page topic (frontend/src/data/studentStories.jsx) becomes a scene
+# where the model EMBODIES a character: at the clinic it IS the doctor, at the
+# restaurant it IS the waitress, etc. The learner is female, so every character
+# addresses her in feminine Hebrew (את / תרצי / מחפשת).
+@dataclass(frozen=True)
+class _StoryRolePlay:
+    title_he: str
+    role_he: str        # the character the model plays
+    setting_he: str     # where the scene happens
+    opening_he: str
+    opening_ar: str
+
+
+_STORY_ROLEPLAYS: dict[str, _StoryRolePlay] = {
+    "family-visit": _StoryRolePlay(
+        "ביקור משפחתי", "בת משפחה (דודה) שמארחת", "בית המשפחה",
+        "שלום וברוכה הבאה! נעים לראות אותך. איך את מרגישה היום?",
+        "أهلاً وسهلاً! اشتقنالك. كيف حالك اليوم؟",
+    ),
+    "morning-routine": _StoryRolePlay(
+        "שגרת בוקר", "בת בית בבוקר", "הבית בבוקר",
+        "בוקר טוב! קמת מוקדם היום. מה את עושה עכשיו בבוקר?",
+        "صباح الخير! بكّرتي اليوم. شو عم تعملي هلأ بالصبح؟",
+    ),
+    "airport-journey": _StoryRolePlay(
+        "נסיעה לשדה התעופה", "פקידת קבלה בשדה התעופה", "שדה התעופה",
+        "שלום, ברוכה הבאה לשדה התעופה. לאן את טסה היום?",
+        "أهلاً، نوّرتي المطار. لوين مسافرة اليوم؟",
+    ),
+    "doctor-appointment": _StoryRolePlay(
+        "תור לרופא", "רופאה", "מרפאה",
+        "שלום, אני הרופאה. איך את מרגישה? איפה כואב לך?",
+        "أهلاً، أنا الدكتورة. كيف حاسة حالك؟ وين بيوجعك؟",
+    ),
+    "first-day-school": _StoryRolePlay(
+        "יום ראשון בבית הספר", "מורה", "בית הספר",
+        "שלום וברוכה הבאה לכיתה! אני המורה. איך קוראים לך?",
+        "أهلاً ونوّرتي الصف! أنا المعلّمة. شو اسمك؟",
+    ),
+    "at-restaurant": _StoryRolePlay(
+        "במסעדה", "מלצרית", "מסעדה",
+        "שלום וברוכה הבאה למסעדה! הנה התפריט. מה תרצי להזמין?",
+        "أهلاً ونوّرتي المطعم! تفضّلي المنيو. شو حابة تطلبي؟",
+    ),
+    "shopping-day": _StoryRolePlay(
+        "יום קניות", "מוכרת בחנות", "חנות",
+        "שלום! ברוכה הבאה לחנות. מה את מחפשת היום?",
+        "أهلاً! نوّرتي المحل. شو عم تدوّري عليه اليوم؟",
+    ),
+    "job-interview": _StoryRolePlay(
+        "ראיון עבודה", "מראיינת", "משרד",
+        "שלום, נעים מאוד. בואי נתחיל את הראיון — ספרי לי קצת על עצמך.",
+        "أهلاً، تشرفنا. خلينا نبلّش المقابلة — احكيلي شوي عن حالك.",
+    ),
+    "music-festival": _StoryRolePlay(
+        "פסטיבל מוזיקה", "חברה בפסטיבל", "פסטיבל מוזיקה",
+        "היי! איזה כיף שבאת לפסטיבל. איזו מוזיקה את אוהבת?",
+        "هاي! شو حلو إنّك جيتي للمهرجان. أي موسيقى بتحبي؟",
+    ),
+    "lost-pet": _StoryRolePlay(
+        "חתול שאבד", "שכנה שעוזרת", "השכונה",
+        "שלום, שמעתי שאיבדת חתול. אני אעזור לך. איך הוא נראה?",
+        "أهلاً، سمعت إنّه ضاع منّك قط. رح ساعدك. كيف شكله؟",
+    ),
+}
+
+
 def is_scenario(scenario_id: str | None) -> bool:
-    """True when scenario_id names a known activity mode."""
-    return bool(scenario_id) and scenario_id in _SCENARIOS
+    """True when scenario_id names a known activity mode or story role-play."""
+    return bool(scenario_id) and (
+        scenario_id in _SCENARIOS or scenario_id in _STORY_ROLEPLAYS
+    )
 
 
 def scenario_title(scenario_id: str) -> str:
     spec = _SCENARIOS.get(scenario_id)
-    return spec.title_he if spec else ""
+    if spec:
+        return spec.title_he
+    story = _STORY_ROLEPLAYS.get(scenario_id)
+    return story.title_he if story else ""
 
 
 def _level_words(level: str, topics: tuple[str, ...] | None = None) -> list[str]:
@@ -213,8 +286,12 @@ def _common_header(level: str, include_arabic: bool) -> str:
         f"inside the Lisan app, running an interactive activity at Level {level}. "
         f"You LEAD the activity like a real teacher in a real situation.\n\n"
         f"Hard rules for every turn (write in Hebrew):\n"
+        f"- THE LEARNER IS FEMALE: always use את and feminine verb/adjective "
+        f"forms (את רוצה, את צריכה, את אוכלת), NEVER אתה. This is absolute.\n"
         f"- Write in Hebrew only. {arabic_rule}\n"
         f"- Stay at Level {level}. Use simple, level-appropriate words and forms.\n"
+        f"- Correct a mistake briefly WITH a one-clause reason, then continue "
+        f"in character.\n"
         f"- Keep your reply to 2-3 short sentences, up to {max_words} Hebrew words.\n"
         f"- YOU drive the activity. ALWAYS end your turn with ONE short question "
         f"that moves the activity forward.\n"
@@ -249,9 +326,23 @@ def build_scenario_prompt(
     on is_scenario first).
     """
     resolved_level = normalize_level(level)
-    spec = _SCENARIOS[scenario_id]
     header = _common_header(resolved_level, include_arabic)
 
+    # Home-page story topic → embody a specific character in a specific place.
+    story = _STORY_ROLEPLAYS.get(scenario_id)
+    if story is not None:
+        words = ", ".join(_level_words(resolved_level))
+        behaviour = (
+            f"Activity: ROLE-PLAY conversation. You ARE a {story.role_he}, in "
+            f"{story.setting_he}. Stay fully in character the entire time — speak "
+            f"and react as that person would in a real {story.setting_he}, never "
+            f"as a 'tutor'. Greet her, drive the scene forward, and react to what "
+            f"she says. The learner is your visitor/customer/patient. Keep it at "
+            f"her level. Useful simple words: {words}."
+        )
+        return f"{header}\n{behaviour}"
+
+    spec = _SCENARIOS[scenario_id]
     if scenario_id == SPEAKING:
         behaviour = _speaking_behaviour(resolved_level)
     else:
@@ -273,7 +364,10 @@ def scenario_opening(
     their L1, everyone else gets Hebrew only.
     """
     resolved_level = normalize_level(level)
-    if scenario_id == SPEAKING:
+    story = _STORY_ROLEPLAYS.get(scenario_id)
+    if story is not None:
+        he, ar = story.opening_he, story.opening_ar
+    elif scenario_id == SPEAKING:
         setting = _ROLEPLAY_BY_LEVEL.get(resolved_level, _ROLEPLAY_BY_LEVEL["A1"])
         he, ar = setting.opening_he, setting.opening_ar
     else:

@@ -21,7 +21,7 @@ import {
 } from '../data/studentStories.jsx';
 import { getStoredToken, getStoredUser } from '../services/auth.js';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = '/api';
 const USEFUL_LINKS_DRIVE_URL =
   'https://drive.google.com/drive/folders/1AOGvvic8O2K_MzjUJIXMQwGg80unCad8';
 
