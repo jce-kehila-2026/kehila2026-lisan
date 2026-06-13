@@ -20,7 +20,7 @@ import BottomNav from '../components/BottomNav.jsx';
 import PageHeader from '../components/PageHeader.jsx';
 import { getStoredToken } from '../services/auth.js';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = '/api';
 
 const labels = {
   he: {

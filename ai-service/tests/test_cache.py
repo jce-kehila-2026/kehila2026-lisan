@@ -72,7 +72,10 @@ def test_cache_manager_expires_entries_after_ttl():
     assert manager.get_cache_stats()["size"] == 0
 
 
-def test_cache_stats_endpoint_returns_response_cache_metrics():
+def test_cache_stats_endpoint_returns_response_cache_metrics(monkeypatch):
+    # Caching a non-stateless answer is the opt-in fully-local mode; default
+    # conversational mode skips it (see test_cache_session_isolation.py).
+    monkeypatch.setenv("ENABLE_LOCAL_CONVERSATION_SHORTCUTS", "true")
     before = client.get("/api/ai/cache/stats")
     assert before.status_code == 200
     before_stats = before.json()

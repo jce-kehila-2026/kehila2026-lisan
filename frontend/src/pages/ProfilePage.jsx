@@ -186,7 +186,7 @@ function ProfilePage() {
 
         const currentUser = await getCurrentUser();
 
-        const response = await fetch('http://localhost:3000/api/progress/me', {
+        const response = await fetch('/api/progress/me', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

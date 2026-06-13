@@ -103,6 +103,9 @@ class ChatRequestContext:
     session_id: str | None = None
     user_id: str | None = None
     scenario: str | None = None
+    # The learner's raw includeArabic preference (before the Hebrew-only scope
+    # override). Used to attach a short Arabic gloss (answerAr) to LLM replies.
+    raw_include_arabic: bool = False
 
 
 @dataclass(frozen=True)

@@ -1,0 +1,127 @@
+{
+  "summary": {
+    "startedAt": "2026-06-13T12:54:10.776396+00:00",
+    "completedAt": "2026-06-13T12:54:18.375607+00:00",
+    "stoppedReason": "quota_or_rate_limit_at_session_01_turn_01",
+    "targetSessions": 50,
+    "targetTurnsPerSession": 10,
+    "targetTurns": 500,
+    "attemptedSessions": 1,
+    "completedSessions": 0,
+    "completedTurns": 1,
+    "routeCounts": {
+      "fallback:PROVIDER_QUOTA": 1
+    },
+    "fallbackReasonCounts": {
+      "PROVIDER_QUOTA": 1
+    },
+    "levelCounts": {
+      "A1": 1
+    },
+    "topicBreakdown": {
+      "greetings_intro": {
+        "turns": 1,
+        "fallbacks": 1,
+        "errors": 0,
+        "quotaStops": 1
+      }
+    },
+    "averageWallLatencyMs": 7597.9,
+    "maxWallLatencyMs": 7597.9
+  },
+  "sessions": [
+    {
+      "index": 1,
+      "id": "conv50-20260613T125410Z-01-greetings_intro",
+      "userId": "conv50-user-01-greetings_intro",
+      "topic": {
+        "slug": "greetings_intro",
+        "title": "Greetings and self introduction",
+        "level": "A1",
+        "he_topic": "היכרות וברכות",
+        "need": "להציג את עצמי בכיתה",
+        "word": "נעים מאוד",
+        "phrase": "My name is Samer",
+        "sentence": "קוראים לי סאמר ואני לומד עברית",
+        "bad_sentence": "אני קוראים סאמר",
+        "role": "תלמיד חדש",
+        "answer": "אני גר בירושלים ולומד באוניברסיטה"
+      },
+      "turns": [
+        {
+          "runId": "20260613T125410Z",
+          "session": {
+            "index": 1,
+            "id": "conv50-20260613T125410Z-01-greetings_intro",
+            "userId": "conv50-user-01-greetings_intro"
+          },
+          "topic": {
+            "slug": "greetings_intro",
+            "title": "Greetings and self introduction",
+            "level": "A1",
+            "he_topic": "היכרות וברכות",
+            "need": "להציג את עצמי בכיתה",
+            "word": "נעים מאוד",
+            "phrase": "My name is Samer",
+            "sentence": "קוראים לי סאמר ואני לומד עברית",
+            "bad_sentence": "אני קוראים סאמר",
+            "role": "תלמיד חדש",
+            "answer": "אני גר בירושלים ולומד באוניברסיטה"
+          },
+          "turn": 1,
+          "message": "בוא נתרגל שיחה על היכרות וברכות.",
+          "request": {
+            "url": "http://127.0.0.1:8000/api/ai/chat",
+            "payload": {
+              "message": "בוא נתרגל שיחה על היכרות וברכות.",
+              "level": "A1",
+              "includeArabic": true,
+              "voiceMode": false,
+              "sessionId": "conv50-20260613T125410Z-01-greetings_intro",
+              "userId": "conv50-user-01-greetings_intro"
+            },
+            "headers": {
+              "X-User-ID": "conv50-user-01-greetings_intro",
+              "X-Internal-Service-Secret": "<set>"
+            }
+          },
+          "status": 200,
+          "ok": true,
+          "wallLatencyMs": 7597.9,
+          "diagnosis": "fallback:PROVIDER_QUOTA",
+          "quotaStop": true,
+          "response": {
+            "answerHe": "יש עומס עכשיו. נסי שוב עוד מעט.",
+            "answerAr": null,
+            "fallbackUsed": true,
+            "fallbackReason": "PROVIDER_QUOTA",
+            "level": "A1",
+            "model": "gemini-2.5-flash-lite",
+            "provider": "gemini",
+            "latencyMs": 0,
+            "cacheHit": false,
+            "routerHit": false,
+            "contextChunkIds": [
+              "t10-c2"
+            ],
+            "retrievalScores": [
+              0.1667
+            ],
+            "guardrail": {
+              "vocabularyLeakage": false,
+              "blockedTokens": [],
+              "grammarErrors": []
+            },
+            "suggestedNextPrompts": [
+              "מה השם שלך?",
+              "איפה אתה גר?",
+              "שלום!"
+            ],
+            "inputTokens": null,
+            "outputTokens": null
+          }
+        }
+      ]
+    }
+  ]
+}

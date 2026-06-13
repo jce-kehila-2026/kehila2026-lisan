@@ -8,6 +8,20 @@ const SKIP_AUTH_USER = {
   role: SKIP_AUTH_ROLE,
 };
 
+const readJsonResponse = async (response) => {
+  const contentType = response.headers.get('content-type') || '';
+
+  if (!contentType.includes('application/json')) {
+    throw new Error('genericLoginError');
+  }
+
+  try {
+    return await response.json();
+  } catch {
+    throw new Error('genericLoginError');
+  }
+};
+
 export const getLandingPathForRole = (role) => {
   if (role === 'admin') return '/admin/dashboard';
   if (role === 'teacher') return '/teacher/dashboard';
@@ -26,7 +40,7 @@ export const login = async ({ email, password }) => {
     })
   });
 
-  const data = await response.json();
+  const data = await readJsonResponse(response);
 
   if (!response.ok) {
     throw new Error(data.error || 'invalidCredentials');
@@ -81,7 +95,7 @@ export const getCurrentUser = async () => {
     }
   });
 
-  const data = await response.json();
+  const data = await readJsonResponse(response);
 
   if (!response.ok) {
     throw new Error(data.error || 'Failed to load user');

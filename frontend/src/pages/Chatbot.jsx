@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Mic, Square, Keyboard, Volume2 } from 'lucide-react';
+import { Mic, Square, Keyboard, Volume2, MessageSquarePlus, History, Trash2, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
@@ -15,7 +15,7 @@ import { getStoredToken } from '../services/auth.js';
 import { useAudioRecorder } from '../hooks/useAudioRecorder.js';
 import { useWhisperTranscription } from '../hooks/useWhisperTranscription.js';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = '/api';
 
 const MODES = [
   { value: 'text', label: 'טקסט', Icon: Keyboard },
@@ -57,6 +57,11 @@ function Chatbot({
   const [sending, setSending] = useState(false);
   const [inputMode, setInputMode] = useState('text');
   const [isSpeaking, setIsSpeaking] = useState(false);
+
+  // ── Stored-chat management (previous conversations) ──
+  const [showHistory, setShowHistory] = useState(false);
+  const [conversations, setConversations] = useState([]);
+  const [loadingConversations, setLoadingConversations] = useState(false);
 
   // ── Voice hooks ──
   const recorder = useAudioRecorder();
@@ -343,6 +348,92 @@ function Chatbot({
 
   const isRecording = recorder.status === 'recording';
 
+  // ── Previous conversations: list / resume / new / delete ──
+  const fetchConversations = useCallback(async () => {
+    setLoadingConversations(true);
+    try {
+      const data = await request('/chats');
+      const list = Array.isArray(data.chats) ? data.chats : [];
+      list.sort((a, b) =>
+        String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')),
+      );
+      setConversations(list);
+    } catch (error) {
+      console.error('Failed to load conversations:', error);
+    } finally {
+      setLoadingConversations(false);
+    }
+  }, []);
+
+  const toggleHistory = useCallback(() => {
+    setShowHistory((open) => {
+      if (!open) fetchConversations();
+      return !open;
+    });
+  }, [fetchConversations]);
+
+  const loadConversation = useCallback(
+    async (id) => {
+      if (!id || id === chatId) {
+        setShowHistory(false);
+        return;
+      }
+      try {
+        const data = await request(`/chats/${id}`);
+        const backendMessages = data.chat?.messages || [];
+        setChatId(id);
+        setSearchParams({ chatId: id });
+        setMessages(
+          backendMessages.length > 0
+            ? backendMessages.map(mapBackendMessageToUi)
+            : [{ id: 'welcome', role: 'bot', text: initialMessage }],
+        );
+        setShowHistory(false);
+      } catch (error) {
+        console.error('Failed to load conversation:', error);
+      }
+    },
+    [chatId, initialMessage, setSearchParams],
+  );
+
+  const startNewChat = useCallback(async () => {
+    try {
+      const data = await request('/chats', {
+        method: 'POST',
+        body: JSON.stringify({
+          title: title || t('chatbot'),
+          level: 'A1',
+          ...(scenario ? { scenario } : {}),
+        }),
+      });
+      const newId = data.chat.id;
+      setChatId(newId);
+      setSearchParams({ chatId: newId });
+      setMessages([{ id: 'welcome', role: 'bot', text: initialMessage }]);
+      setShowHistory(false);
+    } catch (error) {
+      console.error('Failed to start new chat:', error);
+    }
+  }, [title, t, scenario, initialMessage, setSearchParams]);
+
+  const removeConversation = useCallback(
+    async (id, event) => {
+      event.stopPropagation();
+      try {
+        await request(`/chats/${id}`, { method: 'DELETE' });
+        setConversations((cur) => cur.filter((c) => c.id !== id));
+        if (id === chatId) {
+          setMessages([{ id: 'welcome', role: 'bot', text: initialMessage }]);
+          setChatId(null);
+          setSearchParams({});
+        }
+      } catch (error) {
+        console.error('Failed to delete conversation:', error);
+      }
+    },
+    [chatId, initialMessage, setSearchParams],
+  );
+
   return (
     <main
       className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_100%)] px-3 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8"
@@ -352,17 +443,99 @@ function Chatbot({
         <PageHeader showBack backTo="/home" />
 
         <section className="mt-6 flex min-h-[calc(100vh-9rem)] flex-col rounded-3xl bg-white p-5 shadow-card sm:p-6">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">
-              {title || t('chatbot')}
-            </h1>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">
+                {title || t('chatbot')}
+              </h1>
 
-            {subtitle ? (
-              <p className="mt-2 text-sm font-semibold text-violet-700">
-                {subtitle}
-              </p>
-            ) : null}
+              {subtitle ? (
+                <p className="mt-2 text-sm font-semibold text-violet-700">
+                  {subtitle}
+                </p>
+              ) : null}
+            </div>
+
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                type="button"
+                onClick={startNewChat}
+                title="שיחה חדשה"
+                className="flex items-center gap-1 rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5 text-xs font-semibold text-violet-700 transition hover:bg-violet-100"
+              >
+                <MessageSquarePlus className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">שיחה חדשה</span>
+              </button>
+              <button
+                type="button"
+                onClick={toggleHistory}
+                title="השיחות שלי"
+                className="flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                <History className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">השיחות שלי</span>
+              </button>
+            </div>
           </div>
+
+          {showHistory ? (
+            <div dir="rtl" className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-sm font-bold text-slate-800">השיחות הקודמות</p>
+                <button
+                  type="button"
+                  onClick={() => setShowHistory(false)}
+                  aria-label="סגור"
+                  className="rounded-full p-1 text-slate-400 transition hover:text-slate-700"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              {loadingConversations ? (
+                <p className="py-3 text-center text-sm text-slate-500">טוען…</p>
+              ) : conversations.length === 0 ? (
+                <p className="py-3 text-center text-sm text-slate-500">
+                  אין שיחות קודמות.
+                </p>
+              ) : (
+                <ul className="max-h-64 space-y-1 overflow-y-auto">
+                  {conversations.map((conversation) => (
+                    <li key={conversation.id}>
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => loadConversation(conversation.id)}
+                        className={`flex w-full cursor-pointer items-center justify-between gap-2 rounded-xl px-3 py-2 text-right transition hover:bg-white ${
+                          conversation.id === chatId
+                            ? 'bg-white ring-1 ring-violet-300'
+                            : ''
+                        }`}
+                      >
+                        <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800">
+                          {conversation.title || 'שיחה'}
+                          <span className="mr-2 text-xs font-normal text-slate-400">
+                            ({conversation.messagesCount || 0})
+                          </span>
+                        </span>
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          onClick={(event) =>
+                            removeConversation(conversation.id, event)
+                          }
+                          aria-label="מחק שיחה"
+                          className="shrink-0 rounded-full p-1 text-slate-400 transition hover:text-rose-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ) : null}
 
           <div
             className="mt-5 flex flex-1 flex-col gap-2 overflow-y-auto pb-4"
