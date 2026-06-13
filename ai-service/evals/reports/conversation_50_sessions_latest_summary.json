@@ -1,0 +1,219 @@
+{
+  "startedAt": "2026-06-13T11:21:02.732211+00:00",
+  "completedAt": "2026-06-13T11:58:12.861815+00:00",
+  "stoppedReason": "quota_or_rate_limit_at_session_31_turn_04",
+  "targetSessions": 50,
+  "targetTurnsPerSession": 10,
+  "targetTurns": 500,
+  "attemptedSessions": 31,
+  "completedSessions": 30,
+  "completedTurns": 304,
+  "routeCounts": {
+    "answered_unknown_route": 2,
+    "cache": 34,
+    "fallback:PROVIDER_QUOTA": 1,
+    "fallback:VOCAB_LEAKAGE": 25,
+    "llm_provider": 237,
+    "local_router": 5
+  },
+  "fallbackReasonCounts": {
+    "VOCAB_LEAKAGE": 25,
+    "PROVIDER_QUOTA": 1
+  },
+  "levelCounts": {
+    "A1": 120,
+    "A2": 104,
+    "B1": 60,
+    "B2": 20
+  },
+  "topicBreakdown": {
+    "greetings_intro": {
+      "turns": 10,
+      "fallbacks": 1,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "family": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "daily_routine": {
+      "turns": 10,
+      "fallbacks": 3,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "university_class": {
+      "turns": 10,
+      "fallbacks": 2,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "cafe_order": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "restaurant": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "supermarket": {
+      "turns": 10,
+      "fallbacks": 4,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "market": {
+      "turns": 10,
+      "fallbacks": 2,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "clothing_store": {
+      "turns": 10,
+      "fallbacks": 5,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "bus_station": {
+      "turns": 10,
+      "fallbacks": 1,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "light_rail": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "directions": {
+      "turns": 10,
+      "fallbacks": 3,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "clinic_appointment": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "doctor_symptoms": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "pharmacy": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "emergency_room": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "post_office": {
+      "turns": 10,
+      "fallbacks": 4,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "bank_account": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "atm_problem": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "municipality": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "national_insurance": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "internet_service": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "apartment_rent": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "home_repair": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "hotel_checkin": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "travel_plans": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "late_notice": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "job_interview": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "workplace_meeting": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "school_parent_meeting": {
+      "turns": 10,
+      "fallbacks": 0,
+      "errors": 0,
+      "quotaStops": 0
+    },
+    "kindergarten": {
+      "turns": 4,
+      "fallbacks": 1,
+      "errors": 0,
+      "quotaStops": 1
+    }
+  },
+  "averageWallLatencyMs": 5836.99,
+  "maxWallLatencyMs": 23483.15
+}

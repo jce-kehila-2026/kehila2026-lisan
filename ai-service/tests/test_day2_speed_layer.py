@@ -396,8 +396,14 @@ class TestLLMPath:
             best = min(latencies)
             assert best < 5.0, f"Best LLM latency was {best:.2f}s (target < 5s)"
 
-    def test_llm_then_cache_hit(self):
-        """After an LLM call, same question should come from cache."""
+    def test_llm_then_cache_hit(self, monkeypatch):
+        """After an LLM call, same question should come from cache.
+
+        Caching an LLM answer is the opt-in fully-local mode; default
+        conversational mode does NOT cache context-dependent answers (see
+        tests/test_cache_session_isolation.py).
+        """
+        monkeypatch.setenv("ENABLE_LOCAL_CONVERSATION_SHORTCUTS", "true")
         unique_q = "מי זאת הבחורה?"
         r1 = post_chat(unique_q)
         r2 = post_chat(unique_q)

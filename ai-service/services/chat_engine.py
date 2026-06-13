@@ -119,6 +119,38 @@ def _conversational_scope_reject(message: str, level: str) -> str | None:
     return None
 
 
+def _is_globally_cacheable(message: str) -> bool:
+    """A stateless lookup whose answer does NOT depend on conversation context.
+
+    Only these may use the cross-session exact/semantic cache: a word-meaning
+    glossary lookup ("מה זה X") and fixed greetings/thanks. EVERYTHING ELSE in
+    conversational mode is context-dependent (a summary, a correction, a
+    role-play turn, "give me a question") and must NOT be cached — caching it
+    keyed on message+level only is exactly what made identical scripted turns
+    bleed answers across different conversations (the "topic jump" bug).
+    """
+    key = _policy_key(message)
+    if not key:
+        return False
+    if re.match(r"^מה זה\s+[֐-׿]{2,20}$", key):
+        return True
+    if key in _POLITENESS_REPLIES:
+        return True
+    if key in {"שלום", "היי", "הי", "בוקר טוב", "ערב טוב", "מה שלומך"}:
+        return True
+    return False
+
+
+def _cross_session_cache_allowed(message: str) -> bool:
+    """Whether the cross-session (global) exact/semantic cache may be used.
+
+    Legacy fully-local mode keeps the old broad cache (its answers are
+    deterministic templates). Conversational mode (default) restricts the global
+    cache to stateless lookups only — see _is_globally_cacheable.
+    """
+    return _local_conversation_shortcuts_enabled() or _is_globally_cacheable(message)
+
+
 def generate_chat_response(payload: ChatRequest) -> ChatResponse:
     """
     Public entry point. Wraps the full pipeline in a last-resort guard so an
@@ -204,7 +236,15 @@ def _generate_chat_response_impl(payload: ChatRequest) -> ChatResponse:
         _is_session_sensitive_message(request_context.normalized_message)
         or _has_active_learning_scene(request_context)
     )
-    cached_response = None if session_sensitive else get_exact_cached_response(request_context.cache_key)
+    cache_readable = (
+        not session_sensitive
+        and _cross_session_cache_allowed(request_context.message)
+    )
+    cached_response = (
+        get_exact_cached_response(request_context.cache_key)
+        if cache_readable
+        else None
+    )
     if cached_response is not None:
         hydrated_response = _hydrate_cached_response(cached_response, request_context)
         _remember_successful_turn(request_context, hydrated_response)
@@ -294,8 +334,10 @@ def _generate_chat_response_impl(payload: ChatRequest) -> ChatResponse:
         _log_response(routed_response, request_context.provider, 0)
         return routed_response
 
-    # 4. Semantic Cache lookup
-    if not session_sensitive:
+    # 4. Semantic Cache lookup. Even MORE leak-prone than the exact cache (it
+    #    matches *similar* phrasings, not just identical ones), so in
+    #    conversational mode it is restricted to stateless global lookups too.
+    if not session_sensitive and _cross_session_cache_allowed(request_context.message):
         try:
             from services.chat_cache import SEMANTIC_CACHE_MANAGER
             semantic_cached = SEMANTIC_CACHE_MANAGER.lookup(
@@ -383,6 +425,7 @@ def _generate_chat_response_impl(payload: ChatRequest) -> ChatResponse:
         context=retrieval_context.context_text,
         voice_mode=request_context.voice_mode,
         grammar_hint=grammar_hint,
+        include_arabic=request_context.raw_include_arabic,
     )
 
     history = CONVERSATION_MEMORY.get_history(request_context.session_id or "")
@@ -491,6 +534,13 @@ def _generate_chat_response_impl(payload: ChatRequest) -> ChatResponse:
         _log_response(response, active_provider, retrieval_context.chunks_count, llm_called=True)
         return response
 
+    # _split_answer keeps only the leading Hebrew lines, so the appended "AR:"
+    # gloss is dropped from answerHe; capture it separately for answerAr.
+    answer_ar = (
+        _extract_arabic_gloss(provider_result.answer)
+        if request_context.raw_include_arabic
+        else None
+    )
     answer_he = _split_answer(provider_result.answer, voice_mode=request_context.voice_mode)
     if not answer_he:
         response = _build_fallback_response_from_request(
@@ -570,7 +620,7 @@ def _generate_chat_response_impl(payload: ChatRequest) -> ChatResponse:
 
     response = ChatResponse(
         answerHe=answer_he,
-        answerAr=None,
+        answerAr=answer_ar,
         fallbackUsed=False,
         fallbackReason=None,
         level=resolved_level,
@@ -594,7 +644,12 @@ def _generate_chat_response_impl(payload: ChatRequest) -> ChatResponse:
         inputTokens=provider_result.input_tokens,
         outputTokens=provider_result.output_tokens,
     )
-    store_exact_cached_response(request_context.cache_key, response)
+    # Only cache this LLM answer if it is a stateless GLOBAL lookup (e.g. an
+    # explained word meaning). A normal conversation turn depends on the chat
+    # history, so caching it keyed on message+level only would serve it to a
+    # DIFFERENT conversation — the cross-session "topic jump" bug.
+    if _cross_session_cache_allowed(request_context.message):
+        store_exact_cached_response(request_context.cache_key, response)
     # Save turn to conversation memory (only for sessions with an id)
     if request_context.session_id:
         CONVERSATION_MEMORY.append_turn(
@@ -677,7 +732,7 @@ def _generate_scenario_response(
     system_message = build_scenario_prompt(
         request_context.scenario,
         resolved_level,
-        request_context.include_arabic,
+        request_context.raw_include_arabic,
     )
     history = CONVERSATION_MEMORY.get_history(request_context.session_id or "")
     call_opts = ProviderCallOptions(
@@ -732,6 +787,11 @@ def _generate_scenario_response(
             request_context, resolved_level, "MODEL_ERROR"
         )
 
+    answer_ar = (
+        _extract_arabic_gloss(provider_result.answer)
+        if request_context.raw_include_arabic
+        else None
+    )
     answer_he = _split_answer(provider_result.answer, voice_mode=request_context.voice_mode)
 
     # A single stray non-Hebrew fragment (e.g. an English word the model leaked
@@ -763,7 +823,7 @@ def _generate_scenario_response(
 
     response = ChatResponse(
         answerHe=answer_he,
-        answerAr=None,
+        answerAr=answer_ar,
         fallbackUsed=False,
         fallbackReason=None,
         level=resolved_level,
@@ -1045,6 +1105,7 @@ def _build_request_context(payload: ChatRequest) -> ChatRequestContext:
         session_id=getattr(payload, "sessionId", None) or None,
         user_id=getattr(payload, "userId", None) or None,
         scenario=getattr(payload, "scenario", None) or None,
+        raw_include_arabic=bool(getattr(payload, "includeArabic", False)),
     )
 
 
@@ -1167,15 +1228,18 @@ def _hydrate_cached_response(response: ChatResponse, request_context: ChatReques
     response.latencyMs = 0
     response.provider = response.provider or request_context.provider
     response.model = response.model or request_context.model
-    if not response.retrievalScores:
-        response.retrievalScores = []
-    if not response.suggestedNextPrompts:
-        response.suggestedNextPrompts = get_suggestions(
-            answer_he=response.answerHe,
-            message=request_context.message,
-            level=response.level or request_context.requested_level,
-            fallback_used=response.fallbackUsed,
-        )
+    # Stored retrieval metadata belongs to the ORIGINAL request, not this one —
+    # never present another turn's chunks/scores as if they grounded this reply.
+    response.retrievalScores = []
+    response.contextChunkIds = []
+    # Recompute suggestions for the CURRENT message so a cached hit never carries
+    # next-prompt suggestions from a different conversation.
+    response.suggestedNextPrompts = get_suggestions(
+        answer_he=response.answerHe,
+        message=request_context.message,
+        level=response.level or request_context.requested_level,
+        fallback_used=response.fallbackUsed,
+    )
     return response
 
 
@@ -2163,6 +2227,7 @@ def _build_system_message(
     context: str,
     voice_mode: bool = False,
     grammar_hint: str = "",
+    include_arabic: bool = False,
 ) -> str:
     vocabulary_block = ", ".join(vocabulary)
     # Reinforce the two rules the model most often slips on, right next to the
@@ -2191,13 +2256,39 @@ def _build_system_message(
             "If she erred, correct briefly WITH a one-clause reason, then "
             "continue the conversation in character.\n"
             f"Keep it to 2-3 short Hebrew sentences, up to {TEXT_MAX_WORDS} Hebrew words.\n"
-            "Use Hebrew only. Do not add Arabic or English.\n\n"
+            + (
+                "After your Hebrew reply, add ONE final line that starts with "
+                "'AR:' followed by a SHORT Arabic translation/clarification of "
+                "your reply (one sentence). The Hebrew reply comes first, the "
+                "AR: line last.\n"
+                if include_arabic
+                else "Use Hebrew only. Do not add Arabic or English.\n"
+            )
+            + "\n"
             f"Vocabulary to prefer (simplify harder words to these):\n{vocabulary_block}\n\n"
             f"Curriculum context (optional, for grounding):\n{context}"
         )
     if grammar_hint:
         msg += f"\n\n{grammar_hint}"
     return msg
+
+
+def _extract_arabic_gloss(raw_answer: str) -> str | None:
+    """Pull the 'AR:' Arabic gloss line the model appends when includeArabic.
+
+    Returns the Arabic text (without the marker) or None. Matches an explicit
+    'AR:' marker first; otherwise falls back to a trailing Arabic-script line.
+    """
+    lines = [ln.strip() for ln in (raw_answer or "").splitlines() if ln.strip()]
+    for line in reversed(lines):
+        stripped = re.sub(r"^(ar|AR|عربي|بالعربية)\s*[:：\-]\s*", "", line).strip()
+        if stripped != line and ARABIC_RE.search(stripped):
+            return stripped
+    # No marker — accept a purely-Arabic trailing line as the gloss.
+    for line in reversed(lines):
+        if ARABIC_RE.search(line) and not re.search(r"[֐-׿]", line):
+            return line
+    return None
 
 
 def _split_answer(answer: str, voice_mode: bool = False) -> str:

@@ -1,0 +1,31 @@
+{
+  "startedAt": "2026-06-13T13:02:41.014878+00:00",
+  "completedAt": "2026-06-13T13:02:50.880841+00:00",
+  "stoppedReason": "quota_or_rate_limit_at_session_01_turn_02",
+  "targetSessions": 50,
+  "targetTurnsPerSession": 10,
+  "targetTurns": 500,
+  "attemptedSessions": 1,
+  "completedSessions": 0,
+  "completedTurns": 2,
+  "routeCounts": {
+    "fallback:PROVIDER_QUOTA": 1,
+    "llm_provider": 1
+  },
+  "fallbackReasonCounts": {
+    "PROVIDER_QUOTA": 1
+  },
+  "levelCounts": {
+    "A1": 2
+  },
+  "topicBreakdown": {
+    "greetings_intro": {
+      "turns": 2,
+      "fallbacks": 1,
+      "errors": 0,
+      "quotaStops": 1
+    }
+  },
+  "averageWallLatencyMs": 4163.31,
+  "maxWallLatencyMs": 5644.61
+}
