@@ -60,6 +60,12 @@ router.post(
   chatController.addMessage
 );
 
+router.post(
+  '/:chatId/review',
+  requireAuth,
+  chatController.submitChatReview
+);
+
 router.delete(
   '/:chatId',
   requireAuth,

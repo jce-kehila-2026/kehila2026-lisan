@@ -108,3 +108,69 @@ exports.getMyProgress = async (req, res) => {
     });
   }
 };
+
+
+// ── Game progress (vocabulary game) ──────────────────────────────
+// One Firestore doc per student, keyed by uid, in collection 'gameProgress'.
+// Shape: { userId, categories: { travel: [0,2], family: [0], ... }, updatedAt }
+// Each array holds the level indices the student has PASSED.
+
+exports.getMyGameProgress = async (req, res) => {
+  try {
+    const userId = req.user.uid;
+    const doc = await db.collection('gameProgress').doc(userId).get();
+
+    const categories = doc.exists ? (doc.data().categories || {}) : {};
+
+    return res.status(200).json({ success: true, categories });
+  } catch (error) {
+    console.error('Get game progress error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Server error',
+      code: 'SERVER_ERROR'
+    });
+  }
+};
+
+exports.completeGameLevel = async (req, res) => {
+  try {
+    const userId = req.user.uid;
+    const { category, levelIndex } = req.body || {};
+
+    // Validate input
+    if (typeof category !== 'string' || !category.trim()) {
+      return res.status(400).json({
+        success: false, error: 'category is required', code: 'VALIDATION_ERROR'
+      });
+    }
+    const idx = Number(levelIndex);
+    if (!Number.isInteger(idx) || idx < 0) {
+      return res.status(400).json({
+        success: false, error: 'levelIndex must be a non-negative integer', code: 'VALIDATION_ERROR'
+      });
+    }
+
+    const ref = db.collection('gameProgress').doc(userId);
+    const doc = await ref.get();
+    const categories = doc.exists ? (doc.data().categories || {}) : {};
+
+    const completed = new Set(categories[category] || []);
+    completed.add(idx);
+    categories[category] = Array.from(completed).sort((a, b) => a - b);
+
+    await ref.set(
+      { userId, categories, updatedAt: new Date().toISOString() },
+      { merge: true }
+    );
+
+    return res.status(200).json({ success: true, categories });
+  } catch (error) {
+    console.error('Complete game level error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Server error',
+      code: 'SERVER_ERROR'
+    });
+  }
+};
