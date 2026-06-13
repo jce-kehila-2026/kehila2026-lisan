@@ -11,6 +11,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import PageHeader from '../components/PageHeader.jsx';
 import VoiceOrb from '../components/VoiceOrb.jsx';
+import ChatReview from '../components/chat/ChatReview.jsx';
 import { getStoredToken } from '../services/auth.js';
 import { useAudioRecorder } from '../hooks/useAudioRecorder.js';
 import { useWhisperTranscription } from '../hooks/useWhisperTranscription.js';
@@ -57,6 +58,10 @@ function Chatbot({
   const [sending, setSending] = useState(false);
   const [inputMode, setInputMode] = useState('text');
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewedChats, setReviewedChats] = useState(() => {
+    try { return JSON.parse(sessionStorage.getItem('lisan-reviewed-chats') || '[]'); } catch { return []; }
+  });
 
   // ── Voice hooks ──
   const recorder = useAudioRecorder();
@@ -343,6 +348,37 @@ function Chatbot({
 
   const isRecording = recorder.status === 'recording';
 
+  const endAndReview = () => {
+    if (!chatId || reviewedChats.includes(chatId)) return;
+    setReviewOpen(true);
+  };
+
+  const submitReview = async ({ rating, comment }) => {
+    try {
+      const token = getStoredToken();
+      if (chatId) {
+        await fetch(`http://localhost:3000/api/chats/${chatId}/review`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+          body: JSON.stringify({ rating, comment, role: 'student', scenario: scenario || null }),
+        });
+        const next = [...reviewedChats, chatId];
+        setReviewedChats(next);
+        try { sessionStorage.setItem('lisan-reviewed-chats', JSON.stringify(next)); } catch {}
+      }
+    } catch (e) { /* ignore */ }
+    finally { setReviewOpen(false); }
+  };
+
+  const skipReview = () => {
+    if (chatId) {
+      const next = [...reviewedChats, chatId];
+      setReviewedChats(next);
+      try { sessionStorage.setItem('lisan-reviewed-chats', JSON.stringify(next)); } catch {}
+    }
+    setReviewOpen(false);
+  };
+
   return (
     <main
       className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_100%)] px-3 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8"
@@ -352,16 +388,27 @@ function Chatbot({
         <PageHeader showBack backTo="/home" />
 
         <section className="mt-6 flex min-h-[calc(100vh-9rem)] flex-col rounded-3xl bg-white p-5 shadow-card sm:p-6">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">
-              {title || t('chatbot')}
-            </h1>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">
+                {title || t('chatbot')}
+              </h1>
 
-            {subtitle ? (
-              <p className="mt-2 text-sm font-semibold text-violet-700">
-                {subtitle}
-              </p>
-            ) : null}
+              {subtitle ? (
+                <p className="mt-2 text-sm font-semibold text-violet-700">
+                  {subtitle}
+                </p>
+              ) : null}
+            </div>
+            <button
+              type="button"
+              onClick={endAndReview}
+              disabled={!chatId || messages.length <= 1}
+              className="flex h-10 items-center gap-1.5 rounded-full border border-violet-200 bg-white px-4 text-sm font-bold text-violet-700 shadow-sm transition hover:bg-violet-50 disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-violet-500"
+              title="סיום ומשוב"
+            >
+              סיום ומשוב
+            </button>
           </div>
 
           <div
@@ -523,6 +570,12 @@ function Chatbot({
             </>
           )}
         </section>
+        <ChatReview
+          open={reviewOpen}
+          role="student"
+          onClose={skipReview}
+          onSubmit={submitReview}
+        />
       </div>
     </main>
   );

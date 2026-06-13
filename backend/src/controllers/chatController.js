@@ -1042,7 +1042,7 @@ exports.submitChatReview = async (req, res) => {
   try {
     const userId = req.user.uid;
     const { chatId } = req.params;
-    const { rating, comment = '', role = 'student' } = req.body || {};
+    const { rating, comment = '', role = 'student', scenario = null } = req.body || {};
 
     const numericRating = Number(rating);
     if (!Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5) {
@@ -1064,6 +1064,7 @@ exports.submitChatReview = async (req, res) => {
       chatId: chatId || null,
       userId,
       role,
+      scenario: scenario || null,
       rating: numericRating,
       comment: String(comment).slice(0, 1000),
       status: 'pending',
