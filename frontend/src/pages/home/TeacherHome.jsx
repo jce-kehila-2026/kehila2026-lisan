@@ -357,6 +357,28 @@ function TeacherHome() {
           </div>
         </section>
 
+        {mode === 'teacher' ? (
+          <Link
+            to="/teacher/reviews"
+            className="lisan-enter mt-8 flex items-center justify-between gap-5 rounded-[28px] border border-white/80 bg-white p-6 shadow-card transition hover:-translate-y-1.5 hover:shadow-[0_24px_56px_rgba(124,58,237,0.18)]"
+            style={{ '--lisan-enter-delay': '200ms' }}
+            dir="rtl"
+          >
+            <div className="flex items-center gap-4">
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-700">
+                <MessageCircle className="h-7 w-7" aria-hidden="true" />
+              </span>
+              <div>
+                <h2 className="text-2xl font-black text-slate-900">משובי שיחות</h2>
+                <p className="mt-1 text-base font-bold text-slate-500">
+                  צפייה וניהול הדירוגים והמשובים של התלמידים.
+                </p>
+              </div>
+            </div>
+            <ArrowLeft className="h-6 w-6 text-violet-600" aria-hidden="true" />
+          </Link>
+        ) : null}
+
         <section
           className="lisan-enter mt-8 rounded-[28px] border border-white/80 bg-[linear-gradient(135deg,#FFFFFF_0%,#F7F1FF_100%)] p-6 shadow-card lg:p-8"
           style={{ '--lisan-enter-delay': '300ms' }}
