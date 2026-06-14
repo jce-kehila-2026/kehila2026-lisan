@@ -60,11 +60,7 @@ router.post(
   chatController.addMessage
 );
 
-router.delete(
-  '/:chatId',
-  requireAuth,
-  chatController.deleteChat
-);
+
 
 router.delete(
   '/:chatId',
