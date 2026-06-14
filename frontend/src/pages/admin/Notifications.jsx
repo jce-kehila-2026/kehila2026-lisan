@@ -12,7 +12,7 @@ import Button from '../../components/ui/Button.jsx';
 import { adminDemoNotifications } from '../../data/adminMockData.js';
 import { getStoredToken, logout } from '../../services/auth.js';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = '/api';
 
 function formatTime(value) {
   if (!value) {

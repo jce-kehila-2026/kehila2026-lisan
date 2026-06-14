@@ -82,26 +82,28 @@ _DEFAULT_CONFIG = _LEVEL_CONFIGS["A1"]
 def _get_config(level: str | None) -> _LevelConfig:
     return _LEVEL_CONFIGS.get(normalize_level(level), _DEFAULT_CONFIG)
 
+# All learners on this platform are FEMALE — every imperative here uses the
+# feminine form (כתבי / נסי / בואי), never masculine.
 FALLBACK_RESPONSES = {
-    "EMPTY_MESSAGE": "כתוב שאלה קצרה בעברית. למשל: מה זה בית?",
-    "MIXED_LANGUAGE": "נסה לכתוב בעברית. אפשר מילה אחת, למשל: שלום.",
-    # Teaching fallback: tell the student HOW to fix the question, with a
+    "EMPTY_MESSAGE": "כתבי שאלה קצרה בעברית. למשל: מה זה בית?",
+    "MIXED_LANGUAGE": "נסי לכתוב בעברית. אפשר מילה אחת, למשל: שלום.",
+    # Teaching fallback: tell the learner HOW to fix the question, with a
     # concrete example, instead of a bare rejection.
-    "OUT_OF_SCOPE": "זה לא בחומר שלנו עכשיו. נסה שאלה פשוטה, למשל: מה זה בית?",
-    "VOCAB_LEAKAGE": "בוא נתרגל משפט פשוט מהשיעור. למשל: אני רוצה קפה.",
-    "MESSAGE_TOO_LONG": "נסה שוב עם שאלה קצרה.",
-    "MODEL_TIMEOUT": "נסה שוב עם שאלה קצרה.",
-    "MODEL_ERROR": "נסה שוב עם שאלה קצרה.",
-    "EMPTY_RESPONSE": "נסה שוב עם שאלה קצרה.",
+    "OUT_OF_SCOPE": "זה לא בחומר שלנו עכשיו. נסי שאלה פשוטה, למשל: מה זה בית?",
+    "VOCAB_LEAKAGE": "בואי נתרגל משפט פשוט מהשיעור. למשל: אני רוצה קפה.",
+    "MESSAGE_TOO_LONG": "נסי שוב עם שאלה קצרה.",
+    "MODEL_TIMEOUT": "נסי שוב עם שאלה קצרה.",
+    "MODEL_ERROR": "נסי שוב עם שאלה קצרה.",
+    "EMPTY_RESPONSE": "נסי שוב עם שאלה קצרה.",
     # Quota is a server-side condition, not a user error — the message must
     # not blame the question ("try a shorter question" was misleading).
-    "PROVIDER_QUOTA": "יש עומס עכשיו. נסה שוב עוד מעט.",
-    "PROVIDER_AUTH": "נסה שוב עם שאלה קצרה.",
-    "PROVIDER_NETWORK": "נסה שוב עם שאלה קצרה.",
-    "CIRCUIT_OPEN": "נסה שוב עוד כמה דקות.",
+    "PROVIDER_QUOTA": "יש עומס עכשיו. נסי שוב עוד מעט.",
+    "PROVIDER_AUTH": "נסי שוב עם שאלה קצרה.",
+    "PROVIDER_NETWORK": "נסי שוב עם שאלה קצרה.",
+    "CIRCUIT_OPEN": "נסי שוב עוד כמה דקות.",
     # Per-user LLM budget exhausted — a soft, self-resetting rate limit, not an
     # error. Same learner-facing wording as a server-side quota.
-    "LLM_RATE_LIMITED": "יש עומס עכשיו. נסה שוב עוד מעט.",
+    "LLM_RATE_LIMITED": "יש עומס עכשיו. נסי שוב עוד מעט.",
 }
 # Arabic translations of the fallback texts. Served in answerAr ONLY when
 # the student's own message contained Arabic script — a learner who writes

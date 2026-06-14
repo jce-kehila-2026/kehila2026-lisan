@@ -507,6 +507,14 @@ def _refresh_chat_cache_after_backend_startup() -> None:
 _HASH_TO_QUERY_MAP: dict[str, str] = {}
 
 
+# Bump to invalidate ALL previously cached responses at once (after a
+# cache-policy, prompt, model, or curriculum change). Prepended to every key so
+# stale cross-run entries — the source of the cross-session "topic jump" — die
+# immediately. _extract_level_from_cache_key uses rsplit(":", 2)[1], so a
+# PREFIX keeps the level at the correct position.
+CACHE_SCHEMA_VERSION = os.getenv("CACHE_SCHEMA_VERSION", "v2").strip() or "v2"
+
+
 def build_cache_key(message: str, level: str, include_arabic: bool) -> str:
     # Hash the normalized message so colons / whitespace / diacritics in the
     # input can't collide with the structural ":" separators in the key.
@@ -515,7 +523,10 @@ def build_cache_key(message: str, level: str, include_arabic: bool) -> str:
     msg_hash = hashlib.sha1(
         normalized_message.encode("utf-8"), usedforsecurity=False
     ).hexdigest()[:16]
-    key = f"{msg_hash}:{normalize_level(level)}:{str(include_arabic).lower()}"
+    key = (
+        f"{CACHE_SCHEMA_VERSION}:{msg_hash}:"
+        f"{normalize_level(level)}:{str(include_arabic).lower()}"
+    )
     _HASH_TO_QUERY_MAP[key] = message
     return key
 

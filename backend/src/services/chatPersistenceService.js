@@ -12,12 +12,25 @@ const AUTO_TITLE_MAX_WORDS = 10;
 // and the route ids in frontend/src/pages/ScenarioChat.jsx. Anything else is
 // stored as null (normal chat) so a bad client value can't change behaviour.
 const ALLOWED_SCENARIOS = new Set([
+  // Quick-activity modes
   'speaking',
   'daily-word',
   'letters',
   'listening',
   'quiz',
   'culture',
+  // Home-page story role-plays (must match scenario_engine._STORY_ROLEPLAYS
+  // and frontend/src/data/studentStories.jsx)
+  'family-visit',
+  'morning-routine',
+  'airport-journey',
+  'doctor-appointment',
+  'first-day-school',
+  'at-restaurant',
+  'shopping-day',
+  'job-interview',
+  'music-festival',
+  'lost-pet',
 ]);
 
 function normalizeScenarioId(value) {

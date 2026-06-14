@@ -102,9 +102,10 @@ FALLBACK_FAST_REJECT_DATASET = [
 class TestPromptV2Contract:
     def test_prompt_v2_is_loaded(self):
         prompt = _load_prompt()
-        assert "PROACTIVE Hebrew tutor for Arabic-speaking beginners" in prompt
-        assert "Reply in simple A1 Hebrew only" in prompt
-        assert "2 to 3 very short sentences" in prompt
+        # The v2 prompt's core contract: female learner, stay in scene, Hebrew.
+        assert "FEMALE" in prompt
+        assert "feminine" in prompt
+        assert "Hebrew only" in prompt
 
     def test_prompt_acceptance_dataset_has_50_questions(self):
         assert len(PROMPT_ACCEPTANCE_DATASET) == 50
@@ -151,7 +152,11 @@ class TestFallbackSystem:
         assert data["fallbackReason"] == "MODEL_TIMEOUT"
         assert data["answerHe"] == get_fallback_text("MODEL_TIMEOUT")
 
-    def test_vocab_leakage_fallback(self):
+    def test_vocab_leakage_fallback(self, monkeypatch):
+        # The strict A1 output-vocabulary guard is the fully-local lesson mode.
+        # In default conversational mode the model's reply is trusted, so this
+        # behaviour is validated with the local-shortcuts flag enabled.
+        monkeypatch.setenv("ENABLE_LOCAL_CONVERSATION_SHORTCUTS", "true")
         EXACT_RESPONSE_CACHE.clear()
         with (
             patch("services.chat_engine.route_message", return_value=None),

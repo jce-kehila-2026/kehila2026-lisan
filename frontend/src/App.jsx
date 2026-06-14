@@ -1,4 +1,4 @@
-import ChatbotPage from './pages/ChatbotPage.jsx';
+import Chatbot from './pages/Chatbot.jsx';
 import React, { useEffect } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
 import ProtectedRoute from './routes/ProtectedRoute.jsx';
@@ -143,7 +143,7 @@ function App() {
           path="/chatbot"
           element={
             <ProtectedRoute role={['student', 'teacher']}>
-              <ChatbotPage />
+              <Chatbot />
             </ProtectedRoute>
           }
         />

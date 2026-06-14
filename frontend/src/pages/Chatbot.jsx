@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Mic, Square, Keyboard, Volume2 } from 'lucide-react';
+import { Mic, Square, Keyboard, Volume2, MessageSquarePlus, History, Trash2, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
@@ -16,7 +16,7 @@ import { getStoredToken } from '../services/auth.js';
 import { useAudioRecorder } from '../hooks/useAudioRecorder.js';
 import { useWhisperTranscription } from '../hooks/useWhisperTranscription.js';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = '/api';
 
 const MODES = [
   { value: 'text', label: 'טקסט', Icon: Keyboard },
@@ -62,6 +62,11 @@ function Chatbot({
   const [reviewedChats, setReviewedChats] = useState(() => {
     try { return JSON.parse(sessionStorage.getItem('lisan-reviewed-chats') || '[]'); } catch { return []; }
   });
+
+  // ── Stored-chat management (previous conversations) ──
+  const [showHistory, setShowHistory] = useState(false);
+  const [conversations, setConversations] = useState([]);
+  const [loadingConversations, setLoadingConversations] = useState(false);
 
   // ── Voice hooks ──
   const recorder = useAudioRecorder();
@@ -410,6 +415,65 @@ function Chatbot({
               סיום ומשוב
             </button>
           </div>
+
+          {showHistory ? (
+            <div dir="rtl" className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-sm font-bold text-slate-800">השיחות הקודמות</p>
+                <button
+                  type="button"
+                  onClick={() => setShowHistory(false)}
+                  aria-label="סגור"
+                  className="rounded-full p-1 text-slate-400 transition hover:text-slate-700"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              {loadingConversations ? (
+                <p className="py-3 text-center text-sm text-slate-500">טוען…</p>
+              ) : conversations.length === 0 ? (
+                <p className="py-3 text-center text-sm text-slate-500">
+                  אין שיחות קודמות.
+                </p>
+              ) : (
+                <ul className="max-h-64 space-y-1 overflow-y-auto">
+                  {conversations.map((conversation) => (
+                    <li key={conversation.id}>
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => loadConversation(conversation.id)}
+                        className={`flex w-full cursor-pointer items-center justify-between gap-2 rounded-xl px-3 py-2 text-right transition hover:bg-white ${
+                          conversation.id === chatId
+                            ? 'bg-white ring-1 ring-violet-300'
+                            : ''
+                        }`}
+                      >
+                        <span className="min-w-0 flex-1 truncate text-sm font-medium text-slate-800">
+                          {conversation.title || 'שיחה'}
+                          <span className="mr-2 text-xs font-normal text-slate-400">
+                            ({conversation.messagesCount || 0})
+                          </span>
+                        </span>
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          onClick={(event) =>
+                            removeConversation(conversation.id, event)
+                          }
+                          aria-label="מחק שיחה"
+                          className="shrink-0 rounded-full p-1 text-slate-400 transition hover:text-rose-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ) : null}
 
           <div
             className="mt-5 flex flex-1 flex-col gap-2 overflow-y-auto pb-4"

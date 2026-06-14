@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { getStoredToken } from '../../services/auth.js';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = '/api';
 const LEVELS = ['A1', 'A2', 'B1', 'B2'];
 
 const mockPendingWords = [

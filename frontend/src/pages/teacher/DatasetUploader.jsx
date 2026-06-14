@@ -113,7 +113,7 @@ function DatasetUploader() {
     setIsGeneratingJSON(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:3000/api/dataset/generate', {
+      const response = await fetch('/api/dataset/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
