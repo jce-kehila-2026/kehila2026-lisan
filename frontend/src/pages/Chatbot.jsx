@@ -548,7 +548,7 @@ function Chatbot({
           {/* ── Input area per mode ── */}
           {inputMode === 'handsfree' ? (
             <div className="mt-6 flex flex-col items-center justify-center gap-4 pb-2">
-              <VoiceOrb state={orbState} onClick={handleOrbTap} />
+              <VoiceOrb state={orbState} onClick={handleOrbTap} size={typeof window !== 'undefined' && window.innerWidth < 640 ? 110 : 140} />
 
               <p className="text-sm font-semibold text-violet-700">
                 {ORB_CAPTIONS[orbState]}

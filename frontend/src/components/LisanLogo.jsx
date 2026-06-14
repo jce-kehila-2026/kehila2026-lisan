@@ -2,10 +2,11 @@ import React from 'react';
 
 function LisanLogo({ className = '' }) {
   return (
-    <div className={`lisan-logo ${className}`.trim()} aria-label="Lisan">
-      <span>لسان</span>
-      <strong>ליסאן</strong>
-    </div>
+    <img
+      src="/images/loggo.png"
+      alt="Lisan"
+      className={`h-32 w-auto object-contain sm:h-32 ${className}`.trim()}
+    />
   );
 }
 

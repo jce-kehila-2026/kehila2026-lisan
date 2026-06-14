@@ -265,7 +265,7 @@ function TeacherHome() {
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] text-slate-900">
-      <div className="app-page-container relative" dir="rtl">
+      <div className="app-page-container relative pb-32" dir="rtl">
         <div className="lisan-enter" style={{ '--lisan-enter-delay': '0ms' }}>
           <PageHeader
             controlsSlot={<ModeSwitch mode={mode} onChange={setMode} />}
@@ -280,8 +280,8 @@ function TeacherHome() {
           <div className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-violet-200/45 blur-3xl" />
           <div className="pointer-events-none absolute bottom-0 right-1/2 h-36 w-36 rounded-full bg-fuchsia-100/70 blur-3xl" />
 
-          <div className="relative grid min-h-[420px] items-stretch md:grid-cols-[0.6fr_0.4fr] lg:min-h-[460px]" dir="ltr">
-            <div className="relative min-h-[300px] overflow-hidden md:min-h-full">
+          <div className="relative grid items-stretch md:min-h-[420px] md:grid-cols-[0.6fr_0.4fr] lg:min-h-[460px]" dir="ltr">
+            <div className="relative h-[180px] overflow-hidden md:h-auto md:min-h-full">
               <img
                 src="/images/hero-study-image.png"
                 alt=""
@@ -542,16 +542,16 @@ function TeacherHome() {
         <section className="mt-8 grid gap-6 md:grid-cols-2">
           <Link
             to="/shared-chat"
-            className="lisan-enter group flex min-h-[190px] items-center justify-between gap-5 overflow-hidden rounded-[28px] border border-white/80 bg-white p-6 shadow-card transition hover:-translate-y-1.5 hover:shadow-[0_24px_56px_rgba(124,58,237,0.18)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+            className="lisan-enter group flex flex-col sm:flex-row min-h-[190px] items-center justify-between gap-5 overflow-hidden rounded-[28px] border border-white/80 bg-white p-6 shadow-card transition hover:-translate-y-1.5 hover:shadow-[0_24px_56px_rgba(124,58,237,0.18)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
             aria-label={friendsChatTitle}
             dir="ltr"
             style={{ '--lisan-enter-delay': '600ms' }}
           >
-            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-700 transition group-hover:bg-violet-600 group-hover:text-white">
+            <span className="hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-700 transition group-hover:bg-violet-600 group-hover:text-white">
               <MessageCircle className="h-7 w-7" aria-hidden="true" />
             </span>
 
-            <div className="min-w-0 flex-1 text-right" dir="rtl">
+            <div className="min-w-0 flex-1 text-center sm:text-right" dir="rtl">
               <h2 className="text-2xl font-black text-slate-900">
                 {friendsChatTitle}
               </h2>
@@ -577,7 +577,7 @@ function TeacherHome() {
           <button
             type="button"
             onClick={() => setIsLinksModalOpen(true)}
-            className="lisan-enter group flex min-h-[190px] items-center justify-between gap-5 overflow-hidden rounded-[28px] border border-white/80 bg-white p-6 shadow-card transition hover:-translate-y-1.5 hover:shadow-[0_24px_56px_rgba(124,58,237,0.18)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+            className="lisan-enter group flex flex-col sm:flex-row min-h-[190px] items-center justify-between gap-5 overflow-hidden rounded-[28px] border border-white/80 bg-white p-6 shadow-card transition hover:-translate-y-1.5 hover:shadow-[0_24px_56px_rgba(124,58,237,0.18)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
             aria-label={t('teacherLinksTitle')}
             dir="ltr"
             style={{ '--lisan-enter-delay': '700ms' }}
@@ -589,7 +589,7 @@ function TeacherHome() {
               aria-hidden="true"
             />
 
-            <div className="min-w-0 flex-1 text-right" dir="rtl">
+            <div className="min-w-0 flex-1 text-center sm:text-right" dir="rtl">
               <h2 className="text-2xl font-black text-slate-900">
                 {t('teacherLinksTitle')}
               </h2>
@@ -604,7 +604,7 @@ function TeacherHome() {
               </div>
             </div>
 
-            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-700 transition group-hover:bg-violet-600 group-hover:text-white">
+            <span className="hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-700 transition group-hover:bg-violet-600 group-hover:text-white">
               <LinkIcon className="h-7 w-7" aria-hidden="true" />
             </span>
           </button>
@@ -612,7 +612,7 @@ function TeacherHome() {
           {mode === 'teacher' ? (
             <Link
               to="/admin/dashboard"
-              className="lisan-enter group flex min-h-[190px] items-center justify-between gap-5 overflow-hidden rounded-[28px] border border-white/80 bg-white p-6 shadow-card transition hover:-translate-y-1.5 hover:shadow-[0_24px_56px_rgba(124,58,237,0.18)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 md:col-span-2 md:justify-self-center"
+              className="lisan-enter group flex flex-col sm:flex-row min-h-[190px] items-center justify-between gap-5 overflow-hidden rounded-[28px] border border-white/80 bg-white p-6 shadow-card transition hover:-translate-y-1.5 hover:shadow-[0_24px_56px_rgba(124,58,237,0.18)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 md:col-span-2 md:justify-self-center"
               aria-label="ניהול מערכת"
               dir="ltr"
               style={{ '--lisan-enter-delay': '750ms' }}
@@ -624,7 +624,7 @@ function TeacherHome() {
                 aria-hidden="true"
               />
 
-              <div className="min-w-0 flex-1 text-right" dir="rtl">
+              <div className="min-w-0 flex-1 text-center sm:text-right" dir="rtl">
                 <h2 className="text-2xl font-black text-slate-900">
                   ניהול מערכת
                 </h2>
@@ -639,7 +639,7 @@ function TeacherHome() {
                 </div>
               </div>
 
-              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-700 transition group-hover:bg-violet-600 group-hover:text-white">
+              <span className="hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-700 transition group-hover:bg-violet-600 group-hover:text-white">
                 <LinkIcon className="h-7 w-7" aria-hidden="true" />
               </span>
             </Link>

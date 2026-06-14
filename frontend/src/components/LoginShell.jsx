@@ -9,7 +9,7 @@ function LoginShell({ children, title }) {
     <main className="login-screen">
       <section className="login-panel" aria-labelledby="login-title">
         <div className="login-panel__inner">
-          <LisanLogo />
+          <LisanLogo className="mx-auto mb-2 h-35 w-auto sm:h-40" />
           <h1 id="login-title" className="sr-only">
             {title}
           </h1>
