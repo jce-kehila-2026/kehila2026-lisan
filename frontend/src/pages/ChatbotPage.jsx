@@ -51,8 +51,9 @@ import PageHeader from '../components/PageHeader.jsx';
 import ChatComposer from '../components/chat/ChatComposer.jsx';
 import ConversationSidebar from '../components/chat/ConversationSidebar.jsx';
 import ChatWindow from '../components/chat/ChatWindow.jsx';
+import ChatReview from '../components/chat/ChatReview.jsx';
 import { useAudioRecorder } from '../hooks/useAudioRecorder.js';
-import { logout } from '../services/auth.js';
+import { logout, getStoredToken } from '../services/auth.js';
 import {
   DEFAULT_CHAT_LEVEL,
   DEFAULT_SUGGESTED_PROMPTS,
@@ -103,6 +104,10 @@ function ChatbotPage() {
   const [conversations, setConversations] = useState([]);
   const [conversationId, setConversationId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewedChats, setReviewedChats] = useState(() => {
+    try { return JSON.parse(sessionStorage.getItem('lisan-reviewed-chats') || '[]'); } catch { return []; }
+  });
   // Distinguishes a voice round-trip (STT → chat → TTS) from a text request so
   // the typing indicator can show a voice-aware "we're listening…" label.
   const [voiceProcessing, setVoiceProcessing] = useState(false);
@@ -213,6 +218,45 @@ function ChatbotPage() {
     setMessages([]);
     setConversationId(null);
     setErrorMessage('');
+  };
+
+  const endAndReview = () => {
+    // ask once per chat: if already reviewed this conversation, just reset
+    if (!conversationId || reviewedChats.includes(conversationId)) {
+      resetConversation();
+      return;
+    }
+    setReviewOpen(true);
+  };
+
+  const submitReview = async ({ rating, comment }) => {
+    try {
+      const token = getStoredToken ? getStoredToken() : null;
+      if (conversationId) {
+        await fetch(`http://localhost:3000/api/chats/${conversationId}/review`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+          body: JSON.stringify({ rating, comment, role: 'student' }),
+        });
+        const next = [...reviewedChats, conversationId];
+        setReviewedChats(next);
+        try { sessionStorage.setItem('lisan-reviewed-chats', JSON.stringify(next)); } catch {}
+      }
+    } catch (e) { /* ignore network errors */ }
+    finally {
+      setReviewOpen(false);
+      resetConversation();
+    }
+  };
+
+  const skipReview = () => {
+    if (conversationId) {
+      const next = [...reviewedChats, conversationId];
+      setReviewedChats(next);
+      try { sessionStorage.setItem('lisan-reviewed-chats', JSON.stringify(next)); } catch {}
+    }
+    setReviewOpen(false);
+    resetConversation();
   };
 
   const openConversation = async (nextConversationId) => {
@@ -433,6 +477,15 @@ function ChatbotPage() {
               </button>
               <button
                 type="button"
+                onClick={endAndReview}
+                disabled={loading || messages.length === 0}
+                className="flex h-10 items-center gap-1.5 rounded-full border border-violet-200 bg-white px-4 text-sm font-bold text-violet-700 shadow-sm transition hover:bg-violet-50 disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                title="סיום ומשוב"
+              >
+                סיום ומשוב
+              </button>
+              <button
+                type="button"
                 onClick={resetConversation}
                 disabled={loading}
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-600 text-white shadow-sm transition hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500"
@@ -515,6 +568,12 @@ function ChatbotPage() {
           onDeleteConversation={removeConversation}
         />
 
+        <ChatReview
+          open={reviewOpen}
+          role="student"
+          onClose={skipReview}
+          onSubmit={submitReview}
+        />
         <BottomNav />
       </div>
     </main>

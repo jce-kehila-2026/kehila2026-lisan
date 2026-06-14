@@ -1,0 +1,5868 @@
+{
+  "travel": {
+    "total_words": 142,
+    "num_levels": 15,
+    "levels": [
+      [
+        {
+          "id": "A2V_135",
+          "hebrew": "טסים",
+          "arabic": "يسافرون بالطائرة",
+          "transliteration": "tasim",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_136",
+          "hebrew": "איסטנבול",
+          "arabic": "إسطنبول",
+          "transliteration": "istanbul",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_137",
+          "hebrew": "אחרי החתונה",
+          "arabic": "بعد العرس",
+          "transliteration": "acharei hachatuna",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_138",
+          "hebrew": "מדברים",
+          "arabic": "يتحدثون",
+          "transliteration": "medabrim",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_139",
+          "hebrew": "לאן",
+          "arabic": "إلى أين",
+          "transliteration": "le'an",
+          "part_of_speech": "question word"
+        },
+        {
+          "id": "A2V_140",
+          "hebrew": "לטוס",
+          "arabic": "يسافر بالطائرة",
+          "transliteration": "latus",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_141",
+          "hebrew": "אוהבת",
+          "arabic": "تحب",
+          "transliteration": "ohevet",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_142",
+          "hebrew": "הארמון",
+          "arabic": "القصر",
+          "transliteration": "haarmon",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_143",
+          "hebrew": "יפה",
+          "arabic": "جميل",
+          "transliteration": "yafe",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_144",
+          "hebrew": "הסולטן",
+          "arabic": "السلطان",
+          "transliteration": "hasultan",
+          "part_of_speech": "noun"
+        }
+      ],
+      [
+        {
+          "id": "A2V_145",
+          "hebrew": "חנויות",
+          "arabic": "دكاكين / محلات",
+          "transliteration": "chanuyot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_146",
+          "hebrew": "בזאר",
+          "arabic": "بازار / سوق",
+          "transliteration": "bazar",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_147",
+          "hebrew": "המסגד הכחול",
+          "arabic": "المسجد الأزرق",
+          "transliteration": "hamisgad hakachol",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_148",
+          "hebrew": "האוכל הטעים",
+          "arabic": "الطعام اللذيذ",
+          "transliteration": "ha-ochel hata'im",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_149",
+          "hebrew": "מסעדות",
+          "arabic": "مطاعم",
+          "transliteration": "misadot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_150",
+          "hebrew": "לשוט",
+          "arabic": "يبحر / يتنزه بالقارب",
+          "transliteration": "lashut",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_151",
+          "hebrew": "סירה",
+          "arabic": "قارب",
+          "transliteration": "sira",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_152",
+          "hebrew": "לנוח",
+          "arabic": "يرتاح",
+          "transliteration": "lanuach",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_153",
+          "hebrew": "לקום",
+          "arabic": "يستيقظ",
+          "transliteration": "lakum",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_154",
+          "hebrew": "כל יום",
+          "arabic": "كل يوم",
+          "transliteration": "kol yom",
+          "part_of_speech": "time phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_155",
+          "hebrew": "בתשע",
+          "arabic": "في التاسعة",
+          "transliteration": "betesha",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_156",
+          "hebrew": "איזה כיף",
+          "arabic": "كم هذا ممتع",
+          "transliteration": "eize kef",
+          "part_of_speech": "expression"
+        },
+        {
+          "id": "A2V_157",
+          "hebrew": "מסגד",
+          "arabic": "مسجد",
+          "transliteration": "misgad",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_158",
+          "hebrew": "מפורסם",
+          "arabic": "مشهور",
+          "transliteration": "mefursam",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_159",
+          "hebrew": "השם",
+          "arabic": "الاسم",
+          "transliteration": "hashem",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_160",
+          "hebrew": "הסולטן",
+          "arabic": "السلطان",
+          "transliteration": "hasultan",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_161",
+          "hebrew": "קוראים לו",
+          "arabic": "يسمّونه",
+          "transliteration": "korim lo",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_162",
+          "hebrew": "קירות",
+          "arabic": "جدران",
+          "transliteration": "kirot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_163",
+          "hebrew": "קרמיקה",
+          "arabic": "سيراميك",
+          "transliteration": "kramika",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_164",
+          "hebrew": "כחולה",
+          "arabic": "زرقاء",
+          "transliteration": "kchula",
+          "part_of_speech": "adjective"
+        }
+      ],
+      [
+        {
+          "id": "A2V_165",
+          "hebrew": "בן 400 שנה",
+          "arabic": "عمره 400 سنة",
+          "transliteration": "ben arba meot shana",
+          "part_of_speech": "age phrase"
+        },
+        {
+          "id": "A2V_166",
+          "hebrew": "גדול",
+          "arabic": "كبير",
+          "transliteration": "gadol",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_167",
+          "hebrew": "מיוחד",
+          "arabic": "مميز",
+          "transliteration": "meyuchad",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_168",
+          "hebrew": "מינרטים",
+          "arabic": "مآذن",
+          "transliteration": "minaretim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_169",
+          "hebrew": "בעולם",
+          "arabic": "في العالم",
+          "transliteration": "baolam",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_170",
+          "hebrew": "חלונות",
+          "arabic": "نوافذ",
+          "transliteration": "chalonot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_171",
+          "hebrew": "ויטראז'ים",
+          "arabic": "زجاج ملوّن",
+          "transliteration": "vitrajim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_172",
+          "hebrew": "פסוקים",
+          "arabic": "آيات",
+          "transliteration": "psukim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_173",
+          "hebrew": "הקוראן",
+          "arabic": "القرآن",
+          "transliteration": "hakoran",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_174",
+          "hebrew": "תיירים",
+          "arabic": "سيّاح",
+          "transliteration": "tayarim",
+          "part_of_speech": "noun"
+        }
+      ],
+      [
+        {
+          "id": "A2V_175",
+          "hebrew": "מכל העולם",
+          "arabic": "من كل العالم",
+          "transliteration": "mikol haolam",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_176",
+          "hebrew": "פתוח",
+          "arabic": "مفتوح",
+          "transliteration": "patuach",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_177",
+          "hebrew": "חמש פעמים ביום",
+          "arabic": "خمس مرات في اليوم",
+          "transliteration": "chamesh peamim bayom",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_178",
+          "hebrew": "בזמן התפילה",
+          "arabic": "وقت الصلاة",
+          "transliteration": "bizman hatefila",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_179",
+          "hebrew": "סגור",
+          "arabic": "مغلق",
+          "transliteration": "sagur",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_180",
+          "hebrew": "המוסלמים",
+          "arabic": "المسلمون",
+          "transliteration": "hamuslimim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_181",
+          "hebrew": "מתפללים",
+          "arabic": "يصلّون",
+          "transliteration": "mitpalelim",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_330",
+          "hebrew": "בדרך",
+          "arabic": "في الطريق",
+          "transliteration": "baderech",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_331",
+          "hebrew": "חברת הייטק",
+          "arabic": "شركة هايتك",
+          "transliteration": "chevrat hitech",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_332",
+          "hebrew": "עובדים",
+          "arabic": "عمال / موظفون",
+          "transliteration": "ovdim",
+          "part_of_speech": "noun"
+        }
+      ],
+      [
+        {
+          "id": "A2V_333",
+          "hebrew": "משפחות",
+          "arabic": "عائلات",
+          "transliteration": "mishpachot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_334",
+          "hebrew": "סוף שבוע",
+          "arabic": "نهاية أسبوع",
+          "transliteration": "sof shavua",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_335",
+          "hebrew": "נוסעים",
+          "arabic": "يسافرون",
+          "transliteration": "nos'im",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_336",
+          "hebrew": "אוטובוס",
+          "arabic": "باص",
+          "transliteration": "otobus",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_337",
+          "hebrew": "נסיעה",
+          "arabic": "سفرة / رحلة",
+          "transliteration": "nesia",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_338",
+          "hebrew": "ארוכה",
+          "arabic": "طويلة",
+          "transliteration": "aruka",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_339",
+          "hebrew": "בערך",
+          "arabic": "حوالي",
+          "transliteration": "beerech",
+          "part_of_speech": "adverb"
+        },
+        {
+          "id": "A2V_340",
+          "hebrew": "בהתחלה",
+          "arabic": "في البداية",
+          "transliteration": "bahatchala",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_341",
+          "hebrew": "סבלנות",
+          "arabic": "صبر",
+          "transliteration": "savlanut",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_342",
+          "hebrew": "קמה",
+          "arabic": "تقوم",
+          "transliteration": "kama",
+          "part_of_speech": "verb"
+        }
+      ],
+      [
+        {
+          "id": "A2V_343",
+          "hebrew": "עומדת",
+          "arabic": "تقف",
+          "transliteration": "omedet",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_344",
+          "hebrew": "הגב",
+          "arabic": "الظهر",
+          "transliteration": "hagev",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_345",
+          "hebrew": "נהג",
+          "arabic": "سائق",
+          "transliteration": "nahag",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_346",
+          "hebrew": "אסור",
+          "arabic": "ممنوع",
+          "transliteration": "asur",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_347",
+          "hebrew": "לעמוד",
+          "arabic": "يقف",
+          "transliteration": "laamod",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_348",
+          "hebrew": "מסוכן",
+          "arabic": "خطير",
+          "transliteration": "mesukan",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_349",
+          "hebrew": "לעשן",
+          "arabic": "يدخن",
+          "transliteration": "leaashen",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_350",
+          "hebrew": "עוד מעט",
+          "arabic": "بعد قليل",
+          "transliteration": "od me'at",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_351",
+          "hebrew": "הפסקה",
+          "arabic": "استراحة",
+          "transliteration": "hafsaka",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_352",
+          "hebrew": "צועקים",
+          "arabic": "يصرخون",
+          "transliteration": "tzo'akim",
+          "part_of_speech": "verb"
+        }
+      ],
+      [
+        {
+          "id": "A2V_353",
+          "hebrew": "ווליום גבוה",
+          "arabic": "صوت عالٍ",
+          "transliteration": "volume gavoha",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_354",
+          "hebrew": "מותר",
+          "arabic": "مسموح",
+          "transliteration": "mutar",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_355",
+          "hebrew": "לצעוק",
+          "arabic": "يصرخ",
+          "transliteration": "litzok",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_356",
+          "hebrew": "לשמוע מוזיקה",
+          "arabic": "سماع موسيقى",
+          "transliteration": "lishmoa muzika",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_357",
+          "hebrew": "בשקט",
+          "arabic": "بهدوء",
+          "transliteration": "besheket",
+          "part_of_speech": "adverb"
+        },
+        {
+          "id": "A2V_358",
+          "hebrew": "כל הדרך",
+          "arabic": "طوال الطريق",
+          "transliteration": "kol haderech",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_359",
+          "hebrew": "איזה כיף",
+          "arabic": "يا له من ممتع",
+          "transliteration": "eize kef",
+          "part_of_speech": "expression"
+        },
+        {
+          "id": "A2V_360",
+          "hebrew": "אין לי כוח",
+          "arabic": "ليس لدي طاقة",
+          "transliteration": "ein li koach",
+          "part_of_speech": "expression"
+        },
+        {
+          "id": "A2V_361",
+          "hebrew": "בת 14",
+          "arabic": "عمرها 14 سنة",
+          "transliteration": "bat arba esre",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_362",
+          "hebrew": "ארוחת הבוקר",
+          "arabic": "وجبة الفطور",
+          "transliteration": "aruchat haboker",
+          "part_of_speech": "noun phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_363",
+          "hebrew": "מלון",
+          "arabic": "فندق",
+          "transliteration": "malon",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_364",
+          "hebrew": "טיול ג'יפים",
+          "arabic": "رحلة جيبات",
+          "transliteration": "tiyul jeeps",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_365",
+          "hebrew": "לבוא איתנו",
+          "arabic": "المجيء معنا",
+          "transliteration": "lavo itanu",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_366",
+          "hebrew": "נשארת",
+          "arabic": "تبقى",
+          "transliteration": "nish'eret",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_367",
+          "hebrew": "בחדר",
+          "arabic": "في الغرفة",
+          "transliteration": "bacheder",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_368",
+          "hebrew": "לצלול",
+          "arabic": "يغوص",
+          "transliteration": "litzlol",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_369",
+          "hebrew": "בים",
+          "arabic": "في البحر",
+          "transliteration": "bayam",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_370",
+          "hebrew": "בריכה",
+          "arabic": "بركة سباحة",
+          "transliteration": "brecha",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_371",
+          "hebrew": "מצפה התת-ימי",
+          "arabic": "مرصد بحري",
+          "transliteration": "mitzpe hatat-yami",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_372",
+          "hebrew": "לנסוע",
+          "arabic": "يسافر",
+          "transliteration": "linsoa",
+          "part_of_speech": "verb"
+        }
+      ],
+      [
+        {
+          "id": "A2V_373",
+          "hebrew": "לקנות גלידה",
+          "arabic": "شراء بوظة",
+          "transliteration": "liknot glida",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_374",
+          "hebrew": "שופינג",
+          "arabic": "تسوق",
+          "transliteration": "shopping",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_375",
+          "hebrew": "קניון",
+          "arabic": "مجمع تجاري",
+          "transliteration": "kenyon",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_376",
+          "hebrew": "אני באה",
+          "arabic": "أنا آتية",
+          "transliteration": "ani baa",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_625",
+          "hebrew": "טיול לבית לחם",
+          "arabic": "رحلة إلى بيت لحم",
+          "transliteration": "tiyul lebeit lechem",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_626",
+          "hebrew": "רנה מספרת",
+          "arabic": "رنا تحكي",
+          "transliteration": "Rana mesaperet",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_627",
+          "hebrew": "ביום שישי שעבר",
+          "arabic": "في يوم الجمعة الماضي",
+          "transliteration": "beyom shishi she'avar",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_628",
+          "hebrew": "בעלי",
+          "arabic": "زوجي",
+          "transliteration": "ba'ali",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_629",
+          "hebrew": "עשינו טיול ארוך ונחמד",
+          "arabic": "قمنا برحلة طويلة ولطيفة",
+          "transliteration": "asinu tiyul aroch venechmad",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_630",
+          "hebrew": "קמנו מוקדם בבוקר",
+          "arabic": "استيقظنا مبكرًا في الصباح",
+          "transliteration": "kamnu mukdam baboker",
+          "part_of_speech": "verb phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_631",
+          "hebrew": "בשעה תשע",
+          "arabic": "في الساعة التاسعة",
+          "transliteration": "besha'a tesha",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_632",
+          "hebrew": "כבר היינו בבית לחם",
+          "arabic": "كنا بالفعل في بيت لحم",
+          "transliteration": "kvar hayinu bebeit lechem",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_633",
+          "hebrew": "בהתחלה",
+          "arabic": "في البداية",
+          "transliteration": "bahatchala",
+          "part_of_speech": "adverb"
+        },
+        {
+          "id": "A2V_634",
+          "hebrew": "הלכנו לכנסיית המולד",
+          "arabic": "ذهبنا إلى كنيسة المهد",
+          "transliteration": "halachnu leknisiyat hamolad",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_635",
+          "hebrew": "הכנסייה",
+          "arabic": "الكنيسة",
+          "transliteration": "haknesiya",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_636",
+          "hebrew": "הייתה גדולה ויפה",
+          "arabic": "كانت كبيرة وجميلة",
+          "transliteration": "hayta gdola veyafa",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_637",
+          "hebrew": "תיירים מכל העולם",
+          "arabic": "سياح من كل العالم",
+          "transliteration": "tayarim mikol ha'olam",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_638",
+          "hebrew": "באים לבית לחם",
+          "arabic": "يأتون إلى بيت لحم",
+          "transliteration": "ba'im lebeit lechem",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_639",
+          "hebrew": "מאמינים",
+          "arabic": "يؤمنون",
+          "transliteration": "ma'aminim",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_640",
+          "hebrew": "ישו נולד שם",
+          "arabic": "يسوع وُلد هناك",
+          "transliteration": "Yeshu nolad sham",
+          "part_of_speech": "sentence phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_641",
+          "hebrew": "מצלמים הרבה תמונות",
+          "arabic": "يلتقطون الكثير من الصور",
+          "transliteration": "metzalmim harbe tmunot",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_642",
+          "hebrew": "מתפללים",
+          "arabic": "يصلّون",
+          "transliteration": "mitpalelim",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_643",
+          "hebrew": "בשעה אחת עשרה",
+          "arabic": "في الساعة الحادية عشرة",
+          "transliteration": "besha'a achat esre",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_644",
+          "hebrew": "לבריכות סולימאן",
+          "arabic": "إلى برك سليمان",
+          "transliteration": "lebrechot Suleiman",
+          "part_of_speech": "place phrase"
+        },
+        {
+          "id": "A2V_645",
+          "hebrew": "לא שחינו בבריכה",
+          "arabic": "لم نسبح في البركة",
+          "transliteration": "lo sachinu babrecha",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_646",
+          "hebrew": "ישבנו קרוב",
+          "arabic": "جلسنا قريبًا",
+          "transliteration": "yashavnu karov",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_647",
+          "hebrew": "המים היו בצבע טורקיז",
+          "arabic": "كانت المياه بلون تركواز",
+          "transliteration": "hamayim hayu betzeva turkiz",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_648",
+          "hebrew": "אחרי הטיול לבריכה",
+          "arabic": "بعد الرحلة إلى البركة",
+          "transliteration": "acharei hatiyul labrecha",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_649",
+          "hebrew": "היינו רעבים",
+          "arabic": "كنا جائعين",
+          "transliteration": "hayinu re'evim",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_650",
+          "hebrew": "רצינו לאכול",
+          "arabic": "أردنا أن نأكل",
+          "transliteration": "ratzinu le'echol",
+          "part_of_speech": "verb phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_651",
+          "hebrew": "בשעה אחת וחצי",
+          "arabic": "في الساعة الواحدة والنصف",
+          "transliteration": "besha'a achat vachetzi",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_652",
+          "hebrew": "למסעדת אל-ח׳ימה המפורסמת",
+          "arabic": "إلى مطعم الخيمة المشهور",
+          "transliteration": "lemis'adat al-chima hamefursemet",
+          "part_of_speech": "place phrase"
+        },
+        {
+          "id": "A2V_653",
+          "hebrew": "אכלנו ארוחה גדולה",
+          "arabic": "أكلنا وجبة كبيرة",
+          "transliteration": "achalnu arucha gdola",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_654",
+          "hebrew": "שתינו קפה מצוין",
+          "arabic": "شربنا قهوة ممتازة",
+          "transliteration": "shatinu kafe metzuyan",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_655",
+          "hebrew": "בשעה שלוש",
+          "arabic": "في الساعة الثالثة",
+          "transliteration": "besha'a shalosh",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_656",
+          "hebrew": "הלכנו לשוק",
+          "arabic": "ذهبنا إلى السوق",
+          "transliteration": "halachnu lashuk",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_657",
+          "hebrew": "בשוק",
+          "arabic": "في السوق",
+          "transliteration": "bashuk",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_658",
+          "hebrew": "הרבה דוכנים",
+          "arabic": "الكثير من الأكشاك",
+          "transliteration": "harbe duchanim",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_659",
+          "hebrew": "אוכל טוב",
+          "arabic": "طعام جيد",
+          "transliteration": "ochel tov",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_660",
+          "hebrew": "פירות",
+          "arabic": "فواكه",
+          "transliteration": "peirot",
+          "part_of_speech": "noun"
+        }
+      ],
+      [
+        {
+          "id": "A2V_661",
+          "hebrew": "ירקות",
+          "arabic": "خضار",
+          "transliteration": "yerakot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_662",
+          "hebrew": "תבלינים",
+          "arabic": "بهارات",
+          "transliteration": "tavlinim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_663",
+          "hebrew": "תכשיטים",
+          "arabic": "مجوهرات",
+          "transliteration": "tachshitim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_664",
+          "hebrew": "מזכרות",
+          "arabic": "تذكارات",
+          "transliteration": "mazkarot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_665",
+          "hebrew": "נשים מבוגרות",
+          "arabic": "نساء كبيرات في السن",
+          "transliteration": "nashim mevugarot",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_666",
+          "hebrew": "מוכרות דברים",
+          "arabic": "يبعن أشياء",
+          "transliteration": "mochrot dvarim",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_667",
+          "hebrew": "עושות לבד",
+          "arabic": "يصنعن بأنفسهن",
+          "transliteration": "osot levad",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_668",
+          "hebrew": "אחרי הטיול בשוק",
+          "arabic": "بعد الرحلة في السوق",
+          "transliteration": "acharei hatiyul bashuk",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_669",
+          "hebrew": "היינו עייפים",
+          "arabic": "كنا متعبين",
+          "transliteration": "hayinu ayefim",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_670",
+          "hebrew": "נסענו חזרה הביתה",
+          "arabic": "سافرنا عائدين إلى البيت",
+          "transliteration": "nasanu chazara habayta",
+          "part_of_speech": "verb phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_671",
+          "hebrew": "בשעה חמש",
+          "arabic": "في الساعة الخامسة",
+          "transliteration": "besha'a chamesh",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_672",
+          "hebrew": "שמחים מהטיול היפה",
+          "arabic": "سعداء من الرحلة الجميلة",
+          "transliteration": "smechim mehatiyul hayafe",
+          "part_of_speech": "phrase"
+        }
+      ]
+    ]
+  },
+  "family": {
+    "total_words": 141,
+    "num_levels": 15,
+    "levels": [
+      [
+        {
+          "id": "A2V_033",
+          "hebrew": "משפחה",
+          "arabic": "عائلة",
+          "transliteration": "mishpacha",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_034",
+          "hebrew": "אבא",
+          "arabic": "أب",
+          "transliteration": "aba",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_035",
+          "hebrew": "אימא",
+          "arabic": "أم",
+          "transliteration": "ima",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_036",
+          "hebrew": "בן שמונים",
+          "arabic": "عمره ثمانون",
+          "transliteration": "ben shmonim",
+          "part_of_speech": "age phrase"
+        },
+        {
+          "id": "A2V_037",
+          "hebrew": "בת שבעים וארבע",
+          "arabic": "عمرها أربع وسبعون",
+          "transliteration": "bat shiv'im ve-arba",
+          "part_of_speech": "age phrase"
+        },
+        {
+          "id": "A2V_038",
+          "hebrew": "גרים",
+          "arabic": "يسكنون",
+          "transliteration": "garim",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_039",
+          "hebrew": "ירושלים",
+          "arabic": "القدس",
+          "transliteration": "yerushalayim",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_040",
+          "hebrew": "ג'בל אל-מוכבר",
+          "arabic": "جبل المكبر",
+          "transliteration": "jabel al-mukaber",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_041",
+          "hebrew": "אחותי הגדולה",
+          "arabic": "أختي الكبيرة",
+          "transliteration": "achoti hagdola",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_042",
+          "hebrew": "בעלה",
+          "arabic": "زوجها",
+          "transliteration": "ba'ala",
+          "part_of_speech": "noun"
+        }
+      ],
+      [
+        {
+          "id": "A2V_043",
+          "hebrew": "ההורים",
+          "arabic": "الأهل / الوالدين",
+          "transliteration": "hahorim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_044",
+          "hebrew": "שלוש בנות",
+          "arabic": "ثلاث بنات",
+          "transliteration": "shalosh banot",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_045",
+          "hebrew": "נשואה",
+          "arabic": "متزوجة",
+          "transliteration": "nesua",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_046",
+          "hebrew": "גרה",
+          "arabic": "تسكن",
+          "transliteration": "gara",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_047",
+          "hebrew": "יפו",
+          "arabic": "يافا",
+          "transliteration": "yafo",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_048",
+          "hebrew": "בבית",
+          "arabic": "في البيت",
+          "transliteration": "babayit",
+          "part_of_speech": "place phrase"
+        },
+        {
+          "id": "A2V_049",
+          "hebrew": "האחות שלי",
+          "arabic": "أختي",
+          "transliteration": "ha-achot sheli",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_050",
+          "hebrew": "בת ארבעים ותשע",
+          "arabic": "عمرها تسع وأربعون",
+          "transliteration": "bat arba'im vetesha",
+          "part_of_speech": "age phrase"
+        },
+        {
+          "id": "A2V_051",
+          "hebrew": "עכו",
+          "arabic": "عكا",
+          "transliteration": "ako",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_052",
+          "hebrew": "שני בנים",
+          "arabic": "ولدان / ابنان",
+          "transliteration": "shnei banim",
+          "part_of_speech": "noun phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_053",
+          "hebrew": "לומדים",
+          "arabic": "يدرسون",
+          "transliteration": "lomdim",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_054",
+          "hebrew": "אוניברסיטה",
+          "arabic": "جامعة",
+          "transliteration": "universita",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_055",
+          "hebrew": "חיפה",
+          "arabic": "حيفا",
+          "transliteration": "haifa",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_056",
+          "hebrew": "האח שלי",
+          "arabic": "أخي",
+          "transliteration": "ha-ach sheli",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_057",
+          "hebrew": "בן ארבעים ושמונה",
+          "arabic": "عمره ثمانٍ وأربعون",
+          "transliteration": "ben arba'im ushmone",
+          "part_of_speech": "age phrase"
+        },
+        {
+          "id": "A2V_058",
+          "hebrew": "אשתו",
+          "arabic": "زوجته",
+          "transliteration": "ishto",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_059",
+          "hebrew": "בת ארבעים וחמש",
+          "arabic": "عمرها خمس وأربعون",
+          "transliteration": "bat arba'im vechamesh",
+          "part_of_speech": "age phrase"
+        },
+        {
+          "id": "A2V_060",
+          "hebrew": "שתי בנות",
+          "arabic": "بنتان",
+          "transliteration": "shtei banot",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_061",
+          "hebrew": "ברזיל",
+          "arabic": "البرازيل",
+          "transliteration": "brazil",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_062",
+          "hebrew": "בן שלושים ושש",
+          "arabic": "عمري ست وثلاثون",
+          "transliteration": "ben shloshim veshesh",
+          "part_of_speech": "age phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_063",
+          "hebrew": "רווק",
+          "arabic": "أعزب",
+          "transliteration": "ravak",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_064",
+          "hebrew": "מחפש",
+          "arabic": "أبحث / يبحث",
+          "transliteration": "mechapes",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_065",
+          "hebrew": "אישה",
+          "arabic": "امرأة",
+          "transliteration": "isha",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_066",
+          "hebrew": "טובה",
+          "arabic": "جيدة",
+          "transliteration": "tova",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_067",
+          "hebrew": "יפה",
+          "arabic": "جميلة",
+          "transliteration": "yafa",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_068",
+          "hebrew": "איפה",
+          "arabic": "أين",
+          "transliteration": "eifo",
+          "part_of_speech": "question word"
+        },
+        {
+          "id": "A2V_109",
+          "hebrew": "חתונה",
+          "arabic": "عرس",
+          "transliteration": "chatuna",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_110",
+          "hebrew": "מתחתן",
+          "arabic": "يتزوج",
+          "transliteration": "mitchaten",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_111",
+          "hebrew": "היום בערב",
+          "arabic": "اليوم مساءً",
+          "transliteration": "hayom ba'erev",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_112",
+          "hebrew": "ההורים שלנו",
+          "arabic": "أهلنا / والدانا",
+          "transliteration": "hahorim shelanu",
+          "part_of_speech": "noun phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_113",
+          "hebrew": "סבא",
+          "arabic": "جد",
+          "transliteration": "saba",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_114",
+          "hebrew": "סבתא",
+          "arabic": "جدة",
+          "transliteration": "savta",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_115",
+          "hebrew": "הדוד",
+          "arabic": "العم / الخال",
+          "transliteration": "hadod",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_116",
+          "hebrew": "אשתו",
+          "arabic": "زوجته",
+          "transliteration": "ishto",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_117",
+          "hebrew": "דודה",
+          "arabic": "عمة / خالة",
+          "transliteration": "doda",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_118",
+          "hebrew": "גרמניה",
+          "arabic": "ألمانيا",
+          "transliteration": "germanyah",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_119",
+          "hebrew": "שם",
+          "arabic": "هناك",
+          "transliteration": "sham",
+          "part_of_speech": "adverb"
+        },
+        {
+          "id": "A2V_120",
+          "hebrew": "בעלה",
+          "arabic": "زوجها",
+          "transliteration": "ba'ala",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_121",
+          "hebrew": "הבעל",
+          "arabic": "الزوج",
+          "transliteration": "haba'al",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_122",
+          "hebrew": "הילדים",
+          "arabic": "الأولاد",
+          "transliteration": "hayeladim",
+          "part_of_speech": "noun"
+        }
+      ],
+      [
+        {
+          "id": "A2V_123",
+          "hebrew": "כלה",
+          "arabic": "عروس",
+          "transliteration": "kala",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_124",
+          "hebrew": "סטודנטית",
+          "arabic": "طالبة جامعية",
+          "transliteration": "studentit",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_125",
+          "hebrew": "כפר יסיף",
+          "arabic": "كفر ياسيف",
+          "transliteration": "kfar yasif",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_126",
+          "hebrew": "עושים",
+          "arabic": "نعمل / يفعلون",
+          "transliteration": "osim",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_127",
+          "hebrew": "מסיבה",
+          "arabic": "حفلة",
+          "transliteration": "mesiba",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_128",
+          "hebrew": "טירה",
+          "arabic": "الطيرة",
+          "transliteration": "tira",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_129",
+          "hebrew": "מוזיקה",
+          "arabic": "موسيقى",
+          "transliteration": "muzika",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_130",
+          "hebrew": "שמחים",
+          "arabic": "فرحون",
+          "transliteration": "smechim",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_131",
+          "hebrew": "מתרגשים",
+          "arabic": "متحمسون / متأثرون",
+          "transliteration": "mitragshim",
+          "part_of_speech": "verb/adjective"
+        },
+        {
+          "id": "A2V_132",
+          "hebrew": "אחרי החתונה",
+          "arabic": "بعد العرس",
+          "transliteration": "acharei hachatuna",
+          "part_of_speech": "time phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_133",
+          "hebrew": "רוצים",
+          "arabic": "يريدون / نريد",
+          "transliteration": "rotzim",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_134",
+          "hebrew": "חיים יפים",
+          "arabic": "حياة جميلة",
+          "transliteration": "chayim yafim",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_455",
+          "hebrew": "דומות",
+          "arabic": "متشابهات",
+          "transliteration": "domot",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_456",
+          "hebrew": "שונות",
+          "arabic": "مختلفات",
+          "transliteration": "shonot",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_457",
+          "hebrew": "תאומות",
+          "arabic": "توأمتان / توائم مؤنث",
+          "transliteration": "te'omot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_458",
+          "hebrew": "בנות שלוש עשרה",
+          "arabic": "عمرهن ثلاث عشرة سنة",
+          "transliteration": "bnot shlosh esre",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_459",
+          "hebrew": "נולדו",
+          "arabic": "وُلدوا / وُلدن",
+          "transliteration": "noldu",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_460",
+          "hebrew": "בשישה באפריל",
+          "arabic": "في السادس من أبريل",
+          "transliteration": "beshisha be'april",
+          "part_of_speech": "date expression"
+        },
+        {
+          "id": "A2V_461",
+          "hebrew": "היום יש להן יום הולדת",
+          "arabic": "اليوم لديهن عيد ميلاد",
+          "transliteration": "hayom yesh lahen yom huledet",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_462",
+          "hebrew": "לסרט",
+          "arabic": "إلى فيلم",
+          "transliteration": "leseret",
+          "part_of_speech": "noun phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_463",
+          "hebrew": "החברות שלהן",
+          "arabic": "صديقاتهن",
+          "transliteration": "hachaverot shelahen",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_464",
+          "hebrew": "חוזרת מבית הספר",
+          "arabic": "تعود من المدرسة",
+          "transliteration": "chozeret mibeit hasefer",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_465",
+          "hebrew": "מיד",
+          "arabic": "فورًا",
+          "transliteration": "miyad",
+          "part_of_speech": "adverb"
+        },
+        {
+          "id": "A2V_466",
+          "hebrew": "מתקלחת",
+          "arabic": "تستحم",
+          "transliteration": "mitkalechat",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_467",
+          "hebrew": "מתחילה להתלבש",
+          "arabic": "تبدأ بلبس ملابسها",
+          "transliteration": "matchila lehitlabesh",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_468",
+          "hebrew": "לוקח לה הרבה זמן",
+          "arabic": "يأخذ منها وقتًا طويلًا",
+          "transliteration": "lokeach la harbe zman",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_469",
+          "hebrew": "מה ללבוש",
+          "arabic": "ماذا تلبس",
+          "transliteration": "ma lilbosh",
+          "part_of_speech": "question phrase"
+        },
+        {
+          "id": "A2V_470",
+          "hebrew": "חולצה וחצאית",
+          "arabic": "قميص وتنورة",
+          "transliteration": "chultza vechatzait",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_471",
+          "hebrew": "שמלה",
+          "arabic": "فستان",
+          "transliteration": "simla",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_472",
+          "hebrew": "בסוף",
+          "arabic": "في النهاية",
+          "transliteration": "basof",
+          "part_of_speech": "adverb"
+        }
+      ],
+      [
+        {
+          "id": "A2V_473",
+          "hebrew": "בוחרת",
+          "arabic": "تختار",
+          "transliteration": "bocheret",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_474",
+          "hebrew": "השמלה הלבנה",
+          "arabic": "الفستان الأبيض",
+          "transliteration": "hasimla halevana",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_475",
+          "hebrew": "מסתרקת",
+          "arabic": "تمشط شعرها",
+          "transliteration": "mistareket",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_476",
+          "hebrew": "חצי שעה",
+          "arabic": "نصف ساعة",
+          "transliteration": "chatzi sha'a",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_477",
+          "hebrew": "שוב ושוב",
+          "arabic": "مرة بعد مرة",
+          "transliteration": "shuv vashuv",
+          "part_of_speech": "adverb"
+        },
+        {
+          "id": "A2V_478",
+          "hebrew": "מסתכלת במראה",
+          "arabic": "تنظر في المرآة",
+          "transliteration": "mistakelet bamara",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_479",
+          "hebrew": "מסדרת",
+          "arabic": "ترتب",
+          "transliteration": "mesaderet",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_480",
+          "hebrew": "את השיער",
+          "arabic": "الشعر",
+          "transliteration": "et hase'ar",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_481",
+          "hebrew": "לכבוד יום ההולדת",
+          "arabic": "بمناسبة عيد الميلاد",
+          "transliteration": "lichvod yom hahuledet",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_482",
+          "hebrew": "אפילו",
+          "arabic": "حتى",
+          "transliteration": "afilu",
+          "part_of_speech": "adverb"
+        }
+      ],
+      [
+        {
+          "id": "A2V_483",
+          "hebrew": "רק קצת",
+          "arabic": "قليلًا فقط",
+          "transliteration": "rak ktzat",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_484",
+          "hebrew": "מצטלמת",
+          "arabic": "تتصور",
+          "transliteration": "mitztalemet",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_485",
+          "hebrew": "סלפי",
+          "arabic": "سيلفي",
+          "transliteration": "selfie",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_486",
+          "hebrew": "כמובן",
+          "arabic": "طبعًا",
+          "transliteration": "kamuvan",
+          "part_of_speech": "adverb"
+        },
+        {
+          "id": "A2V_487",
+          "hebrew": "שולחת את התמונות",
+          "arabic": "ترسل الصور",
+          "transliteration": "sholachat et hatmunot",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_488",
+          "hebrew": "לכל החברות",
+          "arabic": "لكل الصديقات",
+          "transliteration": "lechol hachaverot",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_489",
+          "hebrew": "מתלבשת מהר",
+          "arabic": "تلبس بسرعة",
+          "transliteration": "mitlabeshet maher",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_490",
+          "hebrew": "תמיד",
+          "arabic": "دائمًا",
+          "transliteration": "tamid",
+          "part_of_speech": "adverb"
+        },
+        {
+          "id": "A2V_491",
+          "hebrew": "ג'ינס וחולצה",
+          "arabic": "جينز وقميص",
+          "transliteration": "jeans vechultza",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_492",
+          "hebrew": "שיער קצר",
+          "arabic": "شعر قصير",
+          "transliteration": "se'ar katzar",
+          "part_of_speech": "noun phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_493",
+          "hebrew": "ממש לא רוצה",
+          "arabic": "حقًا لا تريد",
+          "transliteration": "mamash lo rotza",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_494",
+          "hebrew": "להצטלם",
+          "arabic": "أن يتصور",
+          "transliteration": "lehitztalem",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_495",
+          "hebrew": "את באה",
+          "arabic": "هل أنت قادمة",
+          "transliteration": "at ba'a",
+          "part_of_speech": "question phrase"
+        },
+        {
+          "id": "A2V_496",
+          "hebrew": "עוד מעט",
+          "arabic": "بعد قليل",
+          "transliteration": "od me'at",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_497",
+          "hebrew": "הסרט מתחיל",
+          "arabic": "الفيلم يبدأ",
+          "transliteration": "haseret matchil",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_498",
+          "hebrew": "שתי הבנות",
+          "arabic": "البنتان",
+          "transliteration": "shtei habanot",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_499",
+          "hebrew": "חושבת",
+          "arabic": "تفكر",
+          "transliteration": "choshevet",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_673",
+          "hebrew": "כשעימד היה ילד",
+          "arabic": "عندما كان عماد طفلًا",
+          "transliteration": "kshe'Imad haya yeled",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_674",
+          "hebrew": "בדרך לבית לחם",
+          "arabic": "في الطريق إلى بيت لحم",
+          "transliteration": "baderech lebeit lechem",
+          "part_of_speech": "place phrase"
+        },
+        {
+          "id": "A2V_675",
+          "hebrew": "שאלו את עימד",
+          "arabic": "سألوا عماد",
+          "transliteration": "sha'alu et Imad",
+          "part_of_speech": "verb phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_676",
+          "hebrew": "לאן טיילת",
+          "arabic": "إلى أين تنزهت / سافرت",
+          "transliteration": "le'an tiyalt",
+          "part_of_speech": "question phrase"
+        },
+        {
+          "id": "A2V_677",
+          "hebrew": "כשהיית ילד",
+          "arabic": "عندما كنت طفلًا",
+          "transliteration": "kshehayita yeled",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_678",
+          "hebrew": "סיפר לילדים",
+          "arabic": "حكى للأطفال",
+          "transliteration": "siper layeladim",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_679",
+          "hebrew": "על הילדות שלו",
+          "arabic": "عن طفولته",
+          "transliteration": "al hayaldut shelo",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_680",
+          "hebrew": "כשהייתי ילד",
+          "arabic": "عندما كنت طفلًا",
+          "transliteration": "kshehayiti yeled",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_681",
+          "hebrew": "לא הייתה לנו מכונית",
+          "arabic": "لم تكن لدينا سيارة",
+          "transliteration": "lo hayta lanu mechonit",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_682",
+          "hebrew": "לא טיילנו הרבה",
+          "arabic": "لم نتنزه كثيرًا",
+          "transliteration": "lo tiyalnu harbe",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_683",
+          "hebrew": "עבד קשה מאוד",
+          "arabic": "عمل بجد كثيرًا",
+          "transliteration": "avad kashe me'od",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_684",
+          "hebrew": "לא היה לו הרבה זמן",
+          "arabic": "لم يكن لديه الكثير من الوقت",
+          "transliteration": "lo haya lo harbe zman",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_685",
+          "hebrew": "להיות עם הילדים",
+          "arabic": "أن يكون مع الأطفال",
+          "transliteration": "lihiyot im hayeladim",
+          "part_of_speech": "verb phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_686",
+          "hebrew": "הייתה איתנו בבית",
+          "arabic": "كانت معنا في البيت",
+          "transliteration": "hayta itanu babayit",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_687",
+          "hebrew": "בישלה מצוין",
+          "arabic": "طبخت بشكل ممتاز",
+          "transliteration": "bishla metzuyan",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_688",
+          "hebrew": "אוכל טעים",
+          "arabic": "طعام لذيذ",
+          "transliteration": "ochel ta'im",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_689",
+          "hebrew": "היה לנו בית קטן",
+          "arabic": "كان لدينا بيت صغير",
+          "transliteration": "haya lanu bayit katan",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_690",
+          "hebrew": "לא היו לנו הרבה משחקים",
+          "arabic": "لم تكن لدينا ألعاب كثيرة",
+          "transliteration": "lo hayu lanu harbe mischakim",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_691",
+          "hebrew": "לא הייתה לנו טלוויזיה",
+          "arabic": "لم يكن لدينا تلفزيون",
+          "transliteration": "lo hayta lanu televizya",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_692",
+          "hebrew": "לא היה לנו מחשב",
+          "arabic": "لم يكن لدينا حاسوب",
+          "transliteration": "lo haya lanu machshev",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_693",
+          "hebrew": "טלפונים",
+          "arabic": "هواتف",
+          "transliteration": "telefonim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_694",
+          "hebrew": "כדור",
+          "arabic": "كرة",
+          "transliteration": "kadur",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_695",
+          "hebrew": "שיחקנו בחוץ",
+          "arabic": "لعبنا في الخارج",
+          "transliteration": "sichaknu bachutz",
+          "part_of_speech": "verb phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_696",
+          "hebrew": "בשכונה",
+          "arabic": "في الحي",
+          "transliteration": "bashchuna",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_697",
+          "hebrew": "סבתא שלי",
+          "arabic": "جدتي",
+          "transliteration": "savta sheli",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_698",
+          "hebrew": "גרה איתנו",
+          "arabic": "سكنت معنا",
+          "transliteration": "gara itanu",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_699",
+          "hebrew": "סיפורים מעניינים ומצחיקים",
+          "arabic": "قصص ممتعة ومضحكة",
+          "transliteration": "sipurim me'anyenim umatzchikim",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_700",
+          "hebrew": "הנכדות והנכדים",
+          "arabic": "الحفيدات والأحفاد",
+          "transliteration": "hanechdot vehanechadim",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_701",
+          "hebrew": "אהבו לשבת איתה",
+          "arabic": "أحبوا الجلوس معها",
+          "transliteration": "ahavu lashevet ita",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_702",
+          "hebrew": "לשמוע את הסיפורים שלה",
+          "arabic": "سماع قصصها",
+          "transliteration": "lishmoa et hasipurim shela",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_703",
+          "hebrew": "סוכריות טעימות",
+          "arabic": "حلوى لذيذة",
+          "transliteration": "sukariot te'imot",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_704",
+          "hebrew": "בשביל כל הילדים",
+          "arabic": "من أجل كل الأطفال",
+          "transliteration": "bishvil kol hayeladim",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_705",
+          "hebrew": "לא היה לנו הרבה כסף",
+          "arabic": "لم يكن لدينا الكثير من المال",
+          "transliteration": "lo haya lanu harbe kesef",
+          "part_of_speech": "sentence phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_706",
+          "hebrew": "ילדות מאושרת",
+          "arabic": "طفولة سعيدة",
+          "transliteration": "yaldut me'usheret",
+          "part_of_speech": "noun phrase"
+        }
+      ]
+    ]
+  },
+  "work_jobs": {
+    "total_words": 100,
+    "num_levels": 10,
+    "levels": [
+      [
+        {
+          "id": "A2V_525",
+          "hebrew": "לגן בירושלים",
+          "arabic": "لروضة في القدس",
+          "transliteration": "legan birushalayim",
+          "part_of_speech": "place phrase"
+        },
+        {
+          "id": "A2V_526",
+          "hebrew": "דרוש/ה",
+          "arabic": "مطلوب/ة",
+          "transliteration": "darush/dhrusha",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_527",
+          "hebrew": "עובד/ת",
+          "arabic": "عامل/ة",
+          "transliteration": "oved/ovedet",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_528",
+          "hebrew": "במשרה חלקית",
+          "arabic": "بوظيفة جزئية",
+          "transliteration": "bemisra chelkit",
+          "part_of_speech": "work phrase"
+        },
+        {
+          "id": "A2V_529",
+          "hebrew": "יומיים בשבוע",
+          "arabic": "يومان في الأسبوع",
+          "transliteration": "yomayim bashavua",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_530",
+          "hebrew": "משמונה עד ארבע וחצי",
+          "arabic": "من الثامنة حتى الرابعة والنصف",
+          "transliteration": "mishmone ad arba vachetzi",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_531",
+          "hebrew": "טלפון",
+          "arabic": "هاتف",
+          "transliteration": "telefon",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_532",
+          "hebrew": "למשרד קטן",
+          "arabic": "لمكتب صغير",
+          "transliteration": "lemisrad katan",
+          "part_of_speech": "place phrase"
+        },
+        {
+          "id": "A2V_533",
+          "hebrew": "בתל אביב",
+          "arabic": "في تل أبيب",
+          "transliteration": "betel aviv",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_534",
+          "hebrew": "מזכיר/ה",
+          "arabic": "سكرتير/ة",
+          "transliteration": "mazkir/mazkira",
+          "part_of_speech": "noun"
+        }
+      ],
+      [
+        {
+          "id": "A2V_535",
+          "hebrew": "למשרה מלאה",
+          "arabic": "لوظيفة كاملة",
+          "transliteration": "lemisra mele'a",
+          "part_of_speech": "work phrase"
+        },
+        {
+          "id": "A2V_536",
+          "hebrew": "בימים א' עד ה'",
+          "arabic": "في الأيام من الأحد حتى الخميس",
+          "transliteration": "beyamim alef ad hey",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_537",
+          "hebrew": "בשעות 9:00 עד 18:00",
+          "arabic": "في الساعات من 9:00 حتى 18:00",
+          "transliteration": "besha'ot tesha ad shmone esre",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_538",
+          "hebrew": "חובה",
+          "arabic": "إلزامي / ضروري",
+          "transliteration": "chova",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_539",
+          "hebrew": "למסעדות",
+          "arabic": "لمطاعم",
+          "transliteration": "lemis'adot",
+          "part_of_speech": "place phrase"
+        },
+        {
+          "id": "A2V_540",
+          "hebrew": "בכל הארץ",
+          "arabic": "في كل البلاد",
+          "transliteration": "bechol ha'aretz",
+          "part_of_speech": "place phrase"
+        },
+        {
+          "id": "A2V_541",
+          "hebrew": "דרושים",
+          "arabic": "مطلوبون",
+          "transliteration": "drushim",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_542",
+          "hebrew": "מלצרים",
+          "arabic": "نُدُل",
+          "transliteration": "meltzarim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_543",
+          "hebrew": "במשרה חלקית",
+          "arabic": "بوظيفة جزئية",
+          "transliteration": "bemisra chelkit",
+          "part_of_speech": "work phrase"
+        },
+        {
+          "id": "A2V_544",
+          "hebrew": "העבודה",
+          "arabic": "العمل",
+          "transliteration": "ha'avoda",
+          "part_of_speech": "noun"
+        }
+      ],
+      [
+        {
+          "id": "A2V_545",
+          "hebrew": "בבוקר",
+          "arabic": "في الصباح",
+          "transliteration": "baboker",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_546",
+          "hebrew": "בערב",
+          "arabic": "في المساء",
+          "transliteration": "ba'erev",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_547",
+          "hebrew": "לא דרוש ניסיון",
+          "arabic": "لا توجد حاجة لخبرة",
+          "transliteration": "lo darush nisayon",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_548",
+          "hebrew": "ניסיון",
+          "arabic": "خبرة",
+          "transliteration": "nisayon",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_549",
+          "hebrew": "ריאיון עבודה",
+          "arabic": "مقابلة عمل",
+          "transliteration": "re'ayon avoda",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_550",
+          "hebrew": "סטודנטית לחינוך",
+          "arabic": "طالبة تربية",
+          "transliteration": "studentit lechinuch",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_551",
+          "hebrew": "מחפשת עבודה",
+          "arabic": "تبحث عن عمل",
+          "transliteration": "mechapeset avoda",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_552",
+          "hebrew": "בגן",
+          "arabic": "في روضة",
+          "transliteration": "bagan",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_553",
+          "hebrew": "המנהלת של הגן",
+          "arabic": "مديرة الروضة",
+          "transliteration": "hamenahelet shel hagan",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_554",
+          "hebrew": "מזמינה אותה",
+          "arabic": "تدعوها",
+          "transliteration": "mazmina ota",
+          "part_of_speech": "verb phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_555",
+          "hebrew": "לריאיון",
+          "arabic": "إلى مقابلة",
+          "transliteration": "lere'ayon",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_556",
+          "hebrew": "קוראים לי",
+          "arabic": "اسمي",
+          "transliteration": "kor'im li",
+          "part_of_speech": "expression"
+        },
+        {
+          "id": "A2V_557",
+          "hebrew": "איפה את גרה",
+          "arabic": "أين تسكنين",
+          "transliteration": "eifo at gara",
+          "part_of_speech": "question phrase"
+        },
+        {
+          "id": "A2V_558",
+          "hebrew": "בבית חנינא",
+          "arabic": "في بيت حنينا",
+          "transliteration": "bebeit chanina",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_559",
+          "hebrew": "תמיד גרת",
+          "arabic": "هل سكنت دائمًا",
+          "transliteration": "tamid gart",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_560",
+          "hebrew": "כל המשפחה שלי פה",
+          "arabic": "كل عائلتي هنا",
+          "transliteration": "kol hamishpacha sheli po",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_561",
+          "hebrew": "לומדת חינוך",
+          "arabic": "تدرس تربية",
+          "transliteration": "lomedet chinuch",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_562",
+          "hebrew": "עבדת עד היום",
+          "arabic": "عملت حتى اليوم",
+          "transliteration": "avadet ad hayom",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_563",
+          "hebrew": "לא עבדתי",
+          "arabic": "لم أعمل",
+          "transliteration": "lo avadeti",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_564",
+          "hebrew": "רק למדתי",
+          "arabic": "فقط درست",
+          "transliteration": "rak lamadeti",
+          "part_of_speech": "verb phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_565",
+          "hebrew": "עבדתי במסעדה",
+          "arabic": "عملت في مطعم",
+          "transliteration": "avadeti bemis'ada",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_566",
+          "hebrew": "אין לך ניסיון",
+          "arabic": "ليس لديك خبرة",
+          "transliteration": "ein lach nisayon",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_567",
+          "hebrew": "בעבודה עם ילדים",
+          "arabic": "في العمل مع الأطفال",
+          "transliteration": "be'avoda im yeladim",
+          "part_of_speech": "work phrase"
+        },
+        {
+          "id": "A2V_568",
+          "hebrew": "הבת הגדולה",
+          "arabic": "الابنة الكبرى",
+          "transliteration": "habat hagedola",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_569",
+          "hebrew": "במשפחה",
+          "arabic": "في العائلة",
+          "transliteration": "bamishpacha",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_570",
+          "hebrew": "עזרתי לאימא שלי",
+          "arabic": "ساعدت أمي",
+          "transliteration": "azarti le'ima sheli",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_571",
+          "hebrew": "לטפל בילדים הקטנים",
+          "arabic": "الاعتناء بالأطفال الصغار",
+          "transliteration": "letapel bayeladim haktanim",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_572",
+          "hebrew": "להיות גננת",
+          "arabic": "أن تكون معلمة روضة",
+          "transliteration": "lihiyot ganenet",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_573",
+          "hebrew": "אוהבת ילדים",
+          "arabic": "تحب الأطفال",
+          "transliteration": "ohevet yeladim",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_574",
+          "hebrew": "אני חושבת",
+          "arabic": "أنا أعتقد",
+          "transliteration": "ani choshevet",
+          "part_of_speech": "sentence phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_575",
+          "hebrew": "מתאימה לעבודה בגן",
+          "arabic": "مناسبة للعمل في روضة",
+          "transliteration": "mat'ima le'avoda bagan",
+          "part_of_speech": "work phrase"
+        },
+        {
+          "id": "A2V_576",
+          "hebrew": "יש לך זמן לעבודה",
+          "arabic": "هل لديك وقت للعمل",
+          "transliteration": "yesh lach zman le'avoda",
+          "part_of_speech": "question phrase"
+        },
+        {
+          "id": "A2V_577",
+          "hebrew": "בשנה האחרונה",
+          "arabic": "في السنة الأخيرة",
+          "transliteration": "bashana ha'acharona",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_578",
+          "hebrew": "יומיים בשבוע",
+          "arabic": "يومان في الأسبوع",
+          "transliteration": "yomayim bashavua",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_579",
+          "hebrew": "לעבוד בגן",
+          "arabic": "العمل في روضة",
+          "transliteration": "la'avod bagan",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_580",
+          "hebrew": "שלושה ימים בשבוע",
+          "arabic": "ثلاثة أيام في الأسبوع",
+          "transliteration": "shlosha yamim bashavua",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_581",
+          "hebrew": "שאלות",
+          "arabic": "أسئلة",
+          "transliteration": "she'elot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_582",
+          "hebrew": "מה המזכורת",
+          "arabic": "ما هو الراتب",
+          "transliteration": "ma hamaskoret",
+          "part_of_speech": "question phrase"
+        },
+        {
+          "id": "A2V_583",
+          "hebrew": "לשלושה ימים בשבוע",
+          "arabic": "لثلاثة أيام في الأسبوع",
+          "transliteration": "lishlosha yamim bashavua",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_584",
+          "hebrew": "4200 שקלים",
+          "arabic": "4200 شيكل",
+          "transliteration": "arba'at alafim umatayim shkalim",
+          "part_of_speech": "money expression"
+        }
+      ],
+      [
+        {
+          "id": "A2V_585",
+          "hebrew": "זה בסדר",
+          "arabic": "هذا جيد",
+          "transliteration": "ze beseder",
+          "part_of_speech": "expression"
+        },
+        {
+          "id": "A2V_586",
+          "hebrew": "לגן שלנו",
+          "arabic": "لروضتنا",
+          "transliteration": "lagan shelanu",
+          "part_of_speech": "place phrase"
+        },
+        {
+          "id": "A2V_587",
+          "hebrew": "להתחיל לעבוד",
+          "arabic": "أن تبدأ العمل",
+          "transliteration": "lehatchil la'avod",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_588",
+          "hebrew": "בשבוע הבא",
+          "arabic": "في الأسبوع القادم",
+          "transliteration": "bashavua haba",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_589",
+          "hebrew": "הגננת",
+          "arabic": "المربية / معلمة الروضة",
+          "transliteration": "haganenet",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_590",
+          "hebrew": "עובדת בגן ילדים",
+          "arabic": "تعمل في روضة أطفال",
+          "transliteration": "ovedet began yeladim",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_591",
+          "hebrew": "גן ילדים",
+          "arabic": "روضة أطفال",
+          "transliteration": "gan yeladim",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_592",
+          "hebrew": "יום מיוחד",
+          "arabic": "يوم مميز",
+          "transliteration": "yom meyuchad",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_593",
+          "hebrew": "בשעה שמונה בבוקר",
+          "arabic": "في الساعة الثامنة صباحًا",
+          "transliteration": "besha'a shmone baboker",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_594",
+          "hebrew": "סידרה",
+          "arabic": "رتبت",
+          "transliteration": "sidra",
+          "part_of_speech": "verb"
+        }
+      ],
+      [
+        {
+          "id": "A2V_595",
+          "hebrew": "הצעצועים",
+          "arabic": "الألعاب",
+          "transliteration": "hatza'atzua'im",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_596",
+          "hebrew": "הכיסאות",
+          "arabic": "الكراسي",
+          "transliteration": "hakis'ot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_597",
+          "hebrew": "של הילדים",
+          "arabic": "الخاصة بالأطفال",
+          "transliteration": "shel hayeladim",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_598",
+          "hebrew": "בשעה עשר",
+          "arabic": "في الساعة العاشرة",
+          "transliteration": "besha'a eser",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_599",
+          "hebrew": "בישלה",
+          "arabic": "طبخت",
+          "transliteration": "bishla",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_600",
+          "hebrew": "אורז",
+          "arabic": "رز",
+          "transliteration": "orez",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_601",
+          "hebrew": "שניצלים",
+          "arabic": "شنيتسل",
+          "transliteration": "shnitzelim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_602",
+          "hebrew": "לארוחת הצהריים",
+          "arabic": "لوجبة الغداء",
+          "transliteration": "learuchat hatzohorayim",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_603",
+          "hebrew": "בשעה אחת",
+          "arabic": "في الساعة الواحدة",
+          "transliteration": "besha'a achat",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_604",
+          "hebrew": "אחרי שהילדים שיחקו בגינה",
+          "arabic": "بعد أن لعب الأطفال في الحديقة",
+          "transliteration": "acharei shehayeladim sichaku bagina",
+          "part_of_speech": "time phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_605",
+          "hebrew": "ביקשה מהם",
+          "arabic": "طلبت منهم",
+          "transliteration": "biksha mehem",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_606",
+          "hebrew": "לסדר",
+          "arabic": "أن يرتب",
+          "transliteration": "lesader",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_607",
+          "hebrew": "כל המשחקים",
+          "arabic": "كل الألعاب",
+          "transliteration": "kol hamis'chakim",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_608",
+          "hebrew": "הדפים",
+          "arabic": "الأوراق",
+          "transliteration": "hadapim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_609",
+          "hebrew": "הבובות",
+          "arabic": "الدمى",
+          "transliteration": "habubot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_610",
+          "hebrew": "כל הכבוד",
+          "arabic": "أحسنتم / كل الاحترام",
+          "transliteration": "kol hakavod",
+          "part_of_speech": "expression"
+        },
+        {
+          "id": "A2V_611",
+          "hebrew": "בסוף היום",
+          "arabic": "في نهاية اليوم",
+          "transliteration": "besof hayom",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_612",
+          "hebrew": "ההורים",
+          "arabic": "الأهل / الوالدان",
+          "transliteration": "hahorim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_613",
+          "hebrew": "באו לקחת",
+          "arabic": "جاؤوا لأخذ",
+          "transliteration": "ba'u lakachat",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_614",
+          "hebrew": "מהגן",
+          "arabic": "من الروضة",
+          "transliteration": "mehagan",
+          "part_of_speech": "place phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_615",
+          "hebrew": "קיבלה מהם",
+          "arabic": "حصلت منهم",
+          "transliteration": "kibla mehem",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_616",
+          "hebrew": "מתנה יפה",
+          "arabic": "هدية جميلة",
+          "transliteration": "matana yafa",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_617",
+          "hebrew": "קנו לה",
+          "arabic": "اشتروا لها",
+          "transliteration": "kanu la",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_618",
+          "hebrew": "ספר חשוב",
+          "arabic": "كتاب مهم",
+          "transliteration": "sefer chashuv",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_619",
+          "hebrew": "הספר היה מעניין",
+          "arabic": "كان الكتاب ممتعًا",
+          "transliteration": "hasefer haya me'anyen",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_620",
+          "hebrew": "על חינוך",
+          "arabic": "عن التربية",
+          "transliteration": "al chinuch",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_621",
+          "hebrew": "כתבו לה",
+          "arabic": "كتبوا لها",
+          "transliteration": "katvu la",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_622",
+          "hebrew": "ברכה יפה",
+          "arabic": "تهنئة جميلة",
+          "transliteration": "bracha yafa",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_623",
+          "hebrew": "שמחה מאוד",
+          "arabic": "فرحت كثيرًا",
+          "transliteration": "samcha me'od",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_624",
+          "hebrew": "תודה מכל הלב",
+          "arabic": "شكرًا من كل القلب",
+          "transliteration": "toda mikol halev",
+          "part_of_speech": "expression"
+        }
+      ]
+    ]
+  },
+  "culture_music": {
+    "total_words": 98,
+    "num_levels": 10,
+    "levels": [
+      [
+        {
+          "id": "A2V_707",
+          "hebrew": "תזמורת ירושלים, מזרח ומערב",
+          "arabic": "أوركسترا القدس، شرق وغرب",
+          "transliteration": "tizmoret yerushalayim, mizrach uma'arav",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_708",
+          "hebrew": "יעל מספרת",
+          "arabic": "يعيل تحكي",
+          "transliteration": "Yael mesaperet",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_709",
+          "hebrew": "הבעל של דנה",
+          "arabic": "زوج دانا",
+          "transliteration": "haba'al shel Dana",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_710",
+          "hebrew": "החברה שלי",
+          "arabic": "صديقتي",
+          "transliteration": "hachavera sheli",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_711",
+          "hebrew": "מנגן בתזמורת",
+          "arabic": "يعزف في أوركسترا",
+          "transliteration": "menagen betizmoret",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_712",
+          "hebrew": "מנגן בעוּד",
+          "arabic": "يعزف على العود",
+          "transliteration": "menagen be'ud",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_713",
+          "hebrew": "אתמול",
+          "arabic": "أمس",
+          "transliteration": "etmol",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_714",
+          "hebrew": "הזמינו אותי",
+          "arabic": "دعوني",
+          "transliteration": "hizminu oti",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_715",
+          "hebrew": "לקונצרט של התזמורת",
+          "arabic": "إلى حفلة الأوركسترا",
+          "transliteration": "lekontzert shel hatizmoret",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_716",
+          "hebrew": "בתיאטרון ירושלים",
+          "arabic": "في مسرح القدس",
+          "transliteration": "beti'atron yerushalayim",
+          "part_of_speech": "place phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_717",
+          "hebrew": "שירים של אום כולתום",
+          "arabic": "أغانٍ لأم كلثوم",
+          "transliteration": "shirim shel Um Kulthum",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_718",
+          "hebrew": "הסביר לי",
+          "arabic": "شرح لي",
+          "transliteration": "hisbir li",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_719",
+          "hebrew": "השם של התזמורת",
+          "arabic": "اسم الأوركسترا",
+          "transliteration": "hashem shel hatizmoret",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_720",
+          "hebrew": "כלי נגינה",
+          "arabic": "آلات موسيقية",
+          "transliteration": "klei negina",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_721",
+          "hebrew": "מהמזרח",
+          "arabic": "من الشرق",
+          "transliteration": "mehamizrach",
+          "part_of_speech": "place phrase"
+        },
+        {
+          "id": "A2V_722",
+          "hebrew": "עוד",
+          "arabic": "عود",
+          "transliteration": "ud",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_723",
+          "hebrew": "קאנון",
+          "arabic": "قانون",
+          "transliteration": "kanun",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_724",
+          "hebrew": "דרבוקה",
+          "arabic": "دربكة",
+          "transliteration": "darbuka",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_725",
+          "hebrew": "מוזיקה קלאסית",
+          "arabic": "موسيقى كلاسيكية",
+          "transliteration": "muzika klasit",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_726",
+          "hebrew": "מהמערב",
+          "arabic": "من الغرب",
+          "transliteration": "mehama'arav",
+          "part_of_speech": "place phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_727",
+          "hebrew": "כינור",
+          "arabic": "كمان",
+          "transliteration": "kinor",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_728",
+          "hebrew": "ויולה",
+          "arabic": "فيولا",
+          "transliteration": "viola",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_729",
+          "hebrew": "צ'לו",
+          "arabic": "تشيلو",
+          "transliteration": "cello",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_730",
+          "hebrew": "סקסופון",
+          "arabic": "ساكسفون",
+          "transliteration": "saxofon",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_731",
+          "hebrew": "חליל",
+          "arabic": "ناي / فلوت",
+          "transliteration": "chalil",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_732",
+          "hebrew": "כל מיני קונצרטים",
+          "arabic": "كل أنواع الحفلات",
+          "transliteration": "kol minei kontzertim",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_733",
+          "hebrew": "מוזיקה מרוקאית",
+          "arabic": "موسيقى مغربية",
+          "transliteration": "muzika marokait",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_734",
+          "hebrew": "מוזיקה מאפריקה",
+          "arabic": "موسيقى من إفريقيا",
+          "transliteration": "muzika me'afrika",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_735",
+          "hebrew": "פלמנקו",
+          "arabic": "فلامنكو",
+          "transliteration": "flamenco",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_736",
+          "hebrew": "זמרים מפורסמים",
+          "arabic": "مطربون مشهورون",
+          "transliteration": "zamarim mefursamim",
+          "part_of_speech": "noun phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_737",
+          "hebrew": "מהארץ ומהעולם",
+          "arabic": "من البلاد ومن العالم",
+          "transliteration": "meha'aretz umeha'olam",
+          "part_of_speech": "place phrase"
+        },
+        {
+          "id": "A2V_738",
+          "hebrew": "כל המנגינות",
+          "arabic": "كل الألحان",
+          "transliteration": "kol hamanginot",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_739",
+          "hebrew": "שאלתי את יונתן",
+          "arabic": "سألت يوناتان",
+          "transliteration": "sha'alti et Yonatan",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_740",
+          "hebrew": "המשיך להסביר",
+          "arabic": "تابع الشرح",
+          "transliteration": "himshich lehasbir",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_741",
+          "hebrew": "מנגנת בהרבה מקומות",
+          "arabic": "تعزف في أماكن كثيرة",
+          "transliteration": "menagenet beharbeh mekomot",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_742",
+          "hebrew": "גם בישראל וגם בעולם",
+          "arabic": "أيضًا في إسرائيل وأيضًا في العالم",
+          "transliteration": "gam beYisrael vegam ba'olam",
+          "part_of_speech": "place phrase"
+        },
+        {
+          "id": "A2V_743",
+          "hebrew": "המוזיקה המיוחדת",
+          "arabic": "الموسيقى الخاصة",
+          "transliteration": "hamuzika hameyuchedet",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_744",
+          "hebrew": "התזמורת הזאת",
+          "arabic": "هذه الأوركسترا",
+          "transliteration": "hatizmoret hazot",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_745",
+          "hebrew": "כשהקונצרט התחיל",
+          "arabic": "عندما بدأت الحفلة",
+          "transliteration": "kshehakontzert hitchil",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_746",
+          "hebrew": "הקשבתי למוזיקה",
+          "arabic": "استمعت إلى الموسيقى",
+          "transliteration": "hikshavti lamuzika",
+          "part_of_speech": "verb phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_747",
+          "hebrew": "לא הפסקתי להתרגש",
+          "arabic": "لم أتوقف عن التأثر",
+          "transliteration": "lo hifsakti lehitragesh",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_748",
+          "hebrew": "הכרתי את כל השירים",
+          "arabic": "عرفت كل الأغاني",
+          "transliteration": "hikarti et kol hashirim",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_749",
+          "hebrew": "אחרות ומיוחדות",
+          "arabic": "مختلفة وخاصة",
+          "transliteration": "acherot umeyuchadot",
+          "part_of_speech": "adjective phrase"
+        },
+        {
+          "id": "A2V_750",
+          "hebrew": "בסוף הקונצרט",
+          "arabic": "في نهاية الحفلة",
+          "transliteration": "besof hakontzert",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_751",
+          "hebrew": "שהזמנתם אותי",
+          "arabic": "لأنكم دعوتموني",
+          "transliteration": "shehizmantem oti",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_752",
+          "hebrew": "ערב מיוחד",
+          "arabic": "مساء مميز",
+          "transliteration": "erev meyuchad",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_753",
+          "hebrew": "נולדה בשם",
+          "arabic": "وُلدت باسم",
+          "transliteration": "nolda beshem",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_754",
+          "hebrew": "נוהד חדד",
+          "arabic": "نهاد حداد",
+          "transliteration": "Nuhad Haddad",
+          "part_of_speech": "proper noun"
+        },
+        {
+          "id": "A2V_755",
+          "hebrew": "בלבנון",
+          "arabic": "في لبنان",
+          "transliteration": "belevanon",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_756",
+          "hebrew": "בשנת 1935",
+          "arabic": "في سنة 1935",
+          "transliteration": "bishnat elef tesha me'ot shloshim vechamesh",
+          "part_of_speech": "time expression"
+        }
+      ],
+      [
+        {
+          "id": "A2V_757",
+          "hebrew": "למשפחה לבנונית נוצרית",
+          "arabic": "لعائلة لبنانية مسيحية",
+          "transliteration": "lemishpacha levanonit notzrit",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_758",
+          "hebrew": "בית ספר חשוב למוזיקה",
+          "arabic": "مدرسة مهمة للموسيقى",
+          "transliteration": "beit sefer chashuv lemuzika",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_759",
+          "hebrew": "בביירות",
+          "arabic": "في بيروت",
+          "transliteration": "bebeirut",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_760",
+          "hebrew": "בגיל 19",
+          "arabic": "في عمر 19",
+          "transliteration": "begil tsha esre",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_761",
+          "hebrew": "התחתנה עם",
+          "arabic": "تزوجت من",
+          "transliteration": "hitchatna im",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_762",
+          "hebrew": "עאסי רחבאני",
+          "arabic": "عاصي الرحباني",
+          "transliteration": "Asi Rahbani",
+          "part_of_speech": "proper noun"
+        },
+        {
+          "id": "A2V_763",
+          "hebrew": "שכתב את המנגינות לשירים שלה",
+          "arabic": "الذي كتب الألحان لأغانيها",
+          "transliteration": "shekatav et hamanginot lashirim shela",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_764",
+          "hebrew": "שרה במקהלה",
+          "arabic": "غنّت في جوقة",
+          "transliteration": "shara bemakhela",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_765",
+          "hebrew": "ברדיו לבנון",
+          "arabic": "في راديو لبنان",
+          "transliteration": "beradyo levanon",
+          "part_of_speech": "place phrase"
+        },
+        {
+          "id": "A2V_766",
+          "hebrew": "אחר כך",
+          "arabic": "بعد ذلك",
+          "transliteration": "achar kach",
+          "part_of_speech": "time expression"
+        }
+      ],
+      [
+        {
+          "id": "A2V_767",
+          "hebrew": "התחילה להופיע",
+          "arabic": "بدأت تظهر / تؤدي",
+          "transliteration": "hitchila lehofia",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_768",
+          "hebrew": "בכל העולם",
+          "arabic": "في كل العالم",
+          "transliteration": "bechol ha'olam",
+          "part_of_speech": "place phrase"
+        },
+        {
+          "id": "A2V_769",
+          "hebrew": "זמרת מצליחה ומפורסמת",
+          "arabic": "مغنية ناجحة ومشهورة",
+          "transliteration": "zameret matzlicha umefursemet",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_770",
+          "hebrew": "השתתפה בפסטיבלים",
+          "arabic": "شاركت في مهرجانات",
+          "transliteration": "hishtatfa befestiwalim",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_771",
+          "hebrew": "בלס וגאס",
+          "arabic": "في لاس فيغاس",
+          "transliteration": "belas vegas",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_772",
+          "hebrew": "אמסטרדם",
+          "arabic": "أمستردام",
+          "transliteration": "amsterdam",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_773",
+          "hebrew": "פריז",
+          "arabic": "باريس",
+          "transliteration": "pariz",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_774",
+          "hebrew": "דובאי",
+          "arabic": "دبي",
+          "transliteration": "dubai",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_775",
+          "hebrew": "עמאן",
+          "arabic": "عمّان",
+          "transliteration": "aman",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_776",
+          "hebrew": "ובעוד הרבה מקומות בעולם",
+          "arabic": "وفي أماكن كثيرة أخرى في العالم",
+          "transliteration": "uve'od harbe mekomot ba'olam",
+          "part_of_speech": "place phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_777",
+          "hebrew": "פוליטיקה",
+          "arabic": "سياسة",
+          "transliteration": "politika",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_778",
+          "hebrew": "פוליטיים",
+          "arabic": "سياسية",
+          "transliteration": "politiyim",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_779",
+          "hebrew": "דיברו על הטבע ועל האהבה",
+          "arabic": "تحدثت عن الطبيعة وعن الحب",
+          "transliteration": "dibru al hateva ve'al ha'ahava",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_780",
+          "hebrew": "בשנת 2008",
+          "arabic": "في سنة 2008",
+          "transliteration": "bishnat alpayim shmone",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_781",
+          "hebrew": "רצתה להופיע בדמשק",
+          "arabic": "أرادت أن تظهر / تؤدي في دمشق",
+          "transliteration": "ratzta lehofia bedamesek",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_782",
+          "hebrew": "אחרי 20 שנה",
+          "arabic": "بعد 20 سنة",
+          "transliteration": "acharei esrim shana",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_783",
+          "hebrew": "לא הופיעה שם",
+          "arabic": "لم تظهر / تؤدِّ هناك",
+          "transliteration": "lo hofia sham",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_784",
+          "hebrew": "פוליטיקאים בלבנון",
+          "arabic": "سياسيون في لبنان",
+          "transliteration": "politika'im belevanon",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_785",
+          "hebrew": "ביקשו מפירוז",
+          "arabic": "طلبوا من فيروز",
+          "transliteration": "bikshu miFairuz",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_786",
+          "hebrew": "לא להופיע בסוריה",
+          "arabic": "ألا تظهر / تؤدي في سوريا",
+          "transliteration": "lo lehofia besurya",
+          "part_of_speech": "verb phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_787",
+          "hebrew": "בעיות פוליטיות",
+          "arabic": "مشاكل سياسية",
+          "transliteration": "be'ayot politiyot",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_788",
+          "hebrew": "בין סוריה ללבנון",
+          "arabic": "بين سوريا ولبنان",
+          "transliteration": "bein surya lelevanon",
+          "part_of_speech": "place phrase"
+        },
+        {
+          "id": "A2V_789",
+          "hebrew": "אני זמרת ולא פוליטיקאית",
+          "arabic": "أنا مغنية ولست سياسية",
+          "transliteration": "ani zameret velo politika'it",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_790",
+          "hebrew": "לשיר בכל העולם",
+          "arabic": "أن أغني في كل العالم",
+          "transliteration": "lashir bechol ha'olam",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_791",
+          "hebrew": "אנשים התרגשו מאוד",
+          "arabic": "الناس تأثروا كثيرًا",
+          "transliteration": "anashim hitrageshu me'od",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_792",
+          "hebrew": "קנו את כל הכרטיסים",
+          "arabic": "اشتروا كل التذاكر",
+          "transliteration": "kanu et kol hakartisim",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_793",
+          "hebrew": "להופעה שלה",
+          "arabic": "لعرضها",
+          "transliteration": "lehofaa shela",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_794",
+          "hebrew": "בטלוויזיה",
+          "arabic": "في التلفزيون",
+          "transliteration": "batelevizya",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_795",
+          "hebrew": "בעיתונים",
+          "arabic": "في الصحف",
+          "transliteration": "ba'itonim",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_796",
+          "hebrew": "בבתי הקפה",
+          "arabic": "في المقاهي",
+          "transliteration": "bevatie hakafe",
+          "part_of_speech": "place"
+        }
+      ],
+      [
+        {
+          "id": "A2V_797",
+          "hebrew": "כולם דיברו",
+          "arabic": "الجميع تحدثوا",
+          "transliteration": "kulam dibru",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_798",
+          "hebrew": "הזמרת פירוז",
+          "arabic": "المغنية فيروز",
+          "transliteration": "hazameret Fairuz",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_799",
+          "hebrew": "כל הזמן",
+          "arabic": "طوال الوقت",
+          "transliteration": "kol hazman",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_800",
+          "hebrew": "שמעו את השירים שלה",
+          "arabic": "سمعوا أغانيها",
+          "transliteration": "sham'u et hashirim shela",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_801",
+          "hebrew": "עד היום",
+          "arabic": "حتى اليوم",
+          "transliteration": "ad hayom",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_802",
+          "hebrew": "זמרת מאוד פופולרית",
+          "arabic": "مغنية شعبية جدًا",
+          "transliteration": "zameret me'od popularit",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_803",
+          "hebrew": "אחת הזמרות הכי חשובות",
+          "arabic": "واحدة من أهم المغنيات",
+          "transliteration": "achat hazamarot hachi chashuvot",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_804",
+          "hebrew": "בעולם הערבי",
+          "arabic": "في العالم العربي",
+          "transliteration": "ba'olam ha'aravi",
+          "part_of_speech": "place phrase"
+        }
+      ]
+    ]
+  },
+  "health": {
+    "total_words": 72,
+    "num_levels": 8,
+    "levels": [
+      [
+        {
+          "id": "A2V_212",
+          "hebrew": "מרגיש",
+          "arabic": "يشعر",
+          "transliteration": "margish",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_213",
+          "hebrew": "בבוקר",
+          "arabic": "في الصباح",
+          "transliteration": "baboker",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_214",
+          "hebrew": "חולה",
+          "arabic": "مريض",
+          "transliteration": "chole",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_215",
+          "hebrew": "כואב",
+          "arabic": "يؤلم",
+          "transliteration": "koev",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_216",
+          "hebrew": "ראש",
+          "arabic": "رأس",
+          "transliteration": "rosh",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_217",
+          "hebrew": "גרון",
+          "arabic": "حلق",
+          "transliteration": "garon",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_218",
+          "hebrew": "בטן",
+          "arabic": "بطن",
+          "transliteration": "beten",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_219",
+          "hebrew": "נותן",
+          "arabic": "يعطي",
+          "transliteration": "noten",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_220",
+          "hebrew": "תה",
+          "arabic": "شاي",
+          "transliteration": "te",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_221",
+          "hebrew": "דבש",
+          "arabic": "عسل",
+          "transliteration": "dvash",
+          "part_of_speech": "noun"
+        }
+      ],
+      [
+        {
+          "id": "A2V_222",
+          "hebrew": "לימון",
+          "arabic": "ليمون",
+          "transliteration": "limon",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_223",
+          "hebrew": "ישן",
+          "arabic": "ينام",
+          "transliteration": "yashen",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_224",
+          "hebrew": "בערב",
+          "arabic": "في المساء",
+          "transliteration": "baerev",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_225",
+          "hebrew": "שואלת",
+          "arabic": "تسأل",
+          "transliteration": "sho'elet",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_226",
+          "hebrew": "עכשיו",
+          "arabic": "الآن",
+          "transliteration": "achshav",
+          "part_of_speech": "adverb"
+        },
+        {
+          "id": "A2V_227",
+          "hebrew": "בריא",
+          "arabic": "بصحة جيدة",
+          "transliteration": "bari",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_228",
+          "hebrew": "לראות",
+          "arabic": "يشاهد / يرى",
+          "transliteration": "lirot",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_229",
+          "hebrew": "טלוויזיה",
+          "arabic": "تلفاز",
+          "transliteration": "televizya",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_230",
+          "hebrew": "דוקטור",
+          "arabic": "دكتور",
+          "transliteration": "doctor",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_231",
+          "hebrew": "חולה",
+          "arabic": "مريض",
+          "transliteration": "chola",
+          "part_of_speech": "adjective"
+        }
+      ],
+      [
+        {
+          "id": "A2V_232",
+          "hebrew": "ארבעה ימים",
+          "arabic": "أربعة أيام",
+          "transliteration": "arbaa yamim",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_233",
+          "hebrew": "רופאה",
+          "arabic": "طبيبة",
+          "transliteration": "rofea",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_234",
+          "hebrew": "קופת החולים",
+          "arabic": "صندوق المرضى",
+          "transliteration": "kupat hacholim",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_235",
+          "hebrew": "כרטיס מגנטי",
+          "arabic": "بطاقة ممغنطة",
+          "transliteration": "kartis magnati",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_236",
+          "hebrew": "מרגישה",
+          "arabic": "تشعر",
+          "transliteration": "margisha",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_237",
+          "hebrew": "חום גבוה",
+          "arabic": "حرارة مرتفعة",
+          "transliteration": "chom gavoha",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_238",
+          "hebrew": "שלושים ותשע",
+          "arabic": "تسعة وثلاثون",
+          "transliteration": "shloshim vetesha",
+          "part_of_speech": "number"
+        },
+        {
+          "id": "A2V_239",
+          "hebrew": "כאב גרון",
+          "arabic": "ألم حلق",
+          "transliteration": "ke'ev garon",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_240",
+          "hebrew": "אוזניים",
+          "arabic": "آذان",
+          "transliteration": "oznayim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_241",
+          "hebrew": "לבדוק",
+          "arabic": "يفحص",
+          "transliteration": "livdok",
+          "part_of_speech": "verb"
+        }
+      ],
+      [
+        {
+          "id": "A2V_242",
+          "hebrew": "הגרון",
+          "arabic": "الحلق",
+          "transliteration": "hagaron",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_243",
+          "hebrew": "אדום",
+          "arabic": "أحمر",
+          "transliteration": "adom",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_244",
+          "hebrew": "דלקת אוזניים",
+          "arabic": "التهاب أذنين",
+          "transliteration": "deleket oznayim",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_245",
+          "hebrew": "אנטיביוטיקה",
+          "arabic": "مضاد حيوي",
+          "transliteration": "antibiotika",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_246",
+          "hebrew": "חמישה ימים",
+          "arabic": "خمسة أيام",
+          "transliteration": "chamisha yamim",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_247",
+          "hebrew": "שלוש פעמים ביום",
+          "arabic": "ثلاث مرات في اليوم",
+          "transliteration": "shalosh peamim bayom",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_248",
+          "hebrew": "אחרי האוכל",
+          "arabic": "بعد الطعام",
+          "transliteration": "acharei haochel",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_249",
+          "hebrew": "לנוח",
+          "arabic": "يرتاح",
+          "transliteration": "lanuach",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_250",
+          "hebrew": "עבודה",
+          "arabic": "عمل",
+          "transliteration": "avoda",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_251",
+          "hebrew": "לשתות",
+          "arabic": "يشرب",
+          "transliteration": "lishtot",
+          "part_of_speech": "verb"
+        }
+      ],
+      [
+        {
+          "id": "A2V_252",
+          "hebrew": "תה",
+          "arabic": "شاي",
+          "transliteration": "te",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_253",
+          "hebrew": "לימון",
+          "arabic": "ليمون",
+          "transliteration": "limon",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_254",
+          "hebrew": "קפה עם חלב",
+          "arabic": "قهوة مع حليب",
+          "transliteration": "kafe im chalav",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_255",
+          "hebrew": "דבש",
+          "arabic": "عسل",
+          "transliteration": "dvash",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_256",
+          "hebrew": "אחרי שבוע",
+          "arabic": "بعد أسبوع",
+          "transliteration": "acharei shavua",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_257",
+          "hebrew": "בטלפון",
+          "arabic": "بالهاتف",
+          "transliteration": "batelefon",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_258",
+          "hebrew": "ככה ככה",
+          "arabic": "نص نص / هكذا هكذا",
+          "transliteration": "kacha kacha",
+          "part_of_speech": "expression"
+        },
+        {
+          "id": "A2V_259",
+          "hebrew": "כבר אין לי",
+          "arabic": "لم يعد لدي",
+          "transliteration": "kvar ein li",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_260",
+          "hebrew": "כואבות",
+          "arabic": "تؤلمان / تؤلم",
+          "transliteration": "koavot",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_261",
+          "hebrew": "לקבוע תור",
+          "arabic": "تحديد موعد",
+          "transliteration": "likboa tor",
+          "part_of_speech": "verb phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_262",
+          "hebrew": "רופא אף אוזן גרון",
+          "arabic": "طبيب أنف أذن حنجرة",
+          "transliteration": "rofe af ozen garon",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_263",
+          "hebrew": "יכולה",
+          "arabic": "تستطيع",
+          "transliteration": "yechola",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_264",
+          "hebrew": "מרפאה",
+          "arabic": "عيادة",
+          "transliteration": "mirpaa",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_265",
+          "hebrew": "מזכירה",
+          "arabic": "سكرتيرة",
+          "transliteration": "mazkira",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_266",
+          "hebrew": "אינטרנט",
+          "arabic": "إنترنت",
+          "transliteration": "internet",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_267",
+          "hebrew": "אפליקציה",
+          "arabic": "تطبيق",
+          "transliteration": "aplikatzia",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_268",
+          "hebrew": "קופת חולים",
+          "arabic": "صندوق مرضى",
+          "transliteration": "kupat cholim",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_269",
+          "hebrew": "המזכירה",
+          "arabic": "السكرتيرة",
+          "transliteration": "hamazkira",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_270",
+          "hebrew": "לקבוע תור",
+          "arabic": "تحديد موعد",
+          "transliteration": "likboa tor",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_271",
+          "hebrew": "בית חנינה",
+          "arabic": "بيت حنينا",
+          "transliteration": "beit chanina",
+          "part_of_speech": "place"
+        }
+      ],
+      [
+        {
+          "id": "A2V_272",
+          "hebrew": "בעוד חמישה שבועות",
+          "arabic": "بعد خمسة أسابيع",
+          "transliteration": "be'od chamisha shavuot",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_273",
+          "hebrew": "חמישה שבועות",
+          "arabic": "خمسة أسابيع",
+          "transliteration": "chamisha shavuot",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_274",
+          "hebrew": "כואבות לי",
+          "arabic": "تؤلمانني",
+          "transliteration": "koavot li",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_275",
+          "hebrew": "עכשיו",
+          "arabic": "الآن",
+          "transliteration": "achshav",
+          "part_of_speech": "adverb"
+        },
+        {
+          "id": "A2V_276",
+          "hebrew": "מצטערת",
+          "arabic": "آسفة",
+          "transliteration": "mitzta'eret",
+          "part_of_speech": "adjective/verb"
+        },
+        {
+          "id": "A2V_277",
+          "hebrew": "תור אחר",
+          "arabic": "موعد آخر",
+          "transliteration": "tor acher",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_278",
+          "hebrew": "יכולה לעשות",
+          "arabic": "تستطيع أن تفعل",
+          "transliteration": "yechola la'asot",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_279",
+          "hebrew": "אולי",
+          "arabic": "ربما",
+          "transliteration": "ulai",
+          "part_of_speech": "adverb"
+        },
+        {
+          "id": "A2V_280",
+          "hebrew": "לבדוק",
+          "arabic": "يفحص / يتحقق",
+          "transliteration": "livdok",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_281",
+          "hebrew": "כל יום",
+          "arabic": "كل يوم",
+          "transliteration": "kol yom",
+          "part_of_speech": "time phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_282",
+          "hebrew": "ללכת לרופא",
+          "arabic": "الذهاب إلى الطبيب",
+          "transliteration": "lalechet larofe",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_283",
+          "hebrew": "שכונה אחרת",
+          "arabic": "حي آخر",
+          "transliteration": "shchuna acheret",
+          "part_of_speech": "noun phrase"
+        }
+      ]
+    ]
+  },
+  "daily_life": {
+    "total_words": 65,
+    "num_levels": 7,
+    "levels": [
+      [
+        {
+          "id": "A2V_069",
+          "hebrew": "בוקר",
+          "arabic": "صباح",
+          "transliteration": "boker",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_070",
+          "hebrew": "שכונה",
+          "arabic": "حي",
+          "transliteration": "shchuna",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_071",
+          "hebrew": "שבע וחצי",
+          "arabic": "السابعة والنصف",
+          "transliteration": "sheva ve-chetzi",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_072",
+          "hebrew": "לוקחת",
+          "arabic": "تأخذ",
+          "transliteration": "lokachat",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_073",
+          "hebrew": "בית הספר",
+          "arabic": "المدرسة",
+          "transliteration": "beit hasefer",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_074",
+          "hebrew": "רחוב",
+          "arabic": "شارع",
+          "transliteration": "rechov",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_075",
+          "hebrew": "מכירה",
+          "arabic": "تعرف",
+          "transliteration": "makira",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_076",
+          "hebrew": "מה נשמע",
+          "arabic": "كيف الحال",
+          "transliteration": "ma nishma",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_077",
+          "hebrew": "בוקר טוב",
+          "arabic": "صباح الخير",
+          "transliteration": "boker tov",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_078",
+          "hebrew": "בתים ישנים",
+          "arabic": "بيوت قديمة",
+          "transliteration": "batim yeshanim",
+          "part_of_speech": "noun phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_079",
+          "hebrew": "עצים",
+          "arabic": "أشجار",
+          "transliteration": "etzim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_080",
+          "hebrew": "ציפורים",
+          "arabic": "طيور",
+          "transliteration": "tziporim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_081",
+          "hebrew": "שומעת",
+          "arabic": "تسمع",
+          "transliteration": "shoma'at",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_082",
+          "hebrew": "רעש",
+          "arabic": "ضجيج",
+          "transliteration": "ra'ash",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_083",
+          "hebrew": "משאיות",
+          "arabic": "شاحنات",
+          "transliteration": "masa'iyot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_084",
+          "hebrew": "אוטובוסים",
+          "arabic": "باصات",
+          "transliteration": "otobusim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_085",
+          "hebrew": "בדרך הביתה",
+          "arabic": "في الطريق إلى البيت",
+          "transliteration": "baderech habayta",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_086",
+          "hebrew": "קונה",
+          "arabic": "تشتري / يشتري",
+          "transliteration": "kona",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_087",
+          "hebrew": "לחם טרי",
+          "arabic": "خبز طازج",
+          "transliteration": "lechem tari",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_088",
+          "hebrew": "מאפייה",
+          "arabic": "مخبز",
+          "transliteration": "ma'afia",
+          "part_of_speech": "noun"
+        }
+      ],
+      [
+        {
+          "id": "A2V_089",
+          "hebrew": "דלפק",
+          "arabic": "كاونتر / طاولة خدمة",
+          "transliteration": "dalpak",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_090",
+          "hebrew": "רדיו",
+          "arabic": "راديو",
+          "transliteration": "radio",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_091",
+          "hebrew": "שירים",
+          "arabic": "أغانٍ",
+          "transliteration": "shirim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_092",
+          "hebrew": "שיר",
+          "arabic": "أغنية",
+          "transliteration": "shir",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_093",
+          "hebrew": "אחר כך",
+          "arabic": "بعد ذلك",
+          "transliteration": "achar kach",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_094",
+          "hebrew": "חנות הירקות",
+          "arabic": "محل الخضار",
+          "transliteration": "chanut hayerakot",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_095",
+          "hebrew": "גזר",
+          "arabic": "جزر",
+          "transliteration": "gezer",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_096",
+          "hebrew": "בצל",
+          "arabic": "بصل",
+          "transliteration": "batzal",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_097",
+          "hebrew": "פוגשת",
+          "arabic": "تلتقي",
+          "transliteration": "pogeshet",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_098",
+          "hebrew": "מדברות",
+          "arabic": "يتحدثن",
+          "transliteration": "medabrot",
+          "part_of_speech": "verb"
+        }
+      ],
+      [
+        {
+          "id": "A2V_099",
+          "hebrew": "זמן",
+          "arabic": "وقت",
+          "transliteration": "zman",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_100",
+          "hebrew": "רצה",
+          "arabic": "تركض",
+          "transliteration": "ratza",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_101",
+          "hebrew": "עבודה",
+          "arabic": "عمل",
+          "transliteration": "avoda",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_102",
+          "hebrew": "דואר",
+          "arabic": "بريد",
+          "transliteration": "doar",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_103",
+          "hebrew": "שותות",
+          "arabic": "يشربن",
+          "transliteration": "shotot",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_104",
+          "hebrew": "קפה",
+          "arabic": "قهوة",
+          "transliteration": "kafe",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_105",
+          "hebrew": "יושבות",
+          "arabic": "يجلسن",
+          "transliteration": "yoshvot",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_106",
+          "hebrew": "מטבח",
+          "arabic": "مطبخ",
+          "transliteration": "mitbach",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_107",
+          "hebrew": "פתאום",
+          "arabic": "فجأة",
+          "transliteration": "pit'om",
+          "part_of_speech": "adverb"
+        },
+        {
+          "id": "A2V_108",
+          "hebrew": "השעה",
+          "arabic": "الساعة",
+          "transliteration": "hasha'a",
+          "part_of_speech": "noun"
+        }
+      ],
+      [
+        {
+          "id": "A2V_500",
+          "hebrew": "לפני שנה",
+          "arabic": "قبل سنة",
+          "transliteration": "lifnei shana",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_501",
+          "hebrew": "גרו ביחד",
+          "arabic": "سكنتا معًا",
+          "transliteration": "garu beyachad",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_502",
+          "hebrew": "ברחוב יפה",
+          "arabic": "في شارع يافا",
+          "transliteration": "birchov yafo",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_503",
+          "hebrew": "בירושלים",
+          "arabic": "في القدس",
+          "transliteration": "birushalayim",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_504",
+          "hebrew": "קמו",
+          "arabic": "استيقظوا / قمن",
+          "transliteration": "kamu",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_505",
+          "hebrew": "כל יום",
+          "arabic": "كل يوم",
+          "transliteration": "kol yom",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_506",
+          "hebrew": "בשעה שבע וחצי",
+          "arabic": "في الساعة السابعة والنصف",
+          "transliteration": "besha'a sheva vachetzi",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_507",
+          "hebrew": "אכלו",
+          "arabic": "أكلوا / تناولوا",
+          "transliteration": "achlu",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_508",
+          "hebrew": "ארוחת בוקר",
+          "arabic": "وجبة فطور",
+          "transliteration": "aruchat boker",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_509",
+          "hebrew": "באו ביחד",
+          "arabic": "جاؤوا معًا",
+          "transliteration": "ba'u beyachad",
+          "part_of_speech": "verb phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_510",
+          "hebrew": "לאוניברסיטה",
+          "arabic": "إلى الجامعة",
+          "transliteration": "la'universita",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_511",
+          "hebrew": "למדו ביחד",
+          "arabic": "درسوا معًا",
+          "transliteration": "lamdu beyachad",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_512",
+          "hebrew": "בכיתה",
+          "arabic": "في الصف",
+          "transliteration": "bakita",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_513",
+          "hebrew": "אחרי הלימודים",
+          "arabic": "بعد الدراسة",
+          "transliteration": "acharei halimudim",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_514",
+          "hebrew": "רצו לדירה",
+          "arabic": "ركضتا إلى الشقة",
+          "transliteration": "ratzu ladira",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_515",
+          "hebrew": "שמו את התיק",
+          "arabic": "وضعوا الحقيبة",
+          "transliteration": "samu et hatik",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_516",
+          "hebrew": "ואז",
+          "arabic": "ثم",
+          "transliteration": "ve'az",
+          "part_of_speech": "connector"
+        },
+        {
+          "id": "A2V_517",
+          "hebrew": "בגן סאקר",
+          "arabic": "في حديقة ساكر",
+          "transliteration": "began saker",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_518",
+          "hebrew": "בקיץ",
+          "arabic": "في الصيف",
+          "transliteration": "bakayitz",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_519",
+          "hebrew": "טסו ביחד",
+          "arabic": "سافروا معًا بالطائرة",
+          "transliteration": "tasu beyachad",
+          "part_of_speech": "verb phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_520",
+          "hebrew": "לחופשה",
+          "arabic": "إلى عطلة",
+          "transliteration": "lechufsha",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_521",
+          "hebrew": "באיסטנבול",
+          "arabic": "في إسطنبول",
+          "transliteration": "be'istanbul",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_522",
+          "hebrew": "אהבו לעשות",
+          "arabic": "أحبوا أن يفعلوا",
+          "transliteration": "ahavu la'asot",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_523",
+          "hebrew": "הכול ביחד",
+          "arabic": "كل شيء معًا",
+          "transliteration": "hakol beyachad",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_524",
+          "hebrew": "אף פעם לא רבו",
+          "arabic": "لم يتشاجروا أبدًا",
+          "transliteration": "af pa'am lo ravu",
+          "part_of_speech": "sentence phrase"
+        }
+      ]
+    ]
+  },
+  "past_events": {
+    "total_words": 54,
+    "num_levels": 6,
+    "levels": [
+      [
+        {
+          "id": "A2V_401",
+          "hebrew": "מסיבת הפתעה",
+          "arabic": "حفلة مفاجأة",
+          "transliteration": "mesibat hafta'a",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_402",
+          "hebrew": "בת 21",
+          "arabic": "عمرها 21",
+          "transliteration": "bat esrim ve'achat",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_403",
+          "hebrew": "מדעי המחשב",
+          "arabic": "علوم الحاسوب",
+          "transliteration": "mada'ei hamachshev",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_404",
+          "hebrew": "אוניברסיטה",
+          "arabic": "جامعة",
+          "transliteration": "universita",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_405",
+          "hebrew": "בשבוע הבא",
+          "arabic": "في الأسبوع القادم",
+          "transliteration": "bashavua haba",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_406",
+          "hebrew": "יום הולדת",
+          "arabic": "عيد ميلاد",
+          "transliteration": "yom huledet",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_407",
+          "hebrew": "החברות שלה",
+          "arabic": "صديقاتها",
+          "transliteration": "hachaverot shela",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_408",
+          "hebrew": "רוצות",
+          "arabic": "يردن",
+          "transliteration": "rotzot",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_409",
+          "hebrew": "לעשות",
+          "arabic": "أن يعمل / يفعل",
+          "transliteration": "la'asot",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_410",
+          "hebrew": "שבוע לפני המסיבה",
+          "arabic": "أسبوع قبل الحفلة",
+          "transliteration": "shavua lifnei hamesiba",
+          "part_of_speech": "time expression"
+        }
+      ],
+      [
+        {
+          "id": "A2V_411",
+          "hebrew": "איפה",
+          "arabic": "أين",
+          "transliteration": "eifo",
+          "part_of_speech": "question word"
+        },
+        {
+          "id": "A2V_412",
+          "hebrew": "אולי",
+          "arabic": "ربما",
+          "transliteration": "ulai",
+          "part_of_speech": "adverb"
+        },
+        {
+          "id": "A2V_413",
+          "hebrew": "הבית קטן",
+          "arabic": "البيت صغير",
+          "transliteration": "habayit katan",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_414",
+          "hebrew": "צריכות",
+          "arabic": "نحتاج / يجب علينا للمؤنث",
+          "transliteration": "tzrichot",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_415",
+          "hebrew": "מקום גדול",
+          "arabic": "مكان كبير",
+          "transliteration": "makom gadol",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_416",
+          "hebrew": "מסעדת דגים",
+          "arabic": "مطعم سمك",
+          "transliteration": "mis'adat dagim",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_417",
+          "hebrew": "דגים",
+          "arabic": "سمك / أسماك",
+          "transliteration": "dagim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_418",
+          "hebrew": "רעיון טוב",
+          "arabic": "فكرة جيدة",
+          "transliteration": "ra'ayon tov",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_419",
+          "hebrew": "את מי",
+          "arabic": "من",
+          "transliteration": "et mi",
+          "part_of_speech": "question phrase"
+        },
+        {
+          "id": "A2V_420",
+          "hebrew": "להזמין",
+          "arabic": "يدعو",
+          "transliteration": "lehazmin",
+          "part_of_speech": "verb"
+        }
+      ],
+      [
+        {
+          "id": "A2V_421",
+          "hebrew": "חברים מהלימודים",
+          "arabic": "أصدقاء من الدراسة",
+          "transliteration": "chaverim mehalimudim",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_422",
+          "hebrew": "חברות טובות",
+          "arabic": "صديقات جيدات",
+          "transliteration": "chaverot tovot",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_423",
+          "hebrew": "אני מזמינה אותן",
+          "arabic": "أنا أدعوهن",
+          "transliteration": "ani mazmina otan",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_424",
+          "hebrew": "מה עם",
+          "arabic": "ماذا عن",
+          "transliteration": "ma im",
+          "part_of_speech": "question phrase"
+        },
+        {
+          "id": "A2V_425",
+          "hebrew": "כן, בטח",
+          "arabic": "نعم، بالتأكيد",
+          "transliteration": "ken, betach",
+          "part_of_speech": "expression"
+        },
+        {
+          "id": "A2V_426",
+          "hebrew": "אני לא יודעת",
+          "arabic": "أنا لا أعرف",
+          "transliteration": "ani lo yoda'at",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_427",
+          "hebrew": "לא כל כך",
+          "arabic": "ليس كثيرًا",
+          "transliteration": "lo kol kach",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_428",
+          "hebrew": "אני לא אוהבת אותה",
+          "arabic": "أنا لا أحبها",
+          "transliteration": "ani lo ohevet ota",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_429",
+          "hebrew": "המורה אלכס",
+          "arabic": "المعلم أليكس",
+          "transliteration": "hamore Alex",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_430",
+          "hebrew": "תלמידים",
+          "arabic": "طلاب",
+          "transliteration": "talmidim",
+          "part_of_speech": "noun"
+        }
+      ],
+      [
+        {
+          "id": "A2V_431",
+          "hebrew": "ביום של המסיבה",
+          "arabic": "في يوم الحفلة",
+          "transliteration": "beyom shel hamesiba",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_432",
+          "hebrew": "רוצות לקחת",
+          "arabic": "تريدان أن تأخذا",
+          "transliteration": "rotzot lakachat",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_433",
+          "hebrew": "זאת הפתעה",
+          "arabic": "هذه مفاجأة",
+          "transliteration": "zot hafta'a",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_434",
+          "hebrew": "מדברת",
+          "arabic": "تتحدث",
+          "transliteration": "medaberet",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_435",
+          "hebrew": "בטלפון",
+          "arabic": "بالهاتف",
+          "transliteration": "batelefon",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_436",
+          "hebrew": "היי",
+          "arabic": "هاي / مرحبًا",
+          "transliteration": "hey",
+          "part_of_speech": "greeting"
+        },
+        {
+          "id": "A2V_437",
+          "hebrew": "הולכות",
+          "arabic": "ذاهبتان / يذهبن",
+          "transliteration": "holchot",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_438",
+          "hebrew": "אחרי הצהריים",
+          "arabic": "بعد الظهر",
+          "transliteration": "acharei hatzohorayim",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_439",
+          "hebrew": "לקניון",
+          "arabic": "إلى المجمع التجاري",
+          "transliteration": "lakanyon",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_440",
+          "hebrew": "את רוצה לבוא",
+          "arabic": "هل تريدين أن تأتي",
+          "transliteration": "at rotza lavo",
+          "part_of_speech": "question phrase"
+        }
+      ],
+      [
+        {
+          "id": "A2V_441",
+          "hebrew": "שמלה חדשה",
+          "arabic": "فستان جديد",
+          "transliteration": "simla chadasha",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_442",
+          "hebrew": "אני יכולה לקחת אתכן",
+          "arabic": "أستطيع أن آخذكما",
+          "transliteration": "ani yechola lakachat etchen",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_443",
+          "hebrew": "במכונית שלי",
+          "arabic": "بسيارتي",
+          "transliteration": "bamechonit sheli",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_444",
+          "hebrew": "יופי",
+          "arabic": "جميل",
+          "transliteration": "yofi",
+          "part_of_speech": "expression"
+        },
+        {
+          "id": "A2V_445",
+          "hebrew": "נהדר",
+          "arabic": "رائع",
+          "transliteration": "nehedar",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_446",
+          "hebrew": "בחמש",
+          "arabic": "في الخامسة",
+          "transliteration": "bechamesh",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_447",
+          "hebrew": "אין לי הרבה זמן",
+          "arabic": "ليس لدي الكثير من الوقت",
+          "transliteration": "ein li harbe zman",
+          "part_of_speech": "sentence phrase"
+        },
+        {
+          "id": "A2V_448",
+          "hebrew": "בשבע",
+          "arabic": "في السابعة",
+          "transliteration": "besheva",
+          "part_of_speech": "time expression"
+        },
+        {
+          "id": "A2V_449",
+          "hebrew": "להתרחץ",
+          "arabic": "يستحم",
+          "transliteration": "lehitrachetz",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_450",
+          "hebrew": "להתלבש",
+          "arabic": "يلبس",
+          "transliteration": "lehitlabesh",
+          "part_of_speech": "verb"
+        }
+      ],
+      [
+        {
+          "id": "A2V_451",
+          "hebrew": "להסתרק",
+          "arabic": "يمشط / يسرّح شعره",
+          "transliteration": "lehistarek",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_452",
+          "hebrew": "להתאפר",
+          "arabic": "يضع مكياج",
+          "transliteration": "lehitaper",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_453",
+          "hebrew": "לאן את הולכת",
+          "arabic": "إلى أين أنت ذاهبة",
+          "transliteration": "le'an at holechet",
+          "part_of_speech": "question phrase"
+        },
+        {
+          "id": "A2V_454",
+          "hebrew": "המשפחה שלי",
+          "arabic": "عائلتي",
+          "transliteration": "hamishpacha sheli",
+          "part_of_speech": "noun phrase"
+        }
+      ]
+    ]
+  },
+  "shopping_leisure": {
+    "total_words": 46,
+    "num_levels": 5,
+    "levels": [
+      [
+        {
+          "id": "A2V_284",
+          "hebrew": "חברות טובות",
+          "arabic": "صديقات جيدات",
+          "transliteration": "chaverot tovot",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_285",
+          "hebrew": "לראות סרטים",
+          "arabic": "مشاهدة أفلام",
+          "transliteration": "lirot sratim",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_286",
+          "hebrew": "ביחד",
+          "arabic": "معًا",
+          "transliteration": "beyachad",
+          "part_of_speech": "adverb"
+        },
+        {
+          "id": "A2V_287",
+          "hebrew": "רוצה לראות",
+          "arabic": "تريد أن ترى",
+          "transliteration": "rotza lirot",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_288",
+          "hebrew": "כרטיסים",
+          "arabic": "تذاكر",
+          "transliteration": "kartisim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_289",
+          "hebrew": "בכיף",
+          "arabic": "بكل سرور",
+          "transliteration": "bekef",
+          "part_of_speech": "expression"
+        },
+        {
+          "id": "A2V_290",
+          "hebrew": "לשתות קפה",
+          "arabic": "شرب قهوة",
+          "transliteration": "lishtot kafe",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_291",
+          "hebrew": "לפני הסרט",
+          "arabic": "قبل الفيلم",
+          "transliteration": "lifnei haseret",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_292",
+          "hebrew": "בית קפה",
+          "arabic": "مقهى",
+          "transliteration": "beit kafe",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_293",
+          "hebrew": "נחמד",
+          "arabic": "لطيف",
+          "transliteration": "nechmad",
+          "part_of_speech": "adjective"
+        }
+      ],
+      [
+        {
+          "id": "A2V_294",
+          "hebrew": "ליד",
+          "arabic": "بجانب",
+          "transliteration": "leyad",
+          "part_of_speech": "preposition"
+        },
+        {
+          "id": "A2V_295",
+          "hebrew": "ממש",
+          "arabic": "حقًا / فعلًا",
+          "transliteration": "mamash",
+          "part_of_speech": "adverb"
+        },
+        {
+          "id": "A2V_296",
+          "hebrew": "לעשות קניות",
+          "arabic": "عمل مشتريات",
+          "transliteration": "laasot kniyot",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_297",
+          "hebrew": "בסופר",
+          "arabic": "في السوبر",
+          "transliteration": "basuper",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_298",
+          "hebrew": "אין לי זמן",
+          "arabic": "ليس لدي وقت",
+          "transliteration": "ein li zman",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_299",
+          "hebrew": "אחרי הסרט",
+          "arabic": "بعد الفيلم",
+          "transliteration": "acharei haseret",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_300",
+          "hebrew": "יאללה",
+          "arabic": "يلا",
+          "transliteration": "yalla",
+          "part_of_speech": "expression"
+        },
+        {
+          "id": "A2V_301",
+          "hebrew": "בשעה שלוש",
+          "arabic": "الساعة الثالثة",
+          "transliteration": "beshaa shalosh",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_302",
+          "hebrew": "מצוין",
+          "arabic": "ممتاز",
+          "transliteration": "metzuyan",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_303",
+          "hebrew": "אוהבות",
+          "arabic": "يحببن",
+          "transliteration": "ohavot",
+          "part_of_speech": "verb"
+        }
+      ],
+      [
+        {
+          "id": "A2V_304",
+          "hebrew": "עשר",
+          "arabic": "عشرة",
+          "transliteration": "eser",
+          "part_of_speech": "number"
+        },
+        {
+          "id": "A2V_305",
+          "hebrew": "יושבות",
+          "arabic": "يجلسن",
+          "transliteration": "yoshvot",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_306",
+          "hebrew": "מדברות",
+          "arabic": "يتحدثن",
+          "transliteration": "medabrot",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_307",
+          "hebrew": "כל אחת",
+          "arabic": "كل واحدة",
+          "transliteration": "kol achat",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_308",
+          "hebrew": "לעשות ספורט",
+          "arabic": "ممارسة الرياضة",
+          "transliteration": "laasot sport",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_309",
+          "hebrew": "אנרגיה",
+          "arabic": "طاقة",
+          "transliteration": "energia",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_310",
+          "hebrew": "לעבוד",
+          "arabic": "يعمل",
+          "transliteration": "laavod",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_311",
+          "hebrew": "הגוף",
+          "arabic": "الجسم",
+          "transliteration": "haguf",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_312",
+          "hebrew": "לאט",
+          "arabic": "ببطء",
+          "transliteration": "leat",
+          "part_of_speech": "adverb"
+        },
+        {
+          "id": "A2V_313",
+          "hebrew": "בשקט",
+          "arabic": "بهدوء",
+          "transliteration": "besheket",
+          "part_of_speech": "adverb"
+        }
+      ],
+      [
+        {
+          "id": "A2V_314",
+          "hebrew": "לקניות",
+          "arabic": "للتسوق",
+          "transliteration": "likniyot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_315",
+          "hebrew": "האחיות שלי",
+          "arabic": "أخواتي",
+          "transliteration": "haachayot sheli",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_316",
+          "hebrew": "לטייל",
+          "arabic": "يتنزه / يسافر",
+          "transliteration": "letayel",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_317",
+          "hebrew": "לבשל",
+          "arabic": "يطبخ",
+          "transliteration": "levashel",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_318",
+          "hebrew": "מבשלת",
+          "arabic": "تطبخ",
+          "transliteration": "mevashelet",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_319",
+          "hebrew": "לצלם",
+          "arabic": "يصور",
+          "transliteration": "letsalem",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_320",
+          "hebrew": "בתים",
+          "arabic": "بيوت",
+          "transliteration": "batim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_321",
+          "hebrew": "אנשים",
+          "arabic": "أشخاص",
+          "transliteration": "anashim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_322",
+          "hebrew": "לצייר",
+          "arabic": "يرسم",
+          "transliteration": "letsayer",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_323",
+          "hebrew": "מציירת",
+          "arabic": "ترسم",
+          "transliteration": "metsayeret",
+          "part_of_speech": "verb"
+        }
+      ],
+      [
+        {
+          "id": "A2V_324",
+          "hebrew": "קולנוע",
+          "arabic": "سينما",
+          "transliteration": "kolnoa",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_325",
+          "hebrew": "לצאת מהבית",
+          "arabic": "الخروج من البيت",
+          "transliteration": "latzet mehabayit",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_326",
+          "hebrew": "בערב",
+          "arabic": "في المساء",
+          "transliteration": "baerev",
+          "part_of_speech": "time phrase"
+        },
+        {
+          "id": "A2V_327",
+          "hebrew": "ישנים",
+          "arabic": "ينامون",
+          "transliteration": "yeshenim",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_328",
+          "hebrew": "בעלי",
+          "arabic": "زوجي",
+          "transliteration": "baali",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_329",
+          "hebrew": "קוראת ספרים",
+          "arabic": "تقرأ كتبًا",
+          "transliteration": "koret sfarim",
+          "part_of_speech": "verb phrase"
+        }
+      ]
+    ]
+  },
+  "animals_nature": {
+    "total_words": 32,
+    "num_levels": 4,
+    "levels": [
+      [
+        {
+          "id": "A2V_001",
+          "hebrew": "אנשים",
+          "arabic": "ناس / أشخاص",
+          "transliteration": "anashim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_002",
+          "hebrew": "חיים",
+          "arabic": "يعيشون",
+          "transliteration": "chayim",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_003",
+          "hebrew": "משפחות",
+          "arabic": "عائلات",
+          "transliteration": "mishpachot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_004",
+          "hebrew": "בעלי חיים",
+          "arabic": "حيوانات",
+          "transliteration": "ba'alei chayim",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_005",
+          "hebrew": "אריות",
+          "arabic": "أسود",
+          "transliteration": "arayot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_006",
+          "hebrew": "פילים",
+          "arabic": "فيلة",
+          "transliteration": "pilim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_007",
+          "hebrew": "שימפנזים",
+          "arabic": "شمبانزي",
+          "transliteration": "shimpanzim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_008",
+          "hebrew": "קבוצה",
+          "arabic": "مجموعة",
+          "transliteration": "kvutza",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_009",
+          "hebrew": "מנהיגה",
+          "arabic": "قائدة",
+          "transliteration": "manhiga",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_010",
+          "hebrew": "מבוגרת",
+          "arabic": "بالغة / كبيرة",
+          "transliteration": "mevugeret",
+          "part_of_speech": "adjective"
+        }
+      ],
+      [
+        {
+          "id": "A2V_011",
+          "hebrew": "אחיות",
+          "arabic": "أخوات",
+          "transliteration": "achayot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_012",
+          "hebrew": "בנות",
+          "arabic": "بنات",
+          "transliteration": "banot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_013",
+          "hebrew": "אחייניות",
+          "arabic": "بنات الأخ/الأخت",
+          "transliteration": "achyaniyot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_014",
+          "hebrew": "נכדים",
+          "arabic": "أحفاد",
+          "transliteration": "nechadim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_015",
+          "hebrew": "נכדות",
+          "arabic": "حفيدات",
+          "transliteration": "nechadot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_016",
+          "hebrew": "פילונים",
+          "arabic": "صغار الفيلة",
+          "transliteration": "pilonim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_017",
+          "hebrew": "משחקים",
+          "arabic": "يلعبون",
+          "transliteration": "mesachakim",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_018",
+          "hebrew": "בני הדודים",
+          "arabic": "أبناء العم/الخالة",
+          "transliteration": "bnei ha-dodim",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_019",
+          "hebrew": "נקבות",
+          "arabic": "إناث",
+          "transliteration": "nekevot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_020",
+          "hebrew": "זכרים",
+          "arabic": "ذكور",
+          "transliteration": "zcharim",
+          "part_of_speech": "noun"
+        }
+      ],
+      [
+        {
+          "id": "A2V_021",
+          "hebrew": "עוזבים",
+          "arabic": "يغادرون",
+          "transliteration": "ozvim",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_022",
+          "hebrew": "בוגרים",
+          "arabic": "بالغون",
+          "transliteration": "bogrim",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_023",
+          "hebrew": "מטפלת",
+          "arabic": "تعتني",
+          "transliteration": "metapelet",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_024",
+          "hebrew": "עוזרות",
+          "arabic": "يساعدن",
+          "transliteration": "ozrot",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_025",
+          "hebrew": "עוברים",
+          "arabic": "يعبرون / يمرون",
+          "transliteration": "ovrim",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_026",
+          "hebrew": "מים",
+          "arabic": "ماء",
+          "transliteration": "mayim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_027",
+          "hebrew": "נולד",
+          "arabic": "وُلد",
+          "transliteration": "nolad",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_028",
+          "hebrew": "חולה",
+          "arabic": "مريض",
+          "transliteration": "chole",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_029",
+          "hebrew": "מביאים",
+          "arabic": "يحضرون / يجلبون",
+          "transliteration": "mevi'im",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_030",
+          "hebrew": "אוכל",
+          "arabic": "طعام",
+          "transliteration": "ochel",
+          "part_of_speech": "noun"
+        }
+      ],
+      [
+        {
+          "id": "A2V_031",
+          "hebrew": "מת",
+          "arabic": "مات / ميت",
+          "transliteration": "met",
+          "part_of_speech": "verb/adjective"
+        },
+        {
+          "id": "A2V_032",
+          "hebrew": "עומדים",
+          "arabic": "يقفون",
+          "transliteration": "omdim",
+          "part_of_speech": "verb"
+        }
+      ]
+    ]
+  },
+  "school": {
+    "total_words": 30,
+    "num_levels": 3,
+    "levels": [
+      [
+        {
+          "id": "A2V_182",
+          "hebrew": "יום הורים",
+          "arabic": "يوم أهالي",
+          "transliteration": "yom horim",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_183",
+          "hebrew": "תלמידים",
+          "arabic": "طلاب",
+          "transliteration": "talmidim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_184",
+          "hebrew": "מורים",
+          "arabic": "معلمون",
+          "transliteration": "morim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_185",
+          "hebrew": "קודם",
+          "arabic": "أولًا",
+          "transliteration": "kodem",
+          "part_of_speech": "adverb"
+        },
+        {
+          "id": "A2V_186",
+          "hebrew": "אחר כך",
+          "arabic": "بعد ذلك",
+          "transliteration": "achar kach",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_187",
+          "hebrew": "מורה",
+          "arabic": "معلم / معلمة",
+          "transliteration": "more",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_188",
+          "hebrew": "תלמידה",
+          "arabic": "طالبة",
+          "transliteration": "talmida",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_189",
+          "hebrew": "מצוינת",
+          "arabic": "ممتازة",
+          "transliteration": "metzuyenet",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_190",
+          "hebrew": "ללמוד",
+          "arabic": "يتعلم",
+          "transliteration": "lilmod",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_191",
+          "hebrew": "לקרוא",
+          "arabic": "يقرأ",
+          "transliteration": "likro",
+          "part_of_speech": "verb"
+        }
+      ],
+      [
+        {
+          "id": "A2V_192",
+          "hebrew": "לכתוב",
+          "arabic": "يكتب",
+          "transliteration": "lichtov",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_193",
+          "hebrew": "שיעורי בית",
+          "arabic": "واجبات بيتية",
+          "transliteration": "shiurei bayit",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_194",
+          "hebrew": "ציונים",
+          "arabic": "علامات",
+          "transliteration": "tziyonim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_195",
+          "hebrew": "מקצועות",
+          "arabic": "مواضيع دراسية",
+          "transliteration": "miktzoot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_196",
+          "hebrew": "בעיה",
+          "arabic": "مشكلة",
+          "transliteration": "beaya",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_197",
+          "hebrew": "כל הזמן",
+          "arabic": "طوال الوقت",
+          "transliteration": "kol hazman",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_198",
+          "hebrew": "הפסקות",
+          "arabic": "استراحات",
+          "transliteration": "hafsakot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_199",
+          "hebrew": "משחקת",
+          "arabic": "تلعب",
+          "transliteration": "mesacheket",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_200",
+          "hebrew": "חברות",
+          "arabic": "صديقات",
+          "transliteration": "chaverot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_201",
+          "hebrew": "יושבת",
+          "arabic": "تجلس",
+          "transliteration": "yoshevet",
+          "part_of_speech": "verb"
+        }
+      ],
+      [
+        {
+          "id": "A2V_202",
+          "hebrew": "כיתה",
+          "arabic": "صف",
+          "transliteration": "kita",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_203",
+          "hebrew": "כזאת",
+          "arabic": "هكذا",
+          "transliteration": "kazot",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_204",
+          "hebrew": "בעיות",
+          "arabic": "مشاكل",
+          "transliteration": "beayot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_205",
+          "hebrew": "מביא",
+          "arabic": "يحضر",
+          "transliteration": "mevi",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_206",
+          "hebrew": "ספרים",
+          "arabic": "كتب",
+          "transliteration": "sfarim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_207",
+          "hebrew": "מחברות",
+          "arabic": "دفاتر",
+          "transliteration": "machbarot",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_208",
+          "hebrew": "חברים",
+          "arabic": "أصدقاء",
+          "transliteration": "chaverim",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_209",
+          "hebrew": "שיעור",
+          "arabic": "حصة / درس",
+          "transliteration": "shiur",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_210",
+          "hebrew": "לא טובים",
+          "arabic": "غير جيدة",
+          "transliteration": "lo tovim",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_211",
+          "hebrew": "הפסקה",
+          "arabic": "استراحة",
+          "transliteration": "hafsaka",
+          "part_of_speech": "noun"
+        }
+      ]
+    ]
+  },
+  "food_restaurant": {
+    "total_words": 24,
+    "num_levels": 3,
+    "levels": [
+      [
+        {
+          "id": "A2V_377",
+          "hebrew": "מסעדה",
+          "arabic": "مطعم",
+          "transliteration": "misada",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_378",
+          "hebrew": "אפשר",
+          "arabic": "ممكن / يمكن",
+          "transliteration": "efshar",
+          "part_of_speech": "modal"
+        },
+        {
+          "id": "A2V_379",
+          "hebrew": "לשבת פה",
+          "arabic": "الجلوس هنا",
+          "transliteration": "lashevet po",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_380",
+          "hebrew": "מותר לעשן",
+          "arabic": "مسموح التدخين",
+          "transliteration": "mutar le'ashen",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_381",
+          "hebrew": "אסור לעשן",
+          "arabic": "ممنوع التدخين",
+          "transliteration": "asur le'ashen",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_382",
+          "hebrew": "בפנים",
+          "arabic": "في الداخل",
+          "transliteration": "bifnim",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_383",
+          "hebrew": "בחוץ",
+          "arabic": "في الخارج",
+          "transliteration": "bachutz",
+          "part_of_speech": "place"
+        },
+        {
+          "id": "A2V_384",
+          "hebrew": "להזמין אוכל",
+          "arabic": "طلب طعام",
+          "transliteration": "lehazmin ochel",
+          "part_of_speech": "verb phrase"
+        },
+        {
+          "id": "A2V_385",
+          "hebrew": "כדאי",
+          "arabic": "من المفضل / يُنصح",
+          "transliteration": "kedai",
+          "part_of_speech": "modal"
+        },
+        {
+          "id": "A2V_386",
+          "hebrew": "שקשוקה",
+          "arabic": "شكشوكة",
+          "transliteration": "shakshuka",
+          "part_of_speech": "noun"
+        }
+      ],
+      [
+        {
+          "id": "A2V_387",
+          "hebrew": "טעימה",
+          "arabic": "لذيذة",
+          "transliteration": "te'ima",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_388",
+          "hebrew": "מעולה",
+          "arabic": "رائع",
+          "transliteration": "me'ule",
+          "part_of_speech": "adjective"
+        },
+        {
+          "id": "A2V_389",
+          "hebrew": "סלט",
+          "arabic": "سلطة",
+          "transliteration": "salat",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_390",
+          "hebrew": "מיץ תפוזים",
+          "arabic": "عصير برتقال",
+          "transliteration": "mitz tapuzim",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_391",
+          "hebrew": "בטח",
+          "arabic": "أكيد",
+          "transliteration": "betach",
+          "part_of_speech": "expression"
+        },
+        {
+          "id": "A2V_392",
+          "hebrew": "לשים",
+          "arabic": "يضع",
+          "transliteration": "lasim",
+          "part_of_speech": "verb"
+        },
+        {
+          "id": "A2V_393",
+          "hebrew": "טחינה",
+          "arabic": "طحينة",
+          "transliteration": "tchina",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_394",
+          "hebrew": "בצד",
+          "arabic": "على الجانب",
+          "transliteration": "batzad",
+          "part_of_speech": "phrase"
+        },
+        {
+          "id": "A2V_395",
+          "hebrew": "אין בעיה",
+          "arabic": "لا مشكلة",
+          "transliteration": "ein beaya",
+          "part_of_speech": "expression"
+        },
+        {
+          "id": "A2V_396",
+          "hebrew": "לשלם",
+          "arabic": "يدفع",
+          "transliteration": "leshalem",
+          "part_of_speech": "verb"
+        }
+      ],
+      [
+        {
+          "id": "A2V_397",
+          "hebrew": "כרטיס אשראי",
+          "arabic": "بطاقة ائتمان",
+          "transliteration": "kartis ashrai",
+          "part_of_speech": "noun phrase"
+        },
+        {
+          "id": "A2V_398",
+          "hebrew": "מזומן",
+          "arabic": "نقد",
+          "transliteration": "mezuman",
+          "part_of_speech": "noun"
+        },
+        {
+          "id": "A2V_399",
+          "hebrew": "אי אפשר",
+          "arabic": "لا يمكن",
+          "transliteration": "ee efshar",
+          "part_of_speech": "modal phrase"
+        },
+        {
+          "id": "A2V_400",
+          "hebrew": "רק במזומן",
+          "arabic": "فقط نقدًا",
+          "transliteration": "rak bemezuman",
+          "part_of_speech": "phrase"
+        }
+      ]
+    ]
+  }
+}

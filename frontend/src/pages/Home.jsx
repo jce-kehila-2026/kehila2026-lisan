@@ -14,14 +14,17 @@ import { useTranslation } from 'react-i18next';
 
 import BottomNav from '../components/BottomNav.jsx';
 import PageHeader from '../components/PageHeader.jsx';
+import VocabGame from '../components/VocabGame.jsx';
 import {
   getStudentStorySubtitle,
   getStudentStoryTitle,
   studentStories,
 } from '../data/studentStories.jsx';
+import gameWords from '../data/gameWords.json';
 import { getStoredToken, getStoredUser } from '../services/auth.js';
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'http://localhost:3000/api';
+const TOTAL_GAME_LEVELS = 86;
 const USEFUL_LINKS_DRIVE_URL =
   'https://drive.google.com/drive/folders/1AOGvvic8O2K_MzjUJIXMQwGg80unCad8';
 
@@ -126,8 +129,7 @@ function Home() {
   });
 
   const [loading, setLoading] = useState(true);
-  const [dictionaryQuery, setDictionaryQuery] = useState('');
-  const [dictionaryExpanded, setDictionaryExpanded] = useState(false);
+
   const [favoriteWords, setFavoriteWords] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('lisan-saved-words') || '[]');
@@ -156,11 +158,13 @@ function Home() {
           progressResult,
           chatsResult,
           sharedChatsResult,
+          gameProgressResult,
         ] = await Promise.allSettled([
           fetch(`${API_BASE_URL}/users/me`, { headers }),
           fetch(`${API_BASE_URL}/progress/me`, { headers }),
           fetch(`${API_BASE_URL}/chats/my`, { headers }),
           fetch(`${API_BASE_URL}/shared-chats/my`, { headers }),
+          fetch(`${API_BASE_URL}/progress/game`, { headers }),
         ]);
 
         let nextStudent = {
@@ -244,9 +248,34 @@ function Home() {
           }
         }
 
+        let gameLearnedWords = 0;
+        let gameCompletedLevels = 0;
+        if (gameProgressResult.status === 'fulfilled') {
+          try {
+            const gameData = await gameProgressResult.value.json();
+            if (gameProgressResult.value.ok && gameData?.categories) {
+              for (const [categoryKey, completedLevels] of Object.entries(gameData.categories)) {
+                gameCompletedLevels += completedLevels.length;
+                const category = gameWords[categoryKey];
+                if (!category || !Array.isArray(category.levels)) continue;
+                for (const levelIdx of completedLevels) {
+                  const level = category.levels[levelIdx];
+                  if (Array.isArray(level)) gameLearnedWords += level.length;
+                }
+              }
+            }
+          } catch {
+            // ignore — learnedWords stays as-is
+          }
+        }
+
+        const gameProgressPct = Math.round((gameCompletedLevels / TOTAL_GAME_LEVELS) * 100);
+
         nextStudent = {
           ...nextStudent,
           chatsCount: realChatsCount,
+          learnedWords: gameLearnedWords,
+          progress: gameProgressPct,
         };
 
         setStudent(nextStudent);
@@ -264,24 +293,7 @@ function Home() {
     return `${normalizeProgress(student.progress)}%`;
   }, [student.progress]);
 
-  const filteredDictionaryWords = useMemo(() => {
-    const query = dictionaryQuery.trim().toLowerCase();
 
-    if (!query) {
-      return dictionaryWords;
-    }
-
-    return dictionaryWords.filter((word) => {
-      return (
-        word.hebrew.toLowerCase().includes(query) ||
-        word.arabic.toLowerCase().includes(query)
-      );
-    });
-  }, [dictionaryQuery]);
-
-  const visibleDictionaryWords = dictionaryExpanded
-    ? filteredDictionaryWords
-    : filteredDictionaryWords.slice(0, 5);
 
   const toggleFavoriteWord = (hebrewWord) => {
     setFavoriteWords((currentWords) => {
@@ -422,134 +434,7 @@ function Home() {
           </div>
         </section>
 
-        <section
-          className="lisan-enter relative mt-8 overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(135deg,#FFFFFF_0%,#FBF8FF_48%,#F4ECFF_100%)] p-6 shadow-card transition hover:-translate-y-1.5 hover:shadow-[0_24px_56px_rgba(124,58,237,0.16)] lg:p-8"
-          style={{
-            '--lisan-enter-delay': '450ms',
-            '--lisan-enter-duration': '400ms',
-          }}
-        >
-          <div className="pointer-events-none absolute -left-12 top-4 h-44 w-44 rounded-full bg-violet-200/35 blur-3xl" />
-          <div className="pointer-events-none absolute bottom-10 right-12 h-28 w-28 rounded-full bg-fuchsia-100/70 blur-3xl" />
-
-          <div className="relative grid gap-8 md:grid-cols-[0.4fr_0.6fr]" dir="ltr">
-            <div className="pointer-events-none flex min-h-[220px] items-center justify-start md:min-h-[260px]" aria-hidden="true">
-              <img
-                src="/images/dictionary-image.png"
-                alt=""
-                className="lisan-dictionary-art h-[240px] w-full max-w-[420px] object-contain object-left opacity-100 md:h-[300px] md:max-w-[500px]"
-              />
-            </div>
-
-            <div className="relative z-10 flex min-w-0 flex-col justify-center text-right" dir="rtl">
-              <h2 className="text-[clamp(1.75rem,2.1vw,2.75rem)] font-black text-slate-950">
-                מילון עברית ↔ ערבית
-              </h2>
-              <p className="mt-3 text-[clamp(1rem,1.1vw,1.2rem)] font-medium leading-7 text-slate-600">
-                חפש מילה בעברית וקבל את התרגום לערבית
-              </p>
-
-              <label className="relative mt-5 block">
-                <span className="sr-only">חיפוש מילה בעברית</span>
-                <Search
-                  className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-violet-500"
-                  aria-hidden="true"
-                />
-                <input
-                  type="search"
-                  value={dictionaryQuery}
-                  onChange={(event) => {
-                    setDictionaryQuery(event.target.value);
-                  }}
-                  placeholder="חיפוש מילה בעברית..."
-                  className="h-14 w-full rounded-full border border-violet-100 bg-violet-50/75 py-4 pl-4 pr-12 text-right text-base font-bold text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-violet-400 focus:bg-white focus:shadow-[0_0_0_4px_rgba(124,58,237,0.12)]"
-                  dir="rtl"
-                />
-              </label>
-            </div>
-          </div>
-
-          <div className="relative z-10 mt-6 overflow-x-auto rounded-[22px] bg-white/72 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.72)] backdrop-blur-sm [scrollbar-width:thin]">
-            <table className="w-full min-w-[620px] border-collapse text-right">
-              <thead>
-                <tr className="bg-violet-50/70 text-base font-black text-violet-800">
-                  <th className="px-4 py-3">עברית</th>
-                  <th className="px-3 py-3 text-center">↔</th>
-                  <th className="px-4 py-3">العربية</th>
-                  <th className="px-3 py-3 text-center">⭐</th>
-                  <th className="px-3 py-3 text-center">🔊</th>
-                </tr>
-              </thead>
-              <tbody>
-                {visibleDictionaryWords.map((word, index) => {
-                  const isFavorite = favoriteWords.includes(word.hebrew);
-
-                  return (
-                    <tr
-                      key={`${word.hebrew}-${word.arabic}`}
-                    className="lisan-dictionary-row border-t border-violet-100/80 text-lg font-bold text-slate-800 transition hover:bg-violet-50/80"
-                      style={{ '--lisan-row-delay': `${index * 45}ms` }}
-                    >
-                      <td className="px-4 py-3">{word.hebrew}</td>
-                      <td className="px-3 py-3 text-center text-violet-500">↔</td>
-                      <td className="px-4 py-3 text-right" dir="rtl">
-                        {word.arabic}
-                      </td>
-                      <td className="px-3 py-3 text-center">
-                        <button
-                          type="button"
-                          onClick={() => toggleFavoriteWord(word.hebrew)}
-                          className={`inline-flex h-9 w-9 items-center justify-center rounded-full transition hover:-translate-y-0.5 ${
-                            isFavorite
-                              ? 'bg-amber-100 text-amber-500'
-                              : 'bg-violet-50 text-violet-400 hover:bg-violet-100 hover:text-violet-700'
-                          }`}
-                          aria-label={`סמן את ${word.hebrew} כמועדף`}
-                          aria-pressed={isFavorite}
-                        >
-                          <Star
-                            className="h-4 w-4"
-                            fill={isFavorite ? 'currentColor' : 'none'}
-                            aria-hidden="true"
-                          />
-                        </button>
-                      </td>
-                      <td className="px-3 py-3 text-center">
-                        <button
-                          type="button"
-                          onClick={() => pronounceHebrewWord(word.hebrew)}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-violet-50 text-violet-600 transition hover:-translate-y-0.5 hover:bg-violet-600 hover:text-white"
-                          aria-label={`השמע את ${word.hebrew}`}
-                        >
-                          <Volume2 className="h-4 w-4" aria-hidden="true" />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              setDictionaryExpanded((currentValue) => !currentValue);
-            }}
-            className="relative z-10 mx-auto mt-4 flex flex-col items-center justify-center gap-1 rounded-2xl px-5 py-2 text-base font-black text-violet-700 transition duration-300 hover:-translate-y-1 hover:bg-violet-50 hover:shadow-[0_14px_28px_rgba(124,58,237,0.14)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
-            aria-expanded={dictionaryExpanded}
-          >
-            <ChevronDown
-              className={`h-7 w-7 transition duration-300 ${
-                dictionaryExpanded ? 'rotate-180' : ''
-              }`}
-              aria-hidden="true"
-            />
-            <span>
-              {dictionaryExpanded ? 'הצג פחות' : 'הצג עוד מילים'}
-            </span>
-          </button>
-        </section>
+        <VocabGame />
 
         <section className="mt-8 grid gap-6 lg:grid-cols-2">
           <button

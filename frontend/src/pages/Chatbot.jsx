@@ -11,6 +11,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import PageHeader from '../components/PageHeader.jsx';
 import VoiceOrb from '../components/VoiceOrb.jsx';
+import ChatReview from '../components/chat/ChatReview.jsx';
 import { getStoredToken } from '../services/auth.js';
 import { useAudioRecorder } from '../hooks/useAudioRecorder.js';
 import { useWhisperTranscription } from '../hooks/useWhisperTranscription.js';
@@ -57,6 +58,10 @@ function Chatbot({
   const [sending, setSending] = useState(false);
   const [inputMode, setInputMode] = useState('text');
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewedChats, setReviewedChats] = useState(() => {
+    try { return JSON.parse(sessionStorage.getItem('lisan-reviewed-chats') || '[]'); } catch { return []; }
+  });
 
   // ── Stored-chat management (previous conversations) ──
   const [showHistory, setShowHistory] = useState(false);
@@ -348,91 +353,36 @@ function Chatbot({
 
   const isRecording = recorder.status === 'recording';
 
-  // ── Previous conversations: list / resume / new / delete ──
-  const fetchConversations = useCallback(async () => {
-    setLoadingConversations(true);
+  const endAndReview = () => {
+    if (!chatId || reviewedChats.includes(chatId)) return;
+    setReviewOpen(true);
+  };
+
+  const submitReview = async ({ rating, comment }) => {
     try {
-      const data = await request('/chats');
-      const list = Array.isArray(data.chats) ? data.chats : [];
-      list.sort((a, b) =>
-        String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')),
-      );
-      setConversations(list);
-    } catch (error) {
-      console.error('Failed to load conversations:', error);
-    } finally {
-      setLoadingConversations(false);
+      const token = getStoredToken();
+      if (chatId) {
+        await fetch(`http://localhost:3000/api/chats/${chatId}/review`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+          body: JSON.stringify({ rating, comment, role: 'student', scenario: scenario || null }),
+        });
+        const next = [...reviewedChats, chatId];
+        setReviewedChats(next);
+        try { sessionStorage.setItem('lisan-reviewed-chats', JSON.stringify(next)); } catch {}
+      }
+    } catch (e) { /* ignore */ }
+    finally { setReviewOpen(false); }
+  };
+
+  const skipReview = () => {
+    if (chatId) {
+      const next = [...reviewedChats, chatId];
+      setReviewedChats(next);
+      try { sessionStorage.setItem('lisan-reviewed-chats', JSON.stringify(next)); } catch {}
     }
-  }, []);
-
-  const toggleHistory = useCallback(() => {
-    setShowHistory((open) => {
-      if (!open) fetchConversations();
-      return !open;
-    });
-  }, [fetchConversations]);
-
-  const loadConversation = useCallback(
-    async (id) => {
-      if (!id || id === chatId) {
-        setShowHistory(false);
-        return;
-      }
-      try {
-        const data = await request(`/chats/${id}`);
-        const backendMessages = data.chat?.messages || [];
-        setChatId(id);
-        setSearchParams({ chatId: id });
-        setMessages(
-          backendMessages.length > 0
-            ? backendMessages.map(mapBackendMessageToUi)
-            : [{ id: 'welcome', role: 'bot', text: initialMessage }],
-        );
-        setShowHistory(false);
-      } catch (error) {
-        console.error('Failed to load conversation:', error);
-      }
-    },
-    [chatId, initialMessage, setSearchParams],
-  );
-
-  const startNewChat = useCallback(async () => {
-    try {
-      const data = await request('/chats', {
-        method: 'POST',
-        body: JSON.stringify({
-          title: title || t('chatbot'),
-          level: 'A1',
-          ...(scenario ? { scenario } : {}),
-        }),
-      });
-      const newId = data.chat.id;
-      setChatId(newId);
-      setSearchParams({ chatId: newId });
-      setMessages([{ id: 'welcome', role: 'bot', text: initialMessage }]);
-      setShowHistory(false);
-    } catch (error) {
-      console.error('Failed to start new chat:', error);
-    }
-  }, [title, t, scenario, initialMessage, setSearchParams]);
-
-  const removeConversation = useCallback(
-    async (id, event) => {
-      event.stopPropagation();
-      try {
-        await request(`/chats/${id}`, { method: 'DELETE' });
-        setConversations((cur) => cur.filter((c) => c.id !== id));
-        if (id === chatId) {
-          setMessages([{ id: 'welcome', role: 'bot', text: initialMessage }]);
-          setChatId(null);
-          setSearchParams({});
-        }
-      } catch (error) {
-        console.error('Failed to delete conversation:', error);
-      }
-    },
-    [chatId, initialMessage, setSearchParams],
-  );
+    setReviewOpen(false);
+  };
 
   return (
     <main
@@ -455,27 +405,15 @@ function Chatbot({
                 </p>
               ) : null}
             </div>
-
-            <div className="flex shrink-0 items-center gap-2">
-              <button
-                type="button"
-                onClick={startNewChat}
-                title="שיחה חדשה"
-                className="flex items-center gap-1 rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5 text-xs font-semibold text-violet-700 transition hover:bg-violet-100"
-              >
-                <MessageSquarePlus className="h-4 w-4" aria-hidden="true" />
-                <span className="hidden sm:inline">שיחה חדשה</span>
-              </button>
-              <button
-                type="button"
-                onClick={toggleHistory}
-                title="השיחות שלי"
-                className="flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
-              >
-                <History className="h-4 w-4" aria-hidden="true" />
-                <span className="hidden sm:inline">השיחות שלי</span>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={endAndReview}
+              disabled={!chatId || messages.length <= 1}
+              className="flex h-10 items-center gap-1.5 rounded-full border border-violet-200 bg-white px-4 text-sm font-bold text-violet-700 shadow-sm transition hover:bg-violet-50 disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-violet-500"
+              title="סיום ומשוב"
+            >
+              סיום ומשוב
+            </button>
           </div>
 
           {showHistory ? (
@@ -696,6 +634,12 @@ function Chatbot({
             </>
           )}
         </section>
+        <ChatReview
+          open={reviewOpen}
+          role="student"
+          onClose={skipReview}
+          onSubmit={submitReview}
+        />
       </div>
     </main>
   );

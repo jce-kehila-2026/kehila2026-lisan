@@ -35,4 +35,18 @@ router.get(
   teacherController.getStudentChats
 );
 
+router.get(
+  '/reviews',
+  requireAuth,
+  requireRole('teacher'),
+  teacherController.getChatReviews
+);
+
+router.post(
+  '/reviews/:reviewId/status',
+  requireAuth,
+  requireRole('teacher'),
+  teacherController.updateChatReviewStatus
+);
+
 module.exports = router;

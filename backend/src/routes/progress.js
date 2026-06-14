@@ -17,5 +17,15 @@ router.get(
   requireAuth,
   progressController.getMyAttempts
 );
+router.get(
+  '/game',
+  requireAuth,
+  progressController.getMyGameProgress
+);
 
+router.post(
+  '/game/complete',
+  requireAuth,
+  progressController.completeGameLevel
+);
 module.exports = router;

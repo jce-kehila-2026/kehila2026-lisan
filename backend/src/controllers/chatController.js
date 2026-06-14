@@ -1037,3 +1037,51 @@ function logChatError(event, error, context = {}) {
     event
   );
 }
+
+exports.submitChatReview = async (req, res) => {
+  try {
+    const userId = req.user.uid;
+    const { chatId } = req.params;
+    const { rating, comment = '', role = 'student', scenario = null } = req.body || {};
+
+    const numericRating = Number(rating);
+    if (!Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5) {
+      return res.status(400).json({
+        success: false,
+        error: 'rating must be an integer 1-5',
+        code: 'VALIDATION_ERROR',
+      });
+    }
+    if (role !== 'student' && role !== 'teacher') {
+      return res.status(400).json({
+        success: false,
+        error: 'role must be student or teacher',
+        code: 'VALIDATION_ERROR',
+      });
+    }
+
+    const review = {
+      chatId: chatId || null,
+      userId,
+      role,
+      scenario: scenario || null,
+      rating: numericRating,
+      comment: String(comment).slice(0, 1000),
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    };
+
+    const ref = await db.collection('chatReviews').add(review);
+
+    return res.status(201).json({ success: true, id: ref.id, review });
+  } catch (error) {
+    logChatError('submit_chat_review_failed', error, {
+      userId: req.user?.uid || null,
+    });
+    return res.status(500).json({
+      success: false,
+      error: 'Server error',
+      code: 'SERVER_ERROR',
+    });
+  }
+};

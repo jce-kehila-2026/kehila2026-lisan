@@ -21,6 +21,7 @@ import HomePage from './pages/home/HomePage.jsx';
 import TeacherHome from './pages/home/TeacherHome.jsx';
 import StudentLogin from './pages/student/Login.jsx';
 import TeacherLogin from './pages/teacher/Login.jsx';
+import TeacherReviews from './pages/teacher/Reviews.jsx';
 import DatasetUploader from './pages/teacher/DatasetUploader.jsx';
 import { getStoredUser } from './services/auth.js';
 
@@ -95,6 +96,14 @@ function App() {
           element={
             <ProtectedRoute role="teacher">
               <TeacherHome />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/reviews"
+          element={
+            <ProtectedRoute role="teacher">
+              <TeacherReviews />
             </ProtectedRoute>
           }
         />

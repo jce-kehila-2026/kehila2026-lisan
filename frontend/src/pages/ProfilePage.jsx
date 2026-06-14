@@ -19,7 +19,9 @@ import { useTranslation } from 'react-i18next';
 import BottomNav from '../components/BottomNav.jsx';
 import PageHeader from '../components/PageHeader.jsx';
 import { getCurrentUser, getStoredToken, getStoredUser } from '../services/auth.js';
+import gameWords from '../data/gameWords.json';
 
+const TOTAL_GAME_LEVELS = 86;
 const preferenceStorageKey = 'lisan-student-preferences';
 
 const labels = {
@@ -51,15 +53,15 @@ const labels = {
     complete: 'הושלם',
     wordsGoal: 'ללמוד 100 מילים',
     wordsLeft: 'נשארו {{count}} מילים',
-    totalProgress: 'התקדמות כוללת',
-    grammarLevel: 'רמת הנוכחית',
+    totalProgress: 'התקדמות במשחק',
+    grammarLevel: 'מילים שנלמדו במשחק',
     xpPoints: 'נקודות ניסיון',
     achievements: 'ההישגים שלי',
-    firstLesson: 'שיעור ראשון',
-    firstStory: 'סיפור ראשון',
+    firstLesson: 'השלמת שלב ראשון',
     firstWords: '50 מילים ראשונות',
-    reachedLevel: 'הגעת לרמה A1',
     accuracyBadge: 'דיוק {{value}}%',
+    lessonHint: 'השלימו שלב אחד במשחק',
+    accuracyHint: 'התחילו לתרגל בצ׳אט',
     openCamera: 'פתיחת מצלמה',
     takePhoto: 'צילום',
     uploadImage: 'העלאת תמונה',
@@ -94,15 +96,15 @@ const labels = {
     complete: 'مكتمل',
     wordsGoal: 'تعلم 100 كلمة',
     wordsLeft: 'بقيت {{count}} كلمة',
-    totalProgress: 'التقدم الكلي',
-    grammarLevel: 'المستوى الحالي',
+    totalProgress: 'تقدم في اللعبة',
+    grammarLevel: 'كلمات تعلمتها في اللعبة',
     xpPoints: 'نقاط خبرة',
     achievements: 'إنجازاتي',
-    firstLesson: 'الدرس الأول',
-    firstStory: 'القصة الأولى',
+    firstLesson: 'أكملت المرحلة الأولى',
     firstWords: 'أول 50 كلمة',
-    reachedLevel: 'وصلت إلى مستوى A1',
     accuracyBadge: 'دقة {{value}}%',
+    lessonHint: 'أكمل مرحلة واحدة في اللعبة',
+    accuracyHint: 'ابدأ التدرب في المحادثة',
     openCamera: 'فتح الكاميرا',
     takePhoto: 'التقاط صورة',
     uploadImage: 'رفع صورة',
@@ -162,6 +164,8 @@ function ProfilePage() {
   const storedUser = getStoredUser();
   const [user, setUser] = useState(storedUser);
   const [progress, setProgress] = useState(null);
+  const [gameLearnedWords, setGameLearnedWords] = useState(0);
+  const [gameCompletedLevels, setGameCompletedLevels] = useState(0);
   const [loading, setLoading] = useState(true);
   const [profileImage, setProfileImage] = useState(() => localStorage.getItem('lisan-profile-image') || '');
 
@@ -200,6 +204,32 @@ function ProfilePage() {
 
         setUser(currentUser);
         setProgress(progressData.progress);
+
+        try {
+          const gameRes = await fetch('http://localhost:3000/api/progress/game', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (gameRes.ok) {
+            const gameData = await gameRes.json();
+            let words = 0;
+            let levels = 0;
+            if (gameData?.categories) {
+              for (const [categoryKey, completedLevels] of Object.entries(gameData.categories)) {
+                levels += completedLevels.length;
+                const category = gameWords[categoryKey];
+                if (!category || !Array.isArray(category.levels)) continue;
+                for (const levelIdx of completedLevels) {
+                  const level = category.levels[levelIdx];
+                  if (Array.isArray(level)) words += level.length;
+                }
+              }
+            }
+            setGameLearnedWords(words);
+            setGameCompletedLevels(levels);
+          }
+        } catch {
+          // ignore — gameLearnedWords stays 0
+        }
       } catch (error) {
         console.error('Failed to load profile:', error);
       } finally {
@@ -326,14 +356,15 @@ function ProfilePage() {
     event.target.value = '';
   };
 
-  const accuracy = Math.max(0, Math.min(100, Number(progress?.accuracy ?? 35)));
-  const learnedWords = Number(progress?.correctMeaningCount ?? 35);
+  const accuracy = Math.max(0, Math.min(100, Number(progress?.accuracy ?? 0)));
+  const learnedWords = gameLearnedWords;
   const wordsGoal = 100;
   const wordsLeft = Math.max(0, wordsGoal - learnedWords);
   const xpPoints = Math.max(
     0,
     Number(progress?.totalAttempts ?? 0) * 10 + learnedWords * 5,
   );
+  const gameProgressPct = Math.round((gameCompletedLevels / TOTAL_GAME_LEVELS) * 100);
 
   const achievementCards = [
     {
@@ -342,15 +373,7 @@ function ProfilePage() {
       color: 'text-rose-500',
       bg: 'bg-rose-50',
       border: 'border-rose-100',
-      done: true,
-    },
-    {
-      key: 'firstStory',
-      icon: Rocket,
-      color: 'text-violet-600',
-      bg: 'bg-violet-50',
-      border: 'border-violet-100',
-      done: true,
+      done: learnedWords > 0,
     },
     {
       key: 'firstWords',
@@ -359,14 +382,6 @@ function ProfilePage() {
       bg: 'bg-amber-50',
       border: 'border-amber-100',
       done: learnedWords >= 50,
-    },
-    {
-      key: 'reachedLevel',
-      icon: Award,
-      color: 'text-emerald-600',
-      bg: 'bg-emerald-50',
-      border: 'border-emerald-100',
-      done: true,
     },
     {
       key: 'accuracyBadge',
@@ -557,12 +572,12 @@ function ProfilePage() {
               <div
                 className="grid h-36 w-36 place-items-center rounded-full sm:h-44 sm:w-44"
                 style={{
-                  background: `conic-gradient(#6d28d9 ${accuracy * 3.6}deg, #f1eafd 0deg)`,
+                  background: `conic-gradient(#6d28d9 ${gameProgressPct * 3.6}deg, #f1eafd 0deg)`,
                 }}
               >
                 <div className="grid h-28 w-28 place-items-center rounded-full bg-white text-center shadow-inner sm:h-32 sm:w-32">
                   <div>
-                    <p className="text-3xl font-black text-slate-950">{accuracy}%</p>
+                    <p className="text-3xl font-black text-slate-950">{gameProgressPct}%</p>
                     <p className="mt-1 text-xs font-black text-slate-600">{text.totalProgress}</p>
                   </div>
                 </div>
@@ -578,7 +593,7 @@ function ProfilePage() {
                 </div>
               </div>
               <div className="mt-4 h-3 overflow-hidden rounded-full bg-violet-50">
-                <div className="h-full rounded-full bg-violet-600" style={{ width: `${accuracy}%` }} />
+                <div className="h-full rounded-full bg-violet-600" style={{ width: `${gameProgressPct}%` }} />
               </div>
               <p className={`mt-3 text-base font-bold ${mutedTextClass}`}>
                 {xpPoints} / 1000 {text.xpPoints}
@@ -627,7 +642,13 @@ function ProfilePage() {
                   </span>
                   <h3 className={`mt-3 text-base font-black ${headingTextClass}`}>{label}</h3>
                   <p className={`mt-1 text-sm font-bold ${mutedTextClass}`}>
-                    {achievement.done ? text.complete : text.wordsLeft.replace('{{count}}', wordsLeft)}
+                    {achievement.done
+                      ? text.complete
+                      : achievement.key === 'firstWords'
+                        ? text.wordsLeft.replace('{{count}}', Math.max(0, 50 - learnedWords))
+                        : achievement.key === 'firstLesson'
+                          ? text.lessonHint
+                          : text.accuracyHint}
                   </p>
                 </article>
               );

@@ -268,3 +268,81 @@ exports.getStudentChats = async (req, res) => {
     });
   }
 };
+
+exports.getChatReviews = async (req, res) => {
+  try {
+    const teacherId = req.user.uid;
+    const statusFilter = (req.query.status || 'pending').trim();
+
+    // Which students belong to this teacher?
+    const studentsSnap = await db
+      .collection('users')
+      .where('role', '==', 'student')
+      .get();
+    const myStudentIds = new Set();
+    const studentNames = {};
+    studentsSnap.forEach((doc) => {
+      const data = doc.data();
+      if (isTeacherAssignedToStudent(data, teacherId)) {
+        myStudentIds.add(doc.id);
+        studentNames[doc.id] = data.name || data.email || '';
+      }
+    });
+
+    // Fetch reviews (optionally filtered by status), then keep only this teacher's students'.
+    let query = db.collection('chatReviews');
+    if (statusFilter && statusFilter !== 'all') {
+      query = query.where('status', '==', statusFilter);
+    }
+    const reviewsSnap = await query.get();
+
+    const reviews = [];
+    reviewsSnap.forEach((doc) => {
+      const data = doc.data();
+      // Student reviews are authored by the student (userId === student). Keep only mine.
+      if (data.role === 'student' && !myStudentIds.has(data.userId)) {
+        return;
+      }
+      reviews.push({
+        id: doc.id,
+        chatId: data.chatId || null,
+        userId: data.userId,
+        studentName: studentNames[data.userId] || '',
+        role: data.role || 'student',
+        rating: data.rating,
+        comment: data.comment || '',
+        scenario: data.scenario || null,
+        status: data.status || 'pending',
+        createdAt: data.createdAt || null,
+      });
+    });
+
+    // newest first
+    reviews.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+
+    return res.status(200).json({ success: true, count: reviews.length, reviews });
+  } catch (error) {
+    console.error('Get chat reviews error:', error);
+    return res.status(500).json({ success: false, error: 'Server error', code: 'SERVER_ERROR' });
+  }
+};
+
+exports.updateChatReviewStatus = async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+    const { status } = req.body || {};
+    if (status !== 'confirmed' && status !== 'rejected' && status !== 'pending') {
+      return res.status(400).json({ success: false, error: 'invalid status', code: 'VALIDATION_ERROR' });
+    }
+    const ref = db.collection('chatReviews').doc(reviewId);
+    const doc = await ref.get();
+    if (!doc.exists) {
+      return res.status(404).json({ success: false, error: 'review not found', code: 'NOT_FOUND' });
+    }
+    await ref.set({ status, reviewedBy: req.user.uid, reviewedAt: new Date().toISOString() }, { merge: true });
+    return res.status(200).json({ success: true, id: reviewId, status });
+  } catch (error) {
+    console.error('Update chat review status error:', error);
+    return res.status(500).json({ success: false, error: 'Server error', code: 'SERVER_ERROR' });
+  }
+};
