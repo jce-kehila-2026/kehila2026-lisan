@@ -2,16 +2,21 @@ const express = require('express');
 const router = express.Router();
 const { GoogleGenAI } = require('@google/genai');
 
+const { requireAuth } = require('../middleware/auth');
+const { requireRole } = require('../middleware/roles');
+
 const ai = new GoogleGenAI({
   apiKey: process.env.GOOGLE_API_KEY,
 });
 
-router.post('/generate', async (req, res) => {
+router.post('/generate', requireAuth, requireRole('teacher', 'admin'), async (req, res) => {
   try {
     const { transcript, level, category } = req.body;
 
     if (!transcript || !level || !category) {
-      return res.status(400).json({ error: 'Missing required fields: transcript, level, or category' });
+      return res.status(400).json({
+        error: 'Missing required fields: transcript, level, or category'
+      });
     }
 
     const systemPrompt = `You are a linguistic AI assistant acting as the brain for an educational dataset generator.
@@ -68,10 +73,14 @@ Ensure you adhere to this EXACT JSON schema for the output:
     const responseContent = completion.text;
     const parsedData = JSON.parse(responseContent);
 
-    res.json(parsedData);
+    return res.status(200).json(parsedData);
   } catch (error) {
     console.error('Error generating dataset via Gemini:', error);
-    res.status(500).json({ error: 'Failed to generate dataset', details: error.message });
+
+    return res.status(500).json({
+      error: 'Failed to generate dataset',
+      details: error.message
+    });
   }
 });
 

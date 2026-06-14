@@ -8,11 +8,14 @@ const adminController = require('../controllers/adminController');
 const { requireAuth } = require('../middleware/auth');
 const { requireRole } = require('../middleware/roles');
 const { adminRateLimit } = require('../middleware/adminRateLimit');
-const { createAiRequestConfig } = require('../services/aiChatService');
+const {
+  createAiRequestConfig,
+  normalizeAiServiceBaseUrl
+} = require('../services/aiChatService');
 
 router.use(adminRateLimit);
 
-const AI_SERVICE_BASE = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+const getAiServiceBase = () => normalizeAiServiceBaseUrl();
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -34,7 +37,7 @@ router.delete('/users/:id', requireAuth, requireRole('admin'), adminController.d
 router.get('/ai/analytics', requireAuth, requireRole('admin'), async (req, res) => {
   try {
     const response = await axios.get(
-      `${AI_SERVICE_BASE}/api/ai/analytics`,
+      `${getAiServiceBase()}/api/ai/analytics`,
       createAiRequestConfig()
     );
 
@@ -57,7 +60,7 @@ router.post(
   async (req, res) => {
     try {
       const response = await axios.post(
-        `${AI_SERVICE_BASE}/api/ai/admin/circuits/reset`,
+        `${getAiServiceBase()}/api/ai/admin/circuits/reset`,
         {},
         createAiRequestConfig({
           headers: { 'Content-Type': 'application/json' }
@@ -94,7 +97,7 @@ router.get('/ai/logs', requireAuth, requireRole('admin'), async (req, res) => {
     params.set('limit', String(limit));
 
     const response = await axios.get(
-      `${AI_SERVICE_BASE}/api/ai/logs?${params.toString()}`,
+      `${getAiServiceBase()}/api/ai/logs?${params.toString()}`,
       createAiRequestConfig()
     );
 
