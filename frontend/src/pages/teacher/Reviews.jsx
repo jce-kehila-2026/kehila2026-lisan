@@ -71,7 +71,7 @@ function TeacherReviews() {
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] text-slate-900">
-      <div className="app-page-container relative" dir="rtl">
+      <div className="app-page-container relative pb-32" dir="rtl">
         <PageHeader showLogout />
 
         <section className="mt-6 rounded-[28px] border border-white/80 bg-white p-6 shadow-card sm:p-7">

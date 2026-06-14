@@ -295,7 +295,7 @@ function MorePage() {
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] text-slate-900">
       <div
-        className="app-page-container relative"
+        className="app-page-container relative pb-32"
         dir="rtl"
       >
         <PageHeader showBack />
@@ -303,12 +303,12 @@ function MorePage() {
         <section className="relative mt-6 overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(135deg,#FFFFFF_0%,#FBF8FF_50%,#F3ECFF_100%)] p-6 shadow-card sm:p-7 lg:min-h-[260px] lg:p-8">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_78%_42%,rgba(196,181,253,0.24)_0%,transparent_34%)]" />
           <div className="pointer-events-none absolute -left-16 top-0 h-48 w-48 rounded-full bg-violet-100/60 blur-3xl" />
-          <div className="relative grid min-h-[220px] items-center gap-7 md:grid-cols-[minmax(0,1fr)_430px]" dir="ltr">
+          <div className="relative grid min-h-0 sm:min-h-[220px] items-center gap-7 md:grid-cols-[minmax(0,1fr)_430px]" dir="ltr">
             <div className="order-2 text-right md:order-1" dir="rtl">
               <span className="inline-flex rounded-full bg-violet-50 px-4 py-2 text-sm font-black text-violet-700">
                 {text.heroKicker}
               </span>
-              <h1 className="mt-4 text-4xl font-black leading-tight text-violet-700 lg:text-5xl">
+              <h1 className="mt-4 text-3xl font-black leading-tight text-violet-700 sm:text-4xl lg:text-5xl">
                 {text.title}
               </h1>
               <p className="mt-3 max-w-2xl text-base font-bold leading-7 text-slate-600">
@@ -320,7 +320,7 @@ function MorePage() {
               <img
                 src="/images/profile-hebrew-learning.png"
                 alt=""
-                className="h-[250px] w-full max-w-[460px] object-contain opacity-95 mix-blend-multiply md:h-[270px] [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_72%,rgba(0,0,0,0.72)_88%,transparent_100%)]"
+                className="h-[170px] w-full max-w-[460px] object-contain opacity-95 mix-blend-multiply sm:h-[220px] md:h-[270px] [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_72%,rgba(0,0,0,0.72)_88%,transparent_100%)]"
               />
             </div>
           </div>
@@ -384,7 +384,7 @@ function MorePage() {
                 return (
                   <article
                     key={item.title}
-                    className="flex min-h-[106px] items-center justify-between gap-5 rounded-[24px] bg-white p-5 shadow-card transition hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(124,58,237,0.12)]"
+                    className="flex min-h-[106px] items-center justify-between gap-3 sm:gap-5 rounded-[24px] bg-white p-5 shadow-card transition hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(124,58,237,0.12)]"
                   >
                     <div className="flex min-w-0 items-center gap-5">
                       <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-violet-50 text-violet-700">
@@ -397,7 +397,7 @@ function MorePage() {
                     </div>
                     <Link
                       to="/chatbot"
-                      className="shrink-0 rounded-full border border-violet-200 px-6 py-3 text-base font-black text-violet-700 transition hover:bg-violet-600 hover:text-white"
+                      className="shrink-0 rounded-full border border-violet-200 px-4 py-2 text-sm sm:px-6 sm:py-3 sm:text-base font-black text-violet-700 transition hover:bg-violet-600 hover:text-white"
                     >
                       {item.action}
                     </Link>
