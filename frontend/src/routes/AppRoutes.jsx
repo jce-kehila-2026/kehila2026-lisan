@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from '../pages/Home.jsx';
 import PlaceholderPage from '../pages/PlaceholderPage.jsx';
 import Chatbot from '../pages/Chatbot.jsx';
+import GamesPage from '../pages/GamesPage.jsx';
 import MorePage from '../pages/MorePage.jsx';
 import ProfilePage from '../pages/ProfilePage.jsx';
 import ScenarioChat from '../pages/ScenarioChat.jsx';
@@ -63,7 +64,7 @@ function AppRoutes() {
           }
         />
         <Route path="/story/:id" element={<PlaceholderPage type="story" />} />
-        <Route path="/games" element={<PlaceholderPage titleKey="games" />} />
+        <Route path="/games" element={<GamesPage />} />
         <Route path="/links" element={<PlaceholderPage titleKey="links" />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/chatbot" element={<Chatbot />} />

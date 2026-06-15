@@ -18,9 +18,12 @@ import { useTranslation } from 'react-i18next';
 import BottomNav from '../components/BottomNav.jsx';
 import PageHeader from '../components/PageHeader.jsx';
 import { getCurrentUser, getStoredToken, getStoredUser } from '../services/auth.js';
-import gameWords from '../data/gameWords.json';
+import {
+  gameCatalog,
+  getCompletedWordCount,
+  getTotalLevelCount,
+} from '../data/vocabGameCatalog.js';
 
-const TOTAL_GAME_LEVELS = 86;
 const preferenceStorageKey = 'lisan-student-preferences';
 
 const labels = {
@@ -213,20 +216,14 @@ function ProfilePage() {
           });
           if (gameRes.ok) {
             const gameData = await gameRes.json();
-            let words = 0;
             let levels = 0;
             if (gameData?.categories) {
               for (const [categoryKey, completedLevels] of Object.entries(gameData.categories)) {
+                if (!Array.isArray(completedLevels) || !gameCatalog[categoryKey]) continue;
                 levels += completedLevels.length;
-                const category = gameWords[categoryKey];
-                if (!category || !Array.isArray(category.levels)) continue;
-                for (const levelIdx of completedLevels) {
-                  const level = category.levels[levelIdx];
-                  if (Array.isArray(level)) words += level.length;
-                }
               }
             }
-            setGameLearnedWords(words);
+            setGameLearnedWords(getCompletedWordCount(gameData.categories, gameCatalog));
             setGameCompletedLevels(levels);
           }
         } catch {
@@ -265,7 +262,7 @@ function ProfilePage() {
     0,
     Number(progress?.totalAttempts ?? 0) * 10 + learnedWords * 5,
   );
-  const gameProgressPct = Math.round((gameCompletedLevels / TOTAL_GAME_LEVELS) * 100);
+  const gameProgressPct = Math.round((gameCompletedLevels / getTotalLevelCount(gameCatalog)) * 100);
 
   const achievementCards = [
     {
