@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Send, Users } from 'lucide-react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import BottomNav from '../components/BottomNav.jsx';
 import PageHeader from '../components/PageHeader.jsx';
@@ -8,9 +9,32 @@ import { getStoredToken, getStoredUser } from '../services/auth.js';
 
 const API_BASE_URL = '/api';
 
-function formatParticipantNames(chat, currentUserId) {
+const roomText = {
+    ar: {
+        sharedChat: 'محادثة مشتركة',
+        loadError: 'حدث خطأ أثناء تحميل المحادثة.',
+        sendError: 'حدث خطأ أثناء إرسال الرسالة.',
+        subtitle: 'محادثة بين مستخدمات النظام',
+        loading: 'جارٍ تحميل المحادثة...',
+        empty: 'لا توجد رسائل بعد.',
+        userFallback: 'مستخدمة',
+        placeholder: 'اكتبي رسالة...',
+    },
+    he: {
+        sharedChat: 'שיחה משותפת',
+        loadError: 'אירעה שגיאה בטעינת השיחה.',
+        sendError: 'אירעה שגיאה בשליחת ההודעה.',
+        subtitle: 'שיחה בין משתמשי המערכת',
+        loading: 'טוען שיחה...',
+        empty: 'אין הודעות עדיין.',
+        userFallback: 'משתמש',
+        placeholder: 'כתבי הודעה...',
+    },
+};
+
+function formatParticipantNames(chat, currentUserId, text) {
     if (!chat?.participantNames) {
-        return 'שיחה משותפת';
+        return text.sharedChat;
     }
 
     const names = Object.entries(chat.participantNames)
@@ -18,13 +42,13 @@ function formatParticipantNames(chat, currentUserId) {
         .map(([, name]) => name);
 
     if (names.length === 0) {
-        return 'שיחה משותפת';
+        return text.sharedChat;
     }
 
     return names.join(', ');
 }
 
-function formatMessageTime(value) {
+function formatMessageTime(value, language) {
     if (!value) {
         return '';
     }
@@ -35,7 +59,7 @@ function formatMessageTime(value) {
         return '';
     }
 
-    return date.toLocaleTimeString('he-IL', {
+    return date.toLocaleTimeString(language === 'he' ? 'he-IL' : 'ar', {
         hour: '2-digit',
         minute: '2-digit',
     });
@@ -43,6 +67,9 @@ function formatMessageTime(value) {
 
 function SharedChatRoom() {
     const { id } = useParams();
+    const { i18n } = useTranslation();
+    const language = i18n.language === 'he' ? 'he' : 'ar';
+    const textLabels = roomText[language];
     const user = getStoredUser();
 
     const currentUserId = user?.id || user?.uid;
@@ -80,7 +107,7 @@ function SharedChatRoom() {
             setMessages(data.messages || []);
         } catch (err) {
             console.error('Failed to load shared chat:', err);
-            setError('אירעה שגיאה בטעינת השיחה.');
+            setError(textLabels.loadError);
         } finally {
             setLoading(false);
         }
@@ -106,15 +133,15 @@ function SharedChatRoom() {
 
     const chatTitle = useMemo(() => {
         if (!chat) {
-            return 'שיחה משותפת';
+            return textLabels.sharedChat;
         }
 
         return (
-            formatParticipantNames(chat, currentUserId) ||
+            formatParticipantNames(chat, currentUserId, textLabels) ||
             chat.title ||
-            'שיחה משותפת'
+            textLabels.sharedChat
         );
-    }, [chat, currentUserId]);
+    }, [chat, currentUserId, textLabels]);
 
     const sendMessage = async () => {
         if (!text.trim()) {
@@ -150,7 +177,7 @@ function SharedChatRoom() {
             loadChat(true);
         } catch (err) {
             console.error('Failed to send message:', err);
-            setError('אירעה שגיאה בשליחת ההודעה.');
+            setError(textLabels.sendError);
         } finally {
             setSending(false);
         }
@@ -176,7 +203,7 @@ function SharedChatRoom() {
                             </h1>
 
                             <p className="mt-1 text-sm font-semibold text-slate-500">
-                                שיחה בין משתמשי המערכת
+                                {textLabels.subtitle}
                             </p>
                         </div>
                     </div>
@@ -185,7 +212,7 @@ function SharedChatRoom() {
                 <section className="mt-5 flex flex-1 flex-col rounded-3xl bg-white p-5 shadow-card sm:p-6">
                     {loading ? (
                         <p className="text-center text-sm font-semibold text-slate-500">
-                            טוען שיחה...
+                            {textLabels.loading}
                         </p>
                     ) : error ? (
                         <p className="text-center text-sm font-semibold text-violet-700">
@@ -193,7 +220,7 @@ function SharedChatRoom() {
                         </p>
                     ) : messages.length === 0 ? (
                         <p className="text-center text-sm font-semibold text-slate-500">
-                            אין הודעות עדיין.
+                            {textLabels.empty}
                         </p>
                     ) : (
                         <div className="flex max-h-[500px] flex-1 flex-col gap-3 overflow-y-auto pr-1">
@@ -202,7 +229,7 @@ function SharedChatRoom() {
                                     message.senderId === currentUserId;
 
                                 const senderName =
-                                    chat?.participantNames?.[message.senderId] || 'משתמש';
+                                    chat?.participantNames?.[message.senderId] || textLabels.userFallback;
 
                                 return (
                                     <div
@@ -226,7 +253,7 @@ function SharedChatRoom() {
                                                     : 'text-slate-400'
                                                 }`}
                                         >
-                                            {formatMessageTime(message.createdAt)}
+                                            {formatMessageTime(message.createdAt, language)}
                                         </p>
                                     </div>
                                 );
@@ -240,7 +267,7 @@ function SharedChatRoom() {
                         <input
                             value={text}
                             onChange={(event) => setText(event.target.value)}
-                            placeholder="כתבי הודעה..."
+                            placeholder={textLabels.placeholder}
                             className="min-w-0 flex-1 bg-transparent px-3 text-sm outline-none"
                             onKeyDown={(event) => {
                                 if (event.key === 'Enter') {

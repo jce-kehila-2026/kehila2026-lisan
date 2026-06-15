@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Clock, MessageCircle, Search, Send, UserRound } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import BottomNav from '../components/BottomNav.jsx';
 import PageHeader from '../components/PageHeader.jsx';
@@ -9,10 +10,61 @@ import { getStoredToken, getStoredUser } from '../services/auth.js';
 const API_BASE_URL = '/api';
 
 const roleLabels = {
-  student: 'תלמידה',
-  teacher: 'מורה',
-  expert: 'מורה',
-  admin: 'מנהל',
+  ar: {
+    student: 'طالبة',
+    teacher: 'معلمة',
+    expert: 'معلمة',
+    admin: 'مديرة',
+  },
+  he: {
+    student: 'תלמידה',
+    teacher: 'מורה',
+    expert: 'מורה',
+    admin: 'מנהל',
+  },
+};
+
+const sharedChatText = {
+  ar: {
+    sharedChat: 'محادثة مشتركة',
+    usersChat: 'محادثة بين مستخدمات',
+    loadUsersError: 'حدث خطأ أثناء تحميل المستخدمين.',
+    selectUserError: 'اختاري مستخدمة واحدة على الأقل لبدء المحادثة.',
+    openChatError: 'حدث خطأ أثناء فتح المحادثة.',
+    eyebrow: 'محادثة مشتركة',
+    title: 'اختاري مشاركات للتدريب المشترك',
+    search: 'بحث عن مستخدمات',
+    loadingUsers: 'جارٍ تحميل المستخدمين...',
+    noUsers: 'لا توجد مستخدمات متاحات',
+    userFallback: 'مستخدمة',
+    opening: 'جارٍ فتح المحادثة...',
+    start: 'بدء المحادثة',
+    myChats: 'محادثاتي',
+    refresh: 'تحديث',
+    loadingChats: 'جارٍ تحميل المحادثات...',
+    noChats: 'لا توجد محادثات بعد.',
+    noMessages: 'لا توجد رسائل بعد',
+  },
+  he: {
+    sharedChat: 'שיחה משותפת',
+    usersChat: 'שיחה בין משתמשים',
+    loadUsersError: 'אירעה שגיאה בטעינת המשתמשים.',
+    selectUserError: 'בחרי לפחות משתמש אחד להתחלת שיחה.',
+    openChatError: 'אירעה שגיאה בפתיחת השיחה.',
+    eyebrow: 'שיחה משותפת',
+    title: 'בחרי משתתפים לתרגול משותף',
+    search: 'חיפוש משתמשים',
+    loadingUsers: 'טוען משתמשים...',
+    noUsers: 'לא נמצאו משתמשים זמינים',
+    userFallback: 'משתמש',
+    opening: 'פותח שיחה...',
+    start: 'התחלת שיחה',
+    myChats: 'השיחות שלי',
+    refresh: 'רענון',
+    loadingChats: 'טוען שיחות...',
+    noChats: 'אין שיחות עדיין.',
+    noMessages: 'אין הודעות עדיין',
+  },
 };
 
 function getCurrentUserId() {
@@ -20,7 +72,7 @@ function getCurrentUserId() {
   return user?.id || user?.uid || null;
 }
 
-function formatChatTitle(chat, currentUserId) {
+function formatChatTitle(chat, currentUserId, text) {
   if (chat?.participantNames) {
     const names = Object.entries(chat.participantNames)
       .filter(([id]) => id !== currentUserId)
@@ -32,23 +84,23 @@ function formatChatTitle(chat, currentUserId) {
     }
   }
 
-  return chat?.title || 'שיחה משותפת';
+  return chat?.title || text.sharedChat;
 }
 
-function formatChatRoles(chat, currentUserId) {
+function formatChatRoles(chat, currentUserId, text, labels) {
   if (!chat?.participantRoles) {
-    return 'שיחה בין משתמשים';
+    return text.usersChat;
   }
 
   const roles = Object.entries(chat.participantRoles)
     .filter(([id]) => id !== currentUserId)
-    .map(([, role]) => roleLabels[role] || role)
+    .map(([, role]) => labels[role] || role)
     .filter(Boolean);
 
-  return roles.length > 0 ? [...new Set(roles)].join(', ') : 'שיחה בין משתמשים';
+  return roles.length > 0 ? [...new Set(roles)].join(', ') : text.usersChat;
 }
 
-function formatLastActivity(value) {
+function formatLastActivity(value, language) {
   if (!value) {
     return '';
   }
@@ -59,7 +111,7 @@ function formatLastActivity(value) {
     return '';
   }
 
-  return date.toLocaleString('he-IL', {
+  return date.toLocaleString(language === 'he' ? 'he-IL' : 'ar', {
     day: '2-digit',
     month: '2-digit',
     hour: '2-digit',
@@ -73,6 +125,10 @@ function chatTimestamp(chat) {
 
 function SharedChat() {
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
+  const language = i18n.language === 'he' ? 'he' : 'ar';
+  const text = sharedChatText[language];
+  const labels = roleLabels[language];
   const currentUserId = getCurrentUserId();
 
   const [query, setQuery] = useState('');
@@ -128,7 +184,7 @@ function SharedChat() {
         setUsers(data.users || []);
       } catch (error) {
         console.error('Failed to load available users:', error);
-        setStatus('אירעה שגיאה בטעינת המשתמשים.');
+        setStatus(text.loadUsersError);
       } finally {
         setLoadingUsers(false);
       }
@@ -136,7 +192,7 @@ function SharedChat() {
 
     loadAvailableUsers();
     loadMyChats();
-  }, []);
+  }, [text.loadUsersError]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -185,7 +241,7 @@ function SharedChat() {
 
   const startConversation = async () => {
     if (selectedIds.length === 0) {
-      setStatus('בחרי לפחות משתמש אחד להתחלת שיחה.');
+      setStatus(text.selectUserError);
       return;
     }
 
@@ -215,7 +271,7 @@ function SharedChat() {
       navigate(`/shared-chat/${data.chatId}`);
     } catch (error) {
       console.error('Failed to start shared chat:', error);
-      setStatus('אירעה שגיאה בפתיחת השיחה.');
+      setStatus(text.openChatError);
     } finally {
       setCreatingChat(false);
     }
@@ -237,11 +293,11 @@ function SharedChat() {
 
             <div>
               <p className="text-sm font-semibold text-violet-700">
-                שיחה משותפת
+                {text.eyebrow}
               </p>
 
               <h1 className="mt-1 text-2xl font-bold leading-tight text-slate-950">
-                בחרי משתתפים לתרגול משותף
+                {text.title}
               </h1>
             </div>
           </div>
@@ -252,7 +308,7 @@ function SharedChat() {
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="חיפוש משתמשים"
+              placeholder={text.search}
               className="min-w-0 flex-1 bg-transparent text-sm outline-none"
             />
           </label>
@@ -260,11 +316,11 @@ function SharedChat() {
           <div className="mt-4 flex flex-wrap gap-2">
             {loadingUsers ? (
               <p className="text-sm font-semibold text-slate-500">
-                טוען משתמשים...
+                {text.loadingUsers}
               </p>
             ) : filteredUsers.length === 0 ? (
               <p className="text-sm font-semibold text-slate-500">
-                לא נמצאו משתמשים זמינים
+                {text.noUsers}
               </p>
             ) : (
               filteredUsers.map((user) => {
@@ -281,7 +337,7 @@ function SharedChat() {
                         : 'bg-violet-50 text-violet-700 hover:bg-violet-100'
                     }`}
                   >
-                    {user.name || 'משתמש'} · {roleLabels[user.role] || user.role || 'user'}
+                    {user.name || text.userFallback} · {labels[user.role] || user.role || 'user'}
                   </button>
                 );
               })
@@ -295,7 +351,7 @@ function SharedChat() {
             className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-violet-600 px-4 py-3 text-sm font-bold text-white shadow-button transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:bg-slate-300"
           >
             <Send className="h-4 w-4" aria-hidden="true" />
-            {creatingChat ? 'פותח שיחה...' : 'התחלת שיחה'}
+            {creatingChat ? text.opening : text.start}
           </button>
 
           {status ? (
@@ -306,7 +362,7 @@ function SharedChat() {
         <section className="mt-5 rounded-3xl bg-white p-5 shadow-card sm:p-6">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-xl font-bold text-slate-900">
-              השיחות שלי
+              {text.myChats}
             </h2>
 
             <button
@@ -314,24 +370,24 @@ function SharedChat() {
               onClick={loadMyChats}
               className="rounded-full bg-violet-50 px-3 py-1.5 text-xs font-bold text-violet-700 transition hover:bg-violet-100"
             >
-              רענון
+              {text.refresh}
             </button>
           </div>
 
           <div className="mt-4 grid gap-3 lg:grid-cols-2">
             {loadingChats ? (
               <p className="text-sm font-semibold text-slate-500">
-                טוען שיחות...
+                {text.loadingChats}
               </p>
             ) : sortedChats.length === 0 ? (
               <p className="text-sm font-semibold text-slate-500">
-                אין שיחות עדיין.
+                {text.noChats}
               </p>
             ) : (
               sortedChats.map((chat) => {
-                const title = formatChatTitle(chat, currentUserId);
-                const roles = formatChatRoles(chat, currentUserId);
-                const lastActivity = formatLastActivity(chat.updatedAt || chat.createdAt);
+                const title = formatChatTitle(chat, currentUserId, text);
+                const roles = formatChatRoles(chat, currentUserId, text, labels);
+                const lastActivity = formatLastActivity(chat.updatedAt || chat.createdAt, language);
                 const isUnread = Array.isArray(chat.unreadBy) && chat.unreadBy.includes(currentUserId);
 
                 return (
@@ -367,7 +423,7 @@ function SharedChat() {
                             ? 'font-black text-slate-900'
                             : 'font-semibold text-slate-500'
                         }`}>
-                          {chat.lastMessage || 'אין הודעות עדיין'}
+                          {chat.lastMessage || text.noMessages}
                         </span>
                       </span>
 

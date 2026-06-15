@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
 import ProtectedRoute from './routes/ProtectedRoute.jsx';
 import ExistingPlaceholderPage from './pages/PlaceholderPage.jsx';
+import GamesPage from './pages/GamesPage.jsx';
 import MorePage from './pages/MorePage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import ScenarioChat from './pages/ScenarioChat.jsx';
@@ -119,7 +120,7 @@ function App() {
           path="/games"
           element={
             <ProtectedRoute role={['student', 'teacher']}>
-              <ExistingPlaceholderPage titleKey="games" />
+              <GamesPage />
             </ProtectedRoute>
           }
         />

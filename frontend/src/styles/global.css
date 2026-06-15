@@ -267,20 +267,126 @@ input {
   will-change: transform;
 }
 
-.lisan-hero-art {
-  animation: lisan-hero-art-drift 8s ease-in-out infinite;
-  transform-origin: center;
+.lisan-hero-reel {
+  isolation: isolate;
+  background:
+    linear-gradient(115deg, rgba(248, 245, 255, 0.78), rgba(255, 255, 255, 0.18)),
+    #f4ecff;
+}
+
+.lisan-hero-video-plane {
+  position: absolute;
+  inset: -18px;
+  z-index: 1;
+  transform: translate3d(var(--hero-image-x, 0px), var(--hero-image-y, 0px), 0)
+    scale(var(--hero-image-scale, 1.03));
+  transform-origin: 40% 58%;
+  transition: transform 90ms linear;
   will-change: transform;
 }
 
-@keyframes lisan-hero-art-drift {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
+.lisan-hero-art {
+  display: block;
+  object-position: left center;
+  transform: none;
+  animation: none;
+}
+
+.lisan-hero-depth-haze,
+.lisan-hero-light-sweep {
+  position: absolute;
+  pointer-events: none;
+}
+
+.lisan-hero-depth-haze {
+  inset: 0;
+  z-index: 2;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0.46) 86%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(238, 229, 255, 0.42) 100%);
+  opacity: var(--hero-haze-opacity, 0.28);
+  transition: opacity 120ms linear;
+}
+
+.lisan-hero-light-sweep {
+  inset: -28% -52%;
+  z-index: 3;
+  background: linear-gradient(
+    105deg,
+    transparent 32%,
+    rgba(255, 255, 255, 0.54) 48%,
+    rgba(230, 213, 255, 0.16) 56%,
+    transparent 68%
+  );
+  mix-blend-mode: screen;
+  opacity: var(--hero-light-opacity, 0.2);
+  transform: translate3d(var(--hero-light-x, -42%), 0, 0) rotate(3deg);
+  transition: opacity 120ms linear, transform 90ms linear;
+  will-change: transform, opacity;
+}
+
+.lisan-hero-glyph {
+  position: absolute;
+  z-index: 4;
+  color: rgba(124, 58, 237, 0.34);
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-weight: 900;
+  line-height: 1;
+  opacity: 0.58;
+  pointer-events: none;
+  text-shadow: 0 10px 28px rgba(124, 58, 237, 0.18);
+  transition: transform 90ms linear, opacity 120ms linear;
+  will-change: transform, opacity;
+}
+
+.lisan-hero-glyph--aleph {
+  top: 10%;
+  right: 22%;
+  font-size: clamp(2.2rem, 4vw, 4.9rem);
+  transform: translate3d(0, var(--hero-glyph-drift, 0px), 0) rotate(4deg);
+}
+
+.lisan-hero-glyph--bet {
+  top: 8%;
+  left: 40%;
+  font-size: clamp(2rem, 3.5vw, 4.4rem);
+  transform: translate3d(var(--hero-glyph-drift, 0px), 0, 0) rotate(-6deg);
+}
+
+.lisan-hero-glyph--ghain {
+  top: 28%;
+  right: 12%;
+  font-size: clamp(2.4rem, 4.6vw, 5.4rem);
+  transform: translate3d(0, var(--hero-glyph-drift, 0px), 0) rotate(-3deg);
+}
+
+.lisan-hero-glyph--noon {
+  top: 22%;
+  left: 63%;
+  font-size: clamp(2rem, 3.8vw, 4.7rem);
+  transform: translate3d(var(--hero-glyph-drift, 0px), 0, 0) rotate(7deg);
+}
+
+@media (max-width: 767px) {
+  .lisan-hero-video-plane {
+    inset: -14px;
   }
 
-  50% {
-    transform: translate3d(0, -8px, 0) scale(1.025);
+  .lisan-hero-glyph {
+    opacity: 0.36;
+  }
+
+  .lisan-hero-glyph--aleph,
+  .lisan-hero-glyph--ghain {
+    right: 8%;
+  }
+
+  .lisan-hero-glyph--bet {
+    left: 46%;
+  }
+
+  .lisan-hero-glyph--noon {
+    left: 70%;
   }
 }
 
@@ -317,8 +423,19 @@ input {
     animation: none;
   }
 
-  .lisan-hero-art {
-    animation: none;
+  .lisan-hero-video-plane,
+  .lisan-hero-light-sweep,
+  .lisan-hero-glyph {
+    transition: none;
+    transform: none !important;
+  }
+
+  .lisan-hero-light-sweep {
+    opacity: 0.16;
+  }
+
+  .lisan-hero-depth-haze {
+    opacity: 0.22;
   }
 }
 

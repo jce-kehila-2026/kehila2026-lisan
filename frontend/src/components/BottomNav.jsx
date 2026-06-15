@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { BotMessageSquare, Grid2X2, UserRound } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { motion, useReducedMotion } from 'framer-motion';
 
 const navItems = [
   { to: '/profile', labelKey: 'profile', icon: UserRound },
@@ -12,6 +13,7 @@ const navItems = [
 function BottomNav() {
   const { t } = useTranslation();
   const location = useLocation();
+  const reduceMotion = useReducedMotion();
   const primaryItem = navItems.find((item) => item.primary);
   const sideItems = navItems.filter((item) => !item.primary);
 
@@ -27,12 +29,25 @@ function BottomNav() {
         {sideItems.map((item) => {
           const Icon = item.icon;
           const active = location.pathname === item.to;
-          const classes = `mx-auto flex min-h-12 min-w-0 flex-col items-center justify-center rounded-2xl px-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:min-w-16 sm:px-3 ${
-            active ? 'bg-violet-50 text-violet-700 hover:-translate-y-0.5' : 'text-slate-500 hover:-translate-y-0.5 hover:bg-slate-50 hover:text-violet-700'
+          const classes = `relative mx-auto flex min-h-12 min-w-0 flex-col items-center justify-center rounded-2xl px-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:min-w-16 sm:px-3 ${
+            active ? 'text-violet-700 hover:-translate-y-0.5' : 'text-slate-500 hover:-translate-y-0.5 hover:bg-slate-50 hover:text-violet-700'
           }`;
 
           return (
             <Link key={item.to} to={item.to} className={classes} aria-label={t(item.labelKey)}>
+              {active && (
+                // Active pill glides between nav items as the route changes.
+                <motion.span
+                  layoutId="lisan-nav-indicator"
+                  aria-hidden="true"
+                  className="absolute inset-0 -z-10 rounded-2xl bg-violet-50"
+                  transition={
+                    reduceMotion
+                      ? { duration: 0 }
+                      : { type: 'spring', stiffness: 400, damping: 34 }
+                  }
+                />
+              )}
               <Icon className="h-6 w-6 transition" aria-hidden="true" />
               <span className="mt-1">{t(item.labelKey)}</span>
             </Link>
