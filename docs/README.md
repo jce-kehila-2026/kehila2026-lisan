@@ -8,6 +8,7 @@ the root [README](../README.md) for the project overview.
 - [Known limitations](known-limitations.md) — honest current constraints and trade-offs.
 
 ## Product & behavior
+- [Product spec](spec.md) — overall chatbot product goals and requirements.
 - [Chatbot specification](chatbot-spec.md) — behavioral rules, fallbacks, and answer-quality criteria.
 - [Evaluation dataset](eval/README.md) — prompts and expected behaviors used to evaluate the chatbot.
 - [Design system](DESIGN_SYSTEM.md) — UI/UX direction and component language.
