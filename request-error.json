@@ -1,8 +1,0 @@
-﻿{
-  "recognizedTextHe": "אני רוצה לעשות תור",
-  "level": "A1",
-  "activityTitle": "קביעת תור",
-  "activityTopic": "booking an appointment",
-  "expectedPatterns": ["אני רוצה לקבוע תור"],
-  "targetVocabulary": ["לקבוע תור", "תעודת זהות"]
-}
