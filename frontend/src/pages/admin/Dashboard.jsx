@@ -4,6 +4,7 @@ import {
   BookOpenCheck,
   ChevronLeft,
   ClipboardCheck,
+  Eye,
   FilePlus2,
   GraduationCap,
   MessageSquareText,
@@ -279,9 +280,9 @@ function AdminDashboard() {
         <header className="flex flex-wrap items-center justify-between gap-3">
           <button
             type="button"
-            onClick={() => navigate('/teacher/dashboard')}
+            onClick={() => navigate('/admin/dashboard')}
             className="inline-flex min-h-14 items-center gap-3 rounded-[20px] border border-violet-100/80 bg-white/90 px-3 py-2 text-right shadow-[0_10px_28px_rgba(109,40,217,0.08)] transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_14px_34px_rgba(109,40,217,0.12)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
-            aria-label="חזרה למסך הבית של המורה"
+            aria-label="חזרה ללוח הניהול"
           >
             <img
               src="/logo.png"
@@ -298,6 +299,46 @@ function AdminDashboard() {
               </span>
             </span>
           </button>
+
+          <div className="flex min-w-[17rem] flex-1 items-center justify-between gap-3 overflow-hidden rounded-[22px] border border-violet-100/80 bg-white/85 px-3 py-2 shadow-[0_12px_34px_rgba(109,40,217,0.09)] backdrop-blur sm:min-w-[24rem] lg:max-w-2xl">
+            <div className="hidden min-w-0 items-center gap-2 md:flex">
+              <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-black text-emerald-700">
+                מערכת פעילה
+              </span>
+              <span className="rounded-full bg-violet-50 px-3 py-1.5 text-xs font-black text-violet-700">
+                {adminReviewNotifications.length} ממתינות לבדיקה
+              </span>
+            </div>
+
+            <div className="flex min-w-0 flex-1 items-center justify-center gap-2 text-center">
+              <span className="rounded-2xl bg-violet-50/80 px-3 py-2">
+                <span className="block text-sm font-black leading-none text-[#160A52]">
+                  {students.length}
+                </span>
+                <span className="mt-1 block text-[11px] font-bold leading-none text-slate-500">
+                  תלמידות
+                </span>
+              </span>
+              <span className="rounded-2xl bg-fuchsia-50/80 px-3 py-2">
+                <span className="block text-sm font-black leading-none text-[#160A52]">
+                  {teachers.length}
+                </span>
+                <span className="mt-1 block text-[11px] font-bold leading-none text-slate-500">
+                  מורות
+                </span>
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => navigate('/teacher/dashboard')}
+              className="inline-flex shrink-0 items-center gap-2 rounded-[18px] bg-violet-600 px-4 py-2.5 text-sm font-black text-white shadow-[0_12px_26px_rgba(109,40,217,0.22)] transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+              aria-label="תצוגת תלמיד"
+            >
+              <Eye className="h-4 w-4" aria-hidden="true" />
+              <span>תצוגת תלמיד</span>
+            </button>
+          </div>
 
           <div className="flex items-center gap-3">
             <div className="relative">
