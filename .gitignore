@@ -35,3 +35,4 @@ ai-service/data/chatbot_quality/*.sqlite-wal
 # Firebase
 .firebase/
 .firebaserc
+ai-service/.venv/
