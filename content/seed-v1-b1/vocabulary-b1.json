@@ -1,0 +1,668 @@
+[
+  {
+    "id": "B1V_001",
+    "level": "B1",
+    "hebrew": "ריאיון",
+    "arabic": "مقابلة",
+    "transliteration": "rayon",
+    "part_of_speech": "noun",
+    "source_transcript": "01_raayon-im-yasmin.txt"
+  },
+  {
+    "id": "B1V_002",
+    "level": "B1",
+    "hebrew": "רופאת נשים",
+    "arabic": "طبيبة نساء",
+    "transliteration": "rofet nashim",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "01_raayon-im-yasmin.txt"
+  },
+  {
+    "id": "B1V_003",
+    "level": "B1",
+    "hebrew": "מיילדת",
+    "arabic": "قابلة",
+    "transliteration": "meyaledet",
+    "part_of_speech": "noun",
+    "source_transcript": "01_raayon-im-yasmin.txt"
+  },
+  {
+    "id": "B1V_004",
+    "level": "B1",
+    "hebrew": "רופא ילדים",
+    "arabic": "طبيب أطفال",
+    "transliteration": "rofe yeladim",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "01_raayon-im-yasmin.txt"
+  },
+  {
+    "id": "B1V_005",
+    "level": "B1",
+    "hebrew": "פוליטיקאית",
+    "arabic": "سياسية",
+    "transliteration": "politikait",
+    "part_of_speech": "noun",
+    "source_transcript": "01_raayon-im-yasmin.txt"
+  },
+  {
+    "id": "B1V_006",
+    "level": "B1",
+    "hebrew": "בדיקה",
+    "arabic": "فحص",
+    "transliteration": "bdika",
+    "part_of_speech": "noun",
+    "source_transcript": "01_raayon-im-yasmin.txt"
+  },
+  {
+    "id": "B1V_007",
+    "level": "B1",
+    "hebrew": "חדר לידה",
+    "arabic": "غرفة ولادة",
+    "transliteration": "chadar leda",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "01_raayon-im-yasmin.txt"
+  },
+  {
+    "id": "B1V_008",
+    "level": "B1",
+    "hebrew": "לנוח",
+    "arabic": "أن يرتاح",
+    "transliteration": "lanuach",
+    "part_of_speech": "verb",
+    "source_transcript": "01_raayon-im-yasmin.txt"
+  },
+  {
+    "id": "B1V_009",
+    "level": "B1",
+    "hebrew": "עייפה",
+    "arabic": "متعبة",
+    "transliteration": "ayefa",
+    "part_of_speech": "adjective",
+    "source_transcript": "01_raayon-im-yasmin.txt"
+  },
+  {
+    "id": "B1V_010",
+    "level": "B1",
+    "hebrew": "סבלנות",
+    "arabic": "صبر",
+    "transliteration": "savlanut",
+    "part_of_speech": "noun",
+    "source_transcript": "01_raayon-im-yasmin.txt"
+  },
+  {
+    "id": "B1V_011",
+    "level": "B1",
+    "hebrew": "תכונה",
+    "arabic": "صفة",
+    "transliteration": "tchuna",
+    "part_of_speech": "noun",
+    "source_transcript": "01_raayon-im-yasmin.txt"
+  },
+  {
+    "id": "B1V_012",
+    "level": "B1",
+    "hebrew": "סקרנות",
+    "arabic": "فضول",
+    "transliteration": "sakranut",
+    "part_of_speech": "noun",
+    "source_transcript": "01_raayon-im-yasmin.txt"
+  },
+  {
+    "id": "B1V_013",
+    "level": "B1",
+    "hebrew": "צוות",
+    "arabic": "فريق",
+    "transliteration": "tzevet",
+    "part_of_speech": "noun",
+    "source_transcript": "01_raayon-im-yasmin.txt"
+  },
+  {
+    "id": "B1V_014",
+    "level": "B1",
+    "hebrew": "לחץ",
+    "arabic": "ضغط",
+    "transliteration": "lachatz",
+    "part_of_speech": "noun",
+    "source_transcript": "01_raayon-im-yasmin.txt"
+  },
+  {
+    "id": "B1V_015",
+    "level": "B1",
+    "hebrew": "שפה",
+    "arabic": "لغة",
+    "transliteration": "safa",
+    "part_of_speech": "noun",
+    "source_transcript": "01_raayon-im-yasmin.txt"
+  },
+  {
+    "id": "B1V_016",
+    "level": "B1",
+    "hebrew": "לפתור בעיות",
+    "arabic": "حل المشكلات",
+    "transliteration": "liftor beayot",
+    "part_of_speech": "verb phrase",
+    "source_transcript": "02_targil-haazana.txt"
+  },
+  {
+    "id": "B1V_017",
+    "level": "B1",
+    "hebrew": "הקשבה",
+    "arabic": "إصغاء",
+    "transliteration": "hakshava",
+    "part_of_speech": "noun",
+    "source_transcript": "02_targil-haazana.txt"
+  },
+  {
+    "id": "B1V_018",
+    "level": "B1",
+    "hebrew": "נעימה",
+    "arabic": "لطيفة",
+    "transliteration": "neima",
+    "part_of_speech": "adjective",
+    "source_transcript": "02_targil-haazana.txt"
+  },
+  {
+    "id": "B1V_019",
+    "level": "B1",
+    "hebrew": "חום",
+    "arabic": "حرارة",
+    "transliteration": "chom",
+    "part_of_speech": "noun",
+    "source_transcript": "03_ma-yihye-im-hachom.txt"
+  },
+  {
+    "id": "B1V_020",
+    "level": "B1",
+    "hebrew": "מזגן",
+    "arabic": "مكيّف",
+    "transliteration": "mazgan",
+    "part_of_speech": "noun",
+    "source_transcript": "03_ma-yihye-im-hachom.txt"
+  },
+  {
+    "id": "B1V_021",
+    "level": "B1",
+    "hebrew": "קהילה",
+    "arabic": "مجتمع / جماعة",
+    "transliteration": "kehila",
+    "part_of_speech": "noun",
+    "source_transcript": "03_ma-yihye-im-hachom.txt"
+  },
+  {
+    "id": "B1V_022",
+    "level": "B1",
+    "hebrew": "מומחים",
+    "arabic": "خبراء",
+    "transliteration": "mumchim",
+    "part_of_speech": "noun",
+    "source_transcript": "03_ma-yihye-im-hachom.txt"
+  },
+  {
+    "id": "B1V_023",
+    "level": "B1",
+    "hebrew": "צל",
+    "arabic": "ظل",
+    "transliteration": "tzel",
+    "part_of_speech": "noun",
+    "source_transcript": "03_ma-yihye-im-hachom.txt"
+  },
+  {
+    "id": "B1V_024",
+    "level": "B1",
+    "hebrew": "מרחב הציבורי",
+    "arabic": "الفضاء العام",
+    "transliteration": "merchav hatziburi",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "03_ma-yihye-im-hachom.txt"
+  },
+  {
+    "id": "B1V_025",
+    "level": "B1",
+    "hebrew": "עיריות",
+    "arabic": "بلديات",
+    "transliteration": "iriyot",
+    "part_of_speech": "noun",
+    "source_transcript": "03_ma-yihye-im-hachom.txt"
+  },
+  {
+    "id": "B1V_026",
+    "level": "B1",
+    "hebrew": "תחבורה ציבורית",
+    "arabic": "مواصلات عامة",
+    "transliteration": "tachbura tziburit",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "03_ma-yihye-im-hachom.txt"
+  },
+  {
+    "id": "B1V_027",
+    "level": "B1",
+    "hebrew": "משמרת",
+    "arabic": "وردية",
+    "transliteration": "mishmeret",
+    "part_of_speech": "noun",
+    "source_transcript": "04_hodaa-meamit.txt"
+  },
+  {
+    "id": "B1V_028",
+    "level": "B1",
+    "hebrew": "טופס",
+    "arabic": "استمارة",
+    "transliteration": "tofes",
+    "part_of_speech": "noun",
+    "source_transcript": "04_hodaa-meamit.txt"
+  },
+  {
+    "id": "B1V_029",
+    "level": "B1",
+    "hebrew": "בית המרקחת",
+    "arabic": "الصيدلية",
+    "transliteration": "beit hamerkachat",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "04_hodaa-meamit.txt"
+  },
+  {
+    "id": "B1V_030",
+    "level": "B1",
+    "hebrew": "מסורת",
+    "arabic": "تقليد",
+    "transliteration": "masoret",
+    "part_of_speech": "noun",
+    "source_transcript": "05_aruchat-shishi.txt"
+  },
+  {
+    "id": "B1V_031",
+    "level": "B1",
+    "hebrew": "קידוש",
+    "arabic": "كيدوش (بركة)",
+    "transliteration": "kidush",
+    "part_of_speech": "noun",
+    "source_transcript": "05_aruchat-shishi.txt"
+  },
+  {
+    "id": "B1V_032",
+    "level": "B1",
+    "hebrew": "ברכה",
+    "arabic": "بركة",
+    "transliteration": "bracha",
+    "part_of_speech": "noun",
+    "source_transcript": "05_aruchat-shishi.txt"
+  },
+  {
+    "id": "B1V_033",
+    "level": "B1",
+    "hebrew": "פרחים",
+    "arabic": "زهور",
+    "transliteration": "prachim",
+    "part_of_speech": "noun",
+    "source_transcript": "05_aruchat-shishi.txt"
+  },
+  {
+    "id": "B1V_034",
+    "level": "B1",
+    "hebrew": "חתונה",
+    "arabic": "زفاف / عرس",
+    "transliteration": "chatuna",
+    "part_of_speech": "noun",
+    "source_transcript": "06_hachatuna-shel-keren-veyonatan.txt"
+  },
+  {
+    "id": "B1V_035",
+    "level": "B1",
+    "hebrew": "אולם אירועים",
+    "arabic": "قاعة أفراح",
+    "transliteration": "ulam eruim",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "06_hachatuna-shel-keren-veyonatan.txt"
+  },
+  {
+    "id": "B1V_036",
+    "level": "B1",
+    "hebrew": "חופה",
+    "arabic": "مظلة الزفاف",
+    "transliteration": "chupa",
+    "part_of_speech": "noun",
+    "source_transcript": "06_hachatuna-shel-keren-veyonatan.txt"
+  },
+  {
+    "id": "B1V_037",
+    "level": "B1",
+    "hebrew": "שמלת כלה",
+    "arabic": "فستان عروس",
+    "transliteration": "simlat kala",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "06_hachatuna-shel-keren-veyonatan.txt"
+  },
+  {
+    "id": "B1V_038",
+    "level": "B1",
+    "hebrew": "טבעת",
+    "arabic": "خاتم",
+    "transliteration": "tabaat",
+    "part_of_speech": "noun",
+    "source_transcript": "06_hachatuna-shel-keren-veyonatan.txt"
+  },
+  {
+    "id": "B1V_039",
+    "level": "B1",
+    "hebrew": "תחבורה ציבורית",
+    "arabic": "مواصلات عامة",
+    "transliteration": "tachbura tziburit",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "07_nashim-batachbura-hatziburit.txt"
+  },
+  {
+    "id": "B1V_040",
+    "level": "B1",
+    "hebrew": "מחקרים",
+    "arabic": "أبحاث",
+    "transliteration": "mechkarim",
+    "part_of_speech": "noun",
+    "source_transcript": "07_nashim-batachbura-hatziburit.txt"
+  },
+  {
+    "id": "B1V_041",
+    "level": "B1",
+    "hebrew": "סידורים",
+    "arabic": "مهام / حاجات",
+    "transliteration": "sidurim",
+    "part_of_speech": "noun",
+    "source_transcript": "07_nashim-batachbura-hatziburit.txt"
+  },
+  {
+    "id": "B1V_042",
+    "level": "B1",
+    "hebrew": "משרה חלקית",
+    "arabic": "دوام جزئي",
+    "transliteration": "misra chelkit",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "07_nashim-batachbura-hatziburit.txt"
+  },
+  {
+    "id": "B1V_043",
+    "level": "B1",
+    "hebrew": "תחנות",
+    "arabic": "محطات",
+    "transliteration": "tachanot",
+    "part_of_speech": "noun",
+    "source_transcript": "07_nashim-batachbura-hatziburit.txt"
+  },
+  {
+    "id": "B1V_044",
+    "level": "B1",
+    "hebrew": "נגישים",
+    "arabic": "متاحون / قابلون للوصول",
+    "transliteration": "negishim",
+    "part_of_speech": "adjective",
+    "source_transcript": "07_nashim-batachbura-hatziburit.txt"
+  },
+  {
+    "id": "B1V_045",
+    "level": "B1",
+    "hebrew": "תור",
+    "arabic": "موعد / دور",
+    "transliteration": "tor",
+    "part_of_speech": "noun",
+    "source_transcript": "08_kupat-cholim.txt"
+  },
+  {
+    "id": "B1V_046",
+    "level": "B1",
+    "hebrew": "צילום רנטגן",
+    "arabic": "صورة أشعة",
+    "transliteration": "tzilum rentgen",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "08_kupat-cholim.txt"
+  },
+  {
+    "id": "B1V_047",
+    "level": "B1",
+    "hebrew": "כרטיס מגנטי",
+    "arabic": "بطاقة مغناطيسية",
+    "transliteration": "kartis magneti",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "08_kupat-cholim.txt"
+  },
+  {
+    "id": "B1V_048",
+    "level": "B1",
+    "hebrew": "כואבת",
+    "arabic": "تؤلم",
+    "transliteration": "koevet",
+    "part_of_speech": "verb",
+    "source_transcript": "08_kupat-cholim.txt"
+  },
+  {
+    "id": "B1V_049",
+    "level": "B1",
+    "hebrew": "זיכוי",
+    "arabic": "رصيد (للشراء)",
+    "transliteration": "zikuy",
+    "part_of_speech": "noun",
+    "source_transcript": "09_chanut.txt"
+  },
+  {
+    "id": "B1V_050",
+    "level": "B1",
+    "hebrew": "החזר כספי",
+    "arabic": "استرداد نقدي",
+    "transliteration": "hechzer kaspi",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "09_chanut.txt"
+  },
+  {
+    "id": "B1V_051",
+    "level": "B1",
+    "hebrew": "מבצע",
+    "arabic": "عرض / تنزيلات",
+    "transliteration": "mivtza",
+    "part_of_speech": "noun",
+    "source_transcript": "09_chanut.txt"
+  },
+  {
+    "id": "B1V_052",
+    "level": "B1",
+    "hebrew": "מידה",
+    "arabic": "مقاس",
+    "transliteration": "mida",
+    "part_of_speech": "noun",
+    "source_transcript": "09_chanut.txt"
+  },
+  {
+    "id": "B1V_053",
+    "level": "B1",
+    "hebrew": "החוק",
+    "arabic": "القانون",
+    "transliteration": "hachok",
+    "part_of_speech": "noun",
+    "source_transcript": "09_chanut.txt"
+  },
+  {
+    "id": "B1V_054",
+    "level": "B1",
+    "hebrew": "תלוש משכורת",
+    "arabic": "قسيمة راتب",
+    "transliteration": "tlush maskoret",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "10_sicha-rania-sara.txt"
+  },
+  {
+    "id": "B1V_055",
+    "level": "B1",
+    "hebrew": "טעות",
+    "arabic": "خطأ",
+    "transliteration": "taut",
+    "part_of_speech": "noun",
+    "source_transcript": "10_sicha-rania-sara.txt"
+  },
+  {
+    "id": "B1V_056",
+    "level": "B1",
+    "hebrew": "לתקן",
+    "arabic": "أن يصحّح",
+    "transliteration": "letaken",
+    "part_of_speech": "verb",
+    "source_transcript": "10_sicha-rania-sara.txt"
+  },
+  {
+    "id": "B1V_057",
+    "level": "B1",
+    "hebrew": "מגיע לי",
+    "arabic": "يستحقني / من حقي",
+    "transliteration": "magia li",
+    "part_of_speech": "phrase",
+    "source_transcript": "10_sicha-rania-sara.txt"
+  },
+  {
+    "id": "B1V_058",
+    "level": "B1",
+    "hebrew": "משרה חלקית",
+    "arabic": "دوام جزئي",
+    "transliteration": "misra chelkit",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "11_baayot-betlush-hamaskoret.txt"
+  },
+  {
+    "id": "B1V_059",
+    "level": "B1",
+    "hebrew": "מעסיק",
+    "arabic": "صاحب عمل",
+    "transliteration": "maasik",
+    "part_of_speech": "noun",
+    "source_transcript": "11_baayot-betlush-hamaskoret.txt"
+  },
+  {
+    "id": "B1V_060",
+    "level": "B1",
+    "hebrew": "מנהלת",
+    "arabic": "مديرة",
+    "transliteration": "menahelet",
+    "part_of_speech": "noun",
+    "source_transcript": "11_baayot-betlush-hamaskoret.txt"
+  },
+  {
+    "id": "B1V_061",
+    "level": "B1",
+    "hebrew": "הנחה",
+    "arabic": "تخفيض",
+    "transliteration": "hanacha",
+    "part_of_speech": "noun",
+    "source_transcript": "12_baeiriya.txt"
+  },
+  {
+    "id": "B1V_062",
+    "level": "B1",
+    "hebrew": "הבטחת הכנסה",
+    "arabic": "ضمان دخل",
+    "transliteration": "havtachat hachnasa",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "12_baeiriya.txt"
+  },
+  {
+    "id": "B1V_063",
+    "level": "B1",
+    "hebrew": "חוב",
+    "arabic": "دين",
+    "transliteration": "chov",
+    "part_of_speech": "noun",
+    "source_transcript": "12_baeiriya.txt"
+  },
+  {
+    "id": "B1V_064",
+    "level": "B1",
+    "hebrew": "מחלקה",
+    "arabic": "قسم / دائرة",
+    "transliteration": "machlaka",
+    "part_of_speech": "noun",
+    "source_transcript": "12_baeiriya.txt"
+  },
+  {
+    "id": "B1V_065",
+    "level": "B1",
+    "hebrew": "זכויות",
+    "arabic": "حقوق",
+    "transliteration": "zchuyot",
+    "part_of_speech": "noun",
+    "source_transcript": "13_kshelo-mekablim-zchuyot.txt"
+  },
+  {
+    "id": "B1V_066",
+    "level": "B1",
+    "hebrew": "ביטוח לאומי",
+    "arabic": "التأمين الوطني",
+    "transliteration": "bituach leumi",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "13_kshelo-mekablim-zchuyot.txt"
+  },
+  {
+    "id": "B1V_067",
+    "level": "B1",
+    "hebrew": "אפליה",
+    "arabic": "تمييز",
+    "transliteration": "aflaya",
+    "part_of_speech": "noun",
+    "source_transcript": "13_kshelo-mekablim-zchuyot.txt"
+  },
+  {
+    "id": "B1V_068",
+    "level": "B1",
+    "hebrew": "עורכת דין",
+    "arabic": "محامية",
+    "transliteration": "orechet din",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "13_kshelo-mekablim-zchuyot.txt"
+  },
+  {
+    "id": "B1V_069",
+    "level": "B1",
+    "hebrew": "פיצויים",
+    "arabic": "تعويضات",
+    "transliteration": "pitzuyim",
+    "part_of_speech": "noun",
+    "source_transcript": "13_kshelo-mekablim-zchuyot.txt"
+  },
+  {
+    "id": "B1V_070",
+    "level": "B1",
+    "hebrew": "קצבאות",
+    "arabic": "مخصّصات",
+    "transliteration": "kitzbaot",
+    "part_of_speech": "noun",
+    "source_transcript": "14_mitzui-zchuyot.txt"
+  },
+  {
+    "id": "B1V_071",
+    "level": "B1",
+    "hebrew": "דמי אבטלה",
+    "arabic": "بدل بطالة",
+    "transliteration": "dmei avtala",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "14_mitzui-zchuyot.txt"
+  },
+  {
+    "id": "B1V_072",
+    "level": "B1",
+    "hebrew": "ארנונה",
+    "arabic": "ضريبة أملاك (أرنونا)",
+    "transliteration": "arnona",
+    "part_of_speech": "noun",
+    "source_transcript": "14_mitzui-zchuyot.txt"
+  },
+  {
+    "id": "B1V_073",
+    "level": "B1",
+    "hebrew": "חופשת לידה",
+    "arabic": "إجازة ولادة",
+    "transliteration": "chufshat leda",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "14_mitzui-zchuyot.txt"
+  },
+  {
+    "id": "B1V_074",
+    "level": "B1",
+    "hebrew": "פנסיה",
+    "arabic": "معاش تقاعد",
+    "transliteration": "pensya",
+    "part_of_speech": "noun",
+    "source_transcript": "14_mitzui-zchuyot.txt"
+  }
+]
