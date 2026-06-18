@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Bell,
   BookOpenCheck,
@@ -42,6 +42,8 @@ const dashboardSections = [
     title: 'ניהול תלמידות',
     subtitle: 'טבלת תלמידות עם רמות, כיתות, שיוכים ופעולות ניהול מלאות.',
     detail: 'כניסה לניהול תלמידות',
+    id: 'students',
+    navLabel: 'תלמידות',
     icon: Users,
     to: '/admin/students',
   },
@@ -49,6 +51,8 @@ const dashboardSections = [
     title: 'ניהול מורות',
     subtitle: 'מורות, כיתות, רמות לימוד ושיוך תלמידות.',
     detail: 'כניסה מאובטחת לניהול מורות',
+    id: 'teachers',
+    navLabel: 'מורות',
     icon: GraduationCap,
     to: '/admin/progress',
     requiresCode: true,
@@ -57,6 +61,8 @@ const dashboardSections = [
     title: 'בדיקת שיחות',
     subtitle: 'סקירת שיחות חדשות שממתינות לבדיקה.',
     detail: 'רשימת שיחות חדשות לבדיקה',
+    id: 'conversations',
+    navLabel: 'שיחות',
     icon: MessageSquareText,
     to: '/admin/conversations',
   },
@@ -64,6 +70,8 @@ const dashboardSections = [
     title: 'בדיקת מילים',
     subtitle: 'סקירת מילים חדשות וסיווג לפי רמות לימוד.',
     detail: 'ניהול מילים שממתינות לבדיקה',
+    id: 'words',
+    navLabel: 'מילים',
     icon: BookOpenCheck,
     to: '/admin/words',
   },
@@ -71,6 +79,8 @@ const dashboardSections = [
     title: 'הוספת חומרים',
     subtitle: 'העלאת חומרי לימוד וקבצי פעילות למערכת.',
     detail: 'מעבר לעמוד העלאת החומרים',
+    id: 'materials',
+    navLabel: 'חומרים',
     icon: FilePlus2,
     to: '/teacher/stories/upload',
   },
@@ -107,6 +117,7 @@ function DashboardSection({
   onOpenTeacherCode,
   navigate,
   section,
+  sectionRef,
 }) {
   const Icon = section.icon;
 
@@ -121,6 +132,8 @@ function DashboardSection({
 
   return (
     <button
+      ref={sectionRef}
+      data-section-id={section.id}
       type="button"
       onClick={handleClick}
       className={`group flex min-h-[190px] flex-col justify-between rounded-[30px] border border-violet-100/80 bg-white/95 p-5 text-right shadow-[0_18px_46px_rgba(109,40,217,0.11)] transition duration-300 hover:-translate-y-1.5 hover:border-violet-200 hover:bg-white hover:shadow-[0_26px_64px_rgba(109,40,217,0.17)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:p-6 ${layoutClass}`}
@@ -164,6 +177,9 @@ function AdminDashboard() {
   const [teacherCodeOpen, setTeacherCodeOpen] = useState(false);
   const [teacherCode, setTeacherCode] = useState('');
   const [teacherCodeError, setTeacherCodeError] = useState('');
+  const [activeSectionId, setActiveSectionId] = useState(dashboardSections[0].id);
+  const sectionRefs = useRef({});
+  const sectionVisibility = useRef({});
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -198,6 +214,52 @@ function AdminDashboard() {
     };
 
     loadUsers();
+  }, []);
+
+  useEffect(() => {
+    const visibleRatios = sectionVisibility.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const sectionId = entry.target.dataset.sectionId;
+          if (!sectionId) return;
+
+          visibleRatios[sectionId] = entry.isIntersecting
+            ? entry.intersectionRatio
+            : 0;
+        });
+
+        const nextActiveSection = dashboardSections.reduce(
+          (activeSection, section) => {
+            const activeRatio = visibleRatios[activeSection.id] || 0;
+            const sectionRatio = visibleRatios[section.id] || 0;
+
+            return sectionRatio > activeRatio ? section : activeSection;
+          },
+          dashboardSections[0],
+        );
+
+        if ((visibleRatios[nextActiveSection.id] || 0) > 0) {
+          setActiveSectionId(nextActiveSection.id);
+        }
+      },
+      {
+        root: null,
+        rootMargin: '-18% 0px -45% 0px',
+        threshold: [0, 0.2, 0.4, 0.6, 0.8, 1],
+      },
+    );
+
+    dashboardSections.forEach((section) => {
+      const node = sectionRefs.current[section.id];
+      if (node) {
+        observer.observe(node);
+      }
+    });
+
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
   const students = users.filter((item) => item.role === 'student');
@@ -259,6 +321,18 @@ function AdminDashboard() {
     });
   };
 
+  const handleSectionShortcutClick = (sectionId) => {
+    const node = sectionRefs.current[sectionId];
+
+    if (!node) return;
+
+    setActiveSectionId(sectionId);
+    node.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    });
+  };
+
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.55),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
       <style>
@@ -300,34 +374,33 @@ function AdminDashboard() {
             </span>
           </button>
 
-          <div className="flex min-w-[17rem] flex-1 items-center justify-between gap-3 overflow-hidden rounded-[22px] border border-violet-100/80 bg-white/85 px-3 py-2 shadow-[0_12px_34px_rgba(109,40,217,0.09)] backdrop-blur sm:min-w-[24rem] lg:max-w-2xl">
-            <div className="hidden min-w-0 items-center gap-2 md:flex">
-              <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-black text-emerald-700">
-                מערכת פעילה
-              </span>
-              <span className="rounded-full bg-violet-50 px-3 py-1.5 text-xs font-black text-violet-700">
-                {adminReviewNotifications.length} ממתינות לבדיקה
-              </span>
-            </div>
+          <div className="flex min-w-[17rem] flex-1 items-center justify-between gap-3 overflow-hidden rounded-[22px] border border-white/55 bg-[linear-gradient(135deg,rgba(250,232,255,0.78)_0%,rgba(237,233,254,0.78)_45%,rgba(255,228,240,0.72)_100%)] px-3 py-2 shadow-[0_16px_42px_rgba(109,40,217,0.13)] backdrop-blur-xl sm:min-w-[24rem] lg:max-w-3xl">
+            <nav
+              className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto py-0.5 text-right [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              aria-label="ניווט מהיר בלוח הניהול"
+            >
+              {dashboardSections.map((section) => {
+                const isActive = activeSectionId === section.id;
+                const Icon = section.icon;
 
-            <div className="flex min-w-0 flex-1 items-center justify-center gap-2 text-center">
-              <span className="rounded-2xl bg-violet-50/80 px-3 py-2">
-                <span className="block text-sm font-black leading-none text-[#160A52]">
-                  {students.length}
-                </span>
-                <span className="mt-1 block text-[11px] font-bold leading-none text-slate-500">
-                  תלמידות
-                </span>
-              </span>
-              <span className="rounded-2xl bg-fuchsia-50/80 px-3 py-2">
-                <span className="block text-sm font-black leading-none text-[#160A52]">
-                  {teachers.length}
-                </span>
-                <span className="mt-1 block text-[11px] font-bold leading-none text-slate-500">
-                  מורות
-                </span>
-              </span>
-            </div>
+                return (
+                  <button
+                    key={section.id}
+                    type="button"
+                    onClick={() => handleSectionShortcutClick(section.id)}
+                    className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-black transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
+                      isActive
+                        ? 'border-white/80 bg-white text-violet-800 shadow-[0_10px_24px_rgba(109,40,217,0.18)]'
+                        : 'border-white/50 bg-white/42 text-violet-900/75 hover:bg-white/70 hover:text-violet-800'
+                    }`}
+                    aria-current={isActive ? 'true' : undefined}
+                  >
+                    <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>{section.navLabel}</span>
+                  </button>
+                );
+              })}
+            </nav>
 
             <button
               type="button"
@@ -432,7 +505,7 @@ function AdminDashboard() {
         <section className="mt-6 flex flex-wrap justify-center gap-5">
           {dashboardSections.map((section) => (
             <DashboardSection
-              key={section.title}
+              key={section.id}
               layoutClass="w-full flex-none md:basis-[calc(50%_-_0.625rem)] lg:basis-[calc((100%_-_2.5rem)/3)]"
               navigate={navigate}
               onOpenTeacherCode={() => {
@@ -440,6 +513,11 @@ function AdminDashboard() {
                 setTeacherCodeError('');
               }}
               section={section}
+              sectionRef={(node) => {
+                if (node) {
+                  sectionRefs.current[section.id] = node;
+                }
+              }}
             />
           ))}
         </section>
