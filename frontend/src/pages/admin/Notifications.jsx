@@ -9,6 +9,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 import Button from '../../components/ui/Button.jsx';
+import AdminNavStrip from '../../components/admin/AdminNavStrip.jsx';
 import { adminDemoNotifications } from '../../data/adminMockData.js';
 import { getStoredToken, logout } from '../../services/auth.js';
 
@@ -165,6 +166,8 @@ function Notifications() {
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
             חזרה ללוח הבקרה
           </button>
+
+          <AdminNavStrip />
 
           <Button type="button" variant="secondary" onClick={handleLogout}>
             יציאה

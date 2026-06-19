@@ -21,6 +21,7 @@ import {
   adminDemoUsers,
   adminReviewNotifications,
 } from '../../data/adminMockData.js';
+import AdminNavStrip from '../../components/admin/AdminNavStrip.jsx';
 
 import {
   getStoredToken,
@@ -113,6 +114,7 @@ function OverviewCard({ stat }) {
 }
 
 function DashboardSection({
+  isSelected = false,
   layoutClass = '',
   onOpenTeacherCode,
   navigate,
@@ -136,7 +138,11 @@ function DashboardSection({
       data-section-id={section.id}
       type="button"
       onClick={handleClick}
-      className={`group flex min-h-[190px] flex-col justify-between rounded-[30px] border border-violet-100/80 bg-white/95 p-5 text-right shadow-[0_18px_46px_rgba(109,40,217,0.11)] transition duration-300 hover:-translate-y-1.5 hover:border-violet-200 hover:bg-white hover:shadow-[0_26px_64px_rgba(109,40,217,0.17)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:p-6 ${layoutClass}`}
+      className={`group flex min-h-[190px] flex-col justify-between rounded-[30px] border p-5 text-right transition duration-300 hover:-translate-y-1.5 hover:border-violet-200 hover:bg-white hover:shadow-[0_26px_64px_rgba(109,40,217,0.17)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:p-6 ${
+        isSelected
+          ? 'border-violet-400 bg-[linear-gradient(145deg,rgba(237,233,254,0.96)_0%,rgba(250,232,255,0.92)_52%,rgba(255,228,240,0.88)_100%)] shadow-[0_26px_70px_rgba(124,58,237,0.28),0_0_0_4px_rgba(196,181,253,0.36),inset_0_0_0_1px_rgba(167,139,250,0.55)]'
+          : 'border-violet-100/80 bg-white/95 shadow-[0_18px_46px_rgba(109,40,217,0.11)]'
+      } ${layoutClass}`}
     >
       <div className="flex items-start justify-between gap-5">
         <span className="flex h-[74px] w-[74px] shrink-0 items-center justify-center rounded-[22px] bg-gradient-to-br from-violet-50 to-fuchsia-50 text-violet-700 shadow-[inset_0_0_0_1px_rgba(124,58,237,0.06)] transition duration-300 group-hover:bg-gradient-to-br group-hover:from-violet-600 group-hover:to-fuchsia-500 group-hover:text-white group-hover:shadow-[0_18px_34px_rgba(124,58,237,0.24)]">
@@ -177,9 +183,10 @@ function AdminDashboard() {
   const [teacherCodeOpen, setTeacherCodeOpen] = useState(false);
   const [teacherCode, setTeacherCode] = useState('');
   const [teacherCodeError, setTeacherCodeError] = useState('');
-  const [activeSectionId, setActiveSectionId] = useState(dashboardSections[0].id);
+  const [selectedSectionId, setSelectedSectionId] = useState('');
+  const sectionHighlightReadyRef = useRef(true);
+  const sectionHighlightTimerRef = useRef(null);
   const sectionRefs = useRef({});
-  const sectionVisibility = useRef({});
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -217,56 +224,47 @@ function AdminDashboard() {
   }, []);
 
   useEffect(() => {
-    const visibleRatios = sectionVisibility.current;
+    return () => {
+      if (sectionHighlightTimerRef.current) {
+        window.clearTimeout(sectionHighlightTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!selectedSectionId) return undefined;
+
+    const node = sectionRefs.current[selectedSectionId];
+    if (!node) return undefined;
+
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const sectionId = entry.target.dataset.sectionId;
-          if (!sectionId) return;
+      ([entry]) => {
+        if (!sectionHighlightReadyRef.current) return;
 
-          visibleRatios[sectionId] = entry.isIntersecting
-            ? entry.intersectionRatio
-            : 0;
-        });
-
-        const nextActiveSection = dashboardSections.reduce(
-          (activeSection, section) => {
-            const activeRatio = visibleRatios[activeSection.id] || 0;
-            const sectionRatio = visibleRatios[section.id] || 0;
-
-            return sectionRatio > activeRatio ? section : activeSection;
-          },
-          dashboardSections[0],
-        );
-
-        if ((visibleRatios[nextActiveSection.id] || 0) > 0) {
-          setActiveSectionId(nextActiveSection.id);
+        if (!entry.isIntersecting) {
+          setSelectedSectionId('');
         }
       },
       {
         root: null,
-        rootMargin: '-18% 0px -45% 0px',
-        threshold: [0, 0.2, 0.4, 0.6, 0.8, 1],
+        rootMargin: '-20% 0px -35% 0px',
+        threshold: 0.12,
       },
     );
 
-    dashboardSections.forEach((section) => {
-      const node = sectionRefs.current[section.id];
-      if (node) {
-        observer.observe(node);
-      }
-    });
+    observer.observe(node);
 
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [selectedSectionId]);
 
   const students = users.filter((item) => item.role === 'student');
   const teachers = users.filter((item) => item.role === 'teacher');
   const admins = users.filter(
     (item) => item.role === 'admin' || item.role === 'expert',
   );
+  const activeSectionId = selectedSectionId;
 
   const stats = [
     {
@@ -326,11 +324,20 @@ function AdminDashboard() {
 
     if (!node) return;
 
-    setActiveSectionId(sectionId);
+    if (sectionHighlightTimerRef.current) {
+      window.clearTimeout(sectionHighlightTimerRef.current);
+    }
+
+    sectionHighlightReadyRef.current = false;
+    setSelectedSectionId(sectionId);
     node.scrollIntoView({
       behavior: 'smooth',
       block: 'center',
     });
+
+    sectionHighlightTimerRef.current = window.setTimeout(() => {
+      sectionHighlightReadyRef.current = true;
+    }, 700);
   };
 
   return (
@@ -374,7 +381,13 @@ function AdminDashboard() {
             </span>
           </button>
 
-          <div className="flex min-w-[17rem] flex-1 items-center justify-between gap-3 overflow-hidden rounded-[22px] border border-white/55 bg-[linear-gradient(135deg,rgba(250,232,255,0.78)_0%,rgba(237,233,254,0.78)_45%,rgba(255,228,240,0.72)_100%)] px-3 py-2 shadow-[0_16px_42px_rgba(109,40,217,0.13)] backdrop-blur-xl sm:min-w-[24rem] lg:max-w-3xl">
+          <AdminNavStrip
+            activeSectionId={selectedSectionId}
+            dashboardMode
+            onSectionClick={handleSectionShortcutClick}
+          />
+
+          <div className="hidden">
             <nav
               className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto py-0.5 text-right [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
               aria-label="ניווט מהיר בלוח הניהול"
@@ -508,6 +521,7 @@ function AdminDashboard() {
               key={section.id}
               layoutClass="w-full flex-none md:basis-[calc(50%_-_0.625rem)] lg:basis-[calc((100%_-_2.5rem)/3)]"
               navigate={navigate}
+              isSelected={selectedSectionId === section.id}
               onOpenTeacherCode={() => {
                 setTeacherCodeOpen(true);
                 setTeacherCodeError('');

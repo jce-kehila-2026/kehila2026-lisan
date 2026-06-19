@@ -11,6 +11,7 @@ import {
   X,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import AdminNavStrip from '../../components/admin/AdminNavStrip.jsx';
 
 const API_BASE_URL = '/api';
 
@@ -505,6 +506,8 @@ function Conversations() {
             <ChevronRight className="h-4 w-4" aria-hidden="true" />
             חזרה ללוח הניהול
           </button>
+
+          <AdminNavStrip />
 
           <div className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/80 bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-[0_10px_24px_rgba(109,40,217,0.08)] backdrop-blur">
             <MessageSquareText className="h-4 w-4" aria-hidden="true" />

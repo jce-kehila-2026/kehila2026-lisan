@@ -16,6 +16,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 import Button from '../../components/ui/Button.jsx';
+import AdminNavStrip from '../../components/admin/AdminNavStrip.jsx';
 import {
   adminLevels,
   adminStudentsSeed,
@@ -576,6 +577,8 @@ function Students() {
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
             חזרה ללוח הבקרה
           </button>
+
+          <AdminNavStrip />
 
           <Button type="button" variant="secondary" onClick={handleLogout}>
             יציאה
