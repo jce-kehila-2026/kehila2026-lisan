@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight, CheckCircle2, Clock, LayoutDashboard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import AdminNavStrip from '../../components/admin/AdminNavStrip.jsx';
 
 function demoCardClass(count) {
   if (count === 3) {
@@ -29,6 +30,7 @@ function AdminDemoPage({ accentLabel, cards, description, icon: Icon, title }) {
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
             חזרה ללוח הבקרה
           </button>
+          <AdminNavStrip />
           <div className="inline-flex items-center gap-2 rounded-full bg-violet-50 px-4 py-2 text-sm font-black text-violet-700">
             <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
             אזור ניהול

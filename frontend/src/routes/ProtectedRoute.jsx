@@ -4,7 +4,7 @@ import { getStoredUser, getStoredToken } from '../services/auth.js';
 
 const getRedirectPath = (role) => {
   if (role === 'admin') return '/admin/dashboard';
-  if (role === 'teacher') return '/teacher/dashboard';
+  if (role === 'teacher') return '/admin/dashboard';
   if (role === 'student') return '/home';
   return '/login';
 };

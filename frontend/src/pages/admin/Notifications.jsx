@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  ArrowRight,
   Bell,
   Check,
   MessageSquareText,
@@ -8,9 +7,9 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-import Button from '../../components/ui/Button.jsx';
+import AdminPageHeader from '../../components/admin/AdminPageHeader.jsx';
 import { adminDemoNotifications } from '../../data/adminMockData.js';
-import { getStoredToken, logout } from '../../services/auth.js';
+import { getStoredToken } from '../../services/auth.js';
 
 const API_BASE_URL = '/api';
 
@@ -148,40 +147,22 @@ function Notifications() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/admin/login', { replace: true });
-  };
-
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] px-3 py-3 text-slate-900 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-6xl" dir="rtl">
-        <header className="flex flex-wrap items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={() => navigate('/admin/dashboard')}
-            className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-sm transition hover:bg-violet-50"
-          >
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            חזרה ללוח הבקרה
-          </button>
+        <AdminPageHeader icon={Bell} label="התראות מערכת" />
 
-          <Button type="button" variant="secondary" onClick={handleLogout}>
-            יציאה
-          </Button>
-        </header>
-
-        <section className="mt-6 overflow-hidden rounded-[2rem] border border-[#EEE5FF] bg-white/75 p-5 shadow-card backdrop-blur-[8px] sm:p-7">
+        <section className="mt-3 overflow-hidden rounded-[24px] border border-[#EEE5FF] bg-white/75 p-4 shadow-card backdrop-blur-[8px] md:mt-6 md:rounded-[2rem] md:p-7">
           <p className="inline-flex items-center gap-2 text-sm font-black text-violet-700">
             <Bell className="h-4 w-4" aria-hidden="true" />
             התראות מערכת
           </p>
 
-          <h1 className="mt-2 text-[clamp(2.2rem,4.2vw,4.25rem)] font-black leading-tight text-slate-950">
+          <h1 className="mt-2 text-[clamp(1.65rem,7vw,2.1rem)] font-black leading-tight text-slate-950 md:text-[clamp(2.2rem,4.2vw,4.25rem)]">
             ההתראות שלי
           </h1>
 
-          <p className="mt-3 max-w-4xl text-sm font-semibold leading-7 text-slate-600 sm:text-base">
+          <p className="mt-2 max-w-4xl text-sm font-semibold leading-6 text-slate-600 md:mt-3 md:text-base md:leading-7">
             כאן מופיעות התראות חדשות על הודעות ושיחות במערכת.
           </p>
 

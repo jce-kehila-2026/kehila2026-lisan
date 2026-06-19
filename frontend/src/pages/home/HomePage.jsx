@@ -11,7 +11,7 @@ function HomePage() {
   }
 
   if (user?.role === 'teacher') {
-    return <Navigate to="/teacher/dashboard" replace />;
+    return <Navigate to="/admin/dashboard" replace />;
   }
 
   return <ExistingStudentHome />;

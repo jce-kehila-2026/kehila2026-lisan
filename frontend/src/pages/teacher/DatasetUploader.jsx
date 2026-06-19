@@ -1,9 +1,32 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, FileAudio, Play, Loader2, CheckCircle2, AlertCircle, Download } from 'lucide-react';
+import { Upload, FileAudio, Play, Loader2, CheckCircle2, AlertCircle, Download, FilePlus2 } from 'lucide-react';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-import PageHeader from '../../components/PageHeader.jsx';
-import BottomNav from '../../components/BottomNav.jsx';
+import AdminPageHeader from '../../components/admin/AdminPageHeader.jsx';
+
+const recentUploads = [
+  {
+    id: 'conversation-a2',
+    name: 'תרגול שיחה במסעדה',
+    uploadDate: '19.06.2026',
+    teacher: 'מרים אבו חסן',
+    level: 'A2',
+  },
+  {
+    id: 'daily-b1',
+    name: 'אוצר מילים לחיי יום-יום',
+    uploadDate: '17.06.2026',
+    teacher: 'סמאח חורי',
+    level: 'B1',
+  },
+  {
+    id: 'family-a1',
+    name: 'משפחה והיכרות בסיסית',
+    uploadDate: '15.06.2026',
+    teacher: 'נור אבו ריא',
+    level: 'A1',
+  },
+];
 
 function DatasetUploader() {
   const [audioFile, setAudioFile] = useState(null);
@@ -148,33 +171,47 @@ function DatasetUploader() {
   };
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#F5F3FF_0%,#ECFEFF_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8">
-      <div className="relative mx-auto min-h-[calc(100vh-2.5rem)] max-w-xl pb-28 sm:min-h-[780px]" dir="rtl">
-        <PageHeader showBack />
+    <main className="lisan-admin-page min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] px-3 py-3 text-slate-900 md:px-6 md:py-8 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl pb-12" dir="rtl">
+        <AdminPageHeader icon={FilePlus2} label="העלאת חומרים" />
 
-        <section className="mt-6 rounded-3xl bg-white p-5 shadow-card sm:p-6">
-          <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#56CFE1]/20 text-[#6930C3]">
-              <Upload className="h-8 w-8" aria-hidden="true" />
+        <section className="lisan-admin-hero lisan-admin-inner-hero relative mt-3 overflow-hidden rounded-[24px] border border-white/80 bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] shadow-[0_26px_70px_rgba(91,33,182,0.14)] md:mt-6 md:rounded-[28px]">
+          <div className="pointer-events-none absolute left-0 top-0 h-full w-1/2 bg-violet-200/35 blur-3xl" />
+
+          <div className="relative grid min-h-[132px] gap-0 md:min-h-[260px] lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]" dir="ltr">
+            <div className="relative flex min-h-[72px] items-center justify-center overflow-hidden bg-violet-50/30 p-0 md:min-h-[210px]">
+              <img
+                src="/add11.png"
+                alt=""
+                className="h-full min-h-[72px] w-full object-contain object-right md:min-h-[210px]"
+                aria-hidden="true"
+              />
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-slate-900">העלאת קבצי שמע</h1>
-              <p className="mt-1 text-sm text-slate-600">
-                העלי הקלטה או קובץ שמע. המערכת תבצע תמלול אוטומטי במכשיר שלך באמצעות בינה מלאכותית (Whisper).
+
+            <div className="flex flex-col justify-center px-4 py-3 text-right md:px-10 md:py-8 lg:px-12" dir="rtl">
+              <p className="inline-flex items-center gap-2 text-xs font-black text-violet-700 md:text-sm">
+                <FilePlus2 className="h-4 w-4" aria-hidden="true" />
+                ניהול חומרי למידה
+              </p>
+              <h1 className="mt-2 text-xl font-black leading-tight text-slate-950 md:mt-3 md:text-4xl lg:text-5xl">
+                העלאת קבצי שמע וחומרי תרגול
+              </h1>
+              <p className="mt-1.5 text-sm font-semibold leading-6 text-slate-600 md:mt-4 md:text-base md:leading-8">
+                העלי הקלטה או קובץ שמע, צרי תמלול אוטומטי, והפיקי קובצי נתונים לתרגול במערכת ליסאן.
               </p>
             </div>
           </div>
         </section>
 
-        <section className="mt-5 rounded-3xl bg-white p-5 shadow-card sm:p-6">
-          <label className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#56CFE1]/40 bg-[#56CFE1]/10 p-5 text-center transition hover:border-[#56CFE1] hover:bg-[#56CFE1]/20">
+        <section className="mt-4 rounded-[2rem] border border-white/70 bg-white/90 p-4 shadow-[0_22px_60px_rgba(91,33,182,0.11)] backdrop-blur sm:mt-5 sm:p-6">
+          <label className="flex cursor-pointer flex-col items-center justify-center rounded-[24px] border-2 border-dashed border-violet-200 bg-violet-50/65 p-5 text-center transition hover:border-violet-300 hover:bg-violet-100/60">
             <input 
               type="file" 
               accept="audio/*" 
               className="hidden" 
               onChange={handleFileChange} 
             />
-            <FileAudio className="h-10 w-10 text-[#4EA8DE]" />
+            <FileAudio className="h-10 w-10 text-violet-600" />
             <p className="mt-4 text-sm font-bold text-slate-700">
               {audioFile ? audioFile.name : 'לחצי כאן לבחירת קובץ שמע'}
             </p>
@@ -230,9 +267,55 @@ function DatasetUploader() {
           )}
         </section>
 
+        <section className="mt-4 rounded-[2rem] border border-white/70 bg-white/90 p-4 shadow-[0_22px_60px_rgba(91,33,182,0.11)] backdrop-blur sm:mt-5 sm:p-6">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-black text-violet-700">העלאות אחרונות</p>
+              <h2 className="mt-1 text-lg font-black text-slate-950 sm:text-xl">חומרי תרגול שעלו לאחרונה</h2>
+            </div>
+            <span className="w-fit rounded-full border border-violet-100 bg-violet-50 px-3 py-1 text-xs font-black text-violet-700">
+              {recentUploads.length ? `${recentUploads.length} פריטים` : 'אין פריטים'}
+            </span>
+          </div>
+
+          {recentUploads.length > 0 ? (
+            <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {recentUploads.map((material) => (
+                <article
+                  key={material.id}
+                  className="rounded-[24px] border border-violet-100/80 bg-violet-50/55 p-4 shadow-[0_10px_28px_rgba(109,40,217,0.08)] transition hover:-translate-y-0.5 hover:border-violet-200 hover:bg-white/85"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-violet-700 shadow-[0_10px_24px_rgba(109,40,217,0.12)]">
+                      <FileAudio className="h-5 w-5" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="truncate text-sm font-black text-slate-950">{material.name}</h3>
+                      <p className="mt-1 text-xs font-semibold text-slate-500">הועלה בתאריך {material.uploadDate}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap items-center gap-2 text-xs font-bold">
+                    <span className="rounded-full bg-white px-3 py-1 text-slate-700 shadow-sm">מורה: {material.teacher}</span>
+                    <span className="rounded-full bg-violet-600 px-3 py-1 text-white shadow-sm">רמה {material.level}</span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-4 rounded-[24px] border border-dashed border-violet-200 bg-violet-50/60 p-6 text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-violet-700 shadow-[0_12px_28px_rgba(109,40,217,0.12)]">
+                <Upload className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <h3 className="mt-3 text-sm font-black text-slate-950">עדיין לא הועלו חומרי תרגול</h3>
+              <p className="mt-1 text-xs font-semibold text-slate-500">לאחר העלאה, החומרים האחרונים יוצגו כאן בצורה מסודרת.</p>
+            </div>
+          )}
+        </section>
+
         {/* Transcription Results */}
         {transcription && (
-          <section className="mt-5 rounded-3xl bg-white p-5 shadow-card sm:p-6">
+          <section className="mt-5 rounded-[2rem] border border-white/70 bg-white/90 p-4 shadow-[0_22px_60px_rgba(91,33,182,0.11)] backdrop-blur sm:p-6">
             <div className="flex items-center gap-2 text-[#5E60CE]">
               <CheckCircle2 className="h-5 w-5 text-[#64DFDF]" />
               <h2 className="font-bold">תמלול הושלם</h2>
@@ -253,7 +336,7 @@ function DatasetUploader() {
 
         {/* Metadata and Generation */}
         {transcription && (
-          <section className="mt-5 rounded-3xl bg-white p-5 shadow-card sm:p-6">
+          <section className="mt-5 rounded-[2rem] border border-white/70 bg-white/90 p-4 shadow-[0_22px_60px_rgba(91,33,182,0.11)] backdrop-blur sm:p-6">
             <h2 className="text-xl font-bold text-slate-900">הוספת מידע וייצוא</h2>
             
             <label className="mt-5 block">
@@ -322,7 +405,6 @@ function DatasetUploader() {
           </section>
         )}
 
-        <BottomNav />
       </div>
     </main>
   );
