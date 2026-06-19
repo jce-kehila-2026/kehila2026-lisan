@@ -2,19 +2,28 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
   BookOpen,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Gamepad2,
   Home as HomeIcon,
   Link as LinkIcon,
+  LogOut,
   MessageCircle,
+  Search,
+  Star,
+  Volume2,
   Zap,
   Flame,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, useReducedMotion } from 'framer-motion';
 
 import { useCountUp } from '../hooks/useCountUp.js';
 import BottomNav from '../components/BottomNav.jsx';
-import PageHeader from '../components/PageHeader.jsx';
+import LanguageToggle from '../components/LanguageToggle.jsx';
+import LisanLogo from '../components/LisanLogo.jsx';
 import {
   getStudentStorySubtitle,
   getStudentStoryTitle,
@@ -33,6 +42,33 @@ import { getStoredToken, getStoredUser } from '../services/auth.js';
 const API_BASE_URL = 'http://localhost:3000/api';
 const USEFUL_LINKS_DRIVE_URL =
   'https://drive.google.com/drive/folders/1AOGvvic8O2K_MzjUJIXMQwGg80unCad8';
+
+const dictionaryWords = [
+  { hebrew: 'שלום', arabic: 'مرحباً' },
+  { hebrew: 'תודה', arabic: 'شكراً' },
+  { hebrew: 'מים', arabic: 'ماء' },
+  { hebrew: 'בית', arabic: 'بيت' },
+  { hebrew: 'ספר', arabic: 'كتاب' },
+  { hebrew: 'ילד', arabic: 'ولد' },
+  { hebrew: 'ילדה', arabic: 'بنت' },
+  { hebrew: 'מורה', arabic: 'معلم' },
+  { hebrew: 'כיתה', arabic: 'صف' },
+  { hebrew: 'חבר', arabic: 'صديق' },
+  { hebrew: 'חברה', arabic: 'صديقة' },
+  { hebrew: 'אוכל', arabic: 'طعام' },
+  { hebrew: 'שמש', arabic: 'شمس' },
+  { hebrew: 'ירח', arabic: 'قمر' },
+  { hebrew: 'יום', arabic: 'يوم' },
+  { hebrew: 'לילה', arabic: 'ليل' },
+  { hebrew: 'יפה', arabic: 'جميل' },
+  { hebrew: 'קטן', arabic: 'صغير' },
+  { hebrew: 'גדול', arabic: 'كبير' },
+  { hebrew: 'אהבה', arabic: 'حب' },
+  { hebrew: 'משפחה', arabic: 'عائلة' },
+  { hebrew: 'שפה', arabic: 'لغة' },
+  { hebrew: 'עיר', arabic: 'مدينة' },
+  { hebrew: 'דרך', arabic: 'طريق' },
+];
 
 function normalizeProgress(value) {
   const number = Number(value);
@@ -174,6 +210,83 @@ function SectionTabBar({ sections, activeSection, onSectionClick, label }) {
   );
 }
 
+function StudentHomeHeader({ sections, activeSection, onSectionClick, label }) {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <header className="lisan-enter sticky top-3 z-50 flex flex-col gap-5" style={{ '--lisan-enter-delay': '0ms' }}>
+      <div className="grid items-center gap-4 grid-cols-[auto_1fr_auto]">
+        <button
+          type="button"
+          onClick={() => navigate('/home')}
+          className="col-start-1 row-start-1 justify-self-start rounded-2xl transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+          aria-label="דף הבית"
+          title="דף הבית"
+        >
+          <LisanLogo className="h-20 sm:h-24" />
+        </button>
+
+        <div className="col-start-3 row-start-1 flex items-center gap-2 justify-self-end">
+          <LanguageToggle />
+          <button
+            type="button"
+            onClick={() => navigate('/login')}
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-white/85 bg-white/88 text-slate-600 shadow-[0_12px_28px_rgba(124,58,237,0.12)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+            aria-label={t('logout')}
+            title={t('logout')}
+          >
+            <LogOut className="h-5 w-5" aria-hidden="true" />
+          </button>
+        </div>
+
+        <nav
+          className="col-start-1 col-end-4 row-start-2 flex flex-wrap items-center justify-center gap-3 lg:col-start-2 lg:col-end-3 lg:row-start-1"
+          aria-label={label}
+        >
+          {sections.map((section) => {
+            const Icon = section.icon;
+            const isActive = activeSection === section.id;
+
+            return (
+              <button
+                key={section.id}
+                type="button"
+                aria-controls={section.id}
+                aria-current={isActive ? 'true' : undefined}
+                aria-pressed={isActive}
+                onClick={() => onSectionClick(section.id)}
+                className={`relative inline-flex h-14 min-w-[132px] items-center justify-center gap-3 rounded-[24px] px-6 text-lg font-black shadow-[0_14px_34px_rgba(124,58,237,0.12)] backdrop-blur transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
+                  isActive
+                    ? 'text-violet-700'
+                    : 'bg-white/72 text-violet-700 hover:-translate-y-0.5 hover:bg-white'
+                }`}
+              >
+                {isActive ? (
+                  <motion.span
+                    layoutId="lisan-home-header-pill"
+                    aria-hidden="true"
+                    className="absolute inset-0 -z-10 rounded-[24px] bg-white/88 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.88),0_16px_36px_rgba(124,58,237,0.16)]"
+                    transition={
+                      reduceMotion
+                        ? { duration: 0 }
+                        : { type: 'spring', stiffness: 380, damping: 32 }
+                    }
+                  />
+                ) : null}
+                <span>{section.label}</span>
+                <Icon className="h-6 w-6 shrink-0" aria-hidden="true" />
+              </button>
+            );
+          })}
+        </nav>
+
+      </div>
+    </header>
+  );
+}
+
 function Home() {
   const { t, i18n } = useTranslation();
   const storedUser = getStoredUser();
@@ -181,11 +294,20 @@ function Home() {
 
   const chatsLabel = isArabic ? 'المحادثة' : 'שיחה';
   const learnedWordsLabel = isArabic ? 'الكلمات المكتملة' : 'מילים שהושלמו';
+  const dictionaryTitle = isArabic ? 'إدارة قاموس عبري ↔ عربي' : 'ניהול מילון עברית ↔ ערבית';
+  const dictionaryDescription = isArabic
+    ? 'راجعي الكلمات والترجمات التي تظهر للطالبات'
+    : 'בדקי מילים ותרגומים שמוצגים לתלמידות';
+  const dictionaryPlaceholder = isArabic ? 'بحث عن كلمة بالعبرية...' : 'חיפוש מילה בעברית...';
+  const showMoreLabel = isArabic ? 'عرض المزيد من الكلمات' : 'הצג עוד מילים';
+  const showLessLabel = isArabic ? 'عرض أقل' : 'הצג פחות';
   const friendsChatTitle = isArabic ? 'دردشة مع صديقات' : 'שיחה עם חברות';
   const friendsChatDescription = isArabic
     ? 'اختاري صديقات للتدريب المشترك والسريع'
     : 'בחרי חברות לתרגול משותף ומהיר';
   const startLearningLabel = isArabic ? 'ابدئي اللعب' : 'התחילי לשחק';
+  const heroGamesLabel = isArabic ? 'للألعاب' : 'למשחקים';
+  const heroDictionaryLabel = isArabic ? 'للقاموس' : 'למילון';
   const streakLabel = isArabic ? 'جلسات' : 'שיחות';
   const loadingLabel = isArabic ? 'جارٍ التحميل...' : 'טוען...';
   const studentNameFallback = isArabic ? 'طالبة' : 'תלמידה';
@@ -218,11 +340,22 @@ function Home() {
   const [isLinksModalOpen, setIsLinksModalOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('section-hero');
   const [gameProgress, setGameProgress] = useState({});
+  const [dictionaryQuery, setDictionaryQuery] = useState('');
+  const [dictionaryExpanded, setDictionaryExpanded] = useState(false);
+  const [favoriteWords, setFavoriteWords] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('lisan-saved-words') || '[]');
+    } catch {
+      return [];
+    }
+  });
 
   const heroRef = useRef(null);
   const activitiesRef = useRef(null);
   const gamesRef = useRef(null);
   const resourcesRef = useRef(null);
+  const gamesScrollerRef = useRef(null);
+  const gamesDragRef = useRef({ active: false, startX: 0, scrollLeft: 0 });
 
   const sections = useMemo(
     () => [
@@ -239,7 +372,7 @@ function Home() {
       {
         id: 'section-games',
         label: isArabic ? 'ألعاب' : 'משחקים',
-        icon: BookOpen,
+        icon: Gamepad2,
       },
       {
         id: 'section-resources',
@@ -549,6 +682,102 @@ function Home() {
       });
   }, []);
 
+  const filteredDictionaryWords = useMemo(() => {
+    const query = dictionaryQuery.trim().toLowerCase();
+
+    if (!query) {
+      return dictionaryWords;
+    }
+
+    return dictionaryWords.filter((word) => {
+      return (
+        word.hebrew.toLowerCase().includes(query) ||
+        word.arabic.toLowerCase().includes(query)
+      );
+    });
+  }, [dictionaryQuery]);
+
+  const visibleDictionaryWords = dictionaryExpanded
+    ? filteredDictionaryWords
+    : filteredDictionaryWords.slice(0, 2);
+
+  const canToggleDictionary = filteredDictionaryWords.length > 2;
+
+  const toggleFavoriteWord = (hebrewWord) => {
+    setFavoriteWords((currentWords) => {
+      if (currentWords.includes(hebrewWord)) {
+        const nextWords = currentWords.filter((word) => word !== hebrewWord);
+        localStorage.setItem('lisan-saved-words', JSON.stringify(nextWords));
+        window.dispatchEvent(new Event('lisan-saved-words-changed'));
+        return nextWords;
+      }
+
+      const nextWords = [...currentWords, hebrewWord];
+      localStorage.setItem('lisan-saved-words', JSON.stringify(nextWords));
+      window.dispatchEvent(new Event('lisan-saved-words-changed'));
+      return nextWords;
+    });
+  };
+
+  const pronounceHebrewWord = (hebrewWord) => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) {
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(hebrewWord);
+    utterance.lang = 'he-IL';
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const scrollGames = (direction) => {
+    const scroller = gamesScrollerRef.current;
+    if (!scroller) return;
+
+    const distance = Math.min(scroller.clientWidth * 0.8, 620);
+    scroller.scrollBy({
+      left: direction * distance,
+      behavior: shouldReduceMotion() ? 'auto' : 'smooth',
+    });
+  };
+
+  const handleGamesPointerDown = (event) => {
+    const scroller = gamesScrollerRef.current;
+    if (!scroller) return;
+
+    gamesDragRef.current = {
+      active: true,
+      startX: event.clientX,
+      scrollLeft: scroller.scrollLeft,
+    };
+    scroller.setPointerCapture?.(event.pointerId);
+  };
+
+  const handleGamesPointerMove = (event) => {
+    const scroller = gamesScrollerRef.current;
+    const drag = gamesDragRef.current;
+    if (!scroller || !drag.active) return;
+
+    event.preventDefault();
+    scroller.scrollLeft = drag.scrollLeft - (event.clientX - drag.startX);
+  };
+
+  const stopGamesDrag = () => {
+    gamesDragRef.current.active = false;
+  };
+
+  const handleGamesWheel = (event) => {
+    const scroller = gamesScrollerRef.current;
+    if (!scroller) return;
+
+    const horizontalDelta =
+      Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+    if (horizontalDelta === 0) return;
+
+    event.preventDefault();
+    scroller.scrollLeft += horizontalDelta;
+  };
+
   const gamesText = isArabic
     ? {
         title: 'لعبة الكلمات',
@@ -573,13 +802,7 @@ function Home() {
     <main className="min-h-screen overflow-x-clip bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] text-slate-900">
       <div className="app-page-container relative pb-32" dir="rtl">
 
-        {/* Page Header */}
-        <div className="lisan-enter" style={{ '--lisan-enter-delay': '0ms' }}>
-          <PageHeader showLogout />
-        </div>
-
-        {/* Section Tab Bar */}
-        <SectionTabBar
+        <StudentHomeHeader
           sections={sections}
           activeSection={activeSection}
           onSectionClick={scrollToSection}
@@ -590,7 +813,7 @@ function Home() {
         <section
           ref={heroRef}
           id="section-hero"
-          className="lisan-enter relative mt-6 overflow-hidden rounded-[24px] border border-white/80 bg-[linear-gradient(135deg,#F3ECFF_0%,#FFFFFF_58%,#F8F2FF_100%)] shadow-[0_20px_56px_rgba(91,33,182,0.12)] transition hover:-translate-y-0.5 hover:shadow-[0_28px_64px_rgba(124,58,237,0.18)]"
+          className="lisan-enter relative mt-12 overflow-hidden rounded-[34px] border border-white/85 bg-cover bg-center shadow-[0_24px_70px_rgba(91,33,182,0.14)] transition hover:-translate-y-0.5 hover:shadow-[0_30px_78px_rgba(124,58,237,0.18)]"
           style={{
             '--lisan-enter-delay': '150ms',
             '--hero-image-x': '0px',
@@ -600,105 +823,108 @@ function Home() {
             '--hero-light-opacity': '0.2',
             '--hero-haze-opacity': '0.28',
             '--hero-glyph-drift': '0px',
+            backgroundImage: 'url("/images/HADD.png")',
           }}
         >
-          <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-violet-200/45 blur-3xl" />
-          <div className="pointer-events-none absolute bottom-0 right-1/2 h-32 w-32 rounded-full bg-fuchsia-100/70 blur-3xl" />
+          <div className="pointer-events-none absolute inset-0 bg-white/10" />
 
           <div
-            className="relative grid items-stretch md:min-h-[360px] md:grid-cols-[0.55fr_0.45fr] lg:min-h-[400px]"
-            dir="ltr"
+            className="relative min-h-[430px] lg:min-h-[520px]"
+            dir="rtl"
           >
-            {/* Image */}
-            <div className="lisan-hero-reel relative h-[128px] overflow-hidden sm:h-[208px] md:h-auto md:min-h-full">
-              <div className="lisan-hero-video-plane">
-                <img
-                  src="/images/hero-study-image.png"
-                  alt=""
-                  className="lisan-hero-art h-full w-full object-cover object-left"
-                  aria-hidden="true"
-                />
-              </div>
-              <div className="lisan-hero-depth-haze" aria-hidden="true" />
-              <div className="lisan-hero-light-sweep" aria-hidden="true" />
-              <span className="lisan-hero-glyph lisan-hero-glyph--aleph" aria-hidden="true">
-                &#1488;
-              </span>
-              <span className="lisan-hero-glyph lisan-hero-glyph--bet" aria-hidden="true">
-                &#1489;
-              </span>
-              <span className="lisan-hero-glyph lisan-hero-glyph--ghain" aria-hidden="true">
-                &#1594;
-              </span>
-              <span className="lisan-hero-glyph lisan-hero-glyph--noon" aria-hidden="true">
-                &#1606;
-              </span>
-              <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-24 bg-gradient-to-r from-transparent to-white/80 md:block" />
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-white/40 md:hidden" />
-            </div>
-
             {/* Content */}
             <div
-              className="relative z-10 flex min-w-0 items-center p-4 text-right sm:p-6 lg:p-8"
+              className="relative z-10 flex min-h-[430px] w-full min-w-0 items-center justify-start p-5 text-right sm:p-8 lg:min-h-[520px] lg:p-10"
               dir="rtl"
             >
-              <div className="w-full">
+              <div className="w-full max-w-[560px] rounded-[30px] border border-white/70 bg-white/55 p-5 shadow-[0_18px_50px_rgba(91,33,182,0.12)] backdrop-blur-md sm:p-7 lg:p-8">
                 {/* Name + Level + Streak */}
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-black text-violet-700 lg:text-base">
+                <div className="flex flex-wrap-reverse items-center justify-between gap-3">
+                  <p className="text-base font-black text-slate-800 lg:text-lg">
                     {loading ? loadingLabel : t('welcome', { name: student.name || studentNameFallback })}
                   </p>
 
                   <div className="flex items-center gap-2">
                     {/* Streak badge */}
-                    {!loading && student.chatsCount > 0 && (
-                      <div className="flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs font-black text-amber-600">
+                    <div className="flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-3 py-1.5 text-sm font-black text-amber-600 shadow-[0_8px_20px_rgba(245,158,11,0.12)]">
                         <Flame className="h-3.5 w-3.5 text-amber-500" aria-hidden="true" />
-                        <span>{student.chatsCount} {streakLabel}</span>
-                      </div>
-                    )}
+                      <span>{loading ? '...' : student.chatsCount} {streakLabel}</span>
+                    </div>
 
                     {/* Level badge */}
-                    <div className="rounded-full bg-violet-100 px-4 py-1.5 text-xs font-black text-violet-700 lg:text-sm">
+                    <div className="rounded-full bg-violet-100 px-4 py-1.5 text-sm font-black text-violet-700 shadow-[0_8px_20px_rgba(124,58,237,0.1)]">
                       {t('level')} {loading ? '...' : student.level || 'A1'}
                     </div>
                   </div>
                 </div>
 
                 {/* Greeting */}
-                <h1 className="mt-2.5 text-[clamp(1.5rem,2.8vw,3.2rem)] font-black leading-tight text-slate-950 sm:mt-3">
+                <h1 className="mt-7 flex items-center justify-end gap-3 text-[clamp(2rem,3.4vw,4.2rem)] font-black leading-tight text-slate-950">
                   {t('homeGreeting')}
+                  <span className="text-violet-600">☼</span>
                 </h1>
 
-                <p className="mt-2 max-w-2xl text-sm font-medium leading-6 text-slate-600 sm:mt-2.5 sm:text-[clamp(0.875rem,1vw,1.1rem)] sm:leading-7">
+                <p className="mt-4 max-w-2xl text-base font-medium leading-7 text-slate-600 sm:text-[clamp(1rem,1.05vw,1.2rem)] sm:leading-8">
                   {t('homeIntro')}
                 </p>
 
+                <div className="mt-6 flex flex-wrap justify-end gap-3">
+                  <Link
+                    to="/games"
+                    className="inline-flex h-14 min-w-[170px] items-center justify-center gap-3 rounded-full bg-violet-600 px-7 text-lg font-black text-white shadow-[0_14px_30px_rgba(124,58,237,0.28)] transition hover:-translate-y-0.5 hover:bg-violet-700 hover:shadow-[0_18px_36px_rgba(124,58,237,0.36)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.98]"
+                  >
+                    <Gamepad2 className="h-6 w-6" aria-hidden="true" />
+                    <span>{heroGamesLabel}</span>
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      document
+                        .getElementById('section-dictionary')
+                        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                    className="inline-flex h-14 min-w-[170px] items-center justify-center gap-3 rounded-full border border-violet-100 bg-violet-100/75 px-7 text-lg font-black text-violet-700 shadow-[0_14px_30px_rgba(124,58,237,0.12)] backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-violet-100 hover:shadow-[0_18px_36px_rgba(124,58,237,0.18)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.98]"
+                  >
+                    <BookOpen className="h-6 w-6" aria-hidden="true" />
+                    <span>{heroDictionaryLabel}</span>
+                  </button>
+                </div>
+
                 {/* Stats — clickable */}
-                <div className="mt-4 grid grid-cols-2 gap-2 sm:mt-5 sm:gap-3">
+                <div className="mt-8 grid grid-cols-2 gap-4">
                   <Link
                     to="/shared-chat"
-                    className="group rounded-[18px] border border-violet-100 bg-violet-50/70 p-3 text-center transition hover:-translate-y-0.5 hover:bg-violet-100/80 hover:shadow-[0_6px_18px_rgba(124,58,237,0.12)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:rounded-[20px] sm:p-4"
+                    className="group flex min-h-[110px] items-center justify-between rounded-[22px] border border-violet-100 bg-violet-50/70 p-4 text-right transition hover:-translate-y-0.5 hover:bg-violet-100/80 hover:shadow-[0_10px_24px_rgba(124,58,237,0.12)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
                   >
-                    <p className="text-sm font-bold text-slate-500">{chatsLabel}</p>
-                    <p className="mt-1 text-2xl font-black text-slate-950 sm:mt-1.5 sm:text-3xl">
-                      {loading ? '–' : chatsDisplay}
-                    </p>
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-violet-100 text-violet-700">
+                      <MessageCircle className="h-7 w-7" aria-hidden="true" />
+                    </span>
+                    <span>
+                      <span className="block text-sm font-bold text-slate-500">{chatsLabel}</span>
+                      <span className="mt-1 block text-4xl font-black text-violet-700">
+                        {loading ? '–' : chatsDisplay}
+                      </span>
+                    </span>
                   </Link>
 
                   <Link
-                  to="/games?view=completed"
-                    className="group rounded-[18px] border border-violet-100 bg-violet-50/70 p-3 text-center transition hover:-translate-y-0.5 hover:bg-violet-100/80 hover:shadow-[0_6px_18px_rgba(124,58,237,0.12)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:rounded-[20px] sm:p-4"
+                    to="/games?view=completed"
+                    className="group flex min-h-[110px] items-center justify-between rounded-[22px] border border-violet-100 bg-violet-50/70 p-4 text-right transition hover:-translate-y-0.5 hover:bg-violet-100/80 hover:shadow-[0_10px_24px_rgba(124,58,237,0.12)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
                   >
-                    <p className="text-sm font-bold text-slate-500">{learnedWordsLabel}</p>
-                    <p className="mt-1 text-2xl font-black text-slate-950 sm:mt-1.5 sm:text-3xl">
-                      {loading ? '–' : wordsDisplay}
-                    </p>
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-violet-100 text-violet-700">
+                      <BookOpen className="h-7 w-7" aria-hidden="true" />
+                    </span>
+                    <span>
+                      <span className="block text-sm font-bold text-slate-500">{learnedWordsLabel}</span>
+                      <span className="mt-1 block text-4xl font-black text-slate-950">
+                        {loading ? '–' : wordsDisplay}
+                      </span>
+                    </span>
                   </Link>
                 </div>
 
                 {/* Progress */}
-                <div className="mt-3 rounded-[18px] border border-violet-100 bg-violet-50/70 p-3 sm:mt-4 sm:rounded-[20px] sm:p-4">
+                <div className="mt-5 rounded-[20px] border border-violet-100 bg-violet-50/70 p-4">
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-sm font-black text-slate-800">{t('dailyProgress')}</span>
                     <span className="text-sm font-black text-violet-700">{normalizedProgress}%</span>
@@ -718,7 +944,7 @@ function Home() {
                 </div>
 
                 {/* Start CTA — soft emphasis glow (stronger when not yet started) */}
-                <div className="relative mt-3 sm:mt-4">
+                <div className="relative mt-6">
                   {!reduceMotion && (
                     <motion.span
                       aria-hidden="true"
@@ -735,7 +961,7 @@ function Home() {
                   )}
                   <Link
                     to="/games"
-                    className="relative flex h-10 w-full items-center justify-center gap-2 rounded-full bg-violet-600 text-sm font-black text-white shadow-[0_6px_18px_rgba(124,58,237,0.3)] transition hover:-translate-y-0.5 hover:bg-violet-700 hover:shadow-[0_10px_24px_rgba(124,58,237,0.38)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.98] sm:h-11"
+                    className="relative flex h-14 w-full items-center justify-center gap-2 rounded-full bg-violet-600 text-lg font-black text-white shadow-[0_10px_24px_rgba(124,58,237,0.32)] transition hover:-translate-y-0.5 hover:bg-violet-700 hover:shadow-[0_14px_30px_rgba(124,58,237,0.4)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.98]"
                   >
                     <Zap className="h-4 w-4" aria-hidden="true" />
                     <span>{startLearningLabel}</span>
@@ -762,6 +988,151 @@ function Home() {
               <ActivityShortcut key={activity.id} activity={activity} />
             ))}
           </div>
+        </section>
+
+        {/* ── Dictionary ────────────────────────────────────────── */}
+        <section
+          id="section-dictionary"
+          className="lisan-enter relative mt-6 overflow-hidden rounded-[24px] border border-white/80 bg-[linear-gradient(135deg,#FFFFFF_0%,#FBF8FF_48%,#F4ECFF_100%)] p-5 shadow-card sm:p-6 lg:p-8"
+          style={{
+            '--lisan-enter-delay': '390ms',
+            '--lisan-enter-duration': '400ms',
+          }}
+        >
+          <div className="pointer-events-none absolute -left-12 top-4 h-44 w-44 rounded-full bg-violet-200/35 blur-3xl" />
+          <div className="pointer-events-none absolute bottom-10 right-12 h-28 w-28 rounded-full bg-fuchsia-100/70 blur-3xl" />
+
+          <div className="relative grid gap-6 md:grid-cols-[0.38fr_0.62fr]" dir="ltr">
+            <div className="pointer-events-none flex min-h-[150px] items-center justify-start md:min-h-[190px]" aria-hidden="true">
+              <img
+                src="/images/dictionary-image.png"
+                alt=""
+                className="lisan-dictionary-art h-[170px] w-full max-w-[360px] object-contain object-left opacity-100 md:h-[220px] md:max-w-[430px]"
+              />
+            </div>
+
+            <div className="relative z-10 flex min-w-0 flex-col justify-center text-right" dir="rtl">
+              <h2 className="text-[clamp(1.55rem,2vw,2.5rem)] font-black text-slate-950">
+                {dictionaryTitle}
+              </h2>
+              <p className="mt-2 text-[clamp(0.95rem,1vw,1.1rem)] font-medium leading-7 text-slate-600">
+                {dictionaryDescription}
+              </p>
+
+              <label className="relative mt-4 block">
+                <span className="sr-only">{dictionaryPlaceholder}</span>
+                <Search
+                  className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-violet-500"
+                  aria-hidden="true"
+                />
+                <input
+                  type="search"
+                  value={dictionaryQuery}
+                  onChange={(event) => {
+                    setDictionaryQuery(event.target.value);
+                    setDictionaryExpanded(false);
+                  }}
+                  placeholder={dictionaryPlaceholder}
+                  className="h-12 w-full rounded-full border border-violet-100 bg-violet-50/75 py-3 pl-4 pr-12 text-right text-sm font-bold text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-violet-400 focus:bg-white focus:shadow-[0_0_0_4px_rgba(124,58,237,0.12)] sm:h-14 sm:text-base"
+                  dir="rtl"
+                />
+              </label>
+            </div>
+          </div>
+
+          <div className="relative z-10 mt-5 overflow-x-auto rounded-[22px] bg-white/72 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.72)] backdrop-blur-sm [scrollbar-width:thin]">
+            <motion.div
+              layout
+              initial={false}
+              animate={{ height: 'auto' }}
+              transition={
+                reduceMotion
+                  ? { duration: 0 }
+                  : { duration: 0.34, ease: [0.22, 1, 0.36, 1] }
+              }
+            >
+              <table className="w-full min-w-[620px] border-collapse text-right">
+                <thead>
+                  <tr className="bg-violet-50/70 text-sm font-black text-violet-800">
+                    <th className="px-4 py-3">עברית</th>
+                    <th className="px-3 py-3 text-center">↔</th>
+                    <th className="px-4 py-3">العربية</th>
+                    <th className="px-3 py-3 text-center">⭐</th>
+                    <th className="px-3 py-3 text-center">🔊</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {visibleDictionaryWords.map((word, index) => {
+                    const isFavorite = favoriteWords.includes(word.hebrew);
+
+                    return (
+                      <tr
+                        key={`${word.hebrew}-${word.arabic}`}
+                        className="lisan-dictionary-row border-t border-violet-100/80 text-base font-bold text-slate-800 transition hover:bg-violet-50/80"
+                        style={{ '--lisan-row-delay': `${index * 45}ms` }}
+                      >
+                        <td className="px-4 py-3">{word.hebrew}</td>
+                        <td className="px-3 py-3 text-center text-violet-500">↔</td>
+                        <td className="px-4 py-3 text-right" dir="rtl">
+                          {word.arabic}
+                        </td>
+                        <td className="px-3 py-3 text-center">
+                          <button
+                            type="button"
+                            onClick={() => toggleFavoriteWord(word.hebrew)}
+                            className={`inline-flex h-9 w-9 items-center justify-center rounded-full transition hover:-translate-y-0.5 ${
+                              isFavorite
+                                ? 'bg-amber-100 text-amber-500'
+                                : 'bg-violet-50 text-violet-400 hover:bg-violet-100 hover:text-violet-700'
+                            }`}
+                            aria-label={`סמן את ${word.hebrew} כמועדף`}
+                            aria-pressed={isFavorite}
+                          >
+                            <Star
+                              className="h-4 w-4"
+                              fill={isFavorite ? 'currentColor' : 'none'}
+                              aria-hidden="true"
+                            />
+                          </button>
+                        </td>
+                        <td className="px-3 py-3 text-center">
+                          <button
+                            type="button"
+                            onClick={() => pronounceHebrewWord(word.hebrew)}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-violet-50 text-violet-600 transition hover:-translate-y-0.5 hover:bg-violet-600 hover:text-white"
+                            aria-label={`השמע את ${word.hebrew}`}
+                          >
+                            <Volume2 className="h-4 w-4" aria-hidden="true" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </motion.div>
+          </div>
+
+          {canToggleDictionary ? (
+            <button
+              type="button"
+              onClick={() => {
+                setDictionaryExpanded((currentValue) => !currentValue);
+              }}
+              className="relative z-10 mx-auto mt-4 flex flex-col items-center justify-center gap-1 rounded-2xl px-5 py-2 text-sm font-black text-violet-700 transition duration-300 hover:-translate-y-1 hover:bg-violet-50 hover:shadow-[0_14px_28px_rgba(124,58,237,0.14)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+              aria-expanded={dictionaryExpanded}
+            >
+              <ChevronDown
+                className={`h-6 w-6 transition duration-300 ${
+                  dictionaryExpanded ? 'rotate-180' : ''
+                }`}
+                aria-hidden="true"
+              />
+              <span>
+                {dictionaryExpanded ? showLessLabel : showMoreLabel}
+              </span>
+            </button>
+          ) : null}
         </section>
 
         {/* ── Word Games — category picker (deep-links to /games) ──── */}
@@ -793,7 +1164,86 @@ function Home() {
                 {gamesText.subtitle}
               </p>
             </div>
+          </div>
 
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => scrollGames(1)}
+              className="absolute right-0 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-violet-700 shadow-[0_14px_32px_rgba(124,58,237,0.18)] backdrop-blur transition hover:-translate-y-[55%] hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 md:flex"
+              aria-label={isArabic ? 'تمرير الألعاب يميناً' : 'גלילה ימינה במשחקים'}
+            >
+              <ChevronRight className="h-5 w-5" aria-hidden="true" />
+            </button>
+
+            <div
+              ref={gamesScrollerRef}
+              className="lisan-games-carousel flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain px-1 pb-3 pt-1 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden"
+              dir="ltr"
+              onPointerDown={handleGamesPointerDown}
+              onPointerMove={handleGamesPointerMove}
+              onPointerUp={stopGamesDrag}
+              onPointerCancel={stopGamesDrag}
+              onPointerLeave={stopGamesDrag}
+              onWheel={handleGamesWheel}
+            >
+              {gameCategories.map((category) => {
+                const Icon = category.meta.icon;
+                const colors = COLOR_MAP[category.meta.color] || COLOR_MAP.violet;
+                const completedCount = Array.isArray(gameProgress[category.key])
+                  ? gameProgress[category.key].length
+                  : 0;
+                const progress = category.numLevels
+                  ? Math.round((completedCount / category.numLevels) * 100)
+                  : 0;
+
+                return (
+                  <Link
+                    key={category.key}
+                    to={`/games?category=${category.key}`}
+                    className={`group flex min-h-[184px] w-[76%] shrink-0 snap-start flex-col items-center justify-between gap-3 rounded-2xl border bg-white/78 p-4 text-center shadow-[inset_0_0_0_1px_rgba(221,214,254,0.45),0_16px_34px_rgba(124,58,237,0.1)] backdrop-blur-sm transition hover:-translate-y-1 hover:shadow-[0_20px_42px_rgba(124,58,237,0.17)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:w-[260px] lg:w-[280px] ${colors.border}`}
+                    dir="rtl"
+                  >
+                    <span
+                      className={`flex h-14 w-14 items-center justify-center rounded-2xl ${colors.bg} ${colors.text} transition ${colors.hoverBg} group-hover:text-white`}
+                    >
+                      <Icon className="h-7 w-7" aria-hidden="true" />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block text-base font-black text-slate-900">
+                        {category.meta[isArabic ? 'ar' : 'he']}
+                      </span>
+                      <span className="mt-1 block text-xs font-bold text-slate-500">
+                        {gamesText.completed(completedCount, category.numLevels)}
+                      </span>
+                    </span>
+                    <span className="flex flex-wrap items-center justify-center gap-1.5 text-xs font-bold text-slate-500">
+                      <span>{gamesText.words(category.totalWords)}</span>
+                      <span className="opacity-40">·</span>
+                      <span>{gamesText.levels(category.numLevels)}</span>
+                    </span>
+                    <span className="h-1.5 w-full overflow-hidden rounded-full bg-violet-100">
+                      <span
+                        className={`block h-full rounded-full transition-all ${colors.bar}`}
+                        style={{ width: `${progress}%` }}
+                      />
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => scrollGames(-1)}
+              className="absolute left-0 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-violet-700 shadow-[0_14px_32px_rgba(124,58,237,0.18)] backdrop-blur transition hover:-translate-y-[55%] hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 md:flex"
+              aria-label={isArabic ? 'تمرير الألعاب يساراً' : 'גלילה שמאלה במשחקים'}
+            >
+              <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </div>
+
+          <div className="mt-3 flex justify-center">
             <Link
               to="/games"
               className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-white px-4 text-sm font-black text-violet-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
@@ -801,52 +1251,6 @@ function Home() {
               <span>{gamesText.all}</span>
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             </Link>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {gameCategories.map((category) => {
-              const Icon = category.meta.icon;
-              const colors = COLOR_MAP[category.meta.color] || COLOR_MAP.violet;
-              const completedCount = Array.isArray(gameProgress[category.key])
-                ? gameProgress[category.key].length
-                : 0;
-              const progress = category.numLevels
-                ? Math.round((completedCount / category.numLevels) * 100)
-                : 0;
-
-              return (
-                <Link
-                  key={category.key}
-                  to={`/games?category=${category.key}`}
-                  className={`group flex min-h-[178px] flex-col gap-3 rounded-2xl border bg-white/78 p-4 text-right shadow-[inset_0_0_0_1px_rgba(221,214,254,0.45)] backdrop-blur-sm transition hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(124,58,237,0.15)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${colors.border}`}
-                >
-                  <span
-                    className={`flex h-12 w-12 items-center justify-center rounded-2xl ${colors.bg} ${colors.text} transition ${colors.hoverBg} group-hover:text-white`}
-                  >
-                    <Icon className="h-6 w-6" aria-hidden="true" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block text-base font-black text-slate-900">
-                      {category.meta[isArabic ? 'ar' : 'he']}
-                    </span>
-                    <span className="mt-1 block text-xs font-bold text-slate-500">
-                      {gamesText.completed(completedCount, category.numLevels)}
-                    </span>
-                  </span>
-                  <span className="mt-auto flex flex-wrap items-center gap-1.5 text-xs font-bold text-slate-500">
-                    <span>{gamesText.words(category.totalWords)}</span>
-                    <span className="opacity-40">·</span>
-                    <span>{gamesText.levels(category.numLevels)}</span>
-                  </span>
-                  <span className="h-1.5 overflow-hidden rounded-full bg-violet-100">
-                    <span
-                      className={`block h-full rounded-full transition-all ${colors.bar}`}
-                      style={{ width: `${progress}%` }}
-                    />
-                  </span>
-                </Link>
-              );
-            })}
           </div>
         </section>
 

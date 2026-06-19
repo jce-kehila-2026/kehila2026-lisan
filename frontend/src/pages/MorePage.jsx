@@ -5,6 +5,7 @@ import {
   ChevronDown,
   Heart,
   Headphones,
+  LogOut,
   MessageCircle,
   PenLine,
   Search,
@@ -13,11 +14,12 @@ import {
   Star,
   Trash2,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import BottomNav from '../components/BottomNav.jsx';
-import PageHeader from '../components/PageHeader.jsx';
+import LanguageToggle from '../components/LanguageToggle.jsx';
+import LisanLogo from '../components/LisanLogo.jsx';
 import { getStoredToken } from '../services/auth.js';
 
 const API_BASE_URL = '/api';
@@ -110,6 +112,100 @@ const defaultSavedWords = [
   'בוקר טוב',
   'להתראות',
 ];
+
+const glassBlockClass =
+  'border border-white/85 bg-[linear-gradient(135deg,rgba(255,255,255,0.62)_0%,rgba(246,241,255,0.74)_48%,rgba(236,226,255,0.66)_100%)] shadow-[0_24px_70px_rgba(124,58,237,0.14)] backdrop-blur-xl';
+const glassCardClass =
+  'border border-white/72 bg-white/50 shadow-[0_16px_38px_rgba(124,58,237,0.1)] backdrop-blur-lg';
+
+function MoreTopHeader() {
+  const navigate = useNavigate();
+  const { i18n } = useTranslation();
+  const isArabic = i18n.language === 'ar';
+  const text = labels[isArabic ? 'ar' : 'he'];
+  const sectionButtons = [
+    {
+      label: text.continueReading,
+      icon: BookOpen,
+      sectionId: 'history-continue-reading',
+    },
+    {
+      label: text.recentActivity,
+      icon: Star,
+      sectionId: 'history-recent-activity',
+    },
+    {
+      label: text.savedTitle,
+      icon: Heart,
+      sectionId: 'history-saved-words',
+    },
+    {
+      label: text.socialPractice,
+      icon: MessageCircle,
+      sectionId: 'history-social-practice',
+    },
+    {
+      label: text.chatHistory,
+      icon: Search,
+      sectionId: 'history-chat-history',
+    },
+  ];
+
+  const scrollToSection = (sectionId) => {
+    document.getElementById(sectionId)?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  };
+
+  return (
+    <header className="lisan-enter sticky top-3 z-50 rounded-[24px] border border-white/80 bg-white/54 px-5 py-4 shadow-[0_18px_56px_rgba(124,58,237,0.14)] backdrop-blur-xl" style={{ '--lisan-enter-delay': '0ms' }}>
+      <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4">
+        <button
+          type="button"
+          onClick={() => navigate('/home')}
+          className="justify-self-start rounded-2xl transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+          aria-label="דף הבית"
+          title="דף הבית"
+        >
+          <LisanLogo className="h-20 sm:h-24" />
+        </button>
+
+        <div className="flex items-center gap-2 justify-self-end">
+          <LanguageToggle />
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/85 bg-white/90 text-slate-600 shadow-[0_12px_28px_rgba(124,58,237,0.12)] transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+            aria-label={isArabic ? 'رجوع' : 'חזרה'}
+            title={isArabic ? 'رجوع' : 'חזרה'}
+          >
+            <LogOut className="h-5 w-5" aria-hidden="true" />
+          </button>
+        </div>
+
+        <nav className="col-start-1 col-end-4 row-start-2 flex flex-wrap items-center justify-center gap-3 lg:col-start-2 lg:col-end-3 lg:row-start-1" aria-label={isArabic ? 'أقسام السجل' : 'אזורי היסטוריה'}>
+          {sectionButtons.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <button
+                key={item.sectionId}
+                type="button"
+                onClick={() => scrollToSection(item.sectionId)}
+                className="inline-flex h-12 min-w-[150px] items-center justify-center gap-2.5 rounded-[22px] border border-white/80 bg-white/74 px-5 text-base font-black text-violet-700 shadow-[0_12px_30px_rgba(124,58,237,0.12)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+              >
+                <span>{item.label}</span>
+                <Icon className="h-5 w-5" aria-hidden="true" />
+              </button>
+            );
+          })}
+        </nav>
+
+      </div>
+    </header>
+  );
+}
 
 function MorePage() {
   const { i18n } = useTranslation();
@@ -298,35 +394,33 @@ function MorePage() {
         className="app-page-container relative pb-32"
         dir="rtl"
       >
-        <PageHeader showBack />
+        <MoreTopHeader />
 
-        <section className="relative mt-6 overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(135deg,#FFFFFF_0%,#FBF8FF_50%,#F3ECFF_100%)] p-6 shadow-card sm:p-7 lg:min-h-[260px] lg:p-8">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_78%_42%,rgba(196,181,253,0.24)_0%,transparent_34%)]" />
-          <div className="pointer-events-none absolute -left-16 top-0 h-48 w-48 rounded-full bg-violet-100/60 blur-3xl" />
-          <div className="relative grid min-h-0 sm:min-h-[220px] items-center gap-7 md:grid-cols-[minmax(0,1fr)_430px]" dir="ltr">
-            <div className="order-2 text-right md:order-1" dir="rtl">
+        <section
+          className="relative mt-6 overflow-hidden rounded-[28px] border border-white/80 bg-cover p-6 shadow-card sm:p-7 lg:min-h-[330px] lg:p-8"
+          style={{
+            backgroundImage: 'url("/images/history.png")',
+            backgroundPosition: 'center 68%',
+            backgroundSize: '108% auto',
+          }}
+        >
+          <div className="pointer-events-none absolute inset-0 bg-transparent" />
+          <div className="relative grid min-h-0 items-center sm:min-h-[280px] md:grid-cols-[0.24fr_minmax(0,0.38fr)_0.38fr]" dir="ltr">
+            <div className="text-center md:col-start-2" dir="rtl">
               <span className="inline-flex rounded-full bg-violet-50 px-4 py-2 text-sm font-black text-violet-700">
                 {text.heroKicker}
               </span>
-              <h1 className="mt-4 text-3xl font-black leading-tight text-violet-700 sm:text-4xl lg:text-5xl">
+              <h1 className="mt-4 text-4xl font-black leading-tight text-violet-700 sm:text-5xl lg:text-6xl">
                 {text.title}
               </h1>
-              <p className="mt-3 max-w-2xl text-base font-bold leading-7 text-slate-600">
+              <p className="mx-auto mt-4 max-w-2xl text-lg font-bold leading-8 text-slate-700 sm:text-xl">
                 {text.subtitle}
               </p>
-            </div>
-
-            <div className="order-1 flex min-h-[220px] items-center justify-center md:order-2" aria-hidden="true">
-              <img
-                src="/images/profile-hebrew-learning.png"
-                alt=""
-                className="h-[170px] w-full max-w-[460px] object-contain opacity-95 mix-blend-multiply sm:h-[220px] md:h-[270px] [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_72%,rgba(0,0,0,0.72)_88%,transparent_100%)]"
-              />
             </div>
           </div>
         </section>
 
-        <section className="mt-5 flex min-h-[96px] flex-wrap items-center justify-between gap-5 rounded-[24px] bg-white p-5 shadow-card sm:p-6">
+        <section id="history-continue-reading" className={`scroll-mt-8 mt-5 flex min-h-[96px] flex-wrap items-center justify-between gap-5 rounded-[24px] p-5 sm:p-6 ${glassBlockClass}`}>
           <div className="flex items-center gap-5">
             <span className="flex h-14 w-14 items-center justify-center rounded-[20px] bg-violet-50 text-violet-700">
               <BookOpen className="h-7 w-7" aria-hidden="true" />
@@ -346,7 +440,7 @@ function MorePage() {
           </Link>
         </section>
 
-        <section className="mt-6">
+        <section id="history-recent-activity" className={`scroll-mt-8 mt-6 rounded-[26px] p-5 ${glassBlockClass}`}>
           <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
             <div className="flex items-center gap-3 text-right">
               <button
@@ -368,13 +462,6 @@ function MorePage() {
                 <p className="mt-1 text-base font-semibold text-slate-500">{text.recentActivityHint}</p>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => setShowRecentActivities((current) => !current)}
-              className="text-base font-black text-violet-700"
-            >
-              {text.viewFullHistory}
-            </button>
           </div>
 
           {showRecentActivities ? (
@@ -384,7 +471,7 @@ function MorePage() {
                 return (
                   <article
                     key={item.title}
-                    className="flex min-h-[106px] items-center justify-between gap-3 sm:gap-5 rounded-[24px] bg-white p-5 shadow-card transition hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(124,58,237,0.12)]"
+                    className={`flex min-h-[106px] items-center justify-between gap-3 sm:gap-5 rounded-[24px] p-5 transition hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(124,58,237,0.14)] ${glassCardClass}`}
                   >
                     <div className="flex min-w-0 items-center gap-5">
                       <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px] bg-violet-50 text-violet-700">
@@ -408,7 +495,7 @@ function MorePage() {
           ) : null}
         </section>
 
-        <section className="mt-6 min-h-[118px] rounded-[26px] bg-white p-6 shadow-card">
+        <section id="history-saved-words" className={`scroll-mt-8 mt-6 min-h-[118px] rounded-[26px] p-6 ${glassBlockClass}`}>
           <div className="mb-4 flex items-center justify-between gap-3">
             <h2 className="text-3xl font-black text-slate-950">{text.savedTitle}</h2>
             <span className="text-base font-black text-violet-700">{text.savedMore}</span>
@@ -426,10 +513,10 @@ function MorePage() {
           </div>
         </section>
 
-        <section className="mt-6 grid gap-5 lg:grid-cols-2">
+        <section id="history-social-practice" className="scroll-mt-8 mt-6 grid gap-5 lg:grid-cols-2">
           <Link
             to="/shared-chat"
-            className="group flex min-h-[150px] items-center justify-between gap-6 overflow-hidden rounded-[26px] bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(124,58,237,0.12)]"
+            className={`group flex min-h-[150px] items-center justify-between gap-6 overflow-hidden rounded-[26px] p-6 transition hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(124,58,237,0.14)] ${glassBlockClass}`}
           >
             <div className="text-right">
               <h2 className="text-2xl font-black text-slate-950">{text.socialPractice}</h2>
@@ -449,7 +536,7 @@ function MorePage() {
 
           <Link
             to="/profile"
-            className="flex min-h-[150px] items-center gap-5 rounded-[26px] bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(124,58,237,0.12)]"
+            className={`flex min-h-[150px] items-center gap-5 rounded-[26px] p-6 transition hover:-translate-y-1 hover:shadow-[0_18px_36px_rgba(124,58,237,0.14)] ${glassBlockClass}`}
           >
             <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-violet-50 text-violet-700">
               <Settings className="h-7 w-7" aria-hidden="true" />
@@ -463,7 +550,12 @@ function MorePage() {
           </Link>
         </section>
 
-        <section className="mt-6 min-h-[320px] rounded-[28px] bg-white p-6 shadow-card">
+        <section
+          id="history-chat-history"
+          className={`scroll-mt-8 mt-6 rounded-[28px] p-6 transition-all duration-300 ${
+            showChatHistory ? 'min-h-[320px]' : 'min-h-[112px]'
+          } ${glassBlockClass}`}
+        >
           <div className="mb-4 flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <span className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 via-pink-400 to-amber-300 text-white">
@@ -490,7 +582,7 @@ function MorePage() {
 
           {showChatHistory ? (
             <>
-              <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
+              <label className="flex items-center gap-3 rounded-2xl border border-white/72 bg-white/46 px-5 py-4 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5)] backdrop-blur-lg">
                 <Search className="h-5 w-5 text-slate-400" aria-hidden="true" />
                 <input
                   value={query}
@@ -502,7 +594,7 @@ function MorePage() {
 
               <div className="mt-5 grid gap-4 lg:grid-cols-2">
                 {loading ? (
-                  <div className="rounded-2xl bg-slate-50 p-6 text-center text-sm text-slate-500 lg:col-span-2">
+                  <div className={`rounded-2xl p-6 text-center text-sm text-slate-500 lg:col-span-2 ${glassCardClass}`}>
                     Loading chats...
                   </div>
                 ) : (
@@ -513,7 +605,7 @@ function MorePage() {
                     return (
                     <article
                       key={conversation.id}
-                      className={`min-h-[128px] rounded-[22px] border border-violet-100 bg-violet-50/40 p-4 ${
+                      className={`min-h-[128px] rounded-[22px] p-4 ${glassCardClass} ${
                         isLastSingle ? 'lg:col-span-2 lg:mx-auto lg:w-[calc(50%_-_0.5rem)]' : ''
                       }`}
                     >

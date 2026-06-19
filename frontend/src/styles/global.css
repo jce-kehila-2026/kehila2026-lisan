@@ -267,6 +267,18 @@ input {
   will-change: transform;
 }
 
+.lisan-games-carousel {
+  cursor: grab;
+  scroll-behavior: smooth;
+  scroll-padding-inline: 8px;
+  touch-action: pan-x;
+  user-select: none;
+}
+
+.lisan-games-carousel:active {
+  cursor: grabbing;
+}
+
 .lisan-hero-reel {
   isolation: isolate;
   background:
