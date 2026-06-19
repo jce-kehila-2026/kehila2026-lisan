@@ -3,6 +3,7 @@ import {
   GraduationCap,
   Link2,
   Pencil,
+  Search,
   Trash2,
   UserPlus,
   X,
@@ -327,6 +328,9 @@ function TeachersManagement() {
   const [usesLocalData, setUsesLocalData] = useState(false);
   const [error, setError] = useState('');
   const [expandedLevel, setExpandedLevel] = useState('');
+  const [teacherQuery, setTeacherQuery] = useState('');
+  const [studentQuery, setStudentQuery] = useState('');
+  const [levelFilter, setLevelFilter] = useState('all');
 
   const loadData = async () => {
     try {
@@ -368,6 +372,28 @@ function TeachersManagement() {
       return acc;
     }, {});
   }, [students, teachers]);
+
+  const filteredTeachers = useMemo(() => {
+    const normalizedTeacherQuery = teacherQuery.trim().toLowerCase();
+    const normalizedStudentQuery = studentQuery.trim().toLowerCase();
+
+    return teachers.filter((teacher) => {
+      const teacherLevels = getTeacherLevels(teacher);
+      const assignedStudents = studentsByTeacher[teacher.id] || [];
+      const matchesTeacher =
+        !normalizedTeacherQuery ||
+        teacher.name?.toLowerCase().includes(normalizedTeacherQuery);
+      const matchesLevel =
+        levelFilter === 'all' || teacherLevels.includes(levelFilter);
+      const matchesStudent =
+        !normalizedStudentQuery ||
+        assignedStudents.some((student) =>
+          student.name?.toLowerCase().includes(normalizedStudentQuery),
+        );
+
+      return matchesTeacher && matchesLevel && matchesStudent;
+    });
+  }, [levelFilter, studentQuery, studentsByTeacher, teacherQuery, teachers]);
 
   const closeModal = () => {
     setModal(null);
@@ -549,8 +575,56 @@ function TeachersManagement() {
           </div>
         </section>
 
+        <section className="mt-5 rounded-[2rem] border border-[#EEE5FF] bg-white/75 p-4 shadow-card backdrop-blur-[8px] sm:p-5">
+          <div className="grid gap-3 lg:grid-cols-[1fr_0.7fr_1fr]">
+            <label className="flex min-h-12 items-center gap-3 rounded-2xl border border-violet-100 bg-violet-50/60 px-4 transition focus-within:border-violet-300 focus-within:bg-white focus-within:ring-4 focus-within:ring-violet-100">
+              <Search className="h-5 w-5 shrink-0 text-violet-500" aria-hidden="true" />
+              <input
+                value={teacherQuery}
+                onChange={(event) => setTeacherQuery(event.target.value)}
+                placeholder="חיפוש לפי שם מורה"
+                className="min-w-0 flex-1 bg-transparent text-sm font-bold text-slate-800 outline-none placeholder:text-slate-400"
+              />
+            </label>
+
+            <label className="grid gap-1 text-xs font-black text-violet-700">
+              רמת לימוד
+              <select
+                value={levelFilter}
+                onChange={(event) => setLevelFilter(event.target.value)}
+                className="min-h-12 rounded-2xl border border-violet-100 bg-violet-50/60 px-4 text-sm font-black text-slate-800 outline-none transition focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-100"
+              >
+                <option value="all">כל הרמות</option>
+                {adminLevels.map((level) => (
+                  <option key={level} value={level}>
+                    {level}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="flex min-h-12 items-center gap-3 rounded-2xl border border-violet-100 bg-violet-50/60 px-4 transition focus-within:border-violet-300 focus-within:bg-white focus-within:ring-4 focus-within:ring-violet-100">
+              <Search className="h-5 w-5 shrink-0 text-violet-500" aria-hidden="true" />
+              <input
+                value={studentQuery}
+                onChange={(event) => setStudentQuery(event.target.value)}
+                placeholder="חיפוש לפי שם תלמידה"
+                className="min-w-0 flex-1 bg-transparent text-sm font-bold text-slate-800 outline-none placeholder:text-slate-400"
+              />
+            </label>
+          </div>
+
+          <p className="mt-3 text-xs font-black text-violet-700">
+            מוצגות {filteredTeachers.length} מתוך {teachers.length} מורות
+          </p>
+        </section>
+
         <section className={`mt-5 gap-4 ${getTeachersLayoutClass()}`}>
-          {teachers.map((teacher) => {
+          {filteredTeachers.length === 0 ? (
+            <div className="w-full rounded-[1.75rem] border border-violet-100 bg-white/85 p-8 text-center text-sm font-black text-slate-500 shadow-card">
+              לא נמצאו מורות שמתאימות לחיפוש.
+            </div>
+          ) : filteredTeachers.map((teacher) => {
             const assignedStudents = studentsByTeacher[teacher.id] || [];
             const teacherLevels = getTeacherLevels(teacher);
             const visibleLevels = teacherLevels;
@@ -558,7 +632,7 @@ function TeachersManagement() {
             return (
               <article
                 key={teacher.id}
-                className={`rounded-[1.75rem] border border-[#EEE5FF] bg-white p-5 shadow-card ${getTeacherCardClass(teachers.length)}`}
+                className={`rounded-[1.75rem] border border-[#EEE5FF] bg-white p-5 shadow-card ${getTeacherCardClass(filteredTeachers.length)}`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-50 text-violet-700">
