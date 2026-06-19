@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  ChevronRight,
   Clock3,
   Eye,
   MessageSquareText,
@@ -10,8 +9,7 @@ import {
   UserRound,
   X,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import AdminNavStrip from '../../components/admin/AdminNavStrip.jsx';
+import AdminPageHeader from '../../components/admin/AdminPageHeader.jsx';
 
 const API_BASE_URL = '/api';
 
@@ -358,7 +356,6 @@ function ConversationReviewModal({
 }
 
 function Conversations() {
-  const navigate = useNavigate();
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -495,37 +492,21 @@ function Conversations() {
   ).length;
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
+    <main className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] px-3 py-3 text-slate-900 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-7xl pb-12" dir="rtl">
-        <header className="flex flex-wrap items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={() => navigate('/admin/dashboard')}
-            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/80 bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-[0_10px_24px_rgba(109,40,217,0.08)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
-          >
-            <ChevronRight className="h-4 w-4" aria-hidden="true" />
-            חזרה ללוח הניהול
-          </button>
+        <AdminPageHeader icon={MessageSquareText} label="מרכז סקירת שיחות" />
 
-          <AdminNavStrip />
-
-          <div className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/80 bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-[0_10px_24px_rgba(109,40,217,0.08)] backdrop-blur">
-            <MessageSquareText className="h-4 w-4" aria-hidden="true" />
-            מרכז סקירת שיחות
-          </div>
-        </header>
-
-        <section className="relative mt-6 overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] shadow-[0_26px_70px_rgba(91,33,182,0.14)]">
+        <section className="relative mt-3 overflow-hidden rounded-[24px] border border-white/80 bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] shadow-[0_26px_70px_rgba(91,33,182,0.14)] md:mt-6 md:rounded-[28px]">
           <div className="pointer-events-none absolute left-0 top-0 h-full w-1/2 bg-violet-200/35 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-20 right-8 h-44 w-44 rounded-full bg-fuchsia-100/60 blur-3xl" />
 
-          <div className="relative grid gap-0 lg:min-h-80 lg:grid-cols-[minmax(320px,0.9fr)_minmax(0,1fr)]" dir="ltr">
-            <div className="relative flex min-h-64 items-center justify-center overflow-hidden bg-violet-50/30 p-3 sm:min-h-72 lg:min-h-80">
+          <div className="relative grid min-h-[132px] gap-0 md:min-h-[260px] lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]" dir="ltr">
+            <div className="relative flex min-h-[72px] items-center justify-center overflow-hidden bg-violet-50/30 p-2 md:min-h-[210px] md:p-3">
               <div className="pointer-events-none absolute inset-6 rounded-full bg-violet-300/35 blur-3xl" />
               <img
                 src="/ai.png"
                 alt="AI Conversations"
-                className="relative h-full w-full scale-110 object-contain object-center sm:scale-[1.16] lg:scale-125"
+                className="relative h-full min-h-[72px] w-full object-contain object-center md:min-h-[210px]"
               />
               <button
                 type="button"
@@ -538,21 +519,21 @@ function Conversations() {
               </button>
             </div>
 
-            <div className="flex flex-col justify-center p-5 text-right sm:p-7 lg:py-10" dir="rtl">
+            <div className="flex flex-col justify-center p-4 text-right md:p-7 lg:py-10" dir="rtl">
               <p className="inline-flex items-center gap-2 text-sm font-black text-violet-700">
                 <MessageSquareText className="h-4 w-4" aria-hidden="true" />
                 בדיקת שיחות
               </p>
-              <h1 className="mt-2 text-[clamp(2.2rem,4.2vw,4.25rem)] font-black leading-tight text-slate-950">
+              <h1 className="mt-2 text-[clamp(1.65rem,7vw,2.1rem)] font-black leading-tight text-slate-950 md:text-[clamp(2.2rem,4.2vw,4.25rem)]">
                 שיחות AI לבדיקה
               </h1>
-              <p className="mt-3 text-sm font-semibold leading-7 text-slate-600 sm:text-base">
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-600 md:mt-3 md:text-base md:leading-7">
                 סקירת שיחות לימודיות, זיהוי שיחות שמצריכות תשומת לב ומעבר מהיר לפרטי השיחה.
               </p>
             </div>
           </div>
 
-          <div className="relative grid grid-cols-1 gap-4 p-5 pt-0 lg:grid-cols-3 sm:p-7 sm:pt-0">
+          <div className="relative grid grid-cols-1 gap-3 p-4 pt-0 md:gap-4 md:p-7 md:pt-0 lg:grid-cols-3">
             <SummaryCard icon={MessageSquareText} label="שיחות מוצגות" value={conversations.length} />
             <SummaryCard icon={Sparkles} label="ממתינות לבדיקה" value={pendingCount} />
             <SummaryCard icon={Clock3} label="נבדקו" value={reviewedCount} />

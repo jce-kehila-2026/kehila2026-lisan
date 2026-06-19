@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  ArrowRight,
   BarChart3,
   BookOpenCheck,
   LineChart,
@@ -8,9 +7,8 @@ import {
   PieChart,
   Sparkles,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
-import AdminNavStrip from '../../components/admin/AdminNavStrip.jsx';
+import AdminPageHeader from '../../components/admin/AdminPageHeader.jsx';
 import {
   featureUsage,
   getTopLevel,
@@ -134,41 +132,24 @@ function InsightCard({ label, value, description, icon: Icon }) {
 }
 
 function Statistics() {
-  const navigate = useNavigate();
   const activeLevel = getTopLevel('entries');
   const storiesLevel = getTopLevel('stories');
   const chatLevel = getTopLevel('chat');
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] px-3 py-3 text-slate-900 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-7xl pb-12" dir="rtl">
-        <header className="flex flex-wrap items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={() => navigate('/admin/dashboard')}
-            className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-sm transition hover:bg-violet-50"
-          >
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            חזרה ללוח הבקרה
-          </button>
+        <AdminPageHeader icon={BarChart3} label="סטטיסטיקות" />
 
-          <AdminNavStrip />
-
-          <div className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/80 bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-[0_10px_24px_rgba(109,40,217,0.08)] backdrop-blur">
-            <BarChart3 className="h-4 w-4" aria-hidden="true" />
-            סטטיסטיקות
-          </div>
-        </header>
-
-        <section className="mt-6 overflow-hidden rounded-[30px] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.86)_0%,rgba(245,240,255,0.84)_48%,rgba(255,241,248,0.82)_100%)] p-5 shadow-[0_26px_70px_rgba(91,33,182,0.14)] backdrop-blur sm:p-7">
+        <section className="mt-3 overflow-hidden rounded-[24px] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.86)_0%,rgba(245,240,255,0.84)_48%,rgba(255,241,248,0.82)_100%)] p-4 shadow-[0_26px_70px_rgba(91,33,182,0.14)] backdrop-blur md:mt-6 md:rounded-[30px] md:p-7">
           <p className="inline-flex items-center gap-2 rounded-full bg-violet-100/80 px-3 py-1 text-xs font-black text-violet-700">
             <BarChart3 className="h-4 w-4" aria-hidden="true" />
             דשבורד אנליטיקה
           </p>
-          <h1 className="mt-3 text-[clamp(2.3rem,4.6vw,4.6rem)] font-black leading-tight text-slate-950">
+          <h1 className="mt-2 text-[clamp(1.65rem,7vw,2.1rem)] font-black leading-tight text-slate-950 md:mt-3 md:text-[clamp(2.3rem,4.6vw,4.6rem)]">
             סטטיסטיקות שימוש ולמידה
           </h1>
-          <p className="mt-3 max-w-4xl text-sm font-semibold leading-7 text-slate-600 sm:text-base">
+          <p className="mt-2 max-w-4xl text-sm font-semibold leading-6 text-slate-600 md:mt-3 md:text-base md:leading-7">
             מבט מורחב על פעילות תלמידות, מורות, רמות לימוד ושימוש בתכונות המרכזיות של ליסאן. הנתונים כאן הם נתוני דמו קדמיים בלבד.
           </p>
         </section>

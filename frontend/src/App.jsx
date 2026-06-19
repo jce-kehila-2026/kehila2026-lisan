@@ -75,10 +75,23 @@ function StudentPreferenceSync() {
   return null;
 }
 
+function AdminScrollToTop() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname.startsWith('/admin/')) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }
+  }, [location.pathname]);
+
+  return null;
+}
+
 function App() {
   return (
     <Router>
       <StudentPreferenceSync />
+      <AdminScrollToTop />
       <Routes>
         <Route path="/" element={<Navigate to={SKIP_AUTH ? '/home' : '/login'} replace />} />
         <Route path="/login" element={<StudentLogin />} />

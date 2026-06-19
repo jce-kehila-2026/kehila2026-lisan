@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-  ArrowRight,
   Ban,
   GraduationCap,
   Pencil,
@@ -13,10 +12,8 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-
 import Button from '../../components/ui/Button.jsx';
-import AdminNavStrip from '../../components/admin/AdminNavStrip.jsx';
+import AdminPageHeader from '../../components/admin/AdminPageHeader.jsx';
 import {
   adminLevels,
   adminStudentsSeed,
@@ -30,7 +27,6 @@ import {
   toggleStudentSuspension,
   updateStudent,
 } from '../../services/adminApi.js';
-import { logout } from '../../services/auth.js';
 
 const emptyForm = {
   email: '',
@@ -330,7 +326,6 @@ function FilterSelect({ label, value, onChange, children }) {
 }
 
 function Students() {
-  const navigate = useNavigate();
   const [students, setStudents] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [query, setQuery] = useState('');
@@ -560,58 +555,38 @@ function Students() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/admin/login', { replace: true });
-  };
-
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] px-3 py-3 text-slate-900 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-7xl" dir="rtl">
-        <header className="flex flex-wrap items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={() => navigate('/admin/dashboard')}
-            className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-sm transition hover:bg-violet-50"
-          >
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            חזרה ללוח הבקרה
-          </button>
+        <AdminPageHeader icon={Users} label="ניהול תלמידות" />
 
-          <AdminNavStrip />
-
-          <Button type="button" variant="secondary" onClick={handleLogout}>
-            יציאה
-          </Button>
-        </header>
-
-        <section className="relative mt-6 overflow-hidden rounded-[2rem] border border-[#EEE5FF] bg-white/75 shadow-card backdrop-blur-[8px]">
+        <section className="relative mt-3 overflow-hidden rounded-[24px] border border-[#EEE5FF] bg-white/75 shadow-card backdrop-blur-[8px] md:mt-6 md:rounded-[2rem]">
           <div
             className="absolute left-0 top-0 h-full w-1/2 bg-violet-200/25 blur-3xl"
             aria-hidden="true"
           />
 
-          <div className="relative flex flex-col lg:min-h-80 lg:flex-row lg:items-stretch">
-            <div className="flex flex-col justify-center p-5 sm:p-7 lg:w-[52%] lg:py-10">
+          <div className="relative flex min-h-[132px] flex-col md:min-h-[260px] lg:flex-row lg:items-stretch">
+            <div className="flex flex-col justify-center p-4 md:p-7 lg:w-[58%] lg:py-8">
               <p className="inline-flex items-center gap-2 text-sm font-black text-violet-700">
                 <Users className="h-4 w-4" aria-hidden="true" />
                 ניהול תלמידות
               </p>
 
-              <h1 className="mt-2 text-[clamp(2.2rem,4.2vw,4.25rem)] font-black leading-tight text-slate-950">
+              <h1 className="mt-2 text-[clamp(1.65rem,7vw,2.1rem)] font-black leading-tight text-slate-950 md:text-[clamp(2.2rem,4.2vw,4.25rem)]">
                 תלמידות במערכת
               </h1>
 
-              <p className="mt-3 text-sm font-semibold leading-7 text-slate-600 sm:text-base">
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-600 md:mt-3 md:text-base md:leading-7">
                 ניהול תלמידות, רמות, שיוך למורות, עריכה, מחיקה והשהיה דרך המערכת.
               </p>
             </div>
 
-            <div className="relative flex min-h-64 items-center justify-center overflow-hidden bg-violet-50/35 lg:min-h-80 lg:w-[48%] lg:bg-violet-50/20">
+            <div className="relative flex min-h-[72px] items-center justify-center overflow-hidden bg-violet-50/35 md:min-h-[210px] lg:w-[42%] lg:bg-violet-50/20">
               <img
                 src="/addS.png"
                 alt="Add Student"
-                className="h-full w-full scale-110 object-contain object-center sm:scale-[1.15] lg:scale-125"
+                className="h-full min-h-[72px] w-full object-contain object-center md:min-h-[210px]"
               />
             </div>
           </div>
