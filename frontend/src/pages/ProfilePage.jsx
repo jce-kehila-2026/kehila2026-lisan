@@ -178,8 +178,8 @@ function ProfileTopHeader() {
   };
 
   return (
-    <header className="lisan-enter sticky top-3 z-50 rounded-[24px] border border-white/80 bg-white/54 px-5 py-4 shadow-[0_18px_56px_rgba(124,58,237,0.14)] backdrop-blur-xl" style={{ '--lisan-enter-delay': '0ms' }}>
-      <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4">
+    <header className="lisan-enter z-50 rounded-[20px] border border-white/80 bg-white/54 px-3 py-3 shadow-[0_14px_36px_rgba(124,58,237,0.12)] backdrop-blur-xl sm:rounded-[24px] sm:px-5 sm:py-4 lg:sticky lg:top-3" style={{ '--lisan-enter-delay': '0ms' }}>
+      <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-4">
         <button
           type="button"
           onClick={() => navigate('/home')}
@@ -187,23 +187,23 @@ function ProfileTopHeader() {
           aria-label="דף הבית"
           title="דף הבית"
         >
-          <LisanLogo className="h-20 sm:h-24" />
+          <LisanLogo className="h-14 sm:h-24" />
         </button>
 
-        <div className="flex items-center gap-2 justify-self-end">
+        <div className="flex items-center gap-1.5 justify-self-end sm:gap-2">
           <LanguageToggle />
           <button
             type="button"
             onClick={() => navigate('/login')}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/85 bg-white/90 text-slate-600 shadow-[0_12px_28px_rgba(124,58,237,0.12)] transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/85 bg-white/90 text-slate-600 shadow-[0_12px_28px_rgba(124,58,237,0.12)] transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-11 sm:w-11"
             aria-label={t('logout')}
             title={t('logout')}
           >
-            <LogOut className="h-5 w-5" aria-hidden="true" />
+            <LogOut className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
           </button>
         </div>
 
-        <nav className="col-start-1 col-end-4 row-start-2 flex flex-wrap items-center justify-center gap-3 lg:col-start-2 lg:col-end-3 lg:row-start-1" aria-label={isArabic ? 'تنقل الملف الشخصي' : 'ניווט פרופיל'}>
+        <nav className="col-start-1 col-end-4 row-start-2 flex flex-nowrap items-center justify-start gap-2 overflow-x-auto py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:justify-center sm:gap-3 lg:col-start-2 lg:col-end-3 lg:row-start-1" aria-label={isArabic ? 'تنقل الملف الشخصي' : 'ניווט פרופיל'}>
           {navItems.map((item) => {
             const Icon = item.icon;
 
@@ -212,10 +212,10 @@ function ProfileTopHeader() {
                 key={item.sectionId}
                 type="button"
                 onClick={() => scrollToProfileSection(item.sectionId)}
-                className="inline-flex h-12 min-w-[122px] items-center justify-center gap-2.5 rounded-[22px] border border-white/80 bg-white/66 px-5 text-base font-black text-violet-700 shadow-[0_12px_30px_rgba(124,58,237,0.12)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                className="inline-flex h-10 min-w-max shrink-0 items-center justify-center gap-2 rounded-[18px] border border-white/80 bg-white/66 px-3.5 text-sm font-black text-violet-700 shadow-[0_10px_24px_rgba(124,58,237,0.1)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-12 sm:gap-2.5 sm:rounded-[22px] sm:px-5 sm:text-base sm:shadow-[0_12px_30px_rgba(124,58,237,0.12)]"
               >
                 <span>{item.label}</span>
-                <Icon className="h-5 w-5" aria-hidden="true" />
+                <Icon className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
               </button>
             );
           })}
@@ -393,27 +393,26 @@ function ProfilePage() {
         <ProfileTopHeader />
 
         <section
-          className={`relative mt-5 overflow-hidden rounded-[28px] border border-white/85 bg-cover lg:min-h-[250px] ${surfaceClass}`}
+          className={`profile-hero-card relative mt-4 overflow-hidden rounded-[24px] border border-white/85 bg-cover sm:mt-5 sm:rounded-[28px] lg:min-h-[250px] ${surfaceClass}`}
           style={{
-            backgroundImage: 'url("/images/profilePhoto.png")',
-            backgroundPosition: 'center 52%',
+            backgroundImage: 'url("/images/profileHeroNew.png")',
           }}
         >
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.02)_0%,rgba(255,255,255,0.14)_30%,rgba(255,255,255,0.32)_52%,rgba(255,255,255,0.06)_100%)]" />
-          <div className="relative grid min-h-0 p-6 sm:min-h-[260px] sm:p-8 lg:min-h-[250px] lg:grid-cols-[0.18fr_minmax(0,0.38fr)_0.44fr]" dir="ltr">
+          <div className="relative grid min-h-[210px] p-4 sm:min-h-[260px] sm:p-8 lg:min-h-[250px] lg:grid-cols-[0.18fr_minmax(0,0.38fr)_0.44fr]" dir="ltr">
             <div className="flex min-w-0 flex-col items-center justify-center text-center lg:col-start-2 lg:items-center lg:text-center" dir="rtl">
-              <h2 className={`text-4xl font-black leading-tight sm:text-5xl lg:text-6xl ${headingTextClass}`}>
+              <h2 className={`text-5xl font-black leading-tight sm:text-6xl lg:text-7xl ${headingTextClass}`}>
                 {user?.name || 'Lisan Student'}
               </h2>
-              <p className={`mt-4 flex items-center justify-center gap-2 text-lg font-bold sm:text-xl ${mutedTextClass}`}>
+              <p className={`mt-3 flex items-center justify-center gap-2 text-base font-bold sm:mt-4 sm:text-xl ${mutedTextClass}`}>
                 {loading ? 'Loading...' : text.subtitle}
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-100 text-violet-700 shadow-[0_10px_24px_rgba(124,58,237,0.12)]">
-                  <Sparkles className="h-6 w-6" aria-hidden="true" />
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-100 text-violet-700 shadow-[0_10px_24px_rgba(124,58,237,0.12)] sm:h-10 sm:w-10">
+                  <Sparkles className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
                 </span>
               </p>
-              <div className="mt-6 inline-flex mx-auto w-fit items-center gap-3 rounded-full border border-violet-100 bg-white/86 px-6 py-2.5 text-base font-black text-violet-700 shadow-[0_12px_28px_rgba(124,58,237,0.1)]">
+              <div className="mt-4 inline-flex mx-auto w-fit items-center gap-2 rounded-full border border-violet-100 bg-white/86 px-4 py-2 text-sm font-black text-violet-700 shadow-[0_12px_28px_rgba(124,58,237,0.1)] sm:mt-6 sm:gap-3 sm:px-6 sm:py-2.5 sm:text-base">
                 <span>{text.level}</span>
-                <span className="text-xl">{user?.level || 'A1'}</span>
+                <span className="text-lg sm:text-xl">{user?.level || 'A1'}</span>
               </div>
             </div>
 
@@ -421,51 +420,51 @@ function ProfilePage() {
         </section>
 
 
-        <section id="profile-learning-journey" className={`scroll-mt-8 mt-5 rounded-[28px] border p-6 sm:p-7 lg:min-h-[170px] ${glassSectionClass}`}>
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-[240px_minmax(0,1fr)_240px]">
+        <section id="profile-learning-journey" className={`scroll-mt-8 mt-4 rounded-[24px] border p-4 sm:mt-5 sm:rounded-[28px] sm:p-7 lg:min-h-[170px] ${glassSectionClass}`}>
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-[240px_minmax(0,1fr)_240px]">
             <div className="flex items-center justify-center border-violet-100 md:col-span-2 xl:col-span-1 xl:border-l">
               <div
-                className="grid h-36 w-36 place-items-center rounded-full sm:h-44 sm:w-44"
+                className="grid h-28 w-28 place-items-center rounded-full sm:h-44 sm:w-44"
                 style={{
                   background: `conic-gradient(#6d28d9 ${gameProgressPct * 3.6}deg, #f1eafd 0deg)`,
                 }}
               >
-                <div className="grid h-28 w-28 place-items-center rounded-full bg-white text-center shadow-inner sm:h-32 sm:w-32">
+                <div className="grid h-20 w-20 place-items-center rounded-full bg-white text-center shadow-inner sm:h-32 sm:w-32">
                   <div>
-                    <p className="text-3xl font-black text-slate-950">{gameProgressPct}%</p>
-                    <p className="mt-1 text-xs font-black text-slate-600">{text.totalProgress}</p>
+                    <p className="text-2xl font-black text-slate-950 sm:text-3xl">{gameProgressPct}%</p>
+                    <p className="mt-0.5 text-[10px] font-black text-slate-600 sm:mt-1 sm:text-xs">{text.totalProgress}</p>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="flex flex-col justify-center text-right">
-              <div className="flex flex-wrap items-center gap-3">
-                <p className="text-4xl font-black text-violet-700">{user?.level || 'A1'}</p>
+              <div className="flex flex-wrap items-center justify-center gap-2 text-center sm:justify-start sm:gap-3 sm:text-right">
+                <p className="text-3xl font-black text-violet-700 sm:text-4xl">{user?.level || 'A1'}</p>
                 <div>
-                  <h2 className={`text-2xl font-black ${headingTextClass}`}>{text.learningJourney}</h2>
-                  <p className={`mt-1 text-base font-bold ${mutedTextClass}`}>{text.grammarLevel}</p>
+                  <h2 className={`text-xl font-black sm:text-2xl ${headingTextClass}`}>{text.learningJourney}</h2>
+                  <p className={`mt-1 text-sm font-bold sm:text-base ${mutedTextClass}`}>{text.grammarLevel}</p>
                 </div>
               </div>
-              <div className="mt-4 h-3 overflow-hidden rounded-full bg-violet-50">
+              <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-violet-50 sm:mt-4 sm:h-3">
                 <div className="h-full rounded-full bg-violet-600" style={{ width: `${gameProgressPct}%` }} />
               </div>
-              <p className={`mt-3 text-base font-bold ${mutedTextClass}`}>
+              <p className={`mt-2 text-sm font-bold sm:mt-3 sm:text-base ${mutedTextClass}`}>
                 {xpPoints} / 1000 {text.xpPoints}
               </p>
             </div>
 
             <div className="flex flex-col justify-center border-violet-100 text-right md:col-span-2 xl:col-span-1 xl:border-r xl:pr-6">
               <div className="flex items-center gap-3">
-                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-violet-50 text-violet-700">
-                  <Target className="h-6 w-6" aria-hidden="true" />
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-50 text-violet-700 sm:h-11 sm:w-11">
+                  <Target className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
                 </span>
                 <div>
-                  <h2 className={`text-2xl font-black ${headingTextClass}`}>{text.nextTarget}</h2>
-                  <p className={`mt-1 text-base font-bold ${mutedTextClass}`}>{text.wordsGoal}</p>
+                  <h2 className={`text-xl font-black sm:text-2xl ${headingTextClass}`}>{text.nextTarget}</h2>
+                  <p className={`mt-1 text-sm font-bold sm:text-base ${mutedTextClass}`}>{text.wordsGoal}</p>
                 </div>
               </div>
-              <p className={`mt-5 text-xl font-black ${headingTextClass}`}>
+              <p className={`mt-3 text-lg font-black sm:mt-5 sm:text-xl ${headingTextClass}`}>
                 {text.wordsLeft.replace('{{count}}', wordsLeft)}
               </p>
             </div>

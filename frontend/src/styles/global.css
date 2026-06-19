@@ -2173,6 +2173,34 @@ a {
   }
 }
 
+.profile-hero-card {
+  background-position: center 58%;
+  background-size: 135% auto;
+}
+
+.history-hero-card {
+  background-position: center 64%;
+  background-size: 135% auto;
+}
+
+@media (min-width: 640px) {
+  .profile-hero-card {
+    background-size: cover;
+  }
+}
+
+@media (min-width: 1024px) {
+  .profile-hero-card {
+    background-position: right 74%;
+    background-size: 114% auto;
+  }
+
+  .history-hero-card {
+    background-position: center 72%;
+    background-size: 106% auto;
+  }
+}
+
 @media (max-width: 380px) {
   .login-screen {
     padding: 10px;

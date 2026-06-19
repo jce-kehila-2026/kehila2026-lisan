@@ -165,7 +165,7 @@ function SectionTabBar({ sections, activeSection, onSectionClick, label }) {
   const reduceMotion = useReducedMotion();
 
   return (
-    <nav className="sticky top-0 z-30 mt-5 py-3 backdrop-blur-sm" aria-label={label}>
+    <nav className="mt-5 py-3 backdrop-blur-sm lg:sticky lg:top-0 lg:z-30" aria-label={label}>
       <div>
         <div
           className="flex snap-x snap-mandatory items-center justify-start gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -216,8 +216,8 @@ function StudentHomeHeader({ sections, activeSection, onSectionClick, label }) {
   const reduceMotion = useReducedMotion();
 
   return (
-    <header className="lisan-enter sticky top-3 z-50 flex flex-col gap-5" style={{ '--lisan-enter-delay': '0ms' }}>
-      <div className="grid items-center gap-4 grid-cols-[auto_1fr_auto]">
+    <header className="lisan-enter z-50 flex flex-col gap-3 sm:gap-5 lg:sticky lg:top-3" style={{ '--lisan-enter-delay': '0ms' }}>
+      <div className="grid items-center gap-2 sm:gap-4 grid-cols-[auto_1fr_auto]">
         <button
           type="button"
           onClick={() => navigate('/home')}
@@ -225,24 +225,24 @@ function StudentHomeHeader({ sections, activeSection, onSectionClick, label }) {
           aria-label="דף הבית"
           title="דף הבית"
         >
-          <LisanLogo className="h-20 sm:h-24" />
+          <LisanLogo className="h-12 sm:h-24" />
         </button>
 
-        <div className="col-start-3 row-start-1 flex items-center gap-2 justify-self-end">
+        <div className="col-start-3 row-start-1 flex items-center gap-1.5 justify-self-end sm:gap-2">
           <LanguageToggle />
           <button
             type="button"
             onClick={() => navigate('/login')}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-white/85 bg-white/88 text-slate-600 shadow-[0_12px_28px_rgba(124,58,237,0.12)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/85 bg-white/88 text-slate-600 shadow-[0_12px_28px_rgba(124,58,237,0.12)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-12 sm:w-12"
             aria-label={t('logout')}
             title={t('logout')}
           >
-            <LogOut className="h-5 w-5" aria-hidden="true" />
+            <LogOut className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
           </button>
         </div>
 
         <nav
-          className="col-start-1 col-end-4 row-start-2 flex flex-wrap items-center justify-center gap-3 lg:col-start-2 lg:col-end-3 lg:row-start-1"
+          className="col-start-1 col-end-4 row-start-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3 lg:col-start-2 lg:col-end-3 lg:row-start-1"
           aria-label={label}
         >
           {sections.map((section) => {
@@ -257,7 +257,7 @@ function StudentHomeHeader({ sections, activeSection, onSectionClick, label }) {
                 aria-current={isActive ? 'true' : undefined}
                 aria-pressed={isActive}
                 onClick={() => onSectionClick(section.id)}
-                className={`relative inline-flex h-14 min-w-[132px] items-center justify-center gap-3 rounded-[24px] px-6 text-lg font-black shadow-[0_14px_34px_rgba(124,58,237,0.12)] backdrop-blur transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
+                className={`relative inline-flex h-10 min-w-[88px] items-center justify-center gap-1.5 rounded-[18px] px-3 text-sm font-black shadow-[0_10px_24px_rgba(124,58,237,0.12)] backdrop-blur transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-14 sm:min-w-[132px] sm:gap-3 sm:rounded-[24px] sm:px-6 sm:text-lg sm:shadow-[0_14px_34px_rgba(124,58,237,0.12)] ${
                   isActive
                     ? 'text-violet-700'
                     : 'bg-white/72 text-violet-700 hover:-translate-y-0.5 hover:bg-white'
@@ -267,7 +267,7 @@ function StudentHomeHeader({ sections, activeSection, onSectionClick, label }) {
                   <motion.span
                     layoutId="lisan-home-header-pill"
                     aria-hidden="true"
-                    className="absolute inset-0 -z-10 rounded-[24px] bg-white/88 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.88),0_16px_36px_rgba(124,58,237,0.16)]"
+                    className="absolute inset-0 -z-10 rounded-[18px] bg-white/88 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.88),0_12px_28px_rgba(124,58,237,0.14)] sm:rounded-[24px] sm:shadow-[inset_0_0_0_1px_rgba(221,214,254,0.88),0_16px_36px_rgba(124,58,237,0.16)]"
                     transition={
                       reduceMotion
                         ? { duration: 0 }
@@ -276,7 +276,7 @@ function StudentHomeHeader({ sections, activeSection, onSectionClick, label }) {
                   />
                 ) : null}
                 <span>{section.label}</span>
-                <Icon className="h-6 w-6 shrink-0" aria-hidden="true" />
+                <Icon className="h-4 w-4 shrink-0 sm:h-6 sm:w-6" aria-hidden="true" />
               </button>
             );
           })}
@@ -293,7 +293,6 @@ function Home() {
   const isArabic = i18n.language === 'ar';
 
   const chatsLabel = isArabic ? 'المحادثة' : 'שיחה';
-  const learnedWordsLabel = isArabic ? 'الكلمات المكتملة' : 'מילים שהושלמו';
   const dictionaryTitle = isArabic ? 'إدارة قاموس عبري ↔ عربي' : 'ניהול מילון עברית ↔ ערבית';
   const dictionaryDescription = isArabic
     ? 'راجعي الكلمات والترجمات التي تظهر للطالبات'
@@ -305,9 +304,10 @@ function Home() {
   const friendsChatDescription = isArabic
     ? 'اختاري صديقات للتدريب المشترك والسريع'
     : 'בחרי חברות לתרגול משותף ומהיר';
-  const startLearningLabel = isArabic ? 'ابدئي اللعب' : 'התחילי לשחק';
   const heroGamesLabel = isArabic ? 'للألعاب' : 'למשחקים';
   const heroDictionaryLabel = isArabic ? 'للقاموس' : 'למילון';
+  const heroLearningStreakLabel = isArabic ? 'رغبة للتعلم' : 'רצף למידה';
+  const heroDaysSuffix = isArabic ? 'أيام متتالية' : 'ימים ברצף';
   const streakLabel = isArabic ? 'جلسات' : 'שיחות';
   const loadingLabel = isArabic ? 'جارٍ التحميل...' : 'טוען...';
   const studentNameFallback = isArabic ? 'طالبة' : 'תלמידה';
@@ -663,7 +663,6 @@ function Home() {
 
   // Count stats up from 0 once the real values have loaded.
   const chatsDisplay = useCountUp(student.chatsCount, { enabled: !loading });
-  const wordsDisplay = useCountUp(student.learnedWords, { enabled: !loading });
 
   // Word-game categories — same ordering as the Games page. Each card deep-links
   // into /games so the game itself lives in a single place.
@@ -829,15 +828,15 @@ function Home() {
           <div className="pointer-events-none absolute inset-0 bg-white/10" />
 
           <div
-            className="relative min-h-[430px] lg:min-h-[520px]"
+            className="relative min-h-[320px]"
             dir="rtl"
           >
             {/* Content */}
             <div
-              className="relative z-10 flex min-h-[430px] w-full min-w-0 items-center justify-start p-5 text-right sm:p-8 lg:min-h-[520px] lg:p-10"
+              className="relative z-10 flex min-h-[320px] w-full min-w-0 items-center justify-start p-4 text-right sm:p-5 lg:min-h-[360px] lg:p-6"
               dir="rtl"
             >
-              <div className="w-full max-w-[560px] rounded-[30px] border border-white/70 bg-white/55 p-5 shadow-[0_18px_50px_rgba(91,33,182,0.12)] backdrop-blur-md sm:p-7 lg:p-8">
+              <div className="w-full max-w-[460px] rounded-[26px] border border-white/70 bg-white/55 p-4 shadow-[0_18px_50px_rgba(91,33,182,0.12)] backdrop-blur-md sm:p-5 lg:p-6">
                 {/* Name + Level + Streak */}
                 <div className="flex flex-wrap-reverse items-center justify-between gap-3">
                   <p className="text-base font-black text-slate-800 lg:text-lg">
@@ -859,21 +858,21 @@ function Home() {
                 </div>
 
                 {/* Greeting */}
-                <h1 className="mt-7 flex items-center justify-end gap-3 text-[clamp(2rem,3.4vw,4.2rem)] font-black leading-tight text-slate-950">
+                <h1 className="mt-4 flex items-center justify-end gap-3 text-[clamp(1.9rem,2.7vw,3.2rem)] font-black leading-tight text-slate-950">
                   {t('homeGreeting')}
                   <span className="text-violet-600">☼</span>
                 </h1>
 
-                <p className="mt-4 max-w-2xl text-base font-medium leading-7 text-slate-600 sm:text-[clamp(1rem,1.05vw,1.2rem)] sm:leading-8">
+                <p className="mt-2 max-w-2xl text-base font-medium leading-6 text-slate-600 sm:text-[clamp(0.95rem,1vw,1.05rem)]">
                   {t('homeIntro')}
                 </p>
 
-                <div className="mt-6 flex flex-wrap justify-end gap-3">
+                <div className="mt-4 flex flex-wrap justify-end gap-3">
                   <Link
                     to="/games"
-                    className="inline-flex h-14 min-w-[170px] items-center justify-center gap-3 rounded-full bg-violet-600 px-7 text-lg font-black text-white shadow-[0_14px_30px_rgba(124,58,237,0.28)] transition hover:-translate-y-0.5 hover:bg-violet-700 hover:shadow-[0_18px_36px_rgba(124,58,237,0.36)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.98]"
+                    className="inline-flex h-12 min-w-[150px] items-center justify-center gap-3 rounded-full bg-violet-600 px-6 text-base font-black text-white shadow-[0_14px_30px_rgba(124,58,237,0.28)] transition hover:-translate-y-0.5 hover:bg-violet-700 hover:shadow-[0_18px_36px_rgba(124,58,237,0.36)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.98]"
                   >
-                    <Gamepad2 className="h-6 w-6" aria-hidden="true" />
+                    <Gamepad2 className="h-5 w-5" aria-hidden="true" />
                     <span>{heroGamesLabel}</span>
                   </Link>
                   <button
@@ -883,48 +882,49 @@ function Home() {
                         .getElementById('section-dictionary')
                         ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }}
-                    className="inline-flex h-14 min-w-[170px] items-center justify-center gap-3 rounded-full border border-violet-100 bg-violet-100/75 px-7 text-lg font-black text-violet-700 shadow-[0_14px_30px_rgba(124,58,237,0.12)] backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-violet-100 hover:shadow-[0_18px_36px_rgba(124,58,237,0.18)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.98]"
+                    className="inline-flex h-12 min-w-[150px] items-center justify-center gap-3 rounded-full border border-violet-100 bg-violet-100/75 px-6 text-base font-black text-violet-700 shadow-[0_14px_30px_rgba(124,58,237,0.12)] backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-violet-100 hover:shadow-[0_18px_36px_rgba(124,58,237,0.18)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.98]"
                   >
-                    <BookOpen className="h-6 w-6" aria-hidden="true" />
+                    <BookOpen className="h-5 w-5" aria-hidden="true" />
                     <span>{heroDictionaryLabel}</span>
                   </button>
                 </div>
 
                 {/* Stats — clickable */}
-                <div className="mt-8 grid grid-cols-2 gap-4">
+                <div className="mt-4 grid grid-cols-2 gap-3">
                   <Link
                     to="/shared-chat"
-                    className="group flex min-h-[110px] items-center justify-between rounded-[22px] border border-violet-100 bg-violet-50/70 p-4 text-right transition hover:-translate-y-0.5 hover:bg-violet-100/80 hover:shadow-[0_10px_24px_rgba(124,58,237,0.12)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                    className="group flex min-h-[86px] items-center justify-between rounded-[20px] border border-violet-100 bg-violet-50/70 p-3 text-right transition hover:-translate-y-0.5 hover:bg-violet-100/80 hover:shadow-[0_10px_24px_rgba(124,58,237,0.12)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
                   >
-                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-violet-100 text-violet-700">
-                      <MessageCircle className="h-7 w-7" aria-hidden="true" />
+                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-100 text-violet-700">
+                      <MessageCircle className="h-6 w-6" aria-hidden="true" />
                     </span>
                     <span>
                       <span className="block text-sm font-bold text-slate-500">{chatsLabel}</span>
-                      <span className="mt-1 block text-4xl font-black text-violet-700">
+                      <span className="mt-1 block text-3xl font-black text-violet-700">
                         {loading ? '–' : chatsDisplay}
                       </span>
                     </span>
                   </Link>
 
                   <Link
-                    to="/games?view=completed"
-                    className="group flex min-h-[110px] items-center justify-between rounded-[22px] border border-violet-100 bg-violet-50/70 p-4 text-right transition hover:-translate-y-0.5 hover:bg-violet-100/80 hover:shadow-[0_10px_24px_rgba(124,58,237,0.12)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                    to="/games"
+                    className="group flex min-h-[86px] items-center justify-between rounded-[20px] border border-amber-100 bg-amber-50/75 p-3 text-right transition hover:-translate-y-0.5 hover:bg-amber-100/80 hover:shadow-[0_10px_24px_rgba(245,158,11,0.14)] focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
                   >
-                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-violet-100 text-violet-700">
-                      <BookOpen className="h-7 w-7" aria-hidden="true" />
+                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+                      <Flame className="h-6 w-6" aria-hidden="true" />
                     </span>
                     <span>
-                      <span className="block text-sm font-bold text-slate-500">{learnedWordsLabel}</span>
-                      <span className="mt-1 block text-4xl font-black text-slate-950">
-                        {loading ? '–' : wordsDisplay}
+                      <span className="block text-sm font-bold text-slate-500">{heroLearningStreakLabel}</span>
+                      <span className="mt-1 block text-3xl font-black text-amber-600">
+                        {loading ? '–' : chatsDisplay}
                       </span>
+                      <span className="mt-0.5 block text-xs font-bold text-slate-500">{heroDaysSuffix}</span>
                     </span>
                   </Link>
                 </div>
 
                 {/* Progress */}
-                <div className="mt-5 rounded-[20px] border border-violet-100 bg-violet-50/70 p-4">
+                <div className="mt-3 rounded-[18px] border border-violet-100 bg-violet-50/70 p-3">
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-sm font-black text-slate-800">{t('dailyProgress')}</span>
                     <span className="text-sm font-black text-violet-700">{normalizedProgress}%</span>
@@ -943,32 +943,9 @@ function Home() {
                   </div>
                 </div>
 
-                {/* Start CTA — soft emphasis glow (stronger when not yet started) */}
-                <div className="relative mt-6">
-                  {!reduceMotion && (
-                    <motion.span
-                      aria-hidden="true"
-                      className="pointer-events-none absolute inset-0 rounded-full bg-violet-500/40 blur-md"
-                      animate={{
-                        opacity:
-                          normalizedProgress === 0 && !loading
-                            ? [0.3, 0.6, 0.3]
-                            : [0.18, 0.38, 0.18],
-                        scale: [0.97, 1.03, 0.97],
-                      }}
-                      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                    />
-                  )}
-                  <Link
-                    to="/games"
-                    className="relative flex h-14 w-full items-center justify-center gap-2 rounded-full bg-violet-600 text-lg font-black text-white shadow-[0_10px_24px_rgba(124,58,237,0.32)] transition hover:-translate-y-0.5 hover:bg-violet-700 hover:shadow-[0_14px_30px_rgba(124,58,237,0.4)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.98]"
-                  >
-                    <Zap className="h-4 w-4" aria-hidden="true" />
-                    <span>{startLearningLabel}</span>
-                  </Link>
-                </div>
               </div>
             </div>
+
           </div>
         </section>
 

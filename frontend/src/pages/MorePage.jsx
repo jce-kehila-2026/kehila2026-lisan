@@ -159,8 +159,8 @@ function MoreTopHeader() {
   };
 
   return (
-    <header className="lisan-enter sticky top-3 z-50 rounded-[24px] border border-white/80 bg-white/54 px-5 py-4 shadow-[0_18px_56px_rgba(124,58,237,0.14)] backdrop-blur-xl" style={{ '--lisan-enter-delay': '0ms' }}>
-      <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4">
+    <header className="lisan-enter z-50 rounded-[20px] border border-white/80 bg-white/54 px-3 py-3 shadow-[0_14px_36px_rgba(124,58,237,0.12)] backdrop-blur-xl sm:rounded-[24px] sm:px-5 sm:py-4 lg:sticky lg:top-3" style={{ '--lisan-enter-delay': '0ms' }}>
+      <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-4">
         <button
           type="button"
           onClick={() => navigate('/home')}
@@ -168,23 +168,23 @@ function MoreTopHeader() {
           aria-label="דף הבית"
           title="דף הבית"
         >
-          <LisanLogo className="h-20 sm:h-24" />
+          <LisanLogo className="h-14 sm:h-24" />
         </button>
 
-        <div className="flex items-center gap-2 justify-self-end">
+        <div className="flex items-center gap-1.5 justify-self-end sm:gap-2">
           <LanguageToggle />
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/85 bg-white/90 text-slate-600 shadow-[0_12px_28px_rgba(124,58,237,0.12)] transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/85 bg-white/90 text-slate-600 shadow-[0_12px_28px_rgba(124,58,237,0.12)] transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-11 sm:w-11"
             aria-label={isArabic ? 'رجوع' : 'חזרה'}
             title={isArabic ? 'رجوع' : 'חזרה'}
           >
-            <LogOut className="h-5 w-5" aria-hidden="true" />
+            <LogOut className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
           </button>
         </div>
 
-        <nav className="col-start-1 col-end-4 row-start-2 flex flex-wrap items-center justify-center gap-3 lg:col-start-2 lg:col-end-3 lg:row-start-1" aria-label={isArabic ? 'أقسام السجل' : 'אזורי היסטוריה'}>
+        <nav className="col-start-1 col-end-4 row-start-2 flex flex-nowrap items-center justify-start gap-2 overflow-x-auto py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:justify-center sm:gap-3 lg:col-start-2 lg:col-end-3 lg:row-start-1" aria-label={isArabic ? 'أقسام السجل' : 'אזורי היסטוריה'}>
           {sectionButtons.map((item) => {
             const Icon = item.icon;
 
@@ -193,10 +193,10 @@ function MoreTopHeader() {
                 key={item.sectionId}
                 type="button"
                 onClick={() => scrollToSection(item.sectionId)}
-                className="inline-flex h-12 min-w-[150px] items-center justify-center gap-2.5 rounded-[22px] border border-white/80 bg-white/74 px-5 text-base font-black text-violet-700 shadow-[0_12px_30px_rgba(124,58,237,0.12)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                className="inline-flex h-10 min-w-max shrink-0 items-center justify-center gap-2 rounded-[18px] border border-white/80 bg-white/74 px-3.5 text-sm font-black text-violet-700 shadow-[0_10px_24px_rgba(124,58,237,0.1)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-12 sm:gap-2.5 sm:rounded-[22px] sm:px-5 sm:text-base sm:shadow-[0_12px_30px_rgba(124,58,237,0.12)]"
               >
                 <span>{item.label}</span>
-                <Icon className="h-5 w-5" aria-hidden="true" />
+                <Icon className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
               </button>
             );
           })}
@@ -397,23 +397,21 @@ function MorePage() {
         <MoreTopHeader />
 
         <section
-          className="relative mt-6 overflow-hidden rounded-[28px] border border-white/80 bg-cover p-6 shadow-card sm:p-7 lg:min-h-[330px] lg:p-8"
+          className="history-hero-card relative mt-4 overflow-hidden rounded-[24px] border border-white/80 bg-cover p-4 shadow-card sm:mt-6 sm:rounded-[28px] sm:p-7 lg:min-h-[390px] lg:p-8"
           style={{
             backgroundImage: 'url("/images/history.png")',
-            backgroundPosition: 'center 68%',
-            backgroundSize: '108% auto',
           }}
         >
           <div className="pointer-events-none absolute inset-0 bg-transparent" />
-          <div className="relative grid min-h-0 items-center sm:min-h-[280px] md:grid-cols-[0.24fr_minmax(0,0.38fr)_0.38fr]" dir="ltr">
+          <div className="relative grid min-h-[210px] items-center sm:min-h-[280px] md:grid-cols-[0.24fr_minmax(0,0.38fr)_0.38fr]" dir="ltr">
             <div className="text-center md:col-start-2" dir="rtl">
-              <span className="inline-flex rounded-full bg-violet-50 px-4 py-2 text-sm font-black text-violet-700">
+              <span className="inline-flex rounded-full bg-violet-50/90 px-3 py-1.5 text-xs font-black text-violet-700 sm:px-4 sm:py-2 sm:text-sm">
                 {text.heroKicker}
               </span>
-              <h1 className="mt-4 text-4xl font-black leading-tight text-violet-700 sm:text-5xl lg:text-6xl">
+              <h1 className="mt-3 text-3xl font-black leading-tight text-violet-700 sm:mt-4 sm:text-5xl lg:text-6xl">
                 {text.title}
               </h1>
-              <p className="mx-auto mt-4 max-w-2xl text-lg font-bold leading-8 text-slate-700 sm:text-xl">
+              <p className="mx-auto mt-2 max-w-[18rem] text-base font-bold leading-7 text-slate-700 sm:mt-4 sm:max-w-2xl sm:text-xl sm:leading-8">
                 {text.subtitle}
               </p>
             </div>
