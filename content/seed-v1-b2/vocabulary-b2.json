@@ -1,0 +1,1208 @@
+[
+  {
+    "id": "B2V_001",
+    "level": "B2",
+    "hebrew": "מנהלת",
+    "arabic": "مديرة",
+    "transliteration": "menahelet",
+    "part_of_speech": "noun",
+    "source_transcript": "01_mishpaha-abu-amir-achlam.txt"
+  },
+  {
+    "id": "B2V_002",
+    "level": "B2",
+    "hebrew": "בית ספר יסודי",
+    "arabic": "مدرسة ابتدائية",
+    "transliteration": "beit sefer yesodi",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "01_mishpaha-abu-amir-achlam.txt"
+  },
+  {
+    "id": "B2V_003",
+    "level": "B2",
+    "hebrew": "מקצוע",
+    "arabic": "مهنة",
+    "transliteration": "miktzoa",
+    "part_of_speech": "noun",
+    "source_transcript": "01_mishpaha-abu-amir-achlam.txt"
+  },
+  {
+    "id": "B2V_004",
+    "level": "B2",
+    "hebrew": "בריאים",
+    "arabic": "أصحّاء",
+    "transliteration": "briim",
+    "part_of_speech": "adjective",
+    "source_transcript": "01_mishpaha-abu-amir-achlam.txt"
+  },
+  {
+    "id": "B2V_005",
+    "level": "B2",
+    "hebrew": "תרד",
+    "arabic": "سبانخ",
+    "transliteration": "tered",
+    "part_of_speech": "noun",
+    "source_transcript": "01_mishpaha-abu-amir-achlam.txt"
+  },
+  {
+    "id": "B2V_006",
+    "level": "B2",
+    "hebrew": "נכד",
+    "arabic": "حفيد",
+    "transliteration": "neched",
+    "part_of_speech": "noun",
+    "source_transcript": "01_mishpaha-abu-amir-achlam.txt"
+  },
+  {
+    "id": "B2V_007",
+    "level": "B2",
+    "hebrew": "סבלנית",
+    "arabic": "صبورة",
+    "transliteration": "savlanit",
+    "part_of_speech": "adjective",
+    "source_transcript": "01_mishpaha-abu-amir-achlam.txt"
+  },
+  {
+    "id": "B2V_008",
+    "level": "B2",
+    "hebrew": "עורך דין",
+    "arabic": "محامٍ",
+    "transliteration": "orech din",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "02_mishpaha-abu-amir-chaled.txt"
+  },
+  {
+    "id": "B2V_009",
+    "level": "B2",
+    "hebrew": "נשוי",
+    "arabic": "متزوج",
+    "transliteration": "nasui",
+    "part_of_speech": "adjective",
+    "source_transcript": "02_mishpaha-abu-amir-chaled.txt"
+  },
+  {
+    "id": "B2V_010",
+    "level": "B2",
+    "hebrew": "נכדים",
+    "arabic": "أحفاد",
+    "transliteration": "nechadim",
+    "part_of_speech": "noun",
+    "source_transcript": "03_mishpaha-abu-amir-chadija.txt"
+  },
+  {
+    "id": "B2V_011",
+    "level": "B2",
+    "hebrew": "אלרגיה",
+    "arabic": "حساسية",
+    "transliteration": "alergya",
+    "part_of_speech": "noun",
+    "source_transcript": "03_mishpaha-abu-amir-chadija.txt"
+  },
+  {
+    "id": "B2V_012",
+    "level": "B2",
+    "hebrew": "מזכירה רפואית",
+    "arabic": "سكرتيرة طبية",
+    "transliteration": "mazkira refuit",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "04_mishpaha-abu-amir-hiba.txt"
+  },
+  {
+    "id": "B2V_013",
+    "level": "B2",
+    "hebrew": "היריון",
+    "arabic": "حمل",
+    "transliteration": "herayon",
+    "part_of_speech": "noun",
+    "source_transcript": "04_mishpaha-abu-amir-hiba.txt"
+  },
+  {
+    "id": "B2V_014",
+    "level": "B2",
+    "hebrew": "אחראית",
+    "arabic": "مسؤولة",
+    "transliteration": "achrait",
+    "part_of_speech": "adjective",
+    "source_transcript": "04_mishpaha-abu-amir-hiba.txt"
+  },
+  {
+    "id": "B2V_015",
+    "level": "B2",
+    "hebrew": "חשבונאות",
+    "arabic": "محاسبة",
+    "transliteration": "cheshbonaut",
+    "part_of_speech": "noun",
+    "source_transcript": "05_mishpaha-abu-amir-sara.txt"
+  },
+  {
+    "id": "B2V_016",
+    "level": "B2",
+    "hebrew": "סקרנית",
+    "arabic": "فضولية",
+    "transliteration": "sakranit",
+    "part_of_speech": "adjective",
+    "source_transcript": "05_mishpaha-abu-amir-sara.txt"
+  },
+  {
+    "id": "B2V_017",
+    "level": "B2",
+    "hebrew": "חריף",
+    "arabic": "حارّ",
+    "transliteration": "charif",
+    "part_of_speech": "adjective",
+    "source_transcript": "05_mishpaha-abu-amir-sara.txt"
+  },
+  {
+    "id": "B2V_018",
+    "level": "B2",
+    "hebrew": "כדורגל",
+    "arabic": "كرة قدم",
+    "transliteration": "kaduregel",
+    "part_of_speech": "noun",
+    "source_transcript": "06_mishpaha-abu-amir-amir.txt"
+  },
+  {
+    "id": "B2V_019",
+    "level": "B2",
+    "hebrew": "עבודת צוות",
+    "arabic": "عمل جماعي",
+    "transliteration": "avodat tzevet",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "06_mishpaha-abu-amir-amir.txt"
+  },
+  {
+    "id": "B2V_020",
+    "level": "B2",
+    "hebrew": "בדיקות",
+    "arabic": "فحوصات",
+    "transliteration": "bdikot",
+    "part_of_speech": "noun",
+    "source_transcript": "07_eifo-hahodaa-todaa-al-tor.txt"
+  },
+  {
+    "id": "B2V_021",
+    "level": "B2",
+    "hebrew": "הודעת תזכורת",
+    "arabic": "رسالة تذكير",
+    "transliteration": "hodaat tizkoret",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "07_eifo-hahodaa-todaa-al-tor.txt"
+  },
+  {
+    "id": "B2V_022",
+    "level": "B2",
+    "hebrew": "פרסומות",
+    "arabic": "إعلانات",
+    "transliteration": "pirsomot",
+    "part_of_speech": "noun",
+    "source_transcript": "07_eifo-hahodaa-todaa-al-tor.txt"
+  },
+  {
+    "id": "B2V_023",
+    "level": "B2",
+    "hebrew": "מכללה",
+    "arabic": "كلية",
+    "transliteration": "michlala",
+    "part_of_speech": "noun",
+    "source_transcript": "08_tichnun-nesia.txt"
+  },
+  {
+    "id": "B2V_024",
+    "level": "B2",
+    "hebrew": "ברגל",
+    "arabic": "سيرًا على الأقدام",
+    "transliteration": "beregel",
+    "part_of_speech": "adverb",
+    "source_transcript": "08_tichnun-nesia.txt"
+  },
+  {
+    "id": "B2V_025",
+    "level": "B2",
+    "hebrew": "תחנת האוטובוס",
+    "arabic": "محطة الحافلة",
+    "transliteration": "tachanat haotobus",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "09_idkun-al-ichur-sara-modia.txt"
+  },
+  {
+    "id": "B2V_026",
+    "level": "B2",
+    "hebrew": "עיכוב",
+    "arabic": "تأخير",
+    "transliteration": "ikuv",
+    "part_of_speech": "noun",
+    "source_transcript": "09_idkun-al-ichur-sara-modia.txt"
+  },
+  {
+    "id": "B2V_027",
+    "level": "B2",
+    "hebrew": "פקקים",
+    "arabic": "ازدحام مروري",
+    "transliteration": "pkakim",
+    "part_of_speech": "noun",
+    "source_transcript": "09_idkun-al-ichur-sara-modia.txt"
+  },
+  {
+    "id": "B2V_028",
+    "level": "B2",
+    "hebrew": "תעודת זהות",
+    "arabic": "بطاقة هوية",
+    "transliteration": "teudat zehut",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "10_idkun-al-ichur-achlam-meziza-tor.txt"
+  },
+  {
+    "id": "B2V_029",
+    "level": "B2",
+    "hebrew": "להזיז",
+    "arabic": "أن يؤجّل / يحرّك",
+    "transliteration": "lehaziz",
+    "part_of_speech": "verb",
+    "source_transcript": "10_idkun-al-ichur-achlam-meziza-tor.txt"
+  },
+  {
+    "id": "B2V_030",
+    "level": "B2",
+    "hebrew": "מבטלת",
+    "arabic": "تلغي",
+    "transliteration": "mevatelet",
+    "part_of_speech": "verb",
+    "source_transcript": "11_idkun-al-ichur-achlam-meacheret.txt"
+  },
+  {
+    "id": "B2V_031",
+    "level": "B2",
+    "hebrew": "הרגיש",
+    "arabic": "شعر",
+    "transliteration": "hirgish",
+    "part_of_speech": "verb",
+    "source_transcript": "12_idkun-al-ichur-natiyat-hapoal.txt"
+  },
+  {
+    "id": "B2V_032",
+    "level": "B2",
+    "hebrew": "תחנה המרכזית",
+    "arabic": "المحطة المركزية",
+    "transliteration": "tachana hamerkazit",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "13_baotobus-dialogim-ktzarim.txt"
+  },
+  {
+    "id": "B2V_033",
+    "level": "B2",
+    "hebrew": "בדיקת עיניים",
+    "arabic": "فحص عيون",
+    "transliteration": "bdikat einayim",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "13_baotobus-dialogim-ktzarim.txt"
+  },
+  {
+    "id": "B2V_034",
+    "level": "B2",
+    "hebrew": "מעבר החצייה",
+    "arabic": "ممر المشاة",
+    "transliteration": "maavar hachatzaya",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "14_hanchayot-rakevet-kala.txt"
+  },
+  {
+    "id": "B2V_035",
+    "level": "B2",
+    "hebrew": "מעליות",
+    "arabic": "مصاعد",
+    "transliteration": "maaliyot",
+    "part_of_speech": "noun",
+    "source_transcript": "14_hanchayot-rakevet-kala.txt"
+  },
+  {
+    "id": "B2V_036",
+    "level": "B2",
+    "hebrew": "מדרגות נעות",
+    "arabic": "درج متحرك",
+    "transliteration": "madregot naot",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "14_hanchayot-rakevet-kala.txt"
+  },
+  {
+    "id": "B2V_037",
+    "level": "B2",
+    "hebrew": "דוח",
+    "arabic": "مخالفة",
+    "transliteration": "doch",
+    "part_of_speech": "noun",
+    "source_transcript": "15_irur-al-doch-barakevet.txt"
+  },
+  {
+    "id": "B2V_038",
+    "level": "B2",
+    "hebrew": "לערער",
+    "arabic": "أن يعترض",
+    "transliteration": "learer",
+    "part_of_speech": "verb",
+    "source_transcript": "15_irur-al-doch-barakevet.txt"
+  },
+  {
+    "id": "B2V_039",
+    "level": "B2",
+    "hebrew": "עגלה",
+    "arabic": "عربة أطفال",
+    "transliteration": "agala",
+    "part_of_speech": "noun",
+    "source_transcript": "15_irur-al-doch-barakevet.txt"
+  },
+  {
+    "id": "B2V_040",
+    "level": "B2",
+    "hebrew": "רב־קו",
+    "arabic": "راف-كاف (بطاقة سفر)",
+    "transliteration": "rav-kav",
+    "part_of_speech": "noun",
+    "source_transcript": "16_irur-al-doch-baotobus.txt"
+  },
+  {
+    "id": "B2V_041",
+    "level": "B2",
+    "hebrew": "מכנסיים",
+    "arabic": "بنطال",
+    "transliteration": "michnasayim",
+    "part_of_speech": "noun",
+    "source_transcript": "17_chanut-begadim-lehachlif-michnasayim.txt"
+  },
+  {
+    "id": "B2V_042",
+    "level": "B2",
+    "hebrew": "קבלה",
+    "arabic": "فاتورة / إيصال",
+    "transliteration": "kabala",
+    "part_of_speech": "noun",
+    "source_transcript": "17_chanut-begadim-lehachlif-michnasayim.txt"
+  },
+  {
+    "id": "B2V_043",
+    "level": "B2",
+    "hebrew": "תאי המדידה",
+    "arabic": "غرف القياس",
+    "transliteration": "taei hamedida",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "18_chanut-begadim-hiba-umocheret.txt"
+  },
+  {
+    "id": "B2V_044",
+    "level": "B2",
+    "hebrew": "מידה",
+    "arabic": "مقاس",
+    "transliteration": "mida",
+    "part_of_speech": "noun",
+    "source_transcript": "18_chanut-begadim-hiba-umocheret.txt"
+  },
+  {
+    "id": "B2V_045",
+    "level": "B2",
+    "hebrew": "צמוד",
+    "arabic": "ضيّق / ملتصق",
+    "transliteration": "tzamud",
+    "part_of_speech": "adjective",
+    "source_transcript": "18_chanut-begadim-hiba-umocheret.txt"
+  },
+  {
+    "id": "B2V_046",
+    "level": "B2",
+    "hebrew": "רפוי",
+    "arabic": "واسع / فضفاض",
+    "transliteration": "rafui",
+    "part_of_speech": "adjective",
+    "source_transcript": "18_chanut-begadim-hiba-umocheret.txt"
+  },
+  {
+    "id": "B2V_047",
+    "level": "B2",
+    "hebrew": "לפניי",
+    "arabic": "أمامي",
+    "transliteration": "lefanay",
+    "part_of_speech": "preposition (inflected)",
+    "source_transcript": "19_basuper-natiyat-hamila-lifney.txt"
+  },
+  {
+    "id": "B2V_048",
+    "level": "B2",
+    "hebrew": "לפניך",
+    "arabic": "أمامك",
+    "transliteration": "lefanecha",
+    "part_of_speech": "preposition (inflected)",
+    "source_transcript": "19_basuper-natiyat-hamila-lifney.txt"
+  },
+  {
+    "id": "B2V_049",
+    "level": "B2",
+    "hebrew": "לפנייך",
+    "arabic": "أمامكِ",
+    "transliteration": "lefanayich",
+    "part_of_speech": "preposition (inflected)",
+    "source_transcript": "19_basuper-natiyat-hamila-lifney.txt"
+  },
+  {
+    "id": "B2V_050",
+    "level": "B2",
+    "hebrew": "לפניו",
+    "arabic": "أمامه",
+    "transliteration": "lefanav",
+    "part_of_speech": "preposition (inflected)",
+    "source_transcript": "19_basuper-natiyat-hamila-lifney.txt"
+  },
+  {
+    "id": "B2V_051",
+    "level": "B2",
+    "hebrew": "לפניה",
+    "arabic": "أمامها",
+    "transliteration": "lefaneha",
+    "part_of_speech": "preposition (inflected)",
+    "source_transcript": "19_basuper-natiyat-hamila-lifney.txt"
+  },
+  {
+    "id": "B2V_052",
+    "level": "B2",
+    "hebrew": "לפנינו",
+    "arabic": "أمامنا",
+    "transliteration": "lefaneinu",
+    "part_of_speech": "preposition (inflected)",
+    "source_transcript": "19_basuper-natiyat-hamila-lifney.txt"
+  },
+  {
+    "id": "B2V_053",
+    "level": "B2",
+    "hebrew": "לפניכם",
+    "arabic": "أمامكم",
+    "transliteration": "lefneichem",
+    "part_of_speech": "preposition (inflected)",
+    "source_transcript": "19_basuper-natiyat-hamila-lifney.txt"
+  },
+  {
+    "id": "B2V_054",
+    "level": "B2",
+    "hebrew": "לפניכן",
+    "arabic": "أمامكنّ",
+    "transliteration": "lefneichen",
+    "part_of_speech": "preposition (inflected)",
+    "source_transcript": "19_basuper-natiyat-hamila-lifney.txt"
+  },
+  {
+    "id": "B2V_055",
+    "level": "B2",
+    "hebrew": "לפניהם",
+    "arabic": "أمامهم",
+    "transliteration": "lifneihem",
+    "part_of_speech": "preposition (inflected)",
+    "source_transcript": "19_basuper-natiyat-hamila-lifney.txt"
+  },
+  {
+    "id": "B2V_056",
+    "level": "B2",
+    "hebrew": "לפניהן",
+    "arabic": "أمامهنّ",
+    "transliteration": "lifneihen",
+    "part_of_speech": "preposition (inflected)",
+    "source_transcript": "19_basuper-natiyat-hamila-lifney.txt"
+  },
+  {
+    "id": "B2V_057",
+    "level": "B2",
+    "hebrew": "תור",
+    "arabic": "دور / صف",
+    "transliteration": "tor",
+    "part_of_speech": "noun",
+    "source_transcript": "20_basuper-dialogim-batur.txt"
+  },
+  {
+    "id": "B2V_058",
+    "level": "B2",
+    "hebrew": "נייר טואלט",
+    "arabic": "ورق تواليت",
+    "transliteration": "neyar tualet",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "20_basuper-dialogim-batur.txt"
+  },
+  {
+    "id": "B2V_059",
+    "level": "B2",
+    "hebrew": "עוקף",
+    "arabic": "يتجاوز",
+    "transliteration": "okef",
+    "part_of_speech": "verb",
+    "source_transcript": "21_basuper-dialog-batur.txt"
+  },
+  {
+    "id": "B2V_060",
+    "level": "B2",
+    "hebrew": "קופאית",
+    "arabic": "أمينة صندوق",
+    "transliteration": "kupait",
+    "part_of_speech": "noun",
+    "source_transcript": "21_basuper-dialog-batur.txt"
+  },
+  {
+    "id": "B2V_061",
+    "level": "B2",
+    "hebrew": "חבר מועדון",
+    "arabic": "عضوية نادي",
+    "transliteration": "chaver moadon",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "22_basuper-dialog-batur-haazana.txt"
+  },
+  {
+    "id": "B2V_062",
+    "level": "B2",
+    "hebrew": "תשלומים",
+    "arabic": "أقساط",
+    "transliteration": "tashlumim",
+    "part_of_speech": "noun",
+    "source_transcript": "25_basuper-dialogim-ktzarim.txt"
+  },
+  {
+    "id": "B2V_063",
+    "level": "B2",
+    "hebrew": "מבצע",
+    "arabic": "عرض",
+    "transliteration": "mivtza",
+    "part_of_speech": "noun",
+    "source_transcript": "23_basuper-tluna-al-taut-bacheshbon.txt"
+  },
+  {
+    "id": "B2V_064",
+    "level": "B2",
+    "hebrew": "תוקף",
+    "arabic": "صلاحية",
+    "transliteration": "tokef",
+    "part_of_speech": "noun",
+    "source_transcript": "24_basuper-tluna-al-tokef-mutzar.txt"
+  },
+  {
+    "id": "B2V_065",
+    "level": "B2",
+    "hebrew": "אריזה",
+    "arabic": "عبوة",
+    "transliteration": "ariza",
+    "part_of_speech": "noun",
+    "source_transcript": "24_basuper-tluna-al-tokef-mutzar.txt"
+  },
+  {
+    "id": "B2V_066",
+    "level": "B2",
+    "hebrew": "להחזיר",
+    "arabic": "أن يُرجع",
+    "transliteration": "lehachzir",
+    "part_of_speech": "verb",
+    "source_transcript": "25_basuper-dialogim-ktzarim.txt"
+  },
+  {
+    "id": "B2V_067",
+    "level": "B2",
+    "hebrew": "קרם הגנה",
+    "arabic": "كريم حماية (واقي شمس)",
+    "transliteration": "krem hagana",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "26_chanut-pharm-eize-krem.txt"
+  },
+  {
+    "id": "B2V_068",
+    "level": "B2",
+    "hebrew": "רגישה לשמש",
+    "arabic": "حساسة للشمس",
+    "transliteration": "regisha lashemesh",
+    "part_of_speech": "adjective phrase",
+    "source_transcript": "26_chanut-pharm-eize-krem.txt"
+  },
+  {
+    "id": "B2V_069",
+    "level": "B2",
+    "hebrew": "היפואלרגני",
+    "arabic": "مضاد للحساسية",
+    "transliteration": "hipoalergeni",
+    "part_of_speech": "adjective",
+    "source_transcript": "26_chanut-pharm-eize-krem.txt"
+  },
+  {
+    "id": "B2V_070",
+    "level": "B2",
+    "hebrew": "עמיד למים",
+    "arabic": "مقاوم للماء",
+    "transliteration": "amid lemayim",
+    "part_of_speech": "adjective phrase",
+    "source_transcript": "26_chanut-pharm-eize-krem.txt"
+  },
+  {
+    "id": "B2V_071",
+    "level": "B2",
+    "hebrew": "מייקאפ",
+    "arabic": "مكياج",
+    "transliteration": "meykap",
+    "part_of_speech": "noun",
+    "source_transcript": "27_chanut-pharm-dialogim-ktzarim.txt"
+  },
+  {
+    "id": "B2V_072",
+    "level": "B2",
+    "hebrew": "המרפאה",
+    "arabic": "العيادة",
+    "transliteration": "hamirpaa",
+    "part_of_speech": "noun",
+    "source_transcript": "27_chanut-pharm-dialogim-ktzarim.txt"
+  },
+  {
+    "id": "B2V_073",
+    "level": "B2",
+    "hebrew": "תפריטים",
+    "arabic": "قوائم طعام",
+    "transliteration": "tafritim",
+    "part_of_speech": "noun",
+    "source_transcript": "29_bamisada-bamisada.txt"
+  },
+  {
+    "id": "B2V_074",
+    "level": "B2",
+    "hebrew": "מנה",
+    "arabic": "طبق / وجبة",
+    "transliteration": "mana",
+    "part_of_speech": "noun",
+    "source_transcript": "30_bamisada-she'elot-al-manot.txt"
+  },
+  {
+    "id": "B2V_075",
+    "level": "B2",
+    "hebrew": "לקטוז",
+    "arabic": "لاكتوز",
+    "transliteration": "laktoz",
+    "part_of_speech": "noun",
+    "source_transcript": "30_bamisada-she'elot-al-manot.txt"
+  },
+  {
+    "id": "B2V_076",
+    "level": "B2",
+    "hebrew": "תוספת",
+    "arabic": "طبق جانبي / إضافة",
+    "transliteration": "tosefet",
+    "part_of_speech": "noun",
+    "source_transcript": "30_bamisada-she'elot-al-manot.txt"
+  },
+  {
+    "id": "B2V_077",
+    "level": "B2",
+    "hebrew": "בדיקות דם",
+    "arabic": "فحوصات دم",
+    "transliteration": "bdikot dam",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "31_pniyot-lamirpaa-bakasha.txt"
+  },
+  {
+    "id": "B2V_078",
+    "level": "B2",
+    "hebrew": "הפניה",
+    "arabic": "إحالة",
+    "transliteration": "hafnaya",
+    "part_of_speech": "noun",
+    "source_transcript": "31_pniyot-lamirpaa-bakasha.txt"
+  },
+  {
+    "id": "B2V_079",
+    "level": "B2",
+    "hebrew": "כולסטרול",
+    "arabic": "كولسترول",
+    "transliteration": "kolesterol",
+    "part_of_speech": "noun",
+    "source_transcript": "31_pniyot-lamirpaa-bakasha.txt"
+  },
+  {
+    "id": "B2V_080",
+    "level": "B2",
+    "hebrew": "מוקד",
+    "arabic": "مركز اتصال",
+    "transliteration": "moked",
+    "part_of_speech": "noun",
+    "source_transcript": "32_pniyot-lamirpaa-kviyat-tor.txt"
+  },
+  {
+    "id": "B2V_081",
+    "level": "B2",
+    "hebrew": "נציג שירות",
+    "arabic": "ممثل خدمة",
+    "transliteration": "netzig sherut",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "32_pniyot-lamirpaa-kviyat-tor.txt"
+  },
+  {
+    "id": "B2V_082",
+    "level": "B2",
+    "hebrew": "קרדיולוג",
+    "arabic": "طبيب قلب",
+    "transliteration": "kardiolog",
+    "part_of_speech": "noun",
+    "source_transcript": "33_pniyot-lamirpaa-targil-dialog.txt"
+  },
+  {
+    "id": "B2V_083",
+    "level": "B2",
+    "hebrew": "דחוף",
+    "arabic": "عاجل",
+    "transliteration": "dachuf",
+    "part_of_speech": "adjective",
+    "source_transcript": "33_pniyot-lamirpaa-targil-dialog.txt"
+  },
+  {
+    "id": "B2V_084",
+    "level": "B2",
+    "hebrew": "נפצע",
+    "arabic": "أُصيب",
+    "transliteration": "niftza",
+    "part_of_speech": "verb",
+    "source_transcript": "34_ma-kara-amir-niftza.txt"
+  },
+  {
+    "id": "B2V_085",
+    "level": "B2",
+    "hebrew": "פצע",
+    "arabic": "جرح",
+    "transliteration": "petza",
+    "part_of_speech": "noun",
+    "source_transcript": "34_ma-kara-amir-niftza.txt"
+  },
+  {
+    "id": "B2V_086",
+    "level": "B2",
+    "hebrew": "מיון",
+    "arabic": "طوارئ",
+    "transliteration": "miyun",
+    "part_of_speech": "noun",
+    "source_transcript": "34_ma-kara-amir-niftza.txt"
+  },
+  {
+    "id": "B2V_087",
+    "level": "B2",
+    "hebrew": "שבר",
+    "arabic": "كسر",
+    "transliteration": "shever",
+    "part_of_speech": "noun",
+    "source_transcript": "35_telefon-lemoked-achayot.txt"
+  },
+  {
+    "id": "B2V_088",
+    "level": "B2",
+    "hebrew": "התנפחה",
+    "arabic": "انتفخت",
+    "transliteration": "hitnafcha",
+    "part_of_speech": "verb",
+    "source_transcript": "35_telefon-lemoked-achayot.txt"
+  },
+  {
+    "id": "B2V_089",
+    "level": "B2",
+    "hebrew": "תרופה",
+    "arabic": "دواء",
+    "transliteration": "trufa",
+    "part_of_speech": "noun",
+    "source_transcript": "36_ma-harofe-omer.txt"
+  },
+  {
+    "id": "B2V_090",
+    "level": "B2",
+    "hebrew": "לחץ דם",
+    "arabic": "ضغط دم",
+    "transliteration": "lachatz dam",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "36_ma-harofe-omer.txt"
+  },
+  {
+    "id": "B2V_091",
+    "level": "B2",
+    "hebrew": "דימות",
+    "arabic": "تصوير طبي",
+    "transliteration": "dimut",
+    "part_of_speech": "noun",
+    "source_transcript": "37_chadar-miyun-eifo-tzilum.txt"
+  },
+  {
+    "id": "B2V_092",
+    "level": "B2",
+    "hebrew": "צילום",
+    "arabic": "تصوير (أشعة)",
+    "transliteration": "tzilum",
+    "part_of_speech": "noun",
+    "source_transcript": "37_chadar-miyun-eifo-tzilum.txt"
+  },
+  {
+    "id": "B2V_093",
+    "level": "B2",
+    "hebrew": "מוקד",
+    "arabic": "مركز اتصال",
+    "transliteration": "moked",
+    "part_of_speech": "noun",
+    "source_transcript": "32_pniyot-lamirpaa-kviyat-tor.txt"
+  },
+  {
+    "id": "B2V_094",
+    "level": "B2",
+    "hebrew": "נציג שירות",
+    "arabic": "ممثل خدمة",
+    "transliteration": "netzig sherut",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "32_pniyot-lamirpaa-kviyat-tor.txt"
+  },
+  {
+    "id": "B2V_095",
+    "level": "B2",
+    "hebrew": "קרדיולוג",
+    "arabic": "طبيب قلب",
+    "transliteration": "kardiolog",
+    "part_of_speech": "noun",
+    "source_transcript": "33_pniyot-lamirpaa-targil-dialog.txt"
+  },
+  {
+    "id": "B2V_096",
+    "level": "B2",
+    "hebrew": "דחוף",
+    "arabic": "عاجل",
+    "transliteration": "dachuf",
+    "part_of_speech": "adjective",
+    "source_transcript": "33_pniyot-lamirpaa-targil-dialog.txt"
+  },
+  {
+    "id": "B2V_097",
+    "level": "B2",
+    "hebrew": "נפצע",
+    "arabic": "أُصيب",
+    "transliteration": "niftza",
+    "part_of_speech": "verb",
+    "source_transcript": "34_ma-kara-amir-niftza.txt"
+  },
+  {
+    "id": "B2V_098",
+    "level": "B2",
+    "hebrew": "פצע",
+    "arabic": "جرح",
+    "transliteration": "petza",
+    "part_of_speech": "noun",
+    "source_transcript": "34_ma-kara-amir-niftza.txt"
+  },
+  {
+    "id": "B2V_099",
+    "level": "B2",
+    "hebrew": "מיון",
+    "arabic": "طوارئ",
+    "transliteration": "miyun",
+    "part_of_speech": "noun",
+    "source_transcript": "34_ma-kara-amir-niftza.txt"
+  },
+  {
+    "id": "B2V_100",
+    "level": "B2",
+    "hebrew": "שבר",
+    "arabic": "كسر",
+    "transliteration": "shever",
+    "part_of_speech": "noun",
+    "source_transcript": "35_telefon-lemoked-achayot.txt"
+  },
+  {
+    "id": "B2V_101",
+    "level": "B2",
+    "hebrew": "התנפחה",
+    "arabic": "انتفخت",
+    "transliteration": "hitnafcha",
+    "part_of_speech": "verb",
+    "source_transcript": "35_telefon-lemoked-achayot.txt"
+  },
+  {
+    "id": "B2V_102",
+    "level": "B2",
+    "hebrew": "תרופה",
+    "arabic": "دواء",
+    "transliteration": "trufa",
+    "part_of_speech": "noun",
+    "source_transcript": "36_ma-harofe-omer.txt"
+  },
+  {
+    "id": "B2V_103",
+    "level": "B2",
+    "hebrew": "לחץ דם",
+    "arabic": "ضغط دم",
+    "transliteration": "lachatz dam",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "36_ma-harofe-omer.txt"
+  },
+  {
+    "id": "B2V_104",
+    "level": "B2",
+    "hebrew": "דימות",
+    "arabic": "تصوير طبي",
+    "transliteration": "dimut",
+    "part_of_speech": "noun",
+    "source_transcript": "37_chadar-miyun-eifo-tzilum.txt"
+  },
+  {
+    "id": "B2V_105",
+    "level": "B2",
+    "hebrew": "צילום",
+    "arabic": "تصوير (أشعة)",
+    "transliteration": "tzilum",
+    "part_of_speech": "noun",
+    "source_transcript": "37_chadar-miyun-eifo-tzilum.txt"
+  },
+  {
+    "id": "B2V_106",
+    "level": "B2",
+    "hebrew": "נכנסתי",
+    "arabic": "دخلتُ",
+    "transliteration": "nichnasti",
+    "part_of_speech": "verb (past)",
+    "source_transcript": "38_chadar-miyun-binyan-nifal.txt"
+  },
+  {
+    "id": "B2V_107",
+    "level": "B2",
+    "hebrew": "נכנסת",
+    "arabic": "دخلتَ/دخلتِ",
+    "transliteration": "nichnasta",
+    "part_of_speech": "verb (past)",
+    "source_transcript": "38_chadar-miyun-binyan-nifal.txt"
+  },
+  {
+    "id": "B2V_108",
+    "level": "B2",
+    "hebrew": "נכנס",
+    "arabic": "دخل",
+    "transliteration": "nichnas",
+    "part_of_speech": "verb (past)",
+    "source_transcript": "38_chadar-miyun-binyan-nifal.txt"
+  },
+  {
+    "id": "B2V_109",
+    "level": "B2",
+    "hebrew": "נכנסה",
+    "arabic": "دخلت",
+    "transliteration": "nichnesa",
+    "part_of_speech": "verb (past)",
+    "source_transcript": "38_chadar-miyun-binyan-nifal.txt"
+  },
+  {
+    "id": "B2V_110",
+    "level": "B2",
+    "hebrew": "נכנסנו",
+    "arabic": "دخلنا",
+    "transliteration": "nichnasnu",
+    "part_of_speech": "verb (past)",
+    "source_transcript": "38_chadar-miyun-binyan-nifal.txt"
+  },
+  {
+    "id": "B2V_111",
+    "level": "B2",
+    "hebrew": "נכנסתם",
+    "arabic": "دخلتم",
+    "transliteration": "nichnastem",
+    "part_of_speech": "verb (past)",
+    "source_transcript": "38_chadar-miyun-binyan-nifal.txt"
+  },
+  {
+    "id": "B2V_112",
+    "level": "B2",
+    "hebrew": "נכנסתן",
+    "arabic": "دخلتنّ",
+    "transliteration": "nichnasten",
+    "part_of_speech": "verb (past)",
+    "source_transcript": "38_chadar-miyun-binyan-nifal.txt"
+  },
+  {
+    "id": "B2V_113",
+    "level": "B2",
+    "hebrew": "נכנסו",
+    "arabic": "دخلوا",
+    "transliteration": "nichnesu",
+    "part_of_speech": "verb (past)",
+    "source_transcript": "38_chadar-miyun-binyan-nifal.txt"
+  },
+  {
+    "id": "B2V_114",
+    "level": "B2",
+    "hebrew": "מכתב שחרור",
+    "arabic": "رسالة خروج (من المستشفى)",
+    "transliteration": "michtav shichrur",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "39_shichrur-mibeit-hacholim.txt"
+  },
+  {
+    "id": "B2V_115",
+    "level": "B2",
+    "hebrew": "צילום רנטגן",
+    "arabic": "تصوير بالأشعة",
+    "transliteration": "tzilum rentgen",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "39_shichrur-mibeit-hacholim.txt"
+  },
+  {
+    "id": "B2V_116",
+    "level": "B2",
+    "hebrew": "ביטוח לאומי",
+    "arabic": "التأمين الوطني",
+    "transliteration": "bituach leumi",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "40_bituach-leumi-achlam-baatar.txt"
+  },
+  {
+    "id": "B2V_117",
+    "level": "B2",
+    "hebrew": "קצבאות",
+    "arabic": "مخصّصات",
+    "transliteration": "kitzbaot",
+    "part_of_speech": "noun",
+    "source_transcript": "40_bituach-leumi-achlam-baatar.txt"
+  },
+  {
+    "id": "B2V_118",
+    "level": "B2",
+    "hebrew": "טופס",
+    "arabic": "نموذج / استمارة",
+    "transliteration": "tofes",
+    "part_of_speech": "noun",
+    "source_transcript": "40_bituach-leumi-achlam-baatar.txt"
+  },
+  {
+    "id": "B2V_119",
+    "level": "B2",
+    "hebrew": "נתב",
+    "arabic": "راوتر / موجّه",
+    "transliteration": "natav",
+    "part_of_speech": "noun",
+    "source_transcript": "41_nizag-sherut-baayot-internet.txt"
+  },
+  {
+    "id": "B2V_120",
+    "level": "B2",
+    "hebrew": "תמיכה טכנית",
+    "arabic": "دعم تقني",
+    "transliteration": "tmicha technit",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "41_nizag-sherut-baayot-internet.txt"
+  },
+  {
+    "id": "B2V_121",
+    "level": "B2",
+    "hebrew": "תקלה",
+    "arabic": "عطل",
+    "transliteration": "takala",
+    "part_of_speech": "noun",
+    "source_transcript": "41_nizag-sherut-baayot-internet.txt"
+  },
+  {
+    "id": "B2V_122",
+    "level": "B2",
+    "hebrew": "טכנאי",
+    "arabic": "فنّي",
+    "transliteration": "technai",
+    "part_of_speech": "noun",
+    "source_transcript": "42_nizag-sherut-haazana.txt"
+  },
+  {
+    "id": "B2V_123",
+    "level": "B2",
+    "hebrew": "מנוי",
+    "arabic": "اشتراك / مشترك",
+    "transliteration": "manui",
+    "part_of_speech": "noun",
+    "source_transcript": "42_nizag-sherut-haazana.txt"
+  },
+  {
+    "id": "B2V_124",
+    "level": "B2",
+    "hebrew": "לאתחל",
+    "arabic": "أن يعيد التشغيل",
+    "transliteration": "leatchel",
+    "part_of_speech": "verb",
+    "source_transcript": "42_nizag-sherut-haazana.txt"
+  },
+  {
+    "id": "B2V_125",
+    "level": "B2",
+    "hebrew": "התקשרתי",
+    "arabic": "اتصلتُ",
+    "transliteration": "hitkasharti",
+    "part_of_speech": "verb (past)",
+    "source_transcript": "43_binyan-hitpael-be'avar.txt"
+  },
+  {
+    "id": "B2V_126",
+    "level": "B2",
+    "hebrew": "התקשר",
+    "arabic": "اتصل",
+    "transliteration": "hitkasher",
+    "part_of_speech": "verb (past)",
+    "source_transcript": "43_binyan-hitpael-be'avar.txt"
+  },
+  {
+    "id": "B2V_127",
+    "level": "B2",
+    "hebrew": "התקשרה",
+    "arabic": "اتصلت",
+    "transliteration": "hitkashra",
+    "part_of_speech": "verb (past)",
+    "source_transcript": "43_binyan-hitpael-be'avar.txt"
+  },
+  {
+    "id": "B2V_128",
+    "level": "B2",
+    "hebrew": "התקשרנו",
+    "arabic": "اتصلنا",
+    "transliteration": "hitkasharnu",
+    "part_of_speech": "verb (past)",
+    "source_transcript": "43_binyan-hitpael-be'avar.txt"
+  },
+  {
+    "id": "B2V_129",
+    "level": "B2",
+    "hebrew": "אתקשר",
+    "arabic": "سأتصل",
+    "transliteration": "etkasher",
+    "part_of_speech": "verb (future)",
+    "source_transcript": "43_binyan-hitpael-be'avar.txt"
+  },
+  {
+    "id": "B2V_130",
+    "level": "B2",
+    "hebrew": "תתקשרי",
+    "arabic": "ستتصلين",
+    "transliteration": "titkashri",
+    "part_of_speech": "verb (future)",
+    "source_transcript": "43_binyan-hitpael-be'avar.txt"
+  },
+  {
+    "id": "B2V_131",
+    "level": "B2",
+    "hebrew": "יתקשר",
+    "arabic": "سيتصل",
+    "transliteration": "yitkasher",
+    "part_of_speech": "verb (future)",
+    "source_transcript": "43_binyan-hitpael-be'avar.txt"
+  },
+  {
+    "id": "B2V_132",
+    "level": "B2",
+    "hebrew": "נתקשר",
+    "arabic": "سنتصل",
+    "transliteration": "nitkasher",
+    "part_of_speech": "verb (future)",
+    "source_transcript": "43_binyan-hitpael-be'avar.txt"
+  },
+  {
+    "id": "B2V_133",
+    "level": "B2",
+    "hebrew": "אנרגיה",
+    "arabic": "طاقة",
+    "transliteration": "energya",
+    "part_of_speech": "noun",
+    "source_transcript": "45_od-atarim-sara-lomedet.txt"
+  },
+  {
+    "id": "B2V_134",
+    "level": "B2",
+    "hebrew": "תוכנית הריאליטי",
+    "arabic": "برنامج الواقع",
+    "transliteration": "tochnit hareality",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "45_od-atarim-sara-lomedet.txt"
+  }
+]
