@@ -29,6 +29,25 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const STAGE_SIZE = 10;
 
+// Some seed files use inconsistent or compound category labels (e.g. the A2
+// combined file has 'jobs_work', 'music_culture', 'past_family_life'). Normalize
+// every variant onto the canonical category keys that the game's metadata knows,
+// so the build output is always clean regardless of seed sloppiness.
+const CATEGORY_ALIASES = {
+  jobs_work: 'work_jobs',
+  music_culture: 'culture_music',
+  travel_places: 'travel',
+  social_events: 'past_events',
+  past_daily_life: 'past_events',
+  past_family_life: 'past_events',
+  family_daily_life: 'family',
+};
+
+function canonicalCategory(cat) {
+  if (!cat) return cat;
+  return CATEGORY_ALIASES[cat] || cat;
+}
+
 const LEVELS = [
   { level: 'A1', dir: 'content/seed-v1',    vocab: 'vocabulary-a1.json', combined: 'lisan-seed-v1.json' },
   { level: 'A2', dir: 'content/seed-v1-a2', vocab: 'vocabulary-a2.json', combined: 'lisan-seed-v1-a2.json' },
@@ -80,6 +99,7 @@ function buildLevel({ level, dir, vocab, combined }) {
     // dropped.
     let category = w.category || tcMap.get(w.source_transcript) || null;
     if (!category) { category = 'grammar'; uncategorized += 1; }
+    category = canonicalCategory(category);
 
     const key = `${w.hebrew}|${w.arabic}`;
     if (seen.has(key)) { dupes += 1; continue; }
