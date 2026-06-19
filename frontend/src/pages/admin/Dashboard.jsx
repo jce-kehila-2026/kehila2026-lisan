@@ -213,7 +213,7 @@ function AnalyticsOverview({ navigate }) {
   const totalFeatureUsage = featureUsage.reduce((sum, feature) => sum + feature.value, 0);
 
   return (
-    <section className="mt-6 rounded-[28px] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.84)_0%,rgba(245,240,255,0.82)_46%,rgba(255,241,248,0.78)_100%)] p-4 shadow-[0_22px_60px_rgba(109,40,217,0.12)] backdrop-blur-xl sm:p-5">
+    <section className="mt-3 rounded-[28px] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.84)_0%,rgba(245,240,255,0.82)_46%,rgba(255,241,248,0.78)_100%)] p-4 shadow-[0_22px_60px_rgba(109,40,217,0.12)] backdrop-blur-xl sm:mt-6 sm:p-5">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <p className="inline-flex items-center gap-2 rounded-full bg-violet-100/80 px-3 py-1 text-xs font-black text-violet-700">
@@ -487,7 +487,7 @@ function AdminDashboard() {
   };
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.55),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.55),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] px-3 py-3 text-slate-900 md:px-6 md:py-8 lg:px-8">
       <style>
         {`
           @keyframes lisanDropdownIn {
@@ -504,24 +504,24 @@ function AdminDashboard() {
       </style>
 
       <div className="mx-auto w-full max-w-7xl" dir="rtl">
-        <header className="flex flex-wrap items-center justify-between gap-3">
+        <header className="flex flex-wrap items-center justify-between gap-2 md:flex-nowrap md:gap-2 lg:gap-3">
           <button
             type="button"
             onClick={() => navigate('/admin/dashboard')}
-            className="inline-flex min-h-14 items-center gap-3 rounded-[20px] border border-violet-100/80 bg-white/90 px-3 py-2 text-right shadow-[0_10px_28px_rgba(109,40,217,0.08)] transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_14px_34px_rgba(109,40,217,0.12)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+            className="inline-flex min-h-12 items-center gap-2 rounded-[18px] border border-violet-100/80 bg-white/90 px-2.5 py-1.5 text-right shadow-[0_10px_28px_rgba(109,40,217,0.08)] transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_14px_34px_rgba(109,40,217,0.12)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 lg:min-h-14 lg:gap-3 lg:rounded-[20px] lg:px-3 lg:py-2"
             aria-label="חזרה ללוח הניהול"
           >
             <img
               src="/logo.png"
               alt=""
-              className="h-11 w-11 rounded-[14px] object-contain shadow-[0_12px_28px_rgba(109,40,217,0.12)]"
+              className="h-9 w-9 rounded-[12px] object-contain shadow-[0_12px_28px_rgba(109,40,217,0.12)] lg:h-11 lg:w-11 lg:rounded-[14px]"
             />
 
             <span className="flex flex-col leading-none">
-              <span className="text-2xl font-black tracking-normal text-slate-950">
+              <span className="text-xl font-black tracking-normal text-slate-950 lg:text-2xl">
                 ליסאן
               </span>
-              <span className="mt-1 text-sm font-semibold leading-5 text-slate-500">
+              <span className="mt-0.5 hidden text-xs font-semibold leading-5 text-slate-500 md:block lg:mt-1 lg:text-sm">
                 ללמוד עברית בצעדים רגועים וברורים
               </span>
             </span>
@@ -572,12 +572,12 @@ function AdminDashboard() {
             </button>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2 lg:gap-3">
             <div className="relative">
               <button
                 type="button"
                 onClick={() => setNotificationsOpen((isOpen) => !isOpen)}
-                className="relative flex h-12 w-12 items-center justify-center rounded-[18px] border border-violet-100/80 bg-white/90 text-violet-700 shadow-[0_10px_28px_rgba(109,40,217,0.08)] transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                className="relative flex h-11 w-11 items-center justify-center rounded-[16px] border border-violet-100/80 bg-white/90 text-violet-700 shadow-[0_10px_28px_rgba(109,40,217,0.08)] transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 lg:h-12 lg:w-12 lg:rounded-[18px]"
                 aria-label="התראות"
                 aria-expanded={notificationsOpen}
               >
@@ -615,7 +615,7 @@ function AdminDashboard() {
             <button
               type="button"
               onClick={handleLogout}
-              className="inline-flex min-h-12 items-center gap-3 rounded-[18px] border border-violet-100/80 bg-white/90 px-5 py-2 text-sm font-black text-slate-700 shadow-[0_10px_28px_rgba(109,40,217,0.08)] transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+              className="inline-flex min-h-11 items-center gap-2 rounded-[16px] border border-violet-100/80 bg-white/90 px-3 py-1.5 text-xs font-black text-slate-700 shadow-[0_10px_28px_rgba(109,40,217,0.08)] transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 lg:min-h-12 lg:gap-3 lg:rounded-[18px] lg:px-5 lg:py-2 lg:text-sm"
             >
               <UserRound className="h-5 w-5 text-violet-700" aria-hidden="true" />
               יציאה
@@ -623,32 +623,32 @@ function AdminDashboard() {
           </div>
         </header>
 
-        <section className="relative mt-8 overflow-hidden rounded-[30px] border border-violet-100/70 bg-white/75 shadow-[0_22px_70px_rgba(109,40,217,0.11)]">
+        <section className="relative mt-3 overflow-hidden rounded-[24px] border border-violet-100/70 bg-white/75 shadow-[0_18px_48px_rgba(109,40,217,0.1)] md:mt-8 md:rounded-[30px] md:shadow-[0_22px_70px_rgba(109,40,217,0.11)]">
           <div
-            className="grid min-h-[260px] items-stretch lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]"
+            className="grid min-h-[132px] items-stretch md:min-h-[260px] lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]"
             dir="ltr"
           >
-            <div className="relative min-h-[210px] overflow-hidden">
+            <div className="relative min-h-[72px] overflow-hidden md:min-h-[210px]">
               <img
                 src="/images/teacher-dashboard-hero.png"
                 alt=""
-                className="h-full min-h-[210px] w-full object-cover object-left"
+                className="h-full min-h-[72px] w-full object-contain object-left md:min-h-[210px] md:object-cover"
               />
             </div>
 
             <div
-              className="flex flex-col justify-center px-6 py-8 text-right sm:px-10 lg:px-12"
+              className="flex flex-col justify-center px-4 py-3 text-right md:px-10 md:py-8 lg:px-12"
               dir="rtl"
             >
-              <p className="text-sm font-black text-violet-700">
+              <p className="text-xs font-black text-violet-700 md:text-sm">
                 שלום {user?.name || 'מנהלת'}
               </p>
 
-              <h1 className="mt-3 text-3xl font-black leading-tight text-slate-950 sm:text-4xl lg:text-5xl">
+              <h1 className="mt-2 text-xl font-black leading-tight text-slate-950 md:mt-3 md:text-4xl lg:text-5xl">
                 לוח בקרה לניהול מערכת ליסאן
               </h1>
 
-              <p className="mt-4 max-w-2xl text-base font-semibold leading-8 text-slate-600">
+              <p className="mt-1.5 max-w-2xl text-sm font-semibold leading-6 text-slate-600 md:mt-4 md:text-base md:leading-8">
                 ניהול תלמידות, מורות, שיחות וחומרי למידה במערכת.
               </p>
             </div>
@@ -657,13 +657,13 @@ function AdminDashboard() {
 
         <AnalyticsOverview navigate={navigate} />
 
-        <section className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <section className="mt-3 grid grid-cols-1 gap-3 sm:mt-6 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
           {stats.map((stat) => (
             <OverviewCard key={stat.title} stat={stat} />
           ))}
         </section>
 
-        <section className="mt-6 flex flex-wrap justify-center gap-5">
+        <section className="mt-3 flex flex-wrap justify-center gap-3 sm:mt-6 sm:gap-5">
           {dashboardSections.map((section) => (
             <DashboardSection
               key={section.id}

@@ -60,9 +60,9 @@ function AdminNavStrip({
   };
 
   return (
-    <div className="flex min-w-[16rem] flex-1 items-center justify-between gap-2 overflow-hidden rounded-[22px] border border-white/55 bg-[linear-gradient(135deg,rgba(250,232,255,0.78)_0%,rgba(237,233,254,0.78)_45%,rgba(255,228,240,0.72)_100%)] px-2.5 py-2 shadow-[0_16px_42px_rgba(109,40,217,0.13)] backdrop-blur-xl sm:min-w-[22rem] sm:px-3 lg:max-w-3xl">
+    <div className="flex min-w-0 flex-[1_1_100%] items-center justify-between gap-2 overflow-hidden rounded-[20px] border border-white/55 bg-[linear-gradient(135deg,rgba(250,232,255,0.78)_0%,rgba(237,233,254,0.78)_45%,rgba(255,228,240,0.72)_100%)] px-2 py-1.5 shadow-[0_12px_30px_rgba(109,40,217,0.12)] backdrop-blur-xl md:flex-1 md:rounded-[22px] md:px-2.5 lg:min-w-[22rem] lg:px-3 lg:py-2 lg:shadow-[0_16px_42px_rgba(109,40,217,0.13)] lg:max-w-3xl">
       <nav
-        className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto py-0.5 text-right [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto py-0.5 text-right [scrollbar-width:none] md:gap-1.5 lg:gap-2 [&::-webkit-scrollbar]:hidden"
         aria-label="ניווט מהיר באזור הניהול"
       >
         {adminNavItems.map((item) => {
@@ -79,14 +79,14 @@ function AdminNavStrip({
               key={item.id}
               type="button"
               onClick={() => handleNavClick(item)}
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-black transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:px-3.5 sm:text-sm ${
+              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-black transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 md:px-3 md:py-1.5 md:text-xs lg:px-3.5 lg:py-2 lg:text-sm ${
                 isActive
                   ? activeClass
                   : 'border-white/50 bg-white/42 text-violet-900/75 hover:bg-white/70 hover:text-violet-800'
               }`}
               aria-current={isActive ? 'page' : undefined}
             >
-              <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
+              <Icon className="h-3.5 w-3.5 md:h-3.5 md:w-3.5 lg:h-4 lg:w-4" aria-hidden="true" />
               <span>{item.label}</span>
             </button>
           );
@@ -96,10 +96,10 @@ function AdminNavStrip({
       <button
         type="button"
         onClick={() => navigate('/teacher/dashboard')}
-        className="inline-flex shrink-0 items-center gap-2 rounded-[18px] bg-violet-600 px-3 py-2 text-xs font-black text-white shadow-[0_12px_26px_rgba(109,40,217,0.22)] transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:px-4 sm:py-2.5 sm:text-sm"
+        className="inline-flex shrink-0 items-center gap-1.5 rounded-[16px] bg-violet-600 px-3 py-2 text-xs font-black text-white shadow-[0_10px_22px_rgba(109,40,217,0.2)] transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 md:px-3 md:py-1.5 md:text-xs lg:gap-2 lg:rounded-[18px] lg:px-4 lg:py-2.5 lg:text-sm lg:shadow-[0_12px_26px_rgba(109,40,217,0.22)]"
         aria-label="תצוגת תלמיד"
       >
-        <Eye className="h-4 w-4" aria-hidden="true" />
+        <Eye className="h-4 w-4 md:h-3.5 md:w-3.5 lg:h-4 lg:w-4" aria-hidden="true" />
         <span className="whitespace-nowrap">תצוגת תלמיד</span>
       </button>
     </div>
