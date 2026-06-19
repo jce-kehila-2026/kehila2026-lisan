@@ -2,13 +2,18 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   Bell,
   BookOpenCheck,
+  BarChart3,
   ChevronLeft,
   ClipboardCheck,
   Eye,
   FilePlus2,
   GraduationCap,
+  LineChart,
   MessageSquareText,
+  PieChart,
   ShieldCheck,
+  Sparkles,
+  TrendingUp,
   UserRound,
   Users,
   UsersRound,
@@ -21,6 +26,12 @@ import {
   adminDemoUsers,
   adminReviewNotifications,
 } from '../../data/adminMockData.js';
+import {
+  featureUsage,
+  getTopLevel,
+  levelAnalytics,
+  weeklyActivity,
+} from '../../data/adminAnalyticsMock.js';
 import AdminNavStrip from '../../components/admin/AdminNavStrip.jsx';
 
 import {
@@ -170,6 +181,141 @@ function DashboardSection({
         </span>
       </div>
     </button>
+  );
+}
+
+function MiniDistribution({ data, metric }) {
+  const maxValue = Math.max(...data.map((item) => item[metric]));
+
+  return (
+    <div className="grid gap-2">
+      {data.map((item) => (
+        <div key={`${metric}-${item.level}`} className="grid grid-cols-[2.5rem_1fr_2.25rem] items-center gap-2">
+          <span className="text-xs font-black text-violet-800">{item.level}</span>
+          <span className="h-2 overflow-hidden rounded-full bg-white/70 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.7)]">
+            <span
+              className="block h-full rounded-full bg-gradient-to-l from-violet-600 to-fuchsia-400"
+              style={{ width: `${Math.max(10, (item[metric] / maxValue) * 100)}%` }}
+            />
+          </span>
+          <span className="text-left text-xs font-black text-slate-600">{item[metric]}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function AnalyticsOverview({ navigate }) {
+  const activeLevel = getTopLevel('entries');
+  const storiesLevel = getTopLevel('stories');
+  const chatLevel = getTopLevel('chat');
+  const maxWeekly = Math.max(...weeklyActivity.map((day) => day.value));
+  const totalFeatureUsage = featureUsage.reduce((sum, feature) => sum + feature.value, 0);
+
+  return (
+    <section className="mt-6 rounded-[28px] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.84)_0%,rgba(245,240,255,0.82)_46%,rgba(255,241,248,0.78)_100%)] p-4 shadow-[0_22px_60px_rgba(109,40,217,0.12)] backdrop-blur-xl sm:p-5">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <p className="inline-flex items-center gap-2 rounded-full bg-violet-100/80 px-3 py-1 text-xs font-black text-violet-700">
+            <Sparkles className="h-4 w-4" aria-hidden="true" />
+            מדדי ניהול
+          </p>
+          <h2 className="mt-2 text-xl font-black text-[#160A52] sm:text-2xl">
+            סטטיסטיקות מערכת
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => navigate('/admin/statistics')}
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-violet-600 px-5 py-2 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+        >
+          <BarChart3 className="h-4 w-4" aria-hidden="true" />
+          צפייה בכל הסטטיסטיקות
+        </button>
+      </div>
+
+      <div className="mt-4 grid gap-3 lg:grid-cols-[1.2fr_1fr_1.1fr]">
+        <article className="rounded-[22px] border border-violet-100/70 bg-white/72 p-4 shadow-[0_10px_28px_rgba(109,40,217,0.08)]">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h3 className="text-sm font-black text-slate-800">חלוקת תלמידות לפי רמת לימוד</h3>
+            <PieChart className="h-5 w-5 text-violet-600" aria-hidden="true" />
+          </div>
+          <MiniDistribution data={levelAnalytics} metric="students" />
+        </article>
+
+        <article className="rounded-[22px] border border-violet-100/70 bg-white/72 p-4 shadow-[0_10px_28px_rgba(109,40,217,0.08)]">
+          <div className="grid grid-cols-3 gap-2 text-center">
+            {[
+              {
+                label: 'הרמה הפעילה ביותר',
+                value: `רמה ${activeLevel.level}`,
+                detail: `${activeLevel.entries} פעולות`,
+                icon: TrendingUp,
+              },
+              {
+                label: 'שימוש הסיפורים הגבוה ביותר',
+                value: `רמה ${storiesLevel.level}`,
+                detail: `${storiesLevel.stories} שימושים`,
+                icon: BookOpenCheck,
+              },
+              {
+                label: 'שימוש הצ׳אט הגבוה ביותר',
+                value: `רמה ${chatLevel.level}`,
+                detail: `${chatLevel.chat} שיחות`,
+                icon: MessageSquareText,
+              },
+            ].map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <div key={item.label} className="rounded-2xl bg-violet-50/80 px-2 py-3">
+                  <Icon className="mx-auto h-4 w-4 text-violet-700" aria-hidden="true" />
+                  <p className="mt-2 text-base font-black text-[#160A52]">{item.value}</p>
+                  <p className="mt-1 text-[11px] font-black leading-4 text-slate-600">{item.label}</p>
+                  <p className="mt-1 text-[10px] font-bold text-violet-700">{item.detail}</p>
+                </div>
+              );
+            })}
+          </div>
+        </article>
+
+        <article className="rounded-[22px] border border-violet-100/70 bg-white/72 p-4 shadow-[0_10px_28px_rgba(109,40,217,0.08)]">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h3 className="text-sm font-black text-slate-800">פעילות למידה במהלך השבוע</h3>
+            <LineChart className="h-5 w-5 text-violet-600" aria-hidden="true" />
+          </div>
+          <div className="flex h-24 items-end justify-between gap-2 rounded-2xl bg-violet-50/60 px-3 py-2">
+            {weeklyActivity.map((day) => (
+              <div key={day.day} className="flex h-full flex-1 flex-col items-center justify-end gap-1">
+                <span
+                  className="w-full rounded-t-full bg-gradient-to-t from-violet-600 to-fuchsia-300"
+                  style={{ height: `${Math.max(18, (day.value / maxWeekly) * 100)}%` }}
+                />
+                <span className="text-[11px] font-black text-violet-800">{day.day}</span>
+              </div>
+            ))}
+          </div>
+        </article>
+      </div>
+
+      <div className="mt-3 grid gap-2 sm:grid-cols-4">
+        {featureUsage.map((feature) => (
+          <div key={feature.name} className="rounded-2xl bg-white/65 px-3 py-2 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.65)]">
+            <div className="flex items-center justify-between gap-2 text-xs font-black text-slate-600">
+              <span>{feature.name}</span>
+              <span>{Math.round((feature.value / totalFeatureUsage) * 100)}%</span>
+            </div>
+            <div className="mt-2 h-2 overflow-hidden rounded-full bg-violet-50">
+              <span
+                className={`block h-full rounded-full ${feature.color}`}
+                style={{ width: `${(feature.value / totalFeatureUsage) * 100}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -508,6 +654,8 @@ function AdminDashboard() {
             </div>
           </div>
         </section>
+
+        <AnalyticsOverview navigate={navigate} />
 
         <section className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
           {stats.map((stat) => (

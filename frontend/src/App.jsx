@@ -16,6 +16,7 @@ import AdminConversations from './pages/admin/Conversations.jsx';
 import AdminNotifications from './pages/admin/Notifications.jsx';
 import AdminProgress from './pages/admin/Progress.jsx';
 import AdminStudents from './pages/admin/Students.jsx';
+import AdminStatistics from './pages/admin/Statistics.jsx';
 import AdminWords from './pages/admin/Words.jsx';
 import ForgotAccess from './pages/ForgotAccess.jsx';
 import HomePage from './pages/home/HomePage.jsx';
@@ -273,6 +274,14 @@ function App() {
           element={
             <ProtectedRoute role={['admin', 'teacher']}>
               <AdminProgress />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/statistics"
+          element={
+            <ProtectedRoute role={['admin', 'teacher']}>
+              <AdminStatistics />
             </ProtectedRoute>
           }
         />
