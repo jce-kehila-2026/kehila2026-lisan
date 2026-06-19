@@ -16,7 +16,6 @@ import {
 
 import { getStoredToken } from '../services/auth.js';
 import {
-  ALPHABET_CATEGORY_KEY,
   gameCatalog,
   getCompletedWordEntries,
   getTotalLevelCount,
@@ -181,8 +180,6 @@ function VocabGame() {
         };
       })
       .sort((a, b) => {
-        if (a.key === ALPHABET_CATEGORY_KEY) return -1;
-        if (b.key === ALPHABET_CATEGORY_KEY) return 1;
         return b.totalWords - a.totalWords;
       });
   }, []);

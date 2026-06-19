@@ -1,31 +1,36 @@
 import {
   BookOpen,
   Briefcase,
+  Bus,
   CalendarDays,
   GraduationCap,
-  Languages,
+  Hand,
+  Hash,
+  Home,
+  Landmark,
   Leaf,
   Music,
   Plane,
   ShoppingBag,
+  SpellCheck,
   Stethoscope,
   Sun,
   Users,
   Utensils,
 } from 'lucide-react';
 
-import { ALPHABET_CATEGORY_KEY } from './vocabGameCatalog.js';
+
 
 // Shared visual metadata for the word-game categories, used by both the
 // Games page (VocabGame) and the Home page category picker so the two stay
 // in sync.
 export const CATEGORY_META = {
-  [ALPHABET_CATEGORY_KEY]: {
-    he: 'אותיות האלפבית',
-    ar: 'أحرف الأبجدية العبرية',
-    icon: Languages,
-    color: 'indigo',
-  },
+  introductions: { he: 'היכרות', ar: 'تعارف', icon: Hand, color: 'violet' },
+  home: { he: 'בית', ar: 'المنزل', icon: Home, color: 'amber' },
+  numbers_basics: { he: 'מספרים', ar: 'الأرقام', icon: Hash, color: 'sky' },
+  grammar: { he: 'דקדוק', ar: 'قواعد', icon: SpellCheck, color: 'slate' },
+  civic_rights: { he: 'זכויות אזרח', ar: 'حقوق مدنية', icon: Landmark, color: 'emerald' },
+  transport: { he: 'תחבורה', ar: 'مواصلات', icon: Bus, color: 'cyan' },
   travel: { he: 'טיולים', ar: 'السفر', icon: Plane, color: 'sky' },
   family: { he: 'משפחה', ar: 'العائلة', icon: Users, color: 'rose' },
   work_jobs: { he: 'עבודה', ar: 'العمل', icon: Briefcase, color: 'slate' },

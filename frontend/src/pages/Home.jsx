@@ -21,7 +21,6 @@ import {
   studentStories,
 } from '../data/studentStories.jsx';
 import {
-  ALPHABET_CATEGORY_KEY,
   gameCatalog,
   getCompletedWordCount,
   getTotalLevelCount,
@@ -543,8 +542,6 @@ function Home() {
         meta: getCategoryMeta(key),
       }))
       .sort((a, b) => {
-        if (a.key === ALPHABET_CATEGORY_KEY) return -1;
-        if (b.key === ALPHABET_CATEGORY_KEY) return 1;
         return b.totalWords - a.totalWords;
       });
   }, []);
