@@ -534,6 +534,8 @@ function TeachersManagement() {
     }
   };
 
+  const activeStudentSearch = studentQuery.trim().toLowerCase();
+
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] px-3 py-3 text-slate-900 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-7xl" dir="rtl">
@@ -664,16 +666,21 @@ function TeachersManagement() {
                       </p>
                     ) : visibleLevels.map((level) => {
                       const levelKey = `${teacher.id}:${level}`;
-                      const open = expandedLevel === levelKey;
                       const studentsForLevel = assignedStudents.filter(
                         (student) => student.level === level,
                       );
+                      const levelHasStudentSearchMatch =
+                        activeStudentSearch &&
+                        studentsForLevel.some((student) =>
+                          student.name?.toLowerCase().includes(activeStudentSearch),
+                        );
+                      const open = expandedLevel === levelKey || levelHasStudentSearchMatch;
 
                       return (
                         <div key={level} className="rounded-2xl bg-white px-3 py-2">
                           <button
                             type="button"
-                            onClick={() => setExpandedLevel(open ? '' : levelKey)}
+                            onClick={() => setExpandedLevel(open && !levelHasStudentSearchMatch ? '' : levelKey)}
                             className="flex w-full items-center justify-between gap-3 text-sm font-black text-violet-700"
                           >
                             <span>{level}</span>
@@ -685,9 +692,24 @@ function TeachersManagement() {
                           {open ? (
                             <ul className="mt-2 grid gap-1 text-sm font-semibold text-slate-600">
                               {studentsForLevel.length > 0 ? (
-                                studentsForLevel.map((student) => (
-                                  <li key={student.id}>- {student.name}</li>
-                                ))
+                                studentsForLevel.map((student) => {
+                                  const isMatchedStudent =
+                                    activeStudentSearch &&
+                                    student.name?.toLowerCase().includes(activeStudentSearch);
+
+                                  return (
+                                    <li
+                                      key={student.id}
+                                      className={`rounded-xl px-2 py-1 transition ${
+                                        isMatchedStudent
+                                          ? 'bg-violet-100 text-violet-900 shadow-[0_6px_16px_rgba(109,40,217,0.10)]'
+                                          : ''
+                                      }`}
+                                    >
+                                      - {student.name}
+                                    </li>
+                                  );
+                                })
                               ) : (
                                 <li>אין תלמידות ברמה זו</li>
                               )}
