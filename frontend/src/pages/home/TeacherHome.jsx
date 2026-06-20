@@ -2,9 +2,7 @@ import React from 'react';
 import {
   ArrowLeft,
   Link as LinkIcon,
-  Pencil,
   Plus,
-  Trash2,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -15,8 +13,6 @@ const ADMIN_SETTINGS_IMAGE = '/images/admin-settings-card.png';
 function TeacherActions({ compact = false, to }) {
   const actions = [
     { label: 'הוספה', icon: Plus },
-    { label: 'עריכה', icon: Pencil },
-    { label: 'מחיקה', icon: Trash2 },
   ];
 
   return (
@@ -24,7 +20,7 @@ function TeacherActions({ compact = false, to }) {
       {actions.map((action) => {
         const Icon = action.icon;
         const classes =
-          'inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full border border-violet-100 bg-violet-50 px-3 text-xs font-bold text-violet-700 transition hover:bg-violet-100 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2';
+          'inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full border border-violet-200 bg-violet-100/80 px-3 text-xs font-bold text-violet-800 shadow-[0_8px_18px_rgba(124,58,237,0.12)] transition hover:-translate-y-0.5 hover:border-violet-300 hover:bg-violet-600 hover:text-white hover:shadow-[0_12px_24px_rgba(124,58,237,0.22)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2';
 
         if (to) {
           return (
