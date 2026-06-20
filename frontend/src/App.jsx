@@ -11,6 +11,7 @@ import SharedChat from './pages/SharedChat.jsx';
 import SharedChatRoom from './pages/SharedChatRoom.jsx';
 import TeacherMore from './pages/teacher/More.jsx';
 import AdminDashboard from './pages/admin/Dashboard.jsx';
+import AdminAnalytics from './pages/admin/Analytics.jsx';
 import AdminLogin from './pages/admin/Login.jsx';
 import AdminConversations from './pages/admin/Conversations.jsx';
 import AdminNotifications from './pages/admin/Notifications.jsx';
@@ -281,6 +282,14 @@ function App() {
           element={
             <ProtectedRoute role={['admin', 'teacher']}>
               <AdminNotifications />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/analytics"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminAnalytics />
             </ProtectedRoute>
           }
         />

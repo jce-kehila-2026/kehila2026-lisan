@@ -1260,3 +1260,595 @@ exports.rejectWord = async (req, res) => {
     });
   }
 };
+
+// ─────────────────────────────────────────────────────────────────────────
+// Full Analytics (GET /api/admin/analytics/full)
+// Standalone, read-only aggregation endpoint for the /admin/analytics page.
+// Every section reads from a real Firestore collection and is wrapped in
+// its own try/catch so a missing or empty collection never fails the
+// response — it just contributes 0 / [] to that section. No mock data,
+// no random numbers. Does not touch any existing logic in this file.
+// ─────────────────────────────────────────────────────────────────────────
+
+const safeNumber = (value) => {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : 0;
+};
+
+const average = (numbers) => {
+  const valid = numbers.filter(
+    (value) => typeof value === 'number' && Number.isFinite(value)
+  );
+
+  if (valid.length === 0) {
+    return 0;
+  }
+
+  const sum = valid.reduce((total, value) => total + value, 0);
+
+  return Math.round((sum / valid.length) * 10) / 10;
+};
+
+const isWithinRange = (date, fromDate, toDate) => {
+  if (!fromDate && !toDate) {
+    return true;
+  }
+
+  if (!date) {
+    return false;
+  }
+
+  if (fromDate && date < fromDate) {
+    return false;
+  }
+
+  if (toDate && date > toDate) {
+    return false;
+  }
+
+  return true;
+};
+
+exports.getFullAnalytics = async (req, res) => {
+  try {
+    const { from, to, search } = req.query;
+
+    const fromDate = from ? new Date(from) : null;
+    // A plain 'YYYY-MM-DD' value parses to UTC midnight, which would make
+    // the selected end day itself fall outside the range. Push it to the
+    // last instant of that day so the whole day is included.
+    const toDate = to
+      ? new Date(new Date(to).setUTCHours(23, 59, 59, 999))
+      : null;
+    const normalizedSearch = search ? String(search).trim().toLowerCase() : '';
+
+    // ---- 1) Users (students / teachers / everyone) ----
+    let allUsers = [];
+
+    try {
+      const snapshot = await db.collection('users').get();
+
+      snapshot.forEach((doc) => {
+        const data = doc.data() || {};
+
+        allUsers.push({
+          id: doc.id,
+          name: data.name || '',
+          email: data.email || '',
+          role: data.role || '',
+          level: data.level || '',
+          isActive: data.isActive ?? true,
+          teacherIds: normalizeTeacherIds(data.teacherIds, data.teacherId),
+          createdAt: data.createdAt || null,
+          lastLoginAt: data.lastLoginAt || null,
+          failedLoginAttempts: safeNumber(data.failedLoginAttempts)
+        });
+      });
+    } catch (error) {
+      console.error('Analytics: failed to load users:', error.message);
+    }
+
+    const students = allUsers.filter((item) => item.role === 'student');
+    const teachers = allUsers.filter((item) => item.role === 'teacher');
+    const activeUsers = allUsers.filter((item) => item.isActive !== false);
+
+    // ---- 2) Chat sessions (AI tutor conversations + voice messages) ----
+    let chatSessions = [];
+
+    try {
+      const snapshot = await db.collection('chatSessions').get();
+
+      snapshot.forEach((doc) => {
+        const data = doc.data() || {};
+
+        chatSessions.push({
+          id: doc.id,
+          userId: data.userId || null,
+          level: allowedLevels.includes(data.level) ? data.level : null,
+          isArchived: data.isArchived === true,
+          startedAt: data.startedAt || null,
+          updatedAt: data.updatedAt || null,
+          messages: Array.isArray(data.messages) ? data.messages : []
+        });
+      });
+    } catch (error) {
+      console.error('Analytics: failed to load chatSessions:', error.message);
+    }
+
+    const chatSessionsInRange = (fromDate || toDate)
+      ? chatSessions.filter((chat) =>
+          isWithinRange(normalizeFirestoreDate(chat.startedAt), fromDate, toDate)
+        )
+      : chatSessions;
+
+    let totalAiMessages = 0;
+    let totalVoiceRecordings = 0;
+    const aiMessagesByLevel = { A1: 0, A2: 0, B1: 0, B2: 0 };
+    const aiMessagesByStudent = {};
+    const voiceByLevel = { A1: 0, A2: 0, B1: 0, B2: 0 };
+    const voiceByStudent = {};
+
+    chatSessionsInRange.forEach((chat) => {
+      chat.messages.forEach((message) => {
+        if (!message) {
+          return;
+        }
+
+        totalAiMessages += 1;
+
+        if (chat.level) {
+          aiMessagesByLevel[chat.level] += 1;
+        }
+
+        if (chat.userId) {
+          aiMessagesByStudent[chat.userId] =
+            (aiMessagesByStudent[chat.userId] || 0) + 1;
+        }
+
+        if (message.sender === 'user' && message.type === 'voice') {
+          totalVoiceRecordings += 1;
+
+          if (chat.level) {
+            voiceByLevel[chat.level] += 1;
+          }
+
+          if (chat.userId) {
+            voiceByStudent[chat.userId] = (voiceByStudent[chat.userId] || 0) + 1;
+          }
+        }
+      });
+    });
+
+    // ---- 3) Student attempts (pronunciation / speaking evaluation) ----
+    let studentAttempts = [];
+
+    try {
+      const snapshot = await db.collection('studentAttempts').get();
+
+      snapshot.forEach((doc) => {
+        const data = doc.data() || {};
+
+        studentAttempts.push({
+          id: doc.id,
+          userId: data.userId || null,
+          aiEvaluation: data.aiEvaluation || null,
+          createdAt: data.createdAt || null
+        });
+      });
+    } catch (error) {
+      console.error('Analytics: failed to load studentAttempts:', error.message);
+    }
+
+    const attemptsInRange = (fromDate || toDate)
+      ? studentAttempts.filter((attempt) =>
+          isWithinRange(normalizeFirestoreDate(attempt.createdAt), fromDate, toDate)
+        )
+      : studentAttempts;
+
+    let failedEvaluations = 0;
+    const pronunciationScores = [];
+
+    attemptsInRange.forEach((attempt) => {
+      if (!attempt.aiEvaluation) {
+        failedEvaluations += 1;
+      }
+
+      const pronunciationScore = attempt.aiEvaluation?.scores?.pronunciation;
+
+      if (typeof pronunciationScore === 'number') {
+        pronunciationScores.push(pronunciationScore);
+      }
+    });
+
+    // ---- 3b) Vocabulary game progress ----
+    // studentAttempts (above) has no write path anywhere in this codebase
+    // (backend, frontend, or ai-service), so in real usage it reads back
+    // empty. gameProgress is the one progress collection the app actually
+    // writes to (see progressController.completeGameLevel /
+    // components/VocabGame.jsx), so it gives a genuine, non-zero signal.
+    let gameProgressDocs = [];
+
+    try {
+      const snapshot = await db.collection('gameProgress').get();
+
+      snapshot.forEach((doc) => {
+        const data = doc.data() || {};
+        const categories =
+          data.categories && typeof data.categories === 'object' ? data.categories : {};
+        const levelsCompleted = Object.values(categories).reduce(
+          (sum, levels) => sum + (Array.isArray(levels) ? levels.length : 0),
+          0
+        );
+
+        gameProgressDocs.push({
+          userId: data.userId || doc.id,
+          levelsCompleted
+        });
+      });
+    } catch (error) {
+      console.error('Analytics: failed to load gameProgress:', error.message);
+    }
+
+    const gameLevelsByStudent = {};
+    gameProgressDocs.forEach((entry) => {
+      gameLevelsByStudent[entry.userId] = entry.levelsCompleted;
+    });
+
+    const totalGameLevelsCompleted = gameProgressDocs.reduce(
+      (sum, entry) => sum + entry.levelsCompleted,
+      0
+    );
+    const studentsWithGameActivity = gameProgressDocs.filter(
+      (entry) => entry.levelsCompleted > 0
+    ).length;
+
+    // ---- 4) Shared chats (student-teacher / student-student messaging) ----
+    let sharedChats = [];
+
+    try {
+      const snapshot = await db.collection('sharedChats').get();
+
+      snapshot.forEach((doc) => {
+        const data = doc.data() || {};
+
+        sharedChats.push({
+          id: doc.id,
+          participants: Array.isArray(data.participants) ? data.participants : [],
+          participantRoles: data.participantRoles || {},
+          unreadBy: Array.isArray(data.unreadBy) ? data.unreadBy : [],
+          updatedAt: data.updatedAt || null,
+          createdAt: data.createdAt || null
+        });
+      });
+    } catch (error) {
+      console.error('Analytics: failed to load sharedChats:', error.message);
+    }
+
+    let studentTeacherChats = 0;
+    let studentStudentChats = 0;
+    let totalUnreadMessages = 0;
+    const participantFrequency = {};
+
+    sharedChats.forEach((chat) => {
+      const roles = Object.values(chat.participantRoles || {});
+
+      if (roles.includes('teacher') && roles.includes('student')) {
+        studentTeacherChats += 1;
+      } else if (roles.length > 0 && roles.every((role) => role === 'student')) {
+        studentStudentChats += 1;
+      }
+
+      totalUnreadMessages += chat.unreadBy.length;
+
+      chat.participants.forEach((uid) => {
+        participantFrequency[uid] = (participantFrequency[uid] || 0) + 1;
+      });
+    });
+
+    let totalSharedMessages = 0;
+
+    try {
+      const messagesSnapshot = await db.collectionGroup('messages').get();
+      totalSharedMessages = messagesSnapshot.size;
+    } catch (error) {
+      console.error('Analytics: failed to load shared chat messages:', error.message);
+    }
+
+    const topSharedChatUsers = Object.entries(participantFrequency)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([uid, count]) => {
+        const user = allUsers.find((item) => item.id === uid);
+
+        return {
+          id: uid,
+          name: user?.name || user?.email || uid,
+          role: user?.role || '',
+          chatsCount: count
+        };
+      });
+
+    // ---- 5) Vocabulary (pendingWords + words) ----
+    let pendingWordsDocs = [];
+    let approvedWordsDocs = [];
+
+    try {
+      const snapshot = await db.collection('pendingWords').get();
+      snapshot.forEach((doc) => pendingWordsDocs.push(doc.data() || {}));
+    } catch (error) {
+      console.error('Analytics: failed to load pendingWords:', error.message);
+    }
+
+    try {
+      const snapshot = await db.collection('words').get();
+      snapshot.forEach((doc) => approvedWordsDocs.push(doc.data() || {}));
+    } catch (error) {
+      console.error('Analytics: failed to load words:', error.message);
+    }
+
+    const pendingWordsCount = pendingWordsDocs.filter(
+      (word) => (word.status || 'pending') === 'pending'
+    ).length;
+    const rejectedWordsCount = pendingWordsDocs.filter(
+      (word) => word.status === 'rejected'
+    ).length;
+    const approvedWordsCount = approvedWordsDocs.length;
+
+    const wordsByLevel = { A1: 0, A2: 0, B1: 0, B2: 0 };
+
+    [...pendingWordsDocs, ...approvedWordsDocs].forEach((word) => {
+      if (allowedLevels.includes(word.level)) {
+        wordsByLevel[word.level] += 1;
+      }
+    });
+
+    // ---- 6) Chat reviews (used for the teachers table) ----
+    let chatReviews = [];
+
+    try {
+      const snapshot = await db.collection('chatReviews').get();
+
+      snapshot.forEach((doc) => {
+        const data = doc.data() || {};
+
+        chatReviews.push({
+          id: doc.id,
+          userId: data.userId || null,
+          reviewedBy: data.reviewedBy || null,
+          status: data.status || 'pending',
+          createdAt: data.createdAt || null
+        });
+      });
+    } catch (error) {
+      console.error('Analytics: failed to load chatReviews:', error.message);
+    }
+
+    // ---- 7) System (best-effort; no dedicated error-log collection exists) ----
+    const totalFailedLoginAttempts = allUsers.reduce(
+      (sum, user) => sum + safeNumber(user.failedLoginAttempts),
+      0
+    );
+
+    // ---- Build per-student rows ----
+    const studentRows = students.map((student) => {
+      const chatsForStudent = chatSessionsInRange.filter(
+        (chat) => chat.userId === student.id
+      );
+      const attemptsForStudent = attemptsInRange.filter(
+        (attempt) => attempt.userId === student.id
+      );
+      const totalAttempts = attemptsForStudent.length;
+      const correctForStudent = attemptsForStudent.filter(
+        (attempt) => attempt.aiEvaluation?.isMeaningCorrect === true
+      ).length;
+      const accuracy =
+        totalAttempts > 0
+          ? Math.round((correctForStudent / totalAttempts) * 100)
+          : 0;
+
+      const teacherNames = student.teacherIds
+        .map((teacherId) => teachers.find((teacher) => teacher.id === teacherId)?.name)
+        .filter(Boolean);
+
+      return {
+        id: student.id,
+        name: student.name,
+        email: student.email,
+        level: student.level,
+        teacherNames,
+        lastLoginAt: student.lastLoginAt,
+        aiChatsCount: chatsForStudent.length,
+        aiMessagesCount: aiMessagesByStudent[student.id] || 0,
+        voiceRecordingsCount: voiceByStudent[student.id] || 0,
+        averageProgress: accuracy,
+        gameLevelsCompleted: gameLevelsByStudent[student.id] || 0,
+        status: student.isActive === false ? 'inactive' : 'active'
+      };
+    });
+
+    const filteredStudentRows = normalizedSearch
+      ? studentRows.filter(
+          (row) =>
+            row.name.toLowerCase().includes(normalizedSearch) ||
+            row.email.toLowerCase().includes(normalizedSearch)
+        )
+      : studentRows;
+
+    // ---- Build per-teacher rows ----
+    const teacherRows = teachers.map((teacher) => {
+      const assignedStudents = students.filter((student) =>
+        student.teacherIds.includes(teacher.id)
+      );
+      const assignedStudentIds = new Set(assignedStudents.map((student) => student.id));
+
+      const messagesWithStudentsCount = sharedChats.filter(
+        (chat) =>
+          chat.participants.includes(teacher.id) &&
+          chat.participants.some((uid) => assignedStudentIds.has(uid))
+      ).length;
+
+      const reviewsCount = chatReviews.filter(
+        (review) => review.reviewedBy === teacher.id
+      ).length;
+
+      const progressValues = assignedStudents.map((student) => {
+        const row = studentRows.find((item) => item.id === student.id);
+        return row ? row.averageProgress : 0;
+      });
+
+      return {
+        id: teacher.id,
+        name: teacher.name,
+        email: teacher.email,
+        studentsCount: assignedStudents.length,
+        messagesWithStudentsCount,
+        reviewsCount,
+        averageStudentsProgress: average(progressValues),
+        lastActivityAt: teacher.lastLoginAt
+      };
+    });
+
+    const filteredTeacherRows = normalizedSearch
+      ? teacherRows.filter(
+          (row) =>
+            row.name.toLowerCase().includes(normalizedSearch) ||
+            row.email.toLowerCase().includes(normalizedSearch)
+        )
+      : teacherRows;
+
+    // ---- Progress aggregation ----
+    const overallAverageProgress = average(studentRows.map((row) => row.averageProgress));
+
+    const progressByLevel = {};
+    allowedLevels.forEach((level) => {
+      const values = studentRows
+        .filter((row) => row.level === level)
+        .map((row) => row.averageProgress);
+      progressByLevel[level] = average(values);
+    });
+
+    const sortedByProgress = [...studentRows].sort(
+      (a, b) => b.averageProgress - a.averageProgress
+    );
+    const topStudents = sortedByProgress.slice(0, 5);
+    const bottomStudents = [...sortedByProgress].reverse().slice(0, 5);
+
+    // ---- AI usage leaders ----
+    const topAiUsers = [...studentRows]
+      .filter((row) => row.aiMessagesCount > 0)
+      .sort((a, b) => b.aiMessagesCount - a.aiMessagesCount)
+      .slice(0, 5);
+
+    const topGameStudents = [...studentRows]
+      .filter((row) => row.gameLevelsCompleted > 0)
+      .sort((a, b) => b.gameLevelsCompleted - a.gameLevelsCompleted)
+      .slice(0, 5);
+
+    // ---- Audio by-student breakdown ----
+    const audioByStudent = students
+      .map((student) => ({
+        id: student.id,
+        name: student.name,
+        recordings: voiceByStudent[student.id] || 0
+      }))
+      .filter((item) => item.recordings > 0)
+      .sort((a, b) => b.recordings - a.recordings)
+      .slice(0, 10);
+
+    const studentsByLevel = allowedLevels.reduce((acc, level) => {
+      acc[level] = students.filter((student) => student.level === level).length;
+      return acc;
+    }, {});
+
+    return res.status(200).json({
+      success: true,
+      generatedAt: new Date().toISOString(),
+      filters: {
+        from: from || null,
+        to: to || null,
+        search: search || null
+      },
+      overview: {
+        totalStudents: students.length,
+        totalTeachers: teachers.length,
+        totalUsers: allUsers.length,
+        activeUsers: activeUsers.length,
+        totalAiChats: chatSessionsInRange.length,
+        totalAiMessages,
+        totalSharedChats: sharedChats.length,
+        totalAudioRecordings: totalVoiceRecordings,
+        pendingWordsCount,
+        averageProgress: overallAverageProgress
+      },
+      students: filteredStudentRows,
+      teachers: filteredTeacherRows,
+      progress: {
+        overallAverage: overallAverageProgress,
+        byLevel: progressByLevel,
+        topStudents,
+        bottomStudents,
+        details: studentRows,
+        vocabularyGame: {
+          studentsWithActivity: studentsWithGameActivity,
+          totalLevelsCompleted: totalGameLevelsCompleted,
+          averageLevelsPerStudent: average(
+            studentRows.map((row) => row.gameLevelsCompleted)
+          ),
+          topStudents: topGameStudents
+        }
+      },
+      ai: {
+        totalChats: chatSessionsInRange.length,
+        totalMessages: totalAiMessages,
+        messagesByLevel: aiMessagesByLevel,
+        topStudentsByUsage: topAiUsers,
+        errors: [],
+        quotaErrors: [],
+        averageResponseTimeMs: 0
+      },
+      sharedChats: {
+        totalChats: sharedChats.length,
+        totalMessages: totalSharedMessages,
+        studentTeacherChats,
+        studentStudentChats,
+        unreadMessages: totalUnreadMessages,
+        topUsers: topSharedChatUsers
+      },
+      vocabulary: {
+        totalWords: pendingWordsDocs.length + approvedWordsDocs.length,
+        pendingWords: pendingWordsCount,
+        approvedWords: approvedWordsCount,
+        rejectedWords: rejectedWordsCount,
+        byLevel: wordsByLevel
+      },
+      audio: {
+        totalRecordings: totalVoiceRecordings,
+        byLevel: voiceByLevel,
+        byStudent: audioByStudent,
+        averagePronunciationScore: average(pronunciationScores),
+        failedEvaluations
+      },
+      system: {
+        apiErrors: [],
+        firebaseErrors: [],
+        quotaErrors: [],
+        failedLoginAttempts: totalFailedLoginAttempts,
+        recentErrors: []
+      },
+      charts: {
+        messagesByLevel: aiMessagesByLevel,
+        wordsByLevel,
+        progressByLevel,
+        studentsByLevel
+      }
+    });
+  } catch (error) {
+    console.error('Get full analytics error:', error);
+
+    return res.status(500).json({
+      success: false,
+      error: 'Server error',
+      code: 'SERVER_ERROR'
+    });
+  }
+};

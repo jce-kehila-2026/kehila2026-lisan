@@ -298,3 +298,15 @@ export const createUser = async (user) => {
     user: data.user
   };
 };
+
+export const getFullAnalytics = async ({ from, to, search } = {}) => {
+  const params = new URLSearchParams();
+
+  if (from) params.set('from', from);
+  if (to) params.set('to', to);
+  if (search) params.set('search', search);
+
+  const query = params.toString();
+
+  return request(`/admin/analytics/full${query ? `?${query}` : ''}`);
+};
