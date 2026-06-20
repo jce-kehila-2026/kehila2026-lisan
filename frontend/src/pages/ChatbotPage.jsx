@@ -41,14 +41,16 @@
  *  *    → chatServiceError  (generic fallback)
  */
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-// framer-motion used inside child components (ConversationSidebar, ChatWindow)
-import { BotMessageSquare, History, MessageSquarePlus, ShieldCheck, Sparkles } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { BotMessageSquare, Globe, History, Keyboard, Mic, MessageSquarePlus, ShieldCheck, Sparkles, Star, Volume2 } from 'lucide-react';
 import BottomNav from '../components/BottomNav.jsx';
-import PageHeader from '../components/PageHeader.jsx';
+import LisanLogo from '../components/LisanLogo.jsx';
+import LanguageToggle from '../components/LanguageToggle.jsx';
 import ChatComposer from '../components/chat/ChatComposer.jsx';
+import VoiceConsole from '../components/chat/VoiceConsole.jsx';
 import ConversationSidebar from '../components/chat/ConversationSidebar.jsx';
 import ChatWindow from '../components/chat/ChatWindow.jsx';
 import ChatReview from '../components/chat/ChatReview.jsx';
@@ -56,13 +58,13 @@ import { useAudioRecorder } from '../hooks/useAudioRecorder.js';
 import { logout, getStoredToken } from '../services/auth.js';
 import {
   DEFAULT_CHAT_LEVEL,
-  DEFAULT_SUGGESTED_PROMPTS,
   deleteConversation,
   fetchConversation,
   fetchConversations,
   getChatErrorPresentation,
   sendChatMessage,
   sendVoiceMessage,
+  synthesizeSpeech,
 } from '../services/chat.js';
 
 // Fallback reasons that mean STT couldn't make out the speech (vs an
@@ -82,6 +84,7 @@ function createLocalMessage({
   fallbackUsed  = false,
   fallbackReason = null,
   pronunciationScore = null,
+  audioBase64 = null,
 }) {
   return {
     localId: `${role}-${Date.now()}-${Math.random().toString(16).slice(2)}`,
@@ -92,13 +95,25 @@ function createLocalMessage({
     fallbackUsed,
     fallbackReason,
     pronunciationScore,
+    audioBase64,
   };
 }
 
 function ChatbotPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const recorder = useAudioRecorder();
+  const reduceMotion = useReducedMotion();
+  // Active interaction mode: 'text' (type), 'voice' (one-shot voice message),
+  // 'free' (hands-free spoken conversation). All three reuse the existing
+  // send/voice handlers — only the input surface + whether the reply is read
+  // aloud differ.
+  const [inputMode, setInputMode] = useState('text');
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const audioElementRef = useRef(null);
+  // Captured at record-start so submitVoiceMessage knows whether to read the
+  // reply aloud (true only for the free-conversation mode).
+  const speakReplyRef = useRef(false);
   const [composerValue, setComposerValue] = useState('');
   const [messages, setMessages] = useState([]);
   const [conversations, setConversations] = useState([]);
@@ -117,6 +132,8 @@ function ChatbotPage() {
   const [voicePhase, setVoicePhase] = useState('listening');
   const [conversationsLoading, setConversationsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [readAloudLoadingId, setReadAloudLoadingId] = useState(null);
+  const [readAloudPlayingId, setReadAloudPlayingId] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   // Arabic toggle — persisted in sessionStorage so it survives navigation
   const [includeArabic, setIncludeArabic] = useState(() => {
@@ -131,26 +148,6 @@ function ChatbotPage() {
       return next;
     });
   };
-
-  const suggestedPrompts = useMemo(() => DEFAULT_SUGGESTED_PROMPTS, []);
-  const voiceStatusLabel = useMemo(() => {
-    if (!recorder.isSupported) return t('chatVoiceUnsupported');
-
-    switch (recorder.status) {
-      case 'requesting':
-        return t('chatVoiceStatusRequesting');
-      case 'recording':
-        return t('chatVoiceStatusRecording');
-      case 'stopping':
-        return t('chatVoiceStatusStopping');
-      case 'denied':
-        return t('chatVoicePermissionDenied');
-      case 'error':
-        return t('chatVoiceGenericError');
-      default:
-        return t('chatVoiceStatusIdle');
-    }
-  }, [recorder.isSupported, recorder.status, t]);
 
   const refreshConversations = async () => {
     setConversationsLoading(true);
@@ -305,6 +302,8 @@ function ChatbotPage() {
       utterance.rate = 0.9;       // slightly slower — clearer for learners
       utterance.pitch = 1;
       utterance.volume = 1;
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
 
       const speakWithVoice = () => {
         const voices = window.speechSynthesis.getVoices();
@@ -312,7 +311,11 @@ function ChatbotPage() {
           (v) => v.lang === 'he-IL' || v.lang === 'he' || v.lang.startsWith('he-')
         );
         if (hebrewVoice) utterance.voice = hebrewVoice;
-        utterance.onerror = () => setErrorMessage(t('chatVoicePlaybackError'));
+        utterance.onerror = () => {
+          setIsSpeaking(false);
+          setErrorMessage(t('chatVoicePlaybackError'));
+        };
+        setIsSpeaking(true);
         window.speechSynthesis.speak(utterance);
       };
 
@@ -327,9 +330,140 @@ function ChatbotPage() {
         };
       }
     } catch {
+      setIsSpeaking(false);
       setErrorMessage(t('chatVoicePlaybackError'));
     }
   }, [t]);
+
+  const playBrowserSpeech = useCallback((text) => new Promise((resolve, reject) => {
+    if (!text || typeof window === 'undefined' || !window.speechSynthesis) {
+      resolve();
+      return;
+    }
+
+    try {
+      audioElementRef.current?.pause();
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'he-IL';
+      utterance.rate = 0.9;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => {
+        setIsSpeaking(false);
+        resolve();
+      };
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+        reject(new Error('Speech synthesis failed'));
+      };
+
+      const speakWithVoice = () => {
+        const voices = window.speechSynthesis.getVoices();
+        const hebrewVoice = voices.find(
+          (v) => v.lang === 'he-IL' || v.lang === 'he' || v.lang.startsWith('he-')
+        );
+        if (hebrewVoice) utterance.voice = hebrewVoice;
+        setIsSpeaking(true);
+        window.speechSynthesis.speak(utterance);
+      };
+
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        speakWithVoice();
+      } else {
+        window.speechSynthesis.onvoiceschanged = () => {
+          window.speechSynthesis.onvoiceschanged = null;
+          speakWithVoice();
+        };
+      }
+    } catch (error) {
+      setIsSpeaking(false);
+      reject(error);
+    }
+  }), []);
+
+  const playAudioBase64 = useCallback((audioBase64) => new Promise((resolve, reject) => {
+    if (!audioBase64 || typeof window === 'undefined') {
+      resolve(false);
+      return;
+    }
+
+    try {
+      window.speechSynthesis?.cancel();
+      audioElementRef.current?.pause();
+
+      const audio = new Audio(`data:audio/mpeg;base64,${audioBase64}`);
+      audioElementRef.current = audio;
+      audio.onended = () => {
+        setIsSpeaking(false);
+        resolve(true);
+      };
+      audio.onerror = () => {
+        setIsSpeaking(false);
+        reject(new Error('Audio playback failed'));
+      };
+      setIsSpeaking(true);
+      audio.play().catch((error) => {
+        setIsSpeaking(false);
+        reject(error);
+      });
+    } catch (error) {
+      setIsSpeaking(false);
+      reject(error);
+    }
+  }), []);
+
+  const playAssistantReply = useCallback(async ({
+    localId = null,
+    textHe,
+    audioBase64 = null,
+    fallbackUsed = false,
+    pronunciationScore = null,
+  }) => {
+    const text = (textHe || '').trim();
+    if (!text) return;
+
+    setErrorMessage('');
+    if (localId) setReadAloudLoadingId(localId);
+
+    try {
+      let nextAudioBase64 = audioBase64;
+      if (!nextAudioBase64) {
+        const ttsPayload = await synthesizeSpeech({
+          text,
+          isFallback: fallbackUsed,
+          pronunciationScore,
+        });
+        nextAudioBase64 = ttsPayload.audioBase64;
+      }
+
+      if (localId) {
+        setReadAloudLoadingId(null);
+        setReadAloudPlayingId(localId);
+      }
+
+      if (nextAudioBase64) {
+        await playAudioBase64(nextAudioBase64);
+      } else {
+        await playBrowserSpeech(text);
+      }
+    } catch {
+      try {
+        await playBrowserSpeech(text);
+      } catch {
+        setErrorMessage(t('chatVoicePlaybackError'));
+      }
+    } finally {
+      if (localId) {
+        setReadAloudLoadingId(null);
+        setReadAloudPlayingId(null);
+      }
+      setIsSpeaking(false);
+    }
+  }, [playAudioBase64, playBrowserSpeech, t]);
 
   const submitMessage = async (prefilledMessage) => {
     const message = typeof prefilledMessage === 'string' ? prefilledMessage : composerValue;
@@ -412,12 +546,19 @@ function ChatbotPage() {
         textAr: response.answerAr,
         fallbackUsed: response.fallbackUsed,
         fallbackReason: response.fallbackReason,
+        audioBase64: response.audioBase64,
       }));
       setMessages((curr) => [...curr, ...newMessages]);
 
-      // TTS is handled by the browser — speak the Hebrew answer aloud
-      if (response.answerHe && !response.fallbackUsed) {
-        playVoiceReply(response.answerHe);
+      // In free-conversation mode the reply is read aloud; a one-shot voice
+      // message just shows the text reply.
+      if (response.answerHe && !response.fallbackUsed && speakReplyRef.current) {
+        void playAssistantReply({
+          textHe: response.answerHe,
+          audioBase64: response.audioBase64,
+          fallbackUsed: response.fallbackUsed,
+          pronunciationScore: response.pronunciationScore,
+        });
       }
 
       await refreshConversations();
@@ -433,7 +574,7 @@ function ChatbotPage() {
     conversationId,
     includeArabic,
     loading,
-    playVoiceReply,
+    playAssistantReply,
     recorder,
     t,
   ]);
@@ -443,140 +584,309 @@ function ChatbotPage() {
     void submitVoiceMessage(recorder.audioBlob);
   }, [recorder.audioBlob, submitVoiceMessage]);
 
-  const handleVoiceToggle = async () => {
+  const handleVoiceCapture = useCallback(async (speakReply) => {
     setErrorMessage('');
     recorder.clearError();
+    // Lock in whether this turn's reply is read aloud before recording starts.
+    if (recorder.status !== 'recording') {
+      speakReplyRef.current = Boolean(speakReply);
+    }
     await recorder.toggleRecording();
-  };
+  }, [recorder]);
+
+  // Switching modes stops any dangling recording and silences playback.
+  useEffect(() => {
+    if (recorder.status === 'recording') {
+      recorder.stopRecording();
+    }
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+    }
+    audioElementRef.current?.pause();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputMode]);
+
+  const isHe = i18n.language === 'he';
+
+  const FEATURE_CARDS = [
+    {
+      icon: <Sparkles className="h-5 w-5 text-violet-600" />,
+      title: isHe ? 'חכם בלימודים'   : 'ذكي في التعلم',
+      desc:  isHe ? 'הסברים ברורים, מותאמים לתוכנית הלימודים שלך' : 'شرح واضح، ملائم لمنهجك الدراسي',
+    },
+    {
+      icon: <Star className="h-5 w-5 text-violet-600" />,
+      title: isHe ? 'עוזר זמין תמיד' : 'مساعد دائماً',
+      desc:  isHe ? 'תשובות מהירות, 24/7, בכל זמן ומקום' : 'ردود سريعة 24/7، في أي وقت ومكان',
+    },
+    {
+      icon: <Globe className="h-5 w-5 text-violet-600" />,
+      title: isHe ? 'דו-לשוני'        : 'ثنائي اللغة',
+      desc:  isHe ? 'עברית ועברית — למידה והבנה ללא גבולות' : 'عربية وعبرية — تعلّم بلا حدود',
+    },
+    {
+      icon: <ShieldCheck className="h-5 w-5 text-violet-600" />,
+      title: isHe ? 'אישי ובטוח'      : 'خاص وآمن',
+      desc:  isHe ? 'המידע שלך נשמר בצורה מאובטחת' : 'معلوماتك محفوظة بأمان تام',
+    },
+  ];
+
+  const endReviewLabel  = isHe ? 'סיום ומשוב' : 'إنهاء وتقييم';
+  const newChatLabel    = isHe ? 'שיחה חדשה'  : 'محادثة جديدة';
+  const historyLabel    = isHe ? 'היסטוריה'   : 'السجل';
+  const chatModeTitle   = isHe ? 'צ׳אט לימודי' : 'دردشة تعليمية';
+  const homeLabel       = isHe ? 'דף הבית' : 'الصفحة الرئيسية';
+  const modeSelectorLabel = isHe ? 'מצב קלט' : 'وضع الإدخال';
+
+  // The three real interaction modes — shared by the empty state and the
+  // composer's segmented selector.
+  const INPUT_MODES = [
+    { value: 'text',  label: isHe ? 'טקסט' : 'نص',               hint: isHe ? 'כתבי הודעה' : 'اكتبي رسالة',          Icon: Keyboard },
+    { value: 'voice', label: isHe ? 'הודעה קולית' : 'رسالة صوتية', hint: isHe ? 'הקליטי ושלחי' : 'سجّلي وأرسلي',       Icon: Mic },
+    { value: 'free',  label: isHe ? 'שיחה חופשית' : 'محادثة صوتية', hint: isHe ? 'דברי, ואשיב בקול' : 'تحدّثي وسأجيب صوتًا', Icon: Volume2 },
+  ];
+
+  const activeModeLabel = INPUT_MODES.find((mode) => mode.value === inputMode)?.label || '';
+  const chatModeHint = isHe ? `עברית · ${activeModeLabel}` : `العبرية · ${activeModeLabel}`;
+
+  const voiceCaption = !recorder.isSupported
+    ? t('chatVoiceUnsupported')
+    : recorder.status === 'recording'
+      ? (isHe ? 'מקשיבה… הקישי לסיום' : 'أستمع… اضغطي للإنهاء')
+      : (voiceProcessing || loading)
+        ? t('chatThinking')
+        : isSpeaking
+          ? (isHe ? 'משמיעה תשובה…' : 'أشغّل الإجابة…')
+          : inputMode === 'free'
+            ? (isHe ? 'הקישי כדי לדבר' : 'اضغطي للتحدث')
+            : (isHe ? 'הקישי כדי להקליט' : 'اضغطي للتسجيل');
+
+  const voiceHint = inputMode === 'free'
+    ? (isHe ? 'שיחה חופשית — אשיב גם בקול' : 'محادثة حرة — سأجيب صوتًا أيضًا')
+    : (isHe ? 'הודעה קולית אחת — אשיב בטקסט' : 'رسالة صوتية واحدة — سأجيب نصًا');
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-4 py-5 text-slate-900 sm:px-6 sm:py-8">
-      <div className="relative mx-auto min-h-[calc(100vh-2.5rem)] w-full max-w-[1480px] pb-32 sm:min-h-[780px]">
-        <PageHeader />
+    /* Force LTR for the layout grid so the benefit cards stay on the physical
+       left for both Hebrew and Arabic; every text node inside stays RTL. */
+    <div dir="ltr" className="relative flex min-h-screen flex-col overflow-hidden bg-[linear-gradient(180deg,#FAF7FF_0%,#FBF6FD_52%,#F4ECFF_100%)] text-slate-900">
 
-        <section className="mt-6 rounded-3xl bg-white p-5 shadow-card sm:p-6">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-3 py-1 text-xs font-bold text-violet-700">
-                <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                {t('chatHeroBadge')}
-              </div>
-              <h1 className="mt-3 text-xl font-bold text-slate-950 sm:text-2xl">{t('chatTitle')}</h1>
-              <p className="mt-1 text-sm leading-relaxed text-slate-600">{t('chatIntro')}</p>
-            </div>
-            <div className="flex shrink-0 gap-2">
-              <button
-                type="button"
-                onClick={() => setSidebarOpen(true)}
-                disabled={loading}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-violet-500"
-                aria-label={t('chatHistoryTitle')}
-                title={t('chatHistoryTitle')}
-              >
-                <History className="h-5 w-5" aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                onClick={endAndReview}
-                disabled={loading || messages.length === 0}
-                className="flex h-10 items-center gap-1.5 rounded-full border border-violet-200 bg-white px-4 text-sm font-bold text-violet-700 shadow-sm transition hover:bg-violet-50 disabled:opacity-40 focus:outline-none focus:ring-2 focus:ring-violet-500"
-                title="סיום ומשוב"
-              >
-                סיום ומשוב
-              </button>
-              <button
-                type="button"
-                onClick={resetConversation}
-                disabled={loading}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-600 text-white shadow-sm transition hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500"
-                aria-label={t('chatNewConversation')}
-                title={t('chatNewConversation')}
-              >
-                <MessageSquarePlus className="h-5 w-5" aria-hidden="true" />
-              </button>
-            </div>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-50 px-3 py-1.5 text-[11px] font-semibold text-slate-600">
-              <ShieldCheck className="h-3.5 w-3.5 text-violet-600" aria-hidden="true" /> {t('chatTrustOne')}
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-50 px-3 py-1.5 text-[11px] font-semibold text-slate-600">
-              <BotMessageSquare className="h-3.5 w-3.5 text-violet-600" aria-hidden="true" /> {t('chatTrustTwo')}
-            </span>
-          </div>
-        </section>
-
-        {errorMessage ? (
-          <section className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert">
-            {errorMessage}
-          </section>
-        ) : null}
-
-        <section className="chat-page__surface chat-page__surface--premium mt-4">
-          <ChatWindow
-            messages={messages}
-            loading={loading}
-            loadingLabel={
-              voiceProcessing
-                ? t(voicePhase === 'analyzing' ? 'chatVoiceAnalyzing' : 'chatVoiceProcessing')
-                : t('chatThinking')
-            }
-            emptyTitle={t('chatEmptyTitle')}
-            emptyDescription={t('chatEmptyDescription')}
-            emptyPrompts={suggestedPrompts}
-            onPromptClick={submitMessage}
-          />
-        </section>
-
-        <div className="chat-page__composer">
-          <ChatComposer
-            value={composerValue}
-            disabled={loading}
-            loading={loading}
-            includeArabic={includeArabic}
-            onChange={setComposerValue}
-            onSubmit={() => submitMessage()}
-            onToggleArabic={toggleArabic}
-            onVoiceToggle={handleVoiceToggle}
-            placeholder={t('chatComposerPlaceholder')}
-            sendLabel={t('chatSend')}
-            arabicToggleLabel={t('chatIncludeArabic')}
-            voiceLabel={t('chatVoiceAction')}
-            voiceStatusLabel={voiceStatusLabel}
-            voiceState={recorder.status}
-            voiceSupported={recorder.isSupported}
-          />
-        </div>
-
-        {/* ── History Sidebar (responsive drawer) ──────────────────── */}
-        <ConversationSidebar
-          open={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          conversations={conversations}
-          activeConversationId={conversationId}
-          loading={conversationsLoading}
-          title={t('chatHistoryTitle')}
-          subtitle={t('chatHistorySubtitle')}
-          loadingLabel={t('chatHistoryLoading')}
-          newChatLabel={t('chatNewConversation')}
-          emptyLabel={t('chatHistoryEmpty')}
-          deleteLabel={t('chatHistoryDeleteLabel')}
-          closeLabel={t('chatCloseSidebar')}
-          cancelDeleteLabel={t('chatCancelDelete')}
-          onNewChat={resetConversation}
-          onSelectConversation={openConversation}
-          onDeleteConversation={removeConversation}
-        />
-
-        <ChatReview
-          open={reviewOpen}
-          role="student"
-          onClose={skipReview}
-          onSubmit={submitReview}
-        />
-        <BottomNav />
+      {/* Decorative background — blurred lavender blobs + faint desk scene */}
+      <div className="chatbot-bg" aria-hidden="true">
+        <span className="chatbot-bg__blob chatbot-bg__blob--1" />
+        <span className="chatbot-bg__blob chatbot-bg__blob--2" />
+        <span className="chatbot-bg__blob chatbot-bg__blob--3" />
+        <img src="/ai.png" alt="" className="chatbot-bg__desk" loading="lazy" />
       </div>
-    </main>
+
+      {/* ── Header ── */}
+      <header dir="ltr" className="relative z-10 flex shrink-0 items-center justify-between border-b border-violet-100/80 bg-white/75 px-4 py-2.5 backdrop-blur-md sm:px-6">
+        <div dir={isHe ? 'rtl' : 'ltr'}>
+          <LanguageToggle />
+        </div>
+        <button
+          type="button"
+          onClick={() => navigate('/home')}
+          className="rounded-2xl transition hover:scale-[1.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
+          aria-label={homeLabel}
+        >
+          <LisanLogo className="!h-11 sm:!h-12" />
+        </button>
+      </header>
+
+      {/* ── Body ── */}
+      <div className="relative z-10 mx-auto flex w-full max-w-[1240px] flex-1 min-h-0 flex-col gap-4 px-3 pb-28 pt-4 sm:px-4 lg:flex-row lg:gap-5">
+
+        {/* ── Benefit cards: vertical sidebar on desktop, horizontal scroll on mobile ── */}
+        <motion.aside
+          className="lisan-feature-rail flex shrink-0 gap-3 overflow-x-auto pb-1 lg:w-60 lg:flex-col lg:overflow-visible lg:pb-0"
+          aria-label={isHe ? 'יתרונות הצ׳אט' : 'مزايا الدردشة'}
+          initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {FEATURE_CARDS.map((card) => (
+            <div key={card.title} className="lisan-feature-card bg-white">
+              <span className="lisan-feature-card__icon" aria-hidden="true">{card.icon}</span>
+              <p dir="rtl" className="lisan-feature-card__title">{card.title}</p>
+              <p dir="rtl" className="lisan-feature-card__desc">{card.desc}</p>
+            </div>
+          ))}
+        </motion.aside>
+
+        {/* ── Chat column ── */}
+        <div className="flex min-w-0 min-h-0 flex-1 flex-col gap-2">
+
+          {errorMessage ? (
+            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert" dir="rtl">
+              {errorMessage}
+            </div>
+          ) : null}
+
+          {/* Main chat panel — bg-white kept as a utility so dark-mode overrides apply */}
+          <motion.div
+            className="chatbot-panel bg-white flex min-h-0 flex-1 flex-col"
+            initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.44, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {/* Top mini-toolbar (RTL): mode title on the start, controls on the end */}
+            <div dir="rtl" className="chatbot-toolbar">
+              <div className="chatbot-toolbar__brand">
+                <span className="chatbot-toolbar__badge" aria-hidden="true">
+                  <BotMessageSquare className="h-[18px] w-[18px]" />
+                </span>
+                <span className="chatbot-toolbar__titles">
+                  <span className="chatbot-toolbar__title">{chatModeTitle}</span>
+                  <span className="chatbot-toolbar__hint">{chatModeHint}</span>
+                </span>
+              </div>
+
+              <div className="chatbot-toolbar__actions">
+                <button
+                  type="button"
+                  onClick={endAndReview}
+                  disabled={loading || messages.length === 0}
+                  className="chatbot-toolbar__end"
+                >
+                  {endReviewLabel}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSidebarOpen(true)}
+                  disabled={loading}
+                  className="chatbot-toolbar__icon-btn"
+                  aria-label={historyLabel}
+                  title={historyLabel}
+                >
+                  <History className="h-[18px] w-[18px]" aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  onClick={resetConversation}
+                  disabled={loading}
+                  className="chatbot-toolbar__icon-btn is-primary"
+                  aria-label={newChatLabel}
+                  title={newChatLabel}
+                >
+                  <MessageSquarePlus className="h-[18px] w-[18px]" aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+
+            {/* Messages / empty state */}
+            <div className="flex min-h-0 flex-1 flex-col">
+              <ChatWindow
+                messages={messages}
+                loading={loading}
+                loadingLabel={
+                  voiceProcessing
+                    ? t(voicePhase === 'analyzing' ? 'chatVoiceAnalyzing' : 'chatVoiceProcessing')
+                    : t('chatThinking')
+                }
+                emptyTitle={t('chatEmptyTitle')}
+                emptyDescription={t('chatEmptyDescription')}
+                onReadAloud={playAssistantReply}
+                readAloudLoadingId={readAloudLoadingId}
+                readAloudPlayingId={readAloudPlayingId}
+                readAloudLabel={isHe ? 'השמעת התגובה' : 'تشغيل الرد صوتيًا'}
+              />
+            </div>
+
+            {/* Composer region — mode selector + Arabic toggle + per-mode input */}
+            <div className="chatbot-panel__composer">
+              <div className="chatbot-composer">
+                <div className="chatbot-composer__top">
+                  <div className="chatbot-modes" role="group" aria-label={modeSelectorLabel} dir="rtl">
+                    {INPUT_MODES.map((mode) => {
+                      const Icon = mode.Icon;
+                      const active = inputMode === mode.value;
+                      return (
+                        <button
+                          key={mode.value}
+                          type="button"
+                          onClick={() => setInputMode(mode.value)}
+                          aria-pressed={active}
+                          className={`chatbot-modes__btn${active ? ' is-active' : ''}`}
+                          title={mode.label}
+                        >
+                          <Icon className="h-4 w-4" aria-hidden="true" />
+                          <span>{mode.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={includeArabic}
+                    onClick={toggleArabic}
+                    disabled={loading}
+                    className={`chat-composer__arabic-toggle${includeArabic ? ' is-on' : ''}`}
+                  >
+                    <span className="chat-composer__toggle-track" aria-hidden="true">
+                      <span className="chat-composer__toggle-thumb" />
+                    </span>
+                    <span className="chat-composer__toggle-label">{t('chatIncludeArabic')}</span>
+                  </button>
+                </div>
+
+                {inputMode === 'text' ? (
+                  <ChatComposer
+                    value={composerValue}
+                    disabled={loading}
+                    loading={loading}
+                    onChange={setComposerValue}
+                    onSubmit={() => submitMessage()}
+                    placeholder={t('chatComposerPlaceholder')}
+                    sendLabel={t('chatSend')}
+                  />
+                ) : (
+                  <VoiceConsole
+                    variant={inputMode}
+                    recording={recorder.status === 'recording'}
+                    busy={loading}
+                    supported={recorder.isSupported}
+                    caption={voiceCaption}
+                    hint={voiceHint}
+                    onTap={() => handleVoiceCapture(inputMode === 'free')}
+                  />
+                )}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      <ConversationSidebar
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        conversations={conversations}
+        activeConversationId={conversationId}
+        loading={conversationsLoading}
+        title={t('chatHistoryTitle')}
+        subtitle={t('chatHistorySubtitle')}
+        loadingLabel={t('chatHistoryLoading')}
+        newChatLabel={t('chatNewConversation')}
+        emptyLabel={t('chatHistoryEmpty')}
+        deleteLabel={t('chatHistoryDeleteLabel')}
+        closeLabel={t('chatCloseSidebar')}
+        cancelDeleteLabel={t('chatCancelDelete')}
+        onNewChat={resetConversation}
+        onSelectConversation={openConversation}
+        onDeleteConversation={removeConversation}
+      />
+
+      <ChatReview
+        open={reviewOpen}
+        role="student"
+        onClose={skipReview}
+        onSubmit={submitReview}
+      />
+
+      <BottomNav />
+    </div>
   );
 }
 

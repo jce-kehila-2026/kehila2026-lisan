@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import base64
 import logging
 import os
 import time
@@ -9,6 +10,7 @@ import jwt
 from fastapi import APIRouter, File, Form, Header, HTTPException, UploadFile
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
 
 from services.analytics import get_analytics_snapshot
 from services.chat_cache import get_cache_stats
@@ -16,7 +18,7 @@ from services.chat_cache import get_rate_limit_status
 from services.chat_engine import generate_chat_response, stream_chat_response
 from services.chat_provider import get_provider_logs
 from services.chat_schemas import ChatRequest, ChatResponse, VoiceChatResponse
-from services.text_to_speech import build_ssml
+from services.text_to_speech import build_ssml, synthesize_speech
 from services.vocab_tracker import track_vocab_async
 # STT exceptions live in speech_to_text (shared by every engine).
 from services.speech_to_text import (
@@ -44,6 +46,12 @@ _PRONUNCIATION_ENABLED = (
 
 logger = logging.getLogger("lisan.chat")
 router = APIRouter()
+
+
+class TtsRequest(BaseModel):
+    text: str = Field(default="")
+    isFallback: bool = Field(default=False)
+    pronunciationScore: int | None = Field(default=None)
 
 
 def require_internal_service_secret(
@@ -469,10 +477,29 @@ async def chat_voice(
         pronunciation_score=pronunciation_score,
     )
 
+    # ── 5b. Azure TTS — he-IL speech; graceful None on failure ───────────
+    audio_base64: str | None = None
+    if chat_response.answerHe:
+        try:
+            audio_out = await asyncio.wait_for(
+                run_in_threadpool(
+                    synthesize_speech,
+                    chat_response.answerHe,
+                    is_fallback=chat_response.fallbackUsed,
+                    pronunciation_score=pronunciation_score,
+                ),
+                timeout=float(os.getenv("TTS_TIMEOUT_SECONDS", "15")),
+            )
+            if audio_out:
+                audio_base64 = base64.b64encode(audio_out).decode("ascii")
+        except Exception as exc:
+            logger.warning({"event": "tts_failed", "detail": str(exc)})
+            audio_base64 = None
+
     return VoiceChatResponse(
         answerHe=chat_response.answerHe,
         answerAr=chat_response.answerAr,
-        audioBase64=None,
+        audioBase64=audio_base64,
         fallbackUsed=chat_response.fallbackUsed,
         fallbackReason=chat_response.fallbackReason,
         level=chat_response.level,
@@ -486,6 +513,94 @@ async def chat_voice(
         inputTokens=chat_response.inputTokens,
         outputTokens=chat_response.outputTokens,
     )
+
+
+@router.post("/chat/transcribe")
+async def chat_transcribe(
+    audio: UploadFile = File(..., description="Audio (webm/ogg/mp3/wav)"),
+    userId: str | None = Form(default=None),
+    x_internal_service_secret: str | None = Header(default=None),
+    authorization: str | None = Header(default=None),
+) -> dict:
+    """STT only: audio -> Hebrew transcript (no chat, no TTS)."""
+    verify_jwt_token(
+        authorization=authorization,
+        x_internal_service_secret=x_internal_service_secret,
+        x_user_id=userId,
+    )
+
+    audio_bytes = await audio.read()
+    if not audio_bytes:
+        raise HTTPException(status_code=400, detail="Empty audio file")
+
+    try:
+        transcript = await run_in_threadpool(
+            transcribe_audio, audio_bytes, audio.filename or "audio.webm"
+        )
+    except STTError as exc:
+        logger.warning({"event": "transcribe_failed", "detail": str(exc)})
+        return {
+            "transcribedText": "",
+            "fallbackUsed": True,
+            "fallbackReason": getattr(exc, "fallback_code", "STT_FAILED"),
+        }
+
+    return {"transcribedText": transcript or ""}
+
+
+@router.post("/chat/tts")
+async def chat_tts(
+    payload: TtsRequest,
+    x_internal_service_secret: str | None = Header(default=None),
+    authorization: str | None = Header(default=None),
+    x_user_id: str | None = Header(default=None),
+) -> dict[str, object]:
+    """TTS only: Hebrew text -> MP3 audioBase64 for read-aloud buttons."""
+    verify_jwt_token(
+        authorization=authorization,
+        x_internal_service_secret=x_internal_service_secret,
+        x_user_id=x_user_id,
+    )
+
+    text = (payload.text or "").strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="Text is required")
+
+    ssml = build_ssml(
+        text,
+        is_fallback=payload.isFallback,
+        pronunciation_score=payload.pronunciationScore,
+    )
+
+    try:
+        audio_out = await asyncio.wait_for(
+            run_in_threadpool(
+                synthesize_speech,
+                text,
+                is_fallback=payload.isFallback,
+                pronunciation_score=payload.pronunciationScore,
+            ),
+            timeout=float(os.getenv("TTS_TIMEOUT_SECONDS", "15")),
+        )
+        audio_base64 = (
+            base64.b64encode(audio_out).decode("ascii")
+            if audio_out
+            else None
+        )
+        return {
+            "audioBase64": audio_base64,
+            "ssmlText": ssml or None,
+            "fallbackUsed": False,
+            "fallbackReason": None,
+        }
+    except Exception as exc:
+        logger.warning({"event": "chat_tts_failed", "detail": str(exc)})
+        return {
+            "audioBase64": None,
+            "ssmlText": ssml or None,
+            "fallbackUsed": True,
+            "fallbackReason": getattr(exc, "fallback_code", "TTS_FAILED"),
+        }
 
 
 # ── Health endpoint for voice services ───────────────────────────────────────

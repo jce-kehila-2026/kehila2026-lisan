@@ -12,6 +12,8 @@ const { voiceRateLimit } = require('../middleware/voiceRateLimit');
 const {
   createAiRequestConfig,
   normalizeAiServiceBaseUrl,
+  synthesizeTextViaAi,
+  transcribeAudioViaAi,
 } = require('../services/aiChatService');
 
 const STREAM_TIMEOUT_MS = Number(
@@ -86,9 +88,88 @@ router.post(
   chatController.sendVoiceMessage
 );
 
-// ── SSE streaming proxy ───────────────────────────────────────────────────────
-// Uses stream.pipeline() (not pipe()) so backpressure propagates upstream:
-// if the client buffer fills, axios pauses reading from ai-service.
+// STT-only proxy: audio -> { transcribedText }. Powers voice-edit (the
+// student transcribes, reviews/edits the text, then sends it normally).
+router.post(
+  '/transcribe',
+  requireAuth,
+  voiceRateLimit,
+  handleVoiceUpload,
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          error: 'Audio file is required',
+          code: 'VOICE_FILE_REQUIRED',
+        });
+      }
+
+      const userToken =
+        req.headers.authorization?.replace('Bearer ', '') || null;
+
+      const data = await transcribeAudioViaAi({
+        audioBuffer: req.file.buffer,
+        fileName: req.file.originalname || 'voice.webm',
+        mimeType: req.file.mimetype,
+        userId: req.user?.uid,
+        userToken,
+      });
+
+      return res.status(200).json(data);
+    } catch (error) {
+      const status = error?.status || 502;
+      return res.status(status).json({
+        success: false,
+        error: error?.message || 'Transcription failed',
+        code: error?.code || 'AI_SERVICE_ERROR',
+      });
+    }
+  }
+);
+
+// Text-to-speech proxy: text -> { audioBase64 }.
+router.post('/tts', requireAuth, async (req, res) => {
+  try {
+    const text = typeof req.body?.text === 'string'
+      ? req.body.text.trim()
+      : '';
+
+    if (!text) {
+      return res.status(400).json({
+        success: false,
+        error: 'Text is required',
+        code: 'MISSING_TEXT',
+      });
+    }
+
+    const rawPronunciationScore = Number(req.body?.pronunciationScore);
+    const pronunciationScore = Number.isFinite(rawPronunciationScore)
+      ? rawPronunciationScore
+      : null;
+    const userToken = req.headers.authorization?.replace('Bearer ', '') || null;
+
+    const data = await synthesizeTextViaAi({
+      text,
+      isFallback: req.body?.isFallback === true,
+      pronunciationScore,
+      userId: req.user?.uid,
+      userToken,
+    });
+
+    return res.status(200).json(data);
+  } catch (error) {
+    const status = error?.status || 502;
+    return res.status(status).json({
+      success: false,
+      error: error?.message || 'Text-to-speech failed',
+      code: error?.code || 'AI_SERVICE_ERROR',
+    });
+  }
+});
+
+// SSE streaming proxy. Uses stream.pipeline() so backpressure propagates
+// upstream: if the client buffer fills, axios pauses reading from ai-service.
 router.post('/:chatId/stream', requireAuth, async (req, res) => {
   let upstream;
   try {
