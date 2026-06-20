@@ -29,6 +29,7 @@ import {
 
 import { getFullAnalytics } from '../../services/adminApi.js';
 import { getStoredUser, logout } from '../../services/auth.js';
+import AdminMobileMenu from '../../components/admin/AdminMobileMenu.jsx';
 
 const EMPTY_TEXT = 'אין נתונים';
 const LEVELS = ['A1', 'A2', 'B1', 'B2'];
@@ -1121,15 +1122,18 @@ function AdminAnalytics() {
   return (
     <main className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.55),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-7xl" dir="rtl">
-        <header className="flex flex-wrap items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={() => navigate('/admin/dashboard')}
-            className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-sm transition hover:bg-violet-50"
-          >
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            חזרה ללוח הבקרה
-          </button>
+        <header className="fixed left-3 right-3 top-3 z-50 mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 md:left-6 md:right-6 md:top-4 lg:left-8 lg:right-8">
+          <div className="flex shrink-0 items-center gap-2">
+            <AdminMobileMenu />
+            <button
+              type="button"
+              onClick={() => navigate('/admin/dashboard')}
+              className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-sm transition hover:bg-violet-50"
+            >
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              חזרה ללוח הבקרה
+            </button>
+          </div>
 
           <button
             type="button"
@@ -1140,6 +1144,8 @@ function AdminAnalytics() {
             יציאה
           </button>
         </header>
+
+        <div className="h-14 md:h-16" aria-hidden="true" />
 
         <section className="mt-6 overflow-hidden rounded-[2rem] border border-[#EEE5FF] bg-white/75 p-5 shadow-card backdrop-blur-[8px] sm:p-7">
           <div className="grid items-center gap-6 lg:grid-cols-[1fr_auto]">

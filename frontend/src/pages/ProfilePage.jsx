@@ -160,6 +160,8 @@ function ProfileTopHeader() {
   const navigate = useNavigate();
   const { i18n, t } = useTranslation();
   const isArabic = i18n.language === 'ar';
+  const storedUser = getStoredUser();
+  const homeTarget = storedUser?.role === 'teacher' ? '/teacher/dashboard' : '/home';
   const text = labels[isArabic ? 'ar' : 'he'];
   const navItems = [
     { label: text.learningJourney, icon: Target, sectionId: 'profile-learning-journey' },
@@ -182,7 +184,7 @@ function ProfileTopHeader() {
       <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-4">
         <button
           type="button"
-          onClick={() => navigate('/home')}
+          onClick={() => navigate(homeTarget)}
           className="justify-self-start rounded-2xl transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
           aria-label="דף הבית"
           title="דף הבית"

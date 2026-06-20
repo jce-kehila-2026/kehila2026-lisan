@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowRight, CheckCircle2, Clock, LayoutDashboard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AdminNavStrip from '../../components/admin/AdminNavStrip.jsx';
+import AdminMobileMenu from '../../components/admin/AdminMobileMenu.jsx';
 
 function demoCardClass(count) {
   if (count === 3) {
@@ -21,21 +22,28 @@ function AdminDemoPage({ accentLabel, cards, description, icon: Icon, title }) {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-7xl" dir="rtl">
-        <header className="flex flex-wrap items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={() => navigate('/admin/dashboard')}
-            className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-sm transition hover:bg-violet-50"
-          >
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            חזרה ללוח הבקרה
-          </button>
-          <AdminNavStrip />
+        <header className="fixed left-3 right-3 top-3 z-50 mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 md:left-6 md:right-6 md:top-4 lg:left-8 lg:right-8">
+          <div className="flex shrink-0 items-center gap-2">
+            <AdminMobileMenu />
+            <button
+              type="button"
+              onClick={() => navigate('/admin/dashboard')}
+              className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-sm transition hover:bg-violet-50"
+            >
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              חזרה ללוח הבקרה
+            </button>
+          </div>
+          <div className="hidden md:contents">
+            <AdminNavStrip />
+          </div>
           <div className="inline-flex items-center gap-2 rounded-full bg-violet-50 px-4 py-2 text-sm font-black text-violet-700">
             <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
             אזור ניהול
           </div>
         </header>
+
+        <div className="h-14 md:h-16" aria-hidden="true" />
 
         <section className="mt-6 overflow-hidden rounded-[2rem] border border-[#EEE5FF] bg-white/75 p-5 shadow-card backdrop-blur-[8px] sm:p-7">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">

@@ -209,7 +209,7 @@ function SectionTabBar({ sections, activeSection, onSectionClick, label }) {
   );
 }
 
-function StudentHomeHeader({ sections, activeSection, onSectionClick, label }) {
+function StudentHomeHeader({ sections, activeSection, onSectionClick, label, logoTarget = '/home' }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const reduceMotion = useReducedMotion();
@@ -219,7 +219,7 @@ function StudentHomeHeader({ sections, activeSection, onSectionClick, label }) {
       <div className="grid items-center gap-2 sm:gap-4 grid-cols-[auto_1fr_auto]">
         <button
           type="button"
-          onClick={() => navigate('/home')}
+          onClick={() => navigate(logoTarget)}
           className="col-start-1 row-start-1 justify-self-start rounded-2xl transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
           aria-label="דף הבית"
           title="דף הבית"
@@ -286,7 +286,7 @@ function StudentHomeHeader({ sections, activeSection, onSectionClick, label }) {
   );
 }
 
-function Home() {
+function Home({ logoTarget = '/home', teacherManagementAction = null, teacherQuickAction = null }) {
   const { t, i18n } = useTranslation();
   const storedUser = getStoredUser();
   const isArabic = i18n.language === 'ar';
@@ -803,6 +803,7 @@ function Home() {
           activeSection={activeSection}
           onSectionClick={scrollToSection}
           label={sectionNavigationLabel}
+          logoTarget={logoTarget}
         />
 
         {/* ── Hero ──────────────────────────────────────────────── */}
@@ -955,6 +956,7 @@ function Home() {
         >
           <div className="mb-1 flex items-center justify-between gap-3">
             <h2 className="text-2xl font-black text-slate-900">{t('storiesTitle')}</h2>
+            {teacherQuickAction}
           </div>
 
           <div className="mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-hidden overscroll-x-contain pb-2 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden">
@@ -1292,6 +1294,8 @@ function Home() {
               <LinkIcon className="h-6 w-6" aria-hidden="true" />
             </span>
           </button>
+
+          {teacherManagementAction}
         </section>
 
         {/* Links Modal */}
