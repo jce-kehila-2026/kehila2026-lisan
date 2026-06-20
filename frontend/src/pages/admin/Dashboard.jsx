@@ -8,9 +8,10 @@ import {
   Eye,
   FilePlus2,
   GraduationCap,
-  LineChart,
   MessageSquareText,
+  Mic,
   PieChart,
+  Share2,
   ShieldCheck,
   Sparkles,
   TrendingUp,
@@ -26,12 +27,7 @@ import {
   adminDemoUsers,
   adminReviewNotifications,
 } from '../../data/adminMockData.js';
-import {
-  featureUsage,
-  getTopLevel,
-  levelAnalytics,
-  weeklyActivity,
-} from '../../data/adminAnalyticsMock.js';
+import { getFullAnalytics } from '../../services/adminApi.js';
 import AdminNavStrip from '../../components/admin/AdminNavStrip.jsx';
 
 import {
@@ -185,7 +181,7 @@ function DashboardSection({
 }
 
 function MiniDistribution({ data, metric }) {
-  const maxValue = Math.max(...data.map((item) => item[metric]));
+  const maxValue = Math.max(1, ...data.map((item) => item[metric] || 0));
 
   return (
     <div className="grid gap-2">
@@ -205,12 +201,76 @@ function MiniDistribution({ data, metric }) {
   );
 }
 
-function AnalyticsOverview({ navigate }) {
-  const activeLevel = getTopLevel('entries');
-  const storiesLevel = getTopLevel('stories');
-  const chatLevel = getTopLevel('chat');
-  const maxWeekly = Math.max(...weeklyActivity.map((day) => day.value));
-  const totalFeatureUsage = featureUsage.reduce((sum, feature) => sum + feature.value, 0);
+const ANALYTICS_LEVELS = ['A1', 'A2', 'B1', 'B2'];
+
+function formatCount(value) {
+  const num = Number(value);
+  return Number.isFinite(num) ? num.toLocaleString('he-IL') : '0';
+}
+
+function topAnalyticsLevel(metricMap) {
+  let topLevel = ANALYTICS_LEVELS[0];
+  let topValue = -1;
+
+  ANALYTICS_LEVELS.forEach((level) => {
+    const value = Number(metricMap?.[level]) || 0;
+
+    if (value > topValue) {
+      topValue = value;
+      topLevel = level;
+    }
+  });
+
+  return { level: topLevel, value: Math.max(0, topValue) };
+}
+
+function AnalyticsOverview({ navigate, userRole }) {
+  const [analytics, setAnalytics] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadAnalytics = async () => {
+      try {
+        const result = await getFullAnalytics({});
+
+        if (isMounted) {
+          setAnalytics(result);
+        }
+      } catch (error) {
+        console.error('Failed to load dashboard analytics overview:', error);
+      }
+    };
+
+    loadAnalytics();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const studentsByLevel = ANALYTICS_LEVELS.map((level) => ({
+    level,
+    students: analytics?.charts?.studentsByLevel?.[level] || 0,
+  }));
+  const wordsByLevel = ANALYTICS_LEVELS.map((level) => ({
+    level,
+    words: analytics?.charts?.wordsByLevel?.[level] || 0,
+  }));
+  const maxWords = Math.max(1, ...wordsByLevel.map((item) => item.words));
+
+  const topChatLevel = topAnalyticsLevel(analytics?.charts?.messagesByLevel);
+  const topProgressLevel = topAnalyticsLevel(analytics?.charts?.progressByLevel);
+  const topAudioLevel = topAnalyticsLevel(analytics?.audio?.byLevel);
+
+  const overview = analytics?.overview || {};
+  const overviewStats = [
+    { name: 'שיחות AI', value: overview.totalAiChats || 0, color: 'bg-violet-500' },
+    { name: 'הודעות AI', value: overview.totalAiMessages || 0, color: 'bg-fuchsia-400' },
+    { name: 'הקלטות קוליות', value: overview.totalAudioRecordings || 0, color: 'bg-indigo-400' },
+    { name: 'צ׳אטים משותפים', value: overview.totalSharedChats || 0, color: 'bg-rose-300' },
+  ];
+  const maxOverviewStat = Math.max(1, ...overviewStats.map((item) => item.value));
 
   return (
     <section className="mt-3 rounded-[28px] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.84)_0%,rgba(245,240,255,0.82)_46%,rgba(255,241,248,0.78)_100%)] p-4 shadow-[0_22px_60px_rgba(109,40,217,0.12)] backdrop-blur-xl sm:mt-6 sm:p-5">
@@ -225,14 +285,16 @@ function AnalyticsOverview({ navigate }) {
           </h2>
         </div>
 
-        <button
-          type="button"
-          onClick={() => navigate('/admin/statistics')}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-violet-600 px-5 py-2 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
-        >
-          <BarChart3 className="h-4 w-4" aria-hidden="true" />
-          צפייה בכל הסטטיסטיקות
-        </button>
+        {userRole === 'admin' ? (
+          <button
+            type="button"
+            onClick={() => navigate('/admin/analytics')}
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-violet-600 px-5 py-2 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+          >
+            <BarChart3 className="h-4 w-4" aria-hidden="true" />
+            צפייה בניתוח הנתונים המלא
+          </button>
+        ) : null}
       </div>
 
       <div className="mt-4 grid gap-3 lg:grid-cols-[1.2fr_1fr_1.1fr]">
@@ -241,29 +303,29 @@ function AnalyticsOverview({ navigate }) {
             <h3 className="text-sm font-black text-slate-800">חלוקת תלמידות לפי רמת לימוד</h3>
             <PieChart className="h-5 w-5 text-violet-600" aria-hidden="true" />
           </div>
-          <MiniDistribution data={levelAnalytics} metric="students" />
+          <MiniDistribution data={studentsByLevel} metric="students" />
         </article>
 
         <article className="rounded-[22px] border border-violet-100/70 bg-white/72 p-4 shadow-[0_10px_28px_rgba(109,40,217,0.08)]">
           <div className="grid grid-cols-3 gap-2 text-center">
             {[
               {
-                label: 'הרמה הפעילה ביותר',
-                value: `רמה ${activeLevel.level}`,
-                detail: `${activeLevel.entries} פעולות`,
+                label: 'הרמה הפעילה ביותר בשיחות AI',
+                value: `רמה ${topChatLevel.level}`,
+                detail: `${formatCount(topChatLevel.value)} הודעות`,
+                icon: MessageSquareText,
+              },
+              {
+                label: 'ההתקדמות הגבוהה ביותר',
+                value: `רמה ${topProgressLevel.level}`,
+                detail: `${topProgressLevel.value}% התקדמות`,
                 icon: TrendingUp,
               },
               {
-                label: 'שימוש הסיפורים הגבוה ביותר',
-                value: `רמה ${storiesLevel.level}`,
-                detail: `${storiesLevel.stories} שימושים`,
-                icon: BookOpenCheck,
-              },
-              {
-                label: 'שימוש הצ׳אט הגבוה ביותר',
-                value: `רמה ${chatLevel.level}`,
-                detail: `${chatLevel.chat} שיחות`,
-                icon: MessageSquareText,
+                label: 'הכי הרבה הקלטות קוליות',
+                value: `רמה ${topAudioLevel.level}`,
+                detail: `${formatCount(topAudioLevel.value)} הקלטות`,
+                icon: Mic,
               },
             ].map((item) => {
               const Icon = item.icon;
@@ -282,17 +344,18 @@ function AnalyticsOverview({ navigate }) {
 
         <article className="rounded-[22px] border border-violet-100/70 bg-white/72 p-4 shadow-[0_10px_28px_rgba(109,40,217,0.08)]">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <h3 className="text-sm font-black text-slate-800">פעילות למידה במהלך השבוע</h3>
-            <LineChart className="h-5 w-5 text-violet-600" aria-hidden="true" />
+            <h3 className="text-sm font-black text-slate-800">מילים באוצר המילים לפי רמה</h3>
+            <BookOpenCheck className="h-5 w-5 text-violet-600" aria-hidden="true" />
           </div>
           <div className="flex h-24 items-end justify-between gap-2 rounded-2xl bg-violet-50/60 px-3 py-2">
-            {weeklyActivity.map((day) => (
-              <div key={day.day} className="flex h-full flex-1 flex-col items-center justify-end gap-1">
+            {wordsByLevel.map((item) => (
+              <div key={item.level} className="flex h-full flex-1 flex-col items-center justify-end gap-1">
+                <span className="text-[11px] font-black text-violet-800">{item.words}</span>
                 <span
                   className="w-full rounded-t-full bg-gradient-to-t from-violet-600 to-fuchsia-300"
-                  style={{ height: `${Math.max(18, (day.value / maxWeekly) * 100)}%` }}
+                  style={{ height: `${Math.max(8, (item.words / maxWords) * 100)}%` }}
                 />
-                <span className="text-[11px] font-black text-violet-800">{day.day}</span>
+                <span className="text-[11px] font-black text-violet-800">{item.level}</span>
               </div>
             ))}
           </div>
@@ -300,16 +363,21 @@ function AnalyticsOverview({ navigate }) {
       </div>
 
       <div className="mt-3 grid gap-2 sm:grid-cols-4">
-        {featureUsage.map((feature) => (
-          <div key={feature.name} className="rounded-2xl bg-white/65 px-3 py-2 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.65)]">
+        {overviewStats.map((stat) => (
+          <div key={stat.name} className="rounded-2xl bg-white/65 px-3 py-2 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.65)]">
             <div className="flex items-center justify-between gap-2 text-xs font-black text-slate-600">
-              <span>{feature.name}</span>
-              <span>{Math.round((feature.value / totalFeatureUsage) * 100)}%</span>
+              <span className="inline-flex items-center gap-1.5">
+                {stat.name === 'צ׳אטים משותפים' ? (
+                  <Share2 className="h-3.5 w-3.5 text-violet-500" aria-hidden="true" />
+                ) : null}
+                {stat.name}
+              </span>
+              <span>{formatCount(stat.value)}</span>
             </div>
             <div className="mt-2 h-2 overflow-hidden rounded-full bg-violet-50">
               <span
-                className={`block h-full rounded-full ${feature.color}`}
-                style={{ width: `${(feature.value / totalFeatureUsage) * 100}%` }}
+                className={`block h-full rounded-full ${stat.color}`}
+                style={{ width: `${Math.max(4, (stat.value / maxOverviewStat) * 100)}%` }}
               />
             </div>
           </div>
@@ -655,7 +723,7 @@ function AdminDashboard() {
           </div>
         </section>
 
-        <AnalyticsOverview navigate={navigate} />
+        <AnalyticsOverview navigate={navigate} userRole={user?.role} />
 
         <section className="mt-3 grid grid-cols-1 gap-3 sm:mt-6 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
           {stats.map((stat) => (

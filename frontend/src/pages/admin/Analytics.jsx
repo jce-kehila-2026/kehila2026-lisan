@@ -94,6 +94,18 @@ function formatNumber(value) {
   return new Intl.NumberFormat('he-IL').format(num);
 }
 
+function average(numbers) {
+  const valid = numbers.filter((value) => typeof value === 'number' && Number.isFinite(value));
+
+  if (valid.length === 0) {
+    return 0;
+  }
+
+  const sum = valid.reduce((total, value) => total + value, 0);
+
+  return Math.round((sum / valid.length) * 10) / 10;
+}
+
 // ── small presentational building blocks ───────────────────────────────
 
 function AnalyticsHeroIllustration() {
@@ -1032,6 +1044,80 @@ function AdminAnalytics() {
     );
   }, [data, globalSearch]);
 
+  const isSearchActive = globalSearch.trim().length > 0;
+
+  // When a search is active, the scope is the matched people plus whoever
+  // they're directly connected to (a matched student's own teacher, or a
+  // matched teacher's own students) — so searching one student really does
+  // show that student's numbers, not an unrelated text match.
+  const searchScope = useMemo(() => {
+    if (!data || !isSearchActive) return null;
+
+    const teacherByName = new Map(data.teachers.map((teacher) => [teacher.name, teacher]));
+    const studentIds = new Set();
+    const teacherIds = new Set();
+
+    searchedStudents.forEach((student) => {
+      studentIds.add(student.id);
+      student.teacherNames.forEach((name) => {
+        const teacher = teacherByName.get(name);
+        if (teacher) teacherIds.add(teacher.id);
+      });
+    });
+
+    searchedTeachers.forEach((teacher) => teacherIds.add(teacher.id));
+
+    if (searchedTeachers.length > 0) {
+      const matchedTeacherNames = new Set(searchedTeachers.map((teacher) => teacher.name));
+      data.students.forEach((student) => {
+        if (student.teacherNames.some((name) => matchedTeacherNames.has(name))) {
+          studentIds.add(student.id);
+        }
+      });
+    }
+
+    if (studentIds.size === 0 && teacherIds.size === 0) {
+      return { students: [], teachers: [] };
+    }
+
+    const studentMap = new Map(data.students.map((student) => [student.id, student]));
+    const teacherMap = new Map(data.teachers.map((teacher) => [teacher.id, teacher]));
+
+    return {
+      students: Array.from(studentIds).map((id) => studentMap.get(id)).filter(Boolean),
+      teachers: Array.from(teacherIds).map((id) => teacherMap.get(id)).filter(Boolean),
+    };
+  }, [data, isSearchActive, searchedStudents, searchedTeachers]);
+
+  const displayOverview = useMemo(() => {
+    if (!data) return null;
+    if (!isSearchActive || !searchScope) return { ...data.overview, scoped: false };
+
+    const { students: scopedStudents, teachers: scopedTeachers } = searchScope;
+
+    return {
+      totalStudents: scopedStudents.length,
+      totalTeachers: scopedTeachers.length,
+      totalUsers: scopedStudents.length + scopedTeachers.length,
+      activeUsers:
+        scopedStudents.filter((student) => student.status === 'active').length +
+        scopedTeachers.filter((teacher) => teacher.status === 'active').length,
+      totalAiChats: scopedStudents.reduce((sum, student) => sum + student.aiChatsCount, 0),
+      totalAiMessages: scopedStudents.reduce((sum, student) => sum + student.aiMessagesCount, 0),
+      totalSharedChats: scopedStudents.reduce(
+        (sum, student) => sum + (student.sharedChatsCount || 0),
+        0
+      ),
+      totalAudioRecordings: scopedStudents.reduce(
+        (sum, student) => sum + student.voiceRecordingsCount,
+        0
+      ),
+      pendingWordsCount: data.overview.pendingWordsCount,
+      averageProgress: average(scopedStudents.map((student) => student.averageProgress)),
+      scoped: true,
+    };
+  }, [data, isSearchActive, searchScope]);
+
   return (
     <main className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.55),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-7xl" dir="rtl">
@@ -1143,65 +1229,73 @@ function AdminAnalytics() {
           </div>
         ) : (
           <>
+            {displayOverview.scoped ? (
+              <p className="mt-6 inline-flex items-center gap-2 rounded-full bg-violet-100/80 px-4 py-2 text-sm font-black text-violet-700">
+                <Search className="h-4 w-4" aria-hidden="true" />
+                מציגה נתונים עבור החיפוש: "{globalSearch.trim()}" ({formatNumber(searchScope.students.length)} תלמידות,{' '}
+                {formatNumber(searchScope.teachers.length)} מורות)
+              </p>
+            ) : null}
+
             <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
               <StatCard
                 icon={UsersRound}
                 label="תלמידות"
-                value={data.overview.totalStudents}
+                value={displayOverview.totalStudents}
                 gradient="from-violet-500 via-fuchsia-400 to-pink-300"
               />
               <StatCard
                 icon={GraduationCap}
                 label="מורים"
-                value={data.overview.totalTeachers}
+                value={displayOverview.totalTeachers}
                 gradient="from-sky-500 via-blue-400 to-violet-300"
               />
               <StatCard
                 icon={Users}
                 label="משתמשים סה״כ"
-                value={data.overview.totalUsers}
+                value={displayOverview.totalUsers}
                 gradient="from-indigo-500 via-violet-400 to-fuchsia-300"
               />
               <StatCard
                 icon={Activity}
                 label="משתמשים פעילים"
-                value={data.overview.activeUsers}
+                value={displayOverview.activeUsers}
                 gradient="from-emerald-500 via-teal-400 to-sky-300"
               />
               <StatCard
                 icon={MessageSquareText}
                 label="שיחות AI"
-                value={data.overview.totalAiChats}
+                value={displayOverview.totalAiChats}
                 gradient="from-fuchsia-500 via-pink-400 to-rose-300"
               />
               <StatCard
                 icon={MessagesSquare}
                 label="הודעות AI"
-                value={data.overview.totalAiMessages}
+                value={displayOverview.totalAiMessages}
                 gradient="from-violet-500 via-purple-400 to-fuchsia-300"
               />
               <StatCard
                 icon={Share2}
                 label="צ׳אטים משותפים"
-                value={data.overview.totalSharedChats}
+                value={displayOverview.totalSharedChats}
                 gradient="from-amber-500 via-orange-400 to-rose-300"
               />
               <StatCard
                 icon={Mic}
                 label="הקלטות קוליות"
-                value={data.overview.totalAudioRecordings}
+                value={displayOverview.totalAudioRecordings}
                 gradient="from-sky-500 via-cyan-400 to-teal-300"
               />
               <StatCard
                 icon={BookOpenCheck}
-                label="מילים ממתינות"
-                value={data.overview.pendingWordsCount}
+                label={displayOverview.scoped ? 'מילים ממתינות (כלל המערכת)' : 'מילים ממתינות'}
+                value={displayOverview.pendingWordsCount}
                 gradient="from-amber-400 via-yellow-400 to-orange-300"
               />
               <StatCard
                 icon={TrendingUp}
                 label="התקדמות ממוצעת"
-                value={`${data.overview.averageProgress}%`}
+                value={`${displayOverview.averageProgress}%`}
                 gradient="from-emerald-500 via-green-400 to-lime-300"
               />
             </section>

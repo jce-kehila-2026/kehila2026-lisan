@@ -1662,6 +1662,7 @@ exports.getFullAnalytics = async (req, res) => {
         voiceRecordingsCount: voiceByStudent[student.id] || 0,
         averageProgress: accuracy,
         gameLevelsCompleted: gameLevelsByStudent[student.id] || 0,
+        sharedChatsCount: participantFrequency[student.id] || 0,
         status: student.isActive === false ? 'inactive' : 'active'
       };
     });
@@ -1704,7 +1705,8 @@ exports.getFullAnalytics = async (req, res) => {
         messagesWithStudentsCount,
         reviewsCount,
         averageStudentsProgress: average(progressValues),
-        lastActivityAt: teacher.lastLoginAt
+        lastActivityAt: teacher.lastLoginAt,
+        status: teacher.isActive === false ? 'inactive' : 'active'
       };
     });
 
