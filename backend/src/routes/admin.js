@@ -198,4 +198,11 @@ router.put(
   adminController.rejectWord
 );
 
+router.get(
+  '/analytics/full',
+  requireAuth,
+  requireRole('admin'),
+  adminController.getFullAnalytics
+);
+
 module.exports = router;
