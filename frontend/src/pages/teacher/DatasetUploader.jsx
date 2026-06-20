@@ -43,6 +43,10 @@ function DatasetUploader() {
   const workerRef = useRef(null);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, []);
+
+  useEffect(() => {
     workerRef.current = new Worker(new URL('../../whisper.worker.js', import.meta.url), {
       type: 'module',
     });

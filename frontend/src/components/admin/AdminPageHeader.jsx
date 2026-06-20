@@ -7,7 +7,9 @@ import AdminMobileMenu from './AdminMobileMenu.jsx';
 function AdminPageHeader({ icon: Icon, label }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const isAdminPath = location.pathname.startsWith('/admin/');
+  const isAdminPath =
+    location.pathname.startsWith('/admin/') ||
+    location.pathname === '/teacher/stories/upload';
 
   const header = (
     <header

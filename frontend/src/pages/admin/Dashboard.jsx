@@ -821,32 +821,32 @@ function AdminDashboard() {
 
         <div className="h-14 md:h-16" aria-hidden="true" />
 
-        <section className="relative mt-3 overflow-hidden rounded-[22px] border border-violet-100/70 bg-white/75 shadow-[0_16px_42px_rgba(109,40,217,0.1)] md:mt-5 md:rounded-[26px] md:shadow-[0_18px_48px_rgba(109,40,217,0.1)] lg:mt-8 lg:rounded-[30px] lg:shadow-[0_22px_70px_rgba(109,40,217,0.11)]">
+        <section className="relative mt-3 overflow-hidden rounded-[22px] border border-violet-100/70 bg-white/75 shadow-[0_16px_42px_rgba(109,40,217,0.1)] md:mt-5 md:rounded-[28px] md:shadow-[0_20px_56px_rgba(109,40,217,0.1)] lg:mt-8 lg:rounded-[30px] lg:shadow-[0_22px_70px_rgba(109,40,217,0.11)]">
           <div
-            className="grid min-h-[108px] items-stretch md:min-h-[180px] lg:min-h-[260px] lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]"
+            className="grid min-h-[108px] items-stretch md:min-h-[220px] md:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)] lg:min-h-[260px] lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]"
             dir="ltr"
           >
-            <div className="relative min-h-[88px] overflow-hidden md:min-h-[165px] lg:min-h-[210px]">
+            <div className="relative min-h-[88px] overflow-hidden md:min-h-[210px]">
               <img
                 src="/images/teacher-dashboard-hero.png"
                 alt=""
-                className="h-full min-h-[88px] w-full object-contain object-center md:min-h-[165px] md:object-contain lg:min-h-[210px] lg:object-cover lg:object-left"
+                className="h-full min-h-[88px] w-full object-contain object-center md:min-h-[210px] md:object-contain lg:object-cover lg:object-left"
               />
             </div>
 
             <div
-              className="flex flex-col justify-center px-4 py-2.5 text-right md:px-7 md:py-5 lg:px-12 lg:py-8"
+              className="flex flex-col justify-center px-4 py-2.5 text-right md:px-8 md:py-6 lg:px-12 lg:py-8"
               dir="rtl"
             >
               <p className="text-xs font-black text-violet-700 md:text-sm">
                 שלום {user?.name || 'מנהלת'}
               </p>
 
-              <h1 className="mt-1.5 text-lg font-black leading-tight text-slate-950 md:mt-2 md:text-3xl lg:mt-3 lg:text-5xl">
+              <h1 className="mt-1.5 text-lg font-black leading-tight text-slate-950 md:mt-3 md:text-4xl lg:text-5xl">
                 לוח בקרה לניהול מערכת ליסאן
               </h1>
 
-              <p className="mt-1 max-w-2xl text-xs font-semibold leading-5 text-slate-600 md:mt-2 md:text-sm md:leading-6 lg:mt-4 lg:text-base lg:leading-8">
+              <p className="mt-1 max-w-2xl text-xs font-semibold leading-5 text-slate-600 md:mt-3 md:text-base md:leading-7 lg:mt-4 lg:leading-8">
                 ניהול תלמידות, מורות, שיחות וחומרי למידה במערכת.
               </p>
             </div>
