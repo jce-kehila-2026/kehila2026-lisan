@@ -13,10 +13,12 @@ import {
   Star,
   Trophy,
   Volume2,
+  VolumeX,
   X,
 } from 'lucide-react';
 
 import { getStoredToken } from '../services/auth.js';
+import { useGameSounds } from '../hooks/useGameSounds.js';
 import {
   gameCatalog,
   getCompletedWordEntries,
@@ -26,7 +28,7 @@ import {
 } from '../data/vocabGameCatalog.js';
 import { COLOR_MAP, getCategoryMeta } from '../data/vocabGameMeta.js';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 const PASS_THRESHOLD = 6;
 
 const LABELS = {
@@ -166,6 +168,7 @@ function VocabGame() {
   const [searchParams, setSearchParams] = useSearchParams();
   const language = i18n.language === 'he' ? 'he' : 'ar';
   const text = LABELS[language];
+  const sounds = useGameSounds();
 
   const initialCategoryParam = searchParams.get('category');
   const initialCategory =
@@ -294,6 +297,11 @@ function VocabGame() {
     return () => clearTimeout(timer);
   }, [cheer]);
 
+  useEffect(() => {
+    if (quizDone) sounds.play('finish');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quizDone]);
+
   const setGameView = (nextView) => {
     setView(nextView);
     setActiveCategory(null);
@@ -385,16 +393,19 @@ function VocabGame() {
     if (selected !== null) return;
     setSelected(option);
     if (option === currentQuestion.correct) {
+      sounds.play('correct');
       setScore((current) => current + 1);
       setStreak((current) => {
         const next = current + 1;
         setBestStreak((best) => Math.max(best, next));
         const milestone = text.streakMsgs[next];
+        if (milestone) sounds.play('streak');
         const praise = text.correctMsgs[Math.min(next, text.correctMsgs.length) - 1];
         setCheer({ tone: 'good', msg: milestone || praise || text.correctMsgs[0] });
         return next;
       });
     } else {
+      sounds.play('wrong');
       setStreak(0);
       setCheer({ tone: 'bad', msg: text.wrongMsg });
     }
@@ -464,6 +475,14 @@ function VocabGame() {
           </p>
         </div>
 
+        <button
+          type="button"
+          onClick={sounds.toggleMuted}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-violet-100 bg-white/80 text-violet-700 shadow-sm transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500"
+          aria-label={sounds.muted ? 'הפעל צליל' : 'השתק'}
+        >
+          {sounds.muted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+        </button>
         <div className="inline-flex w-full rounded-full border border-violet-100 bg-white/80 p-1 shadow-sm sm:w-auto">
           <button
             type="button"
@@ -719,7 +738,7 @@ function VocabGame() {
           <div className="lisan-flip-card mx-auto w-full max-w-md" style={{ height: '260px' }}>
             <button
               type="button"
-              onClick={() => setFlipped((current) => !current)}
+              onClick={() => { sounds.play('flip'); setFlipped((current) => !current); }}
               className="block h-full w-full focus:outline-none"
               aria-label={text.tapToFlip}
             >
