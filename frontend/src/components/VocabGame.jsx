@@ -6,9 +6,11 @@ import {
   ArrowRight,
   BadgeCheck,
   Check,
+  Flame,
   Gamepad2,
   RotateCw,
   Sparkles,
+  Star,
   Trophy,
   Volume2,
   X,
@@ -54,9 +56,17 @@ const LABELS = {
     questionPrompt: 'ما ترجمة',
     nextQuestion: 'السؤال التالي',
     finish: 'إنهاء',
-    resultPassed: 'أنهيتِ المرحلة!',
-    resultRetry: 'جرّبي المرحلة مرة أخرى',
     score: (score, total) => `علامتك: ${score} / ${total}`,
+    streak: 'سلسلة',
+    bestStreak: (n) => `أطول سلسلة: ${n} متتالية`,
+    correctMsgs: ['أحسنت!', 'صحيح!', 'ممتاز!', 'رائع!', 'عظيم!'],
+    streakMsgs: { 3: 'سلسلة جميلة!', 4: 'أنتِ مشتعلة!', 5: 'لا يمكن إيقافك!' },
+    wrongMsg: 'تقريباً! لنجرب التالي',
+    resultPerfect: 'ممتاز جداً!',
+    resultGreat: 'أحسنتِ!',
+    resultGood: 'جيد جداً!',
+    resultPass: 'نجحتِ!',
+    resultRetry: 'جرّبي المرحلة مرة أخرى',
     passedHint: 'تمت إضافة كلمات هذه المرحلة إلى الكلمات المكتملة.',
     retryHint: 'راجعي الكروت ثم أعيدي الاختبار حتى تُحسب الكلمات.',
     tryAgain: 'إعادة الاختبار',
@@ -92,9 +102,17 @@ const LABELS = {
     questionPrompt: 'מה התרגום של',
     nextQuestion: 'השאלה הבאה',
     finish: 'סיום',
-    resultPassed: 'סיימת את השלב!',
-    resultRetry: 'נסי שוב את השלב',
     score: (score, total) => `הציון שלך: ${score} / ${total}`,
+    streak: 'רצף',
+    bestStreak: (n) => `רצף שיא: ${n} ברצף`,
+    correctMsgs: ['יפה!', 'נכון!', 'מצוין!', 'מעולה!', 'כל הכבוד!'],
+    streakMsgs: { 3: 'רצף יפה!', 4: 'את בוערת!', 5: 'בלתי ניתנת לעצירה!' },
+    wrongMsg: 'כמעט! ננסה את הבא',
+    resultPerfect: 'מושלם!',
+    resultGreat: 'כל הכבוד!',
+    resultGood: 'יפה מאוד!',
+    resultPass: 'עברת!',
+    resultRetry: 'נסי שוב את השלב',
     passedHint: 'המילים בשלב הזה נוספו למילים שהושלמו.',
     retryHint: 'חזרי לכרטיסים ונסי שוב כדי שהמילים ייספרו.',
     tryAgain: 'נסי שוב',
@@ -133,13 +151,22 @@ function addCompletedLevel(progress, categoryKey, levelIndex) {
   };
 }
 
+// Star tier from score ratio: 3 stars >=90% (9-10/10), 2 stars >=70% (7-8/10),
+// 1 star for any pass. Generalizes the 9-10 / 7-8 / 6 tiers to any quiz length.
+function starsForScore(score, total) {
+  if (!total) return 0;
+  const ratio = score / total;
+  if (ratio >= 0.9) return 3;
+  if (ratio >= 0.7) return 2;
+  return 1;
+}
+
 function VocabGame() {
   const { i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const language = i18n.language === 'he' ? 'he' : 'ar';
   const text = LABELS[language];
 
-  // Deep link from the Home page: /games?category=<key> opens that category.
   const initialCategoryParam = searchParams.get('category');
   const initialCategory =
     initialCategoryParam && gameCatalog[initialCategoryParam] ? initialCategoryParam : null;
@@ -159,6 +186,9 @@ function VocabGame() {
   const [selected, setSelected] = useState(null);
   const [score, setScore] = useState(0);
   const [savedThisQuiz, setSavedThisQuiz] = useState(false);
+  const [streak, setStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
+  const [cheer, setCheer] = useState(null);
 
   const allWords = useMemo(() => getUniqueGameWords(gameCatalog), []);
   const totalWordCount = useMemo(() => getUniqueGameWordCount(), []);
@@ -196,6 +226,7 @@ function VocabGame() {
   const quizDone = view === 'quiz' && qIndex >= questions.length && questions.length > 0;
   const passThreshold = Math.min(PASS_THRESHOLD, questions.length || PASS_THRESHOLD);
   const passedQuiz = quizDone && score >= passThreshold;
+  const starCount = quizDone ? starsForScore(score, questions.length) : 0;
 
   useEffect(() => {
     if (searchParams.get('view') === 'completed') {
@@ -203,8 +234,6 @@ function VocabGame() {
     }
   }, [searchParams]);
 
-  // Once the deep-linked category has opened, remove the param from the URL so
-  // subsequent in-game navigation (back to categories, etc.) isn't overridden.
   useEffect(() => {
     if (!searchParams.has('category')) return;
     const next = new URLSearchParams(searchParams);
@@ -258,6 +287,12 @@ function VocabGame() {
       })
       .catch(() => {});
   }, [activeCategory, activeLevel, passedQuiz, quizDone, savedThisQuiz]);
+
+  useEffect(() => {
+    if (!cheer) return undefined;
+    const timer = setTimeout(() => setCheer(null), 1100);
+    return () => clearTimeout(timer);
+  }, [cheer]);
 
   const setGameView = (nextView) => {
     setView(nextView);
@@ -340,13 +375,29 @@ function VocabGame() {
     setSelected(null);
     setScore(0);
     setSavedThisQuiz(false);
+    setStreak(0);
+    setBestStreak(0);
+    setCheer(null);
     setView('quiz');
   };
 
   const answer = (option) => {
     if (selected !== null) return;
     setSelected(option);
-    if (option === currentQuestion.correct) setScore((current) => current + 1);
+    if (option === currentQuestion.correct) {
+      setScore((current) => current + 1);
+      setStreak((current) => {
+        const next = current + 1;
+        setBestStreak((best) => Math.max(best, next));
+        const milestone = text.streakMsgs[next];
+        const praise = text.correctMsgs[Math.min(next, text.correctMsgs.length) - 1];
+        setCheer({ tone: 'good', msg: milestone || praise || text.correctMsgs[0] });
+        return next;
+      });
+    } else {
+      setStreak(0);
+      setCheer({ tone: 'bad', msg: text.wrongMsg });
+    }
   };
 
   const nextQuestion = () => {
@@ -358,12 +409,39 @@ function VocabGame() {
     }
   };
 
+  const resultTitle = () => {
+    if (!passedQuiz) return text.resultRetry;
+    if (starCount >= 3) return score === questions.length ? text.resultPerfect : text.resultGreat;
+    if (starCount === 2) return text.resultGood;
+    return text.resultPass;
+  };
+
   return (
     <section
       className="lisan-enter mt-8 rounded-[28px] border border-white/80 bg-[linear-gradient(135deg,#FFFFFF_0%,#FBF8FF_48%,#F4ECFF_100%)] p-5 shadow-card sm:p-6 lg:p-8"
       style={{ '--lisan-enter-delay': '450ms' }}
       dir="rtl"
     >
+      <style>{`
+        @keyframes lisan-pop { 0%{transform:scale(1)} 50%{transform:scale(1.4)} 100%{transform:scale(1)} }
+        @keyframes lisan-shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 50%{transform:translateX(8px)} 75%{transform:translateX(-5px)} }
+        @keyframes lisan-cheer { 0%{opacity:0;transform:translateY(8px) scale(.9)} 100%{opacity:1;transform:translateY(0) scale(1)} }
+        @keyframes lisan-star { 0%{opacity:0;transform:scale(0) rotate(-40deg)} 60%{opacity:1;transform:scale(1.4) rotate(10deg)} 100%{opacity:1;transform:scale(1) rotate(0)} }
+        @keyframes lisan-trophy { 0%{transform:scale(0) rotate(-30deg)} 60%{transform:scale(1.15) rotate(8deg)} 100%{transform:scale(1) rotate(0)} }
+        @keyframes lisan-optin { 0%{opacity:0;transform:translateX(14px)} 100%{opacity:1;transform:translateX(0)} }
+        .lisan-flip-card { perspective:1200px; }
+        .lisan-flip-inner { position:relative; transition:transform .6s cubic-bezier(.34,1.56,.4,1); transform-style:preserve-3d; }
+        .lisan-flip-inner.is-flipped { transform:rotateY(180deg); }
+        .lisan-flip-face { position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+        .lisan-flip-back { transform:rotateY(180deg); }
+        .lisan-pop { animation:lisan-pop .32s ease; }
+        .lisan-shake { animation:lisan-shake .38s ease; }
+        .lisan-cheer { animation:lisan-cheer .26s ease; }
+        .lisan-star { display:inline-block; animation:lisan-star .5s cubic-bezier(.34,1.56,.4,1) backwards; }
+        .lisan-trophy { animation:lisan-trophy .6s cubic-bezier(.34,1.56,.4,1); }
+        .lisan-optin { animation:lisan-optin .26s ease backwards; }
+      `}</style>
+
       <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -637,35 +715,37 @@ function VocabGame() {
               />
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => setFlipped((current) => !current)}
-            className="relative mx-auto flex min-h-[240px] w-full max-w-md flex-col items-center justify-center gap-3 rounded-[24px] border-2 border-violet-200 bg-white p-8 text-center shadow-[0_18px_40px_rgba(124,58,237,0.12)] transition hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-violet-500"
-          >
-            {!flipped ? (
-              <>
-                <span className="text-4xl font-black text-slate-900">{currentCard.hebrew}</span>
-                <span className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-3 py-1 text-xs font-bold text-violet-600">
-                  <RotateCw className="h-3.5 w-3.5" aria-hidden="true" />
-                  {text.tapToFlip}
-                </span>
-              </>
-            ) : (
-              <>
-                <span className="text-4xl font-black text-violet-700">
-                  {currentCard.arabic}
-                </span>
-                {currentCard.transliteration ? (
-                  <span className="text-base font-bold text-slate-400">
-                    {currentCard.transliteration}
+
+          <div className="lisan-flip-card mx-auto w-full max-w-md" style={{ height: '260px' }}>
+            <button
+              type="button"
+              onClick={() => setFlipped((current) => !current)}
+              className="block h-full w-full focus:outline-none"
+              aria-label={text.tapToFlip}
+            >
+              <div className={`lisan-flip-inner h-full w-full ${flipped ? 'is-flipped' : ''}`}>
+                <div className="lisan-flip-face flex flex-col items-center justify-center gap-3 rounded-[24px] border-2 border-violet-200 bg-white p-8 text-center shadow-[0_18px_40px_rgba(124,58,237,0.12)]">
+                  <span className="text-4xl font-black text-slate-900">{currentCard.hebrew}</span>
+                  <span className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-3 py-1 text-xs font-bold text-violet-600">
+                    <RotateCw className="h-3.5 w-3.5" aria-hidden="true" />
+                    {text.tapToFlip}
                   </span>
-                ) : null}
-                <span className="mt-1 text-sm font-bold text-slate-500">
-                  {currentCard.hebrew}
-                </span>
-              </>
-            )}
-          </button>
+                </div>
+                <div className="lisan-flip-face lisan-flip-back flex flex-col items-center justify-center gap-2 rounded-[24px] border-2 border-violet-400 bg-[linear-gradient(135deg,#F1EAFD,#E4D6FB)] p-8 text-center shadow-[0_18px_40px_rgba(124,58,237,0.2)]">
+                  <span className="text-4xl font-black text-violet-800">{currentCard.arabic}</span>
+                  {currentCard.transliteration ? (
+                    <span className="text-base font-bold text-violet-500">
+                      {currentCard.transliteration}
+                    </span>
+                  ) : null}
+                  <span className="mt-1 text-sm font-bold text-violet-700">
+                    {currentCard.hebrew}
+                  </span>
+                </div>
+              </div>
+            </button>
+          </div>
+
           <div className="mt-3 flex justify-center">
             <button
               type="button"
@@ -723,7 +803,25 @@ function VocabGame() {
               {text.backToCards}
             </button>
           </div>
-          <div className="mb-5 flex items-center gap-3">
+
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <span className="text-sm font-bold text-slate-500">
+              {text.score(score, questions.length)}
+            </span>
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-black transition-all ${
+                streak > 0 ? 'text-amber-700' : 'text-slate-300'
+              } ${streak >= 3 ? 'bg-amber-200' : 'bg-amber-50'}`}
+            >
+              <Flame
+                className="h-4 w-4 transition-transform"
+                style={{ transform: `scale(${1 + Math.min(streak, 5) * 0.12})` }}
+                aria-hidden="true"
+              />
+              {text.streak} {streak}
+            </span>
+          </div>
+          <div className="mb-2 flex items-center gap-3">
             <span dir="ltr" className="text-sm font-bold text-slate-500">
               {qIndex + 1} / {questions.length}
             </span>
@@ -734,22 +832,42 @@ function VocabGame() {
               />
             </div>
           </div>
+
+          <div className="flex h-6 items-center justify-center">
+            {cheer ? (
+              <span
+                className={`lisan-cheer text-sm font-black ${
+                  cheer.tone === 'good' ? 'text-emerald-600' : 'text-red-500'
+                }`}
+              >
+                {cheer.msg}
+              </span>
+            ) : null}
+          </div>
+
           <div className="mx-auto max-w-md text-center">
             <p className="text-sm font-bold text-slate-500">{text.questionPrompt}</p>
-            <p className="mt-1 text-4xl font-black text-slate-900">
+            <p key={qIndex} className="lisan-cheer mt-1 text-4xl font-black text-slate-900">
               {currentQuestion.hebrew}
             </p>
           </div>
           <div className="mx-auto mt-6 grid max-w-md gap-3">
-            {currentQuestion.options.map((option) => {
+            {currentQuestion.options.map((option, optIdx) => {
               const isCorrect = option === currentQuestion.correct;
               const isPicked = option === selected;
               let style = 'border-violet-100 bg-white text-slate-800 hover:border-violet-300 hover:bg-violet-50';
+              let anim = '';
 
               if (selected !== null) {
-                if (isCorrect) style = 'border-emerald-400 bg-emerald-50 text-emerald-800';
-                else if (isPicked) style = 'border-red-300 bg-red-50 text-red-700';
-                else style = 'border-slate-100 bg-white text-slate-400';
+                if (isCorrect) {
+                  style = 'border-emerald-400 bg-emerald-50 text-emerald-800';
+                  if (isPicked) anim = 'lisan-pop';
+                } else if (isPicked) {
+                  style = 'border-red-300 bg-red-50 text-red-700';
+                  anim = 'lisan-shake';
+                } else {
+                  style = 'border-slate-100 bg-white text-slate-400';
+                }
               }
 
               return (
@@ -758,7 +876,8 @@ function VocabGame() {
                   type="button"
                   onClick={() => answer(option)}
                   disabled={selected !== null}
-                  className={`flex items-center justify-between gap-2 rounded-2xl border-2 px-5 py-4 text-right text-lg font-bold transition focus:outline-none focus:ring-2 focus:ring-violet-500 ${style}`}
+                  style={selected === null ? { animationDelay: `${optIdx * 60}ms` } : undefined}
+                  className={`${selected === null ? 'lisan-optin' : ''} ${anim} flex items-center justify-between gap-2 rounded-2xl border-2 px-5 py-4 text-right text-lg font-bold transition focus:outline-none focus:ring-2 focus:ring-violet-500 ${style}`}
                 >
                   <span>{option}</span>
                   {selected !== null && isCorrect ? (
@@ -789,19 +908,39 @@ function VocabGame() {
       {quizDone && (
         <div className="mx-auto max-w-md py-6 text-center">
           <div
-            className={`mx-auto flex h-20 w-20 items-center justify-center rounded-full ${
+            className={`lisan-trophy mx-auto flex h-20 w-20 items-center justify-center rounded-full ${
               passedQuiz ? 'bg-amber-100 text-amber-500' : 'bg-violet-100 text-violet-500'
             }`}
           >
             <Trophy className="h-10 w-10" aria-hidden="true" />
           </div>
-          <h3 className="mt-4 text-2xl font-black text-slate-900">
-            {passedQuiz ? text.resultPassed : text.resultRetry}
-          </h3>
+
+          {passedQuiz ? (
+            <div className="mt-4 flex items-center justify-center gap-2">
+              {[0, 1, 2].map((i) => (
+                <Star
+                  key={i}
+                  className={`lisan-star h-9 w-9 ${
+                    i < starCount ? 'fill-amber-400 text-amber-400' : 'fill-slate-100 text-slate-200'
+                  }`}
+                  style={{ animationDelay: `${i * 220}ms` }}
+                  aria-hidden="true"
+                />
+              ))}
+            </div>
+          ) : null}
+
+          <h3 className="mt-4 text-2xl font-black text-slate-900">{resultTitle()}</h3>
           <p className="mt-2 text-lg font-bold text-slate-600">
             {text.score(score, questions.length)}
           </p>
-          <p className="mt-2 text-sm font-bold leading-6 text-slate-500">
+          {passedQuiz && bestStreak >= 2 ? (
+            <p className="mx-auto mt-3 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-4 py-1.5 text-sm font-black text-amber-700">
+              <Flame className="h-4 w-4" aria-hidden="true" />
+              {text.bestStreak(bestStreak)}
+            </p>
+          ) : null}
+          <p className="mt-3 text-sm font-bold leading-6 text-slate-500">
             {passedQuiz ? text.passedHint : text.retryHint}
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
