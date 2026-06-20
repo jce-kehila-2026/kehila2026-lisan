@@ -1,0 +1,1922 @@
+[
+  {
+    "id": "A1V_001",
+    "level": "A1",
+    "hebrew": "מי",
+    "arabic": "من",
+    "transliteration": "mi",
+    "part_of_speech": "question word",
+    "source_transcript": "01_mi-ani.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_002",
+    "level": "A1",
+    "hebrew": "אני",
+    "arabic": "أنا",
+    "transliteration": "ani",
+    "part_of_speech": "pronoun",
+    "source_transcript": "01_mi-ani.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_003",
+    "level": "A1",
+    "hebrew": "את",
+    "arabic": "أنتِ",
+    "transliteration": "at",
+    "part_of_speech": "pronoun",
+    "source_transcript": "02_mi-at.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_004",
+    "level": "A1",
+    "hebrew": "אתה",
+    "arabic": "أنتَ",
+    "transliteration": "ata",
+    "part_of_speech": "pronoun",
+    "source_transcript": "03_mi-ata.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_005",
+    "level": "A1",
+    "hebrew": "שלום",
+    "arabic": "مرحبا",
+    "transliteration": "shalom",
+    "part_of_speech": "greeting",
+    "source_transcript": "02_mi-at.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_006",
+    "level": "A1",
+    "hebrew": "להתראות",
+    "arabic": "إلى اللقاء",
+    "transliteration": "lehitraot",
+    "part_of_speech": "expression",
+    "source_transcript": "02_mi-at.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_007",
+    "level": "A1",
+    "hebrew": "היי",
+    "arabic": "مرحبا / هاي",
+    "transliteration": "hey",
+    "part_of_speech": "greeting",
+    "source_transcript": "03_mi-ata.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_008",
+    "level": "A1",
+    "hebrew": "גם",
+    "arabic": "أيضًا",
+    "transliteration": "gam",
+    "part_of_speech": "adverb",
+    "source_transcript": "02_mi-at.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_009",
+    "level": "A1",
+    "hebrew": "כן",
+    "arabic": "نعم",
+    "transliteration": "ken",
+    "part_of_speech": "adverb",
+    "source_transcript": "09_dialogim-shonim-ata-more.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_010",
+    "level": "A1",
+    "hebrew": "לא",
+    "arabic": "لا",
+    "transliteration": "lo",
+    "part_of_speech": "adverb",
+    "source_transcript": "05_yonatan-ve-tamar-bauniversita.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_011",
+    "level": "A1",
+    "hebrew": "זה",
+    "arabic": "هذا",
+    "transliteration": "ze",
+    "part_of_speech": "pronoun",
+    "source_transcript": "04_mi-ze-mi-zot.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_012",
+    "level": "A1",
+    "hebrew": "זאת",
+    "arabic": "هذه",
+    "transliteration": "zot",
+    "part_of_speech": "pronoun",
+    "source_transcript": "04_mi-ze-mi-zot.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_013",
+    "level": "A1",
+    "hebrew": "הוא",
+    "arabic": "هو",
+    "transliteration": "hu",
+    "part_of_speech": "pronoun",
+    "source_transcript": "04_mi-ze-mi-zot.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_014",
+    "level": "A1",
+    "hebrew": "היא",
+    "arabic": "هي",
+    "transliteration": "hi",
+    "part_of_speech": "pronoun",
+    "source_transcript": "04_mi-ze-mi-zot.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_015",
+    "level": "A1",
+    "hebrew": "אלה",
+    "arabic": "هؤلاء",
+    "transliteration": "ele",
+    "part_of_speech": "pronoun",
+    "source_transcript": "08_mi-ele.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_016",
+    "level": "A1",
+    "hebrew": "הם",
+    "arabic": "هم",
+    "transliteration": "hem",
+    "part_of_speech": "pronoun",
+    "source_transcript": "08_mi-ele.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_017",
+    "level": "A1",
+    "hebrew": "הן",
+    "arabic": "هنّ",
+    "transliteration": "hen",
+    "part_of_speech": "pronoun",
+    "source_transcript": "08_mi-ele.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_018",
+    "level": "A1",
+    "hebrew": "אתם",
+    "arabic": "أنتم",
+    "transliteration": "atem",
+    "part_of_speech": "pronoun",
+    "source_transcript": "10_dialogim-shonim-aten-yerushalayim.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_019",
+    "level": "A1",
+    "hebrew": "אתן",
+    "arabic": "أنتنّ",
+    "transliteration": "aten",
+    "part_of_speech": "pronoun",
+    "source_transcript": "10_dialogim-shonim-aten-yerushalayim.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_020",
+    "level": "A1",
+    "hebrew": "אנחנו",
+    "arabic": "نحن",
+    "transliteration": "anachnu",
+    "part_of_speech": "pronoun",
+    "source_transcript": "10_dialogim-shonim-aten-yerushalayim.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_021",
+    "level": "A1",
+    "hebrew": "ירושלים",
+    "arabic": "القدس",
+    "transliteration": "yerushalayim",
+    "part_of_speech": "place",
+    "source_transcript": "02_mi-at.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_022",
+    "level": "A1",
+    "hebrew": "מורה",
+    "arabic": "معلم",
+    "transliteration": "more",
+    "part_of_speech": "noun",
+    "source_transcript": "05_yonatan-ve-tamar-bauniversita.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_023",
+    "level": "A1",
+    "hebrew": "תלמיד",
+    "arabic": "طالب",
+    "transliteration": "talmid",
+    "part_of_speech": "noun",
+    "source_transcript": "05_yonatan-ve-tamar-bauniversita.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_024",
+    "level": "A1",
+    "hebrew": "תלמידה",
+    "arabic": "طالبة",
+    "transliteration": "talmida",
+    "part_of_speech": "noun",
+    "source_transcript": "07_at-mora.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_025",
+    "level": "A1",
+    "hebrew": "מורות",
+    "arabic": "معلمات",
+    "transliteration": "morot",
+    "part_of_speech": "noun",
+    "source_transcript": "09_dialogim-shonim-ata-more.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_026",
+    "level": "A1",
+    "hebrew": "תלמידות",
+    "arabic": "طالبات",
+    "transliteration": "talmidot",
+    "part_of_speech": "noun",
+    "source_transcript": "09_dialogim-shonim-ata-more.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_027",
+    "level": "A1",
+    "hebrew": "אמא",
+    "arabic": "أم",
+    "transliteration": "ima",
+    "part_of_speech": "noun",
+    "source_transcript": "07_at-mora.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_028",
+    "level": "A1",
+    "hebrew": "אחות",
+    "arabic": "أخت",
+    "transliteration": "achot",
+    "part_of_speech": "noun",
+    "source_transcript": "06_mi-ze-mi-zot-2.txt",
+    "category": "introductions"
+  },
+  {
+    "id": "A1V_029",
+    "level": "A1",
+    "hebrew": "גר",
+    "arabic": "يسكن",
+    "transliteration": "gar",
+    "part_of_speech": "verb",
+    "source_transcript": "12_ata-gar.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_030",
+    "level": "A1",
+    "hebrew": "גרה",
+    "arabic": "تسكن",
+    "transliteration": "gara",
+    "part_of_speech": "verb",
+    "source_transcript": "12_ata-gar.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_031",
+    "level": "A1",
+    "hebrew": "גרים",
+    "arabic": "يسكنون",
+    "transliteration": "garim",
+    "part_of_speech": "verb",
+    "source_transcript": "12_ata-gar.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_032",
+    "level": "A1",
+    "hebrew": "גרות",
+    "arabic": "يسكنّ",
+    "transliteration": "garot",
+    "part_of_speech": "verb",
+    "source_transcript": "12_ata-gar.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_033",
+    "level": "A1",
+    "hebrew": "איפה",
+    "arabic": "أين",
+    "transliteration": "eifo",
+    "part_of_speech": "question word",
+    "source_transcript": "12_ata-gar.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_034",
+    "level": "A1",
+    "hebrew": "מדבר",
+    "arabic": "يتحدث",
+    "transliteration": "medaber",
+    "part_of_speech": "verb",
+    "source_transcript": "13_ido-gar-betel-aviv.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_035",
+    "level": "A1",
+    "hebrew": "מדברת",
+    "arabic": "تتحدث",
+    "transliteration": "medaberet",
+    "part_of_speech": "verb",
+    "source_transcript": "13_ido-gar-betel-aviv.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_036",
+    "level": "A1",
+    "hebrew": "עברית",
+    "arabic": "العبرية",
+    "transliteration": "ivrit",
+    "part_of_speech": "noun",
+    "source_transcript": "13_ido-gar-betel-aviv.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_037",
+    "level": "A1",
+    "hebrew": "ערבית",
+    "arabic": "العربية",
+    "transliteration": "aravit",
+    "part_of_speech": "noun",
+    "source_transcript": "13_ido-gar-betel-aviv.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_038",
+    "level": "A1",
+    "hebrew": "אנגלית",
+    "arabic": "الإنجليزية",
+    "transliteration": "anglit",
+    "part_of_speech": "noun",
+    "source_transcript": "13_ido-gar-betel-aviv.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_039",
+    "level": "A1",
+    "hebrew": "עובד",
+    "arabic": "يعمل",
+    "transliteration": "oved",
+    "part_of_speech": "verb",
+    "source_transcript": "14_ali-gar-behaifa.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_040",
+    "level": "A1",
+    "hebrew": "עובדת",
+    "arabic": "تعمل",
+    "transliteration": "ovedet",
+    "part_of_speech": "verb",
+    "source_transcript": "14_ali-gar-behaifa.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_041",
+    "level": "A1",
+    "hebrew": "לומד",
+    "arabic": "يدرس",
+    "transliteration": "lomed",
+    "part_of_speech": "verb",
+    "source_transcript": "14_ali-gar-behaifa.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_042",
+    "level": "A1",
+    "hebrew": "לומדת",
+    "arabic": "تدرس",
+    "transliteration": "lomedet",
+    "part_of_speech": "verb",
+    "source_transcript": "14_ali-gar-behaifa.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_043",
+    "level": "A1",
+    "hebrew": "בוקר",
+    "arabic": "صباح",
+    "transliteration": "boker",
+    "part_of_speech": "noun",
+    "source_transcript": "14_ali-gar-behaifa.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_044",
+    "level": "A1",
+    "hebrew": "ערב",
+    "arabic": "مساء",
+    "transliteration": "erev",
+    "part_of_speech": "noun",
+    "source_transcript": "14_ali-gar-behaifa.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_045",
+    "level": "A1",
+    "hebrew": "עבודה",
+    "arabic": "عمل",
+    "transliteration": "avoda",
+    "part_of_speech": "noun",
+    "source_transcript": "18_ratza-veratza.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_046",
+    "level": "A1",
+    "hebrew": "אוניברסיטה",
+    "arabic": "جامعة",
+    "transliteration": "universita",
+    "part_of_speech": "noun",
+    "source_transcript": "05_yonatan-ve-tamar-bauniversita.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_047",
+    "level": "A1",
+    "hebrew": "ספר",
+    "arabic": "كتاب",
+    "transliteration": "sefer",
+    "part_of_speech": "noun",
+    "source_transcript": "17_ma-hem-osim.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_048",
+    "level": "A1",
+    "hebrew": "קורא",
+    "arabic": "يقرأ",
+    "transliteration": "kore",
+    "part_of_speech": "verb",
+    "source_transcript": "17_ma-hem-osim.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_049",
+    "level": "A1",
+    "hebrew": "כותבת",
+    "arabic": "تكتب",
+    "transliteration": "kotevet",
+    "part_of_speech": "verb",
+    "source_transcript": "17_ma-hem-osim.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_050",
+    "level": "A1",
+    "hebrew": "נוסעים",
+    "arabic": "يسافرون",
+    "transliteration": "nosim",
+    "part_of_speech": "verb",
+    "source_transcript": "17_ma-hem-osim.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_051",
+    "level": "A1",
+    "hebrew": "הולכות",
+    "arabic": "يذهبن",
+    "transliteration": "holchot",
+    "part_of_speech": "verb",
+    "source_transcript": "17_ma-hem-osim.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_052",
+    "level": "A1",
+    "hebrew": "רחוב",
+    "arabic": "شارع",
+    "transliteration": "rechov",
+    "part_of_speech": "noun",
+    "source_transcript": "18_ratza-veratza.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_053",
+    "level": "A1",
+    "hebrew": "שיעור",
+    "arabic": "درس",
+    "transliteration": "shiur",
+    "part_of_speech": "noun",
+    "source_transcript": "18_ratza-veratza.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_054",
+    "level": "A1",
+    "hebrew": "קמה",
+    "arabic": "تقوم",
+    "transliteration": "kama",
+    "part_of_speech": "verb",
+    "source_transcript": "24_hayom-shel-narmin.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_055",
+    "level": "A1",
+    "hebrew": "שעה",
+    "arabic": "ساعة",
+    "transliteration": "sha'a",
+    "part_of_speech": "noun",
+    "source_transcript": "24_hayom-shel-narmin.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_056",
+    "level": "A1",
+    "hebrew": "רופאה",
+    "arabic": "طبيبة",
+    "transliteration": "rofea",
+    "part_of_speech": "noun",
+    "source_transcript": "24_hayom-shel-narmin.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_057",
+    "level": "A1",
+    "hebrew": "בית חולים",
+    "arabic": "مستشفى",
+    "transliteration": "beit cholim",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "24_hayom-shel-narmin.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_058",
+    "level": "A1",
+    "hebrew": "קונה",
+    "arabic": "يشتري",
+    "transliteration": "kone",
+    "part_of_speech": "verb",
+    "source_transcript": "24_hayom-shel-narmin.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_059",
+    "level": "A1",
+    "hebrew": "מבשלת",
+    "arabic": "تطبخ",
+    "transliteration": "mevashelet",
+    "part_of_speech": "verb",
+    "source_transcript": "24_hayom-shel-narmin.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_060",
+    "level": "A1",
+    "hebrew": "ספורט",
+    "arabic": "رياضة",
+    "transliteration": "sport",
+    "part_of_speech": "noun",
+    "source_transcript": "24_hayom-shel-narmin.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_061",
+    "level": "A1",
+    "hebrew": "חברה",
+    "arabic": "صديقة",
+    "transliteration": "chavera",
+    "part_of_speech": "noun",
+    "source_transcript": "24_hayom-shel-narmin.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_062",
+    "level": "A1",
+    "hebrew": "טלפון",
+    "arabic": "هاتف",
+    "transliteration": "telefon",
+    "part_of_speech": "noun",
+    "source_transcript": "27_batelefon.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_063",
+    "level": "A1",
+    "hebrew": "לילה",
+    "arabic": "ليل",
+    "transliteration": "layla",
+    "part_of_speech": "noun",
+    "source_transcript": "24_hayom-shel-narmin.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_064",
+    "level": "A1",
+    "hebrew": "לישון",
+    "arabic": "ينام",
+    "transliteration": "lishon",
+    "part_of_speech": "verb",
+    "source_transcript": "24_hayom-shel-narmin.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_065",
+    "level": "A1",
+    "hebrew": "מחר",
+    "arabic": "غدًا",
+    "transliteration": "machar",
+    "part_of_speech": "adverb",
+    "source_transcript": "27_batelefon.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_066",
+    "level": "A1",
+    "hebrew": "יום",
+    "arabic": "يوم",
+    "transliteration": "yom",
+    "part_of_speech": "noun",
+    "source_transcript": "26_savta-jamila.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_067",
+    "level": "A1",
+    "hebrew": "שבת",
+    "arabic": "السبت",
+    "transliteration": "shabat",
+    "part_of_speech": "noun",
+    "source_transcript": "26_savta-jamila.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_068",
+    "level": "A1",
+    "hebrew": "ים",
+    "arabic": "بحر",
+    "transliteration": "yam",
+    "part_of_speech": "noun",
+    "source_transcript": "26_savta-jamila.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_069",
+    "level": "A1",
+    "hebrew": "טלוויזיה",
+    "arabic": "تلفاز",
+    "transliteration": "televizia",
+    "part_of_speech": "noun",
+    "source_transcript": "26_savta-jamila.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_070",
+    "level": "A1",
+    "hebrew": "איטלקית",
+    "arabic": "الإيطالية",
+    "transliteration": "italkit",
+    "part_of_speech": "noun",
+    "source_transcript": "26_savta-jamila.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_071",
+    "level": "A1",
+    "hebrew": "דואר",
+    "arabic": "بريد",
+    "transliteration": "doar",
+    "part_of_speech": "noun",
+    "source_transcript": "35_eifo-hadoar.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_072",
+    "level": "A1",
+    "hebrew": "ישר",
+    "arabic": "مباشرة",
+    "transliteration": "yashar",
+    "part_of_speech": "adverb",
+    "source_transcript": "35_eifo-hadoar.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_073",
+    "level": "A1",
+    "hebrew": "שמאלה",
+    "arabic": "يسارًا",
+    "transliteration": "smola",
+    "part_of_speech": "adverb",
+    "source_transcript": "35_eifo-hadoar.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_074",
+    "level": "A1",
+    "hebrew": "ימינה",
+    "arabic": "يمينًا",
+    "transliteration": "yamina",
+    "part_of_speech": "adverb",
+    "source_transcript": "35_eifo-hadoar.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_075",
+    "level": "A1",
+    "hebrew": "יום ראשון",
+    "arabic": "الأحد",
+    "transliteration": "yom rishon",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "26_savta-jamila.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_076",
+    "level": "A1",
+    "hebrew": "יום שני",
+    "arabic": "الإثنين",
+    "transliteration": "yom sheni",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "26_savta-jamila.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_077",
+    "level": "A1",
+    "hebrew": "יום שלישי",
+    "arabic": "الثلاثاء",
+    "transliteration": "yom shlishi",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "26_savta-jamila.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_078",
+    "level": "A1",
+    "hebrew": "יום רביעי",
+    "arabic": "الأربعاء",
+    "transliteration": "yom revi'i",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "26_savta-jamila.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_079",
+    "level": "A1",
+    "hebrew": "יום חמישי",
+    "arabic": "الخميس",
+    "transliteration": "yom chamishi",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "26_savta-jamila.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_080",
+    "level": "A1",
+    "hebrew": "יום שישי",
+    "arabic": "الجمعة",
+    "transliteration": "yom shishi",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "26_savta-jamila.txt",
+    "category": "daily_life"
+  },
+  {
+    "id": "A1V_081",
+    "level": "A1",
+    "hebrew": "רוצה",
+    "arabic": "يريد",
+    "transliteration": "rotze",
+    "part_of_speech": "verb",
+    "source_transcript": "15_bemisada-shel-said.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_082",
+    "level": "A1",
+    "hebrew": "בבקשה",
+    "arabic": "من فضلك",
+    "transliteration": "bevakasha",
+    "part_of_speech": "expression",
+    "source_transcript": "15_bemisada-shel-said.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_083",
+    "level": "A1",
+    "hebrew": "תודה",
+    "arabic": "شكرًا",
+    "transliteration": "toda",
+    "part_of_speech": "expression",
+    "source_transcript": "15_bemisada-shel-said.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_084",
+    "level": "A1",
+    "hebrew": "שקשוקה",
+    "arabic": "شكشوكة",
+    "transliteration": "shakshuka",
+    "part_of_speech": "noun",
+    "source_transcript": "15_bemisada-shel-said.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_085",
+    "level": "A1",
+    "hebrew": "סלט",
+    "arabic": "سلطة",
+    "transliteration": "salat",
+    "part_of_speech": "noun",
+    "source_transcript": "15_bemisada-shel-said.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_086",
+    "level": "A1",
+    "hebrew": "מלח",
+    "arabic": "ملح",
+    "transliteration": "melach",
+    "part_of_speech": "noun",
+    "source_transcript": "15_bemisada-shel-said.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_087",
+    "level": "A1",
+    "hebrew": "לימון",
+    "arabic": "ليمون",
+    "transliteration": "limon",
+    "part_of_speech": "noun",
+    "source_transcript": "15_bemisada-shel-said.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_088",
+    "level": "A1",
+    "hebrew": "שותה",
+    "arabic": "يشرب",
+    "transliteration": "shote",
+    "part_of_speech": "verb",
+    "source_transcript": "15_bemisada-shel-said.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_089",
+    "level": "A1",
+    "hebrew": "קפה",
+    "arabic": "قهوة",
+    "transliteration": "kafe",
+    "part_of_speech": "noun",
+    "source_transcript": "15_bemisada-shel-said.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_090",
+    "level": "A1",
+    "hebrew": "חלב",
+    "arabic": "حليب",
+    "transliteration": "chalav",
+    "part_of_speech": "noun",
+    "source_transcript": "15_bemisada-shel-said.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_091",
+    "level": "A1",
+    "hebrew": "מסעדה",
+    "arabic": "مطعم",
+    "transliteration": "misada",
+    "part_of_speech": "noun",
+    "source_transcript": "20_hamisada-hahadasha.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_092",
+    "level": "A1",
+    "hebrew": "חומוס",
+    "arabic": "حمص",
+    "transliteration": "chumus",
+    "part_of_speech": "noun",
+    "source_transcript": "16_bekafeteria-shel-hauniversita.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_093",
+    "level": "A1",
+    "hebrew": "פיטה",
+    "arabic": "خبز بيتا",
+    "transliteration": "pita",
+    "part_of_speech": "noun",
+    "source_transcript": "16_bekafeteria-shel-hauniversita.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_094",
+    "level": "A1",
+    "hebrew": "סנדוויץ'",
+    "arabic": "ساندويتش",
+    "transliteration": "sandwich",
+    "part_of_speech": "noun",
+    "source_transcript": "16_bekafeteria-shel-hauniversita.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_095",
+    "level": "A1",
+    "hebrew": "עוגה",
+    "arabic": "كعكة",
+    "transliteration": "uga",
+    "part_of_speech": "noun",
+    "source_transcript": "16_bekafeteria-shel-hauniversita.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_096",
+    "level": "A1",
+    "hebrew": "גבינה",
+    "arabic": "جبنة",
+    "transliteration": "gvina",
+    "part_of_speech": "noun",
+    "source_transcript": "16_bekafeteria-shel-hauniversita.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_097",
+    "level": "A1",
+    "hebrew": "אבוקדו",
+    "arabic": "أفوكادو",
+    "transliteration": "avokado",
+    "part_of_speech": "noun",
+    "source_transcript": "16_bekafeteria-shel-hauniversita.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_098",
+    "level": "A1",
+    "hebrew": "טונה",
+    "arabic": "تونة",
+    "transliteration": "tuna",
+    "part_of_speech": "noun",
+    "source_transcript": "16_bekafeteria-shel-hauniversita.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_099",
+    "level": "A1",
+    "hebrew": "חריף",
+    "arabic": "حار",
+    "transliteration": "charif",
+    "part_of_speech": "adjective",
+    "source_transcript": "16_bekafeteria-shel-hauniversita.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_100",
+    "level": "A1",
+    "hebrew": "שולחן",
+    "arabic": "طاولة",
+    "transliteration": "shulchan",
+    "part_of_speech": "noun",
+    "source_transcript": "20_hamisada-hahadasha.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_101",
+    "level": "A1",
+    "hebrew": "כיסא",
+    "arabic": "كرسي",
+    "transliteration": "kise",
+    "part_of_speech": "noun",
+    "source_transcript": "20_hamisada-hahadasha.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_102",
+    "level": "A1",
+    "hebrew": "אוכל",
+    "arabic": "طعام",
+    "transliteration": "ochel",
+    "part_of_speech": "noun",
+    "source_transcript": "20_hamisada-hahadasha.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_103",
+    "level": "A1",
+    "hebrew": "טעים",
+    "arabic": "لذيذ",
+    "transliteration": "ta'im",
+    "part_of_speech": "adjective",
+    "source_transcript": "20_hamisada-hahadasha.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_104",
+    "level": "A1",
+    "hebrew": "דג",
+    "arabic": "سمكة",
+    "transliteration": "dag",
+    "part_of_speech": "noun",
+    "source_transcript": "20_hamisada-hahadasha.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_105",
+    "level": "A1",
+    "hebrew": "מרק",
+    "arabic": "حساء",
+    "transliteration": "marak",
+    "part_of_speech": "noun",
+    "source_transcript": "20_hamisada-hahadasha.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_106",
+    "level": "A1",
+    "hebrew": "חביתה",
+    "arabic": "عجة",
+    "transliteration": "chavita",
+    "part_of_speech": "noun",
+    "source_transcript": "25_bebeit-kafe.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_107",
+    "level": "A1",
+    "hebrew": "ירקות",
+    "arabic": "خضار",
+    "transliteration": "yerakot",
+    "part_of_speech": "noun",
+    "source_transcript": "25_bebeit-kafe.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_108",
+    "level": "A1",
+    "hebrew": "בצל",
+    "arabic": "بصل",
+    "transliteration": "batzal",
+    "part_of_speech": "noun",
+    "source_transcript": "25_bebeit-kafe.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_109",
+    "level": "A1",
+    "hebrew": "עגבנייה",
+    "arabic": "طماطم",
+    "transliteration": "agvania",
+    "part_of_speech": "noun",
+    "source_transcript": "25_bebeit-kafe.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_110",
+    "level": "A1",
+    "hebrew": "תה",
+    "arabic": "شاي",
+    "transliteration": "te",
+    "part_of_speech": "noun",
+    "source_transcript": "25_bebeit-kafe.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_111",
+    "level": "A1",
+    "hebrew": "נענע",
+    "arabic": "نعناع",
+    "transliteration": "nana",
+    "part_of_speech": "noun",
+    "source_transcript": "25_bebeit-kafe.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_112",
+    "level": "A1",
+    "hebrew": "בשר",
+    "arabic": "لحم",
+    "transliteration": "basar",
+    "part_of_speech": "noun",
+    "source_transcript": "31_habasar-hatari.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_113",
+    "level": "A1",
+    "hebrew": "טרי",
+    "arabic": "طازج",
+    "transliteration": "tari",
+    "part_of_speech": "adjective",
+    "source_transcript": "31_habasar-hatari.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_114",
+    "level": "A1",
+    "hebrew": "קילו",
+    "arabic": "كيلو",
+    "transliteration": "kilo",
+    "part_of_speech": "noun",
+    "source_transcript": "31_habasar-hatari.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_115",
+    "level": "A1",
+    "hebrew": "אדום",
+    "arabic": "أحمر",
+    "transliteration": "adom",
+    "part_of_speech": "adjective",
+    "source_transcript": "32_haagvaniyot-yerukot.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_116",
+    "level": "A1",
+    "hebrew": "ירוק",
+    "arabic": "أخضر",
+    "transliteration": "yarok",
+    "part_of_speech": "adjective",
+    "source_transcript": "32_haagvaniyot-yerukot.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_117",
+    "level": "A1",
+    "hebrew": "אבטיח",
+    "arabic": "بطيخ",
+    "transliteration": "avatiach",
+    "part_of_speech": "noun",
+    "source_transcript": "33_kama-ole-haavatiach.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_118",
+    "level": "A1",
+    "hebrew": "מתוק",
+    "arabic": "حلو",
+    "transliteration": "matok",
+    "part_of_speech": "adjective",
+    "source_transcript": "33_kama-ole-haavatiach.txt",
+    "category": "food_restaurant"
+  },
+  {
+    "id": "A1V_119",
+    "level": "A1",
+    "hebrew": "חולצה",
+    "arabic": "قميص",
+    "transliteration": "chultza",
+    "part_of_speech": "noun",
+    "source_transcript": "28_behanut-habgadim.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_120",
+    "level": "A1",
+    "hebrew": "מבצע",
+    "arabic": "عرض",
+    "transliteration": "mivtza",
+    "part_of_speech": "noun",
+    "source_transcript": "28_behanut-habgadim.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_121",
+    "level": "A1",
+    "hebrew": "בגדים",
+    "arabic": "ملابس",
+    "transliteration": "bgadim",
+    "part_of_speech": "noun",
+    "source_transcript": "29_rahaf-rotza-bgadim-hadashim.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_122",
+    "level": "A1",
+    "hebrew": "לבן",
+    "arabic": "أبيض",
+    "transliteration": "lavan",
+    "part_of_speech": "adjective",
+    "source_transcript": "29_rahaf-rotza-bgadim-hadashim.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_123",
+    "level": "A1",
+    "hebrew": "כחול",
+    "arabic": "أزرق",
+    "transliteration": "kachol",
+    "part_of_speech": "adjective",
+    "source_transcript": "29_rahaf-rotza-bgadim-hadashim.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_124",
+    "level": "A1",
+    "hebrew": "שחור",
+    "arabic": "أسود",
+    "transliteration": "shachor",
+    "part_of_speech": "adjective",
+    "source_transcript": "29_rahaf-rotza-bgadim-hadashim.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_125",
+    "level": "A1",
+    "hebrew": "ורוד",
+    "arabic": "وردي",
+    "transliteration": "varod",
+    "part_of_speech": "adjective",
+    "source_transcript": "29_rahaf-rotza-bgadim-hadashim.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_126",
+    "level": "A1",
+    "hebrew": "סוודר",
+    "arabic": "كنزة",
+    "transliteration": "sveder",
+    "part_of_speech": "noun",
+    "source_transcript": "29_rahaf-rotza-bgadim-hadashim.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_127",
+    "level": "A1",
+    "hebrew": "חום",
+    "arabic": "بني",
+    "transliteration": "chum",
+    "part_of_speech": "adjective",
+    "source_transcript": "29_rahaf-rotza-bgadim-hadashim.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_128",
+    "level": "A1",
+    "hebrew": "צהוב",
+    "arabic": "أصفر",
+    "transliteration": "tzahov",
+    "part_of_speech": "adjective",
+    "source_transcript": "29_rahaf-rotza-bgadim-hadashim.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_129",
+    "level": "A1",
+    "hebrew": "סגול",
+    "arabic": "بنفسجي",
+    "transliteration": "sagol",
+    "part_of_speech": "adjective",
+    "source_transcript": "29_rahaf-rotza-bgadim-hadashim.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_130",
+    "level": "A1",
+    "hebrew": "חצאית",
+    "arabic": "تنورة",
+    "transliteration": "chatzait",
+    "part_of_speech": "noun",
+    "source_transcript": "29_rahaf-rotza-bgadim-hadashim.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_131",
+    "level": "A1",
+    "hebrew": "כמה",
+    "arabic": "كم",
+    "transliteration": "kama",
+    "part_of_speech": "question word",
+    "source_transcript": "28_behanut-habgadim.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_132",
+    "level": "A1",
+    "hebrew": "עולה",
+    "arabic": "يكلف",
+    "transliteration": "ole",
+    "part_of_speech": "verb",
+    "source_transcript": "28_behanut-habgadim.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_133",
+    "level": "A1",
+    "hebrew": "שקל",
+    "arabic": "شيكل",
+    "transliteration": "shekel",
+    "part_of_speech": "noun",
+    "source_transcript": "28_behanut-habgadim.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_134",
+    "level": "A1",
+    "hebrew": "שוק",
+    "arabic": "سوق",
+    "transliteration": "shuk",
+    "part_of_speech": "noun",
+    "source_transcript": "30_lama-bashuk.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_135",
+    "level": "A1",
+    "hebrew": "פירות",
+    "arabic": "فواكه",
+    "transliteration": "perot",
+    "part_of_speech": "noun",
+    "source_transcript": "30_lama-bashuk.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_136",
+    "level": "A1",
+    "hebrew": "סופרמרקט",
+    "arabic": "سوبرماركت",
+    "transliteration": "supermarket",
+    "part_of_speech": "noun",
+    "source_transcript": "30_lama-bashuk.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_137",
+    "level": "A1",
+    "hebrew": "אנשים",
+    "arabic": "ناس",
+    "transliteration": "anashim",
+    "part_of_speech": "noun",
+    "source_transcript": "30_lama-bashuk.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_138",
+    "level": "A1",
+    "hebrew": "רעש",
+    "arabic": "ضجيج",
+    "transliteration": "ra'ash",
+    "part_of_speech": "noun",
+    "source_transcript": "30_lama-bashuk.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_139",
+    "level": "A1",
+    "hebrew": "אוהבת",
+    "arabic": "تحب",
+    "transliteration": "ohevet",
+    "part_of_speech": "verb",
+    "source_transcript": "30_lama-bashuk.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_140",
+    "level": "A1",
+    "hebrew": "יקר",
+    "arabic": "غالي",
+    "transliteration": "yakar",
+    "part_of_speech": "adjective",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "category": "shopping_leisure"
+  },
+  {
+    "id": "A1V_141",
+    "level": "A1",
+    "hebrew": "דירה",
+    "arabic": "شقة",
+    "transliteration": "dira",
+    "part_of_speech": "noun",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "category": "home"
+  },
+  {
+    "id": "A1V_142",
+    "level": "A1",
+    "hebrew": "חדר",
+    "arabic": "غرفة",
+    "transliteration": "cheder",
+    "part_of_speech": "noun",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "category": "home"
+  },
+  {
+    "id": "A1V_143",
+    "level": "A1",
+    "hebrew": "חדרים",
+    "arabic": "غرف",
+    "transliteration": "chadarim",
+    "part_of_speech": "noun",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "category": "home"
+  },
+  {
+    "id": "A1V_144",
+    "level": "A1",
+    "hebrew": "סלון",
+    "arabic": "صالون",
+    "transliteration": "salon",
+    "part_of_speech": "noun",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "category": "home"
+  },
+  {
+    "id": "A1V_145",
+    "level": "A1",
+    "hebrew": "מטבח",
+    "arabic": "مطبخ",
+    "transliteration": "mitbach",
+    "part_of_speech": "noun",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "category": "home"
+  },
+  {
+    "id": "A1V_146",
+    "level": "A1",
+    "hebrew": "מקלחת",
+    "arabic": "دش",
+    "transliteration": "miklachat",
+    "part_of_speech": "noun",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "category": "home"
+  },
+  {
+    "id": "A1V_147",
+    "level": "A1",
+    "hebrew": "שירותים",
+    "arabic": "حمام",
+    "transliteration": "sherutim",
+    "part_of_speech": "noun",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "category": "home"
+  },
+  {
+    "id": "A1V_148",
+    "level": "A1",
+    "hebrew": "גינה",
+    "arabic": "حديقة",
+    "transliteration": "gina",
+    "part_of_speech": "noun",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "category": "home"
+  },
+  {
+    "id": "A1V_149",
+    "level": "A1",
+    "hebrew": "מרפסת",
+    "arabic": "شرفة",
+    "transliteration": "mirpeset",
+    "part_of_speech": "noun",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "category": "home"
+  },
+  {
+    "id": "A1V_150",
+    "level": "A1",
+    "hebrew": "מזגן",
+    "arabic": "مكيف",
+    "transliteration": "mazgan",
+    "part_of_speech": "noun",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "category": "home"
+  },
+  {
+    "id": "A1V_151",
+    "level": "A1",
+    "hebrew": "חלון",
+    "arabic": "نافذة",
+    "transliteration": "chalon",
+    "part_of_speech": "noun",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "category": "home"
+  },
+  {
+    "id": "A1V_152",
+    "level": "A1",
+    "hebrew": "ספה",
+    "arabic": "أريكة",
+    "transliteration": "sapa",
+    "part_of_speech": "noun",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "category": "home"
+  },
+  {
+    "id": "A1V_153",
+    "level": "A1",
+    "hebrew": "ארון",
+    "arabic": "خزانة",
+    "transliteration": "aron",
+    "part_of_speech": "noun",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "category": "home"
+  },
+  {
+    "id": "A1V_154",
+    "level": "A1",
+    "hebrew": "מיטה",
+    "arabic": "سرير",
+    "transliteration": "mita",
+    "part_of_speech": "noun",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "category": "home"
+  },
+  {
+    "id": "A1V_155",
+    "level": "A1",
+    "hebrew": "רהיטים",
+    "arabic": "أثاث",
+    "transliteration": "rehitim",
+    "part_of_speech": "noun",
+    "source_transcript": "23_hadira-berehov-haneviim.txt",
+    "category": "home"
+  },
+  {
+    "id": "A1V_156",
+    "level": "A1",
+    "hebrew": "בית",
+    "arabic": "بيت",
+    "transliteration": "bayit",
+    "part_of_speech": "noun",
+    "source_transcript": "12_ata-gar.txt",
+    "category": "home"
+  },
+  {
+    "id": "A1V_157",
+    "level": "A1",
+    "hebrew": "משפחה",
+    "arabic": "عائلة",
+    "transliteration": "mishpacha",
+    "part_of_speech": "noun",
+    "source_transcript": "26_savta-jamila.txt",
+    "category": "family"
+  },
+  {
+    "id": "A1V_158",
+    "level": "A1",
+    "hebrew": "בן",
+    "arabic": "ابن",
+    "transliteration": "ben",
+    "part_of_speech": "noun",
+    "source_transcript": "22_yesh-li-ein-li.txt",
+    "category": "family"
+  },
+  {
+    "id": "A1V_159",
+    "level": "A1",
+    "hebrew": "בת",
+    "arabic": "ابنة",
+    "transliteration": "bat",
+    "part_of_speech": "noun",
+    "source_transcript": "22_yesh-li-ein-li.txt",
+    "category": "family"
+  },
+  {
+    "id": "A1V_160",
+    "level": "A1",
+    "hebrew": "בנים",
+    "arabic": "أبناء",
+    "transliteration": "banim",
+    "part_of_speech": "noun",
+    "source_transcript": "22_yesh-li-ein-li.txt",
+    "category": "family"
+  },
+  {
+    "id": "A1V_161",
+    "level": "A1",
+    "hebrew": "בנות",
+    "arabic": "بنات",
+    "transliteration": "banot",
+    "part_of_speech": "noun",
+    "source_transcript": "22_yesh-li-ein-li.txt",
+    "category": "family"
+  },
+  {
+    "id": "A1V_162",
+    "level": "A1",
+    "hebrew": "אח",
+    "arabic": "أخ",
+    "transliteration": "ach",
+    "part_of_speech": "noun",
+    "source_transcript": "22_yesh-li-ein-li.txt",
+    "category": "family"
+  },
+  {
+    "id": "A1V_163",
+    "level": "A1",
+    "hebrew": "אחים",
+    "arabic": "إخوة",
+    "transliteration": "achim",
+    "part_of_speech": "noun",
+    "source_transcript": "22_yesh-li-ein-li.txt",
+    "category": "family"
+  },
+  {
+    "id": "A1V_164",
+    "level": "A1",
+    "hebrew": "אחיות",
+    "arabic": "أخوات",
+    "transliteration": "achayot",
+    "part_of_speech": "noun",
+    "source_transcript": "22_yesh-li-ein-li.txt",
+    "category": "family"
+  },
+  {
+    "id": "A1V_165",
+    "level": "A1",
+    "hebrew": "ילדים",
+    "arabic": "أولاد",
+    "transliteration": "yeladim",
+    "part_of_speech": "noun",
+    "source_transcript": "11_dialogim-shonim-mi-ele.txt",
+    "category": "family"
+  },
+  {
+    "id": "A1V_166",
+    "level": "A1",
+    "hebrew": "סבתא",
+    "arabic": "جدة",
+    "transliteration": "savta",
+    "part_of_speech": "noun",
+    "source_transcript": "26_savta-jamila.txt",
+    "category": "family"
+  },
+  {
+    "id": "A1V_167",
+    "level": "A1",
+    "hebrew": "סבא",
+    "arabic": "جد",
+    "transliteration": "saba",
+    "part_of_speech": "noun",
+    "source_transcript": "26_savta-jamila.txt",
+    "category": "family"
+  },
+  {
+    "id": "A1V_168",
+    "level": "A1",
+    "hebrew": "נכדים",
+    "arabic": "أحفاد",
+    "transliteration": "nechadim",
+    "part_of_speech": "noun",
+    "source_transcript": "26_savta-jamila.txt",
+    "category": "family"
+  },
+  {
+    "id": "A1V_169",
+    "level": "A1",
+    "hebrew": "אוטובוס",
+    "arabic": "حافلة",
+    "transliteration": "otobus",
+    "part_of_speech": "noun",
+    "source_transcript": "19_tirgul-misparim.txt",
+    "category": "travel"
+  },
+  {
+    "id": "A1V_170",
+    "level": "A1",
+    "hebrew": "תחנה",
+    "arabic": "محطة",
+    "transliteration": "tachana",
+    "part_of_speech": "noun",
+    "source_transcript": "34_rami-gar.txt",
+    "category": "travel"
+  },
+  {
+    "id": "A1V_171",
+    "level": "A1",
+    "hebrew": "רכבת",
+    "arabic": "قطار",
+    "transliteration": "rakevet",
+    "part_of_speech": "noun",
+    "source_transcript": "17_ma-hem-osim.txt",
+    "category": "travel"
+  },
+  {
+    "id": "A1V_172",
+    "level": "A1",
+    "hebrew": "רכבת קלה",
+    "arabic": "قطار خفيف",
+    "transliteration": "rakevet kala",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "34_rami-gar.txt",
+    "category": "travel"
+  },
+  {
+    "id": "A1V_173",
+    "level": "A1",
+    "hebrew": "קו",
+    "arabic": "خط",
+    "transliteration": "kav",
+    "part_of_speech": "noun",
+    "source_transcript": "34_rami-gar.txt",
+    "category": "travel"
+  },
+  {
+    "id": "A1V_174",
+    "level": "A1",
+    "hebrew": "ברגל",
+    "arabic": "سيرًا على الأقدام",
+    "transliteration": "beregel",
+    "part_of_speech": "adverb",
+    "source_transcript": "34_rami-gar.txt",
+    "category": "travel"
+  },
+  {
+    "id": "A1V_175",
+    "level": "A1",
+    "hebrew": "אפס",
+    "arabic": "صفر",
+    "transliteration": "efes",
+    "part_of_speech": "number",
+    "source_transcript": "19_tirgul-misparim.txt",
+    "category": "numbers_basics"
+  },
+  {
+    "id": "A1V_176",
+    "level": "A1",
+    "hebrew": "אחת",
+    "arabic": "واحد",
+    "transliteration": "achat",
+    "part_of_speech": "number",
+    "source_transcript": "19_tirgul-misparim.txt",
+    "category": "numbers_basics"
+  },
+  {
+    "id": "A1V_177",
+    "level": "A1",
+    "hebrew": "שתיים",
+    "arabic": "اثنان",
+    "transliteration": "shtayim",
+    "part_of_speech": "number",
+    "source_transcript": "19_tirgul-misparim.txt",
+    "category": "numbers_basics"
+  },
+  {
+    "id": "A1V_178",
+    "level": "A1",
+    "hebrew": "שלוש",
+    "arabic": "ثلاثة",
+    "transliteration": "shalosh",
+    "part_of_speech": "number",
+    "source_transcript": "19_tirgul-misparim.txt",
+    "category": "numbers_basics"
+  },
+  {
+    "id": "A1V_179",
+    "level": "A1",
+    "hebrew": "ארבע",
+    "arabic": "أربعة",
+    "transliteration": "arba",
+    "part_of_speech": "number",
+    "source_transcript": "19_tirgul-misparim.txt",
+    "category": "numbers_basics"
+  },
+  {
+    "id": "A1V_180",
+    "level": "A1",
+    "hebrew": "חמש",
+    "arabic": "خمسة",
+    "transliteration": "chamesh",
+    "part_of_speech": "number",
+    "source_transcript": "19_tirgul-misparim.txt",
+    "category": "numbers_basics"
+  },
+  {
+    "id": "A1V_181",
+    "level": "A1",
+    "hebrew": "שש",
+    "arabic": "ستة",
+    "transliteration": "shesh",
+    "part_of_speech": "number",
+    "source_transcript": "19_tirgul-misparim.txt",
+    "category": "numbers_basics"
+  },
+  {
+    "id": "A1V_182",
+    "level": "A1",
+    "hebrew": "שבע",
+    "arabic": "سبعة",
+    "transliteration": "sheva",
+    "part_of_speech": "number",
+    "source_transcript": "19_tirgul-misparim.txt",
+    "category": "numbers_basics"
+  },
+  {
+    "id": "A1V_183",
+    "level": "A1",
+    "hebrew": "שמונה",
+    "arabic": "ثمانية",
+    "transliteration": "shmone",
+    "part_of_speech": "number",
+    "source_transcript": "19_tirgul-misparim.txt",
+    "category": "numbers_basics"
+  },
+  {
+    "id": "A1V_184",
+    "level": "A1",
+    "hebrew": "תשע",
+    "arabic": "تسعة",
+    "transliteration": "tesha",
+    "part_of_speech": "number",
+    "source_transcript": "19_tirgul-misparim.txt",
+    "category": "numbers_basics"
+  },
+  {
+    "id": "A1V_185",
+    "level": "A1",
+    "hebrew": "עשר",
+    "arabic": "عشرة",
+    "transliteration": "eser",
+    "part_of_speech": "number",
+    "source_transcript": "19_tirgul-misparim.txt",
+    "category": "numbers_basics"
+  },
+  {
+    "id": "A1V_186",
+    "level": "A1",
+    "hebrew": "מספר",
+    "arabic": "رقم",
+    "transliteration": "mispar",
+    "part_of_speech": "noun",
+    "source_transcript": "19_tirgul-misparim.txt",
+    "category": "numbers_basics"
+  },
+  {
+    "id": "A1V_187",
+    "level": "A1",
+    "hebrew": "כרטיס אשראי",
+    "arabic": "بطاقة ائتمان",
+    "transliteration": "kartis ashrai",
+    "part_of_speech": "noun phrase",
+    "source_transcript": "19_tirgul-misparim.txt",
+    "category": "numbers_basics"
+  },
+  {
+    "id": "A1V_188",
+    "level": "A1",
+    "hebrew": "מים",
+    "arabic": "ماء",
+    "transliteration": "mayim",
+    "part_of_speech": "noun",
+    "source_transcript": "21_ma-yesh-batik.txt",
+    "category": "numbers_basics"
+  },
+  {
+    "id": "A1V_189",
+    "level": "A1",
+    "hebrew": "בקבוק",
+    "arabic": "زجاجة",
+    "transliteration": "bakbuk",
+    "part_of_speech": "noun",
+    "source_transcript": "21_ma-yesh-batik.txt",
+    "category": "numbers_basics"
+  },
+  {
+    "id": "A1V_190",
+    "level": "A1",
+    "hebrew": "בננה",
+    "arabic": "موزة",
+    "transliteration": "banana",
+    "part_of_speech": "noun",
+    "source_transcript": "21_ma-yesh-batik.txt",
+    "category": "numbers_basics"
+  },
+  {
+    "id": "A1V_191",
+    "level": "A1",
+    "hebrew": "תפוח",
+    "arabic": "تفاحة",
+    "transliteration": "tapuach",
+    "part_of_speech": "noun",
+    "source_transcript": "21_ma-yesh-batik.txt",
+    "category": "numbers_basics"
+  },
+  {
+    "id": "A1V_192",
+    "level": "A1",
+    "hebrew": "סוכרייה",
+    "arabic": "حلوى",
+    "transliteration": "sukaria",
+    "part_of_speech": "noun",
+    "source_transcript": "21_ma-yesh-batik.txt",
+    "category": "numbers_basics"
+  }
+]

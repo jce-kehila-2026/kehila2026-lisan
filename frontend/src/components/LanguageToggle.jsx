@@ -13,13 +13,13 @@ function LanguageToggle() {
 
   return (
     <div
-      className="inline-flex rounded-full border border-slate-200 bg-white p-1 shadow-sm"
+      className="inline-flex rounded-full border border-slate-200 bg-white p-0.5 shadow-sm sm:p-1"
       aria-label={t('languageToggle')}
     >
       <button
         type="button"
         onClick={() => switchLanguage('ar')}
-        className={`min-h-10 rounded-full px-4 py-2 text-sm font-semibold transition ${
+        className={`min-h-8 rounded-full px-2.5 py-1.5 text-xs font-semibold transition sm:min-h-10 sm:px-4 sm:py-2 sm:text-sm ${
           active === 'ar' ? 'bg-violet-600 text-white' : 'text-slate-600 hover:bg-slate-50'
         }`}
       >
@@ -28,7 +28,7 @@ function LanguageToggle() {
       <button
         type="button"
         onClick={() => switchLanguage('he')}
-        className={`min-h-10 rounded-full px-4 py-2 text-sm font-semibold transition ${
+        className={`min-h-8 rounded-full px-2.5 py-1.5 text-xs font-semibold transition sm:min-h-10 sm:px-4 sm:py-2 sm:text-sm ${
           active === 'he' ? 'bg-violet-600 text-white' : 'text-slate-600 hover:bg-slate-50'
         }`}
       >

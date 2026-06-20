@@ -17,6 +17,7 @@ import AdminConversations from './pages/admin/Conversations.jsx';
 import AdminNotifications from './pages/admin/Notifications.jsx';
 import AdminProgress from './pages/admin/Progress.jsx';
 import AdminStudents from './pages/admin/Students.jsx';
+import AdminStatistics from './pages/admin/Statistics.jsx';
 import AdminWords from './pages/admin/Words.jsx';
 import ForgotAccess from './pages/ForgotAccess.jsx';
 import HomePage from './pages/home/HomePage.jsx';
@@ -75,10 +76,23 @@ function StudentPreferenceSync() {
   return null;
 }
 
+function AdminScrollToTop() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname.startsWith('/admin/')) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }
+  }, [location.pathname]);
+
+  return null;
+}
+
 function App() {
   return (
     <Router>
       <StudentPreferenceSync />
+      <AdminScrollToTop />
       <Routes>
         <Route path="/" element={<Navigate to={SKIP_AUTH ? '/home' : '/login'} replace />} />
         <Route path="/login" element={<StudentLogin />} />
@@ -274,6 +288,14 @@ function App() {
           element={
             <ProtectedRoute role={['admin', 'teacher']}>
               <AdminProgress />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/statistics"
+          element={
+            <ProtectedRoute role={['admin', 'teacher']}>
+              <AdminStatistics />
             </ProtectedRoute>
           }
         />
