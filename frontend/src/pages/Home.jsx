@@ -10,9 +10,7 @@ import {
   Link as LinkIcon,
   LogOut,
   MessageCircle,
-  Plus,
   Search,
-  Settings,
   Star,
   Volume2,
   Zap,
@@ -288,7 +286,7 @@ function StudentHomeHeader({ sections, activeSection, onSectionClick, label, log
   );
 }
 
-function Home({ showTeacherActions = false, logoTarget = '/home' }) {
+function Home({ logoTarget = '/home', teacherManagementAction = null, teacherQuickAction = null }) {
   const { t, i18n } = useTranslation();
   const storedUser = getStoredUser();
   const isArabic = i18n.language === 'ar';
@@ -958,6 +956,7 @@ function Home({ showTeacherActions = false, logoTarget = '/home' }) {
         >
           <div className="mb-1 flex items-center justify-between gap-3">
             <h2 className="text-2xl font-black text-slate-900">{t('storiesTitle')}</h2>
+            {teacherQuickAction}
           </div>
 
           <div className="mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-hidden overscroll-x-contain pb-2 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden">
@@ -1296,51 +1295,7 @@ function Home({ showTeacherActions = false, logoTarget = '/home' }) {
             </span>
           </button>
 
-          {showTeacherActions ? (
-            <>
-              <Link
-                to="/teacher/stories/upload"
-                className="lisan-enter group flex flex-col sm:flex-row min-h-[170px] items-center justify-between gap-4 overflow-hidden rounded-[24px] border border-white/80 bg-white p-5 shadow-card transition hover:-translate-y-1.5 hover:shadow-[0_24px_56px_rgba(124,58,237,0.18)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
-                aria-label="הוספת חומר"
-                dir="ltr"
-                style={{ '--lisan-enter-delay': '650ms' }}
-              >
-                <span className="hidden sm:flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-700 transition group-hover:bg-violet-600 group-hover:text-white">
-                  <Plus className="h-6 w-6" aria-hidden="true" />
-                </span>
-
-                <div className="min-w-0 flex-1 text-center sm:text-right" dir="rtl">
-                  <h2 className="text-xl font-black text-slate-900">הוספת חומר</h2>
-                  <p className="mt-1.5 text-sm leading-6 text-slate-600">העלי חומרי תרגול חדשים למערכת.</p>
-                  <div className="mt-3 inline-flex h-10 items-center gap-2 rounded-full bg-violet-600 px-5 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:scale-[1.03] hover:shadow-[0_12px_24px_rgba(124,58,237,0.25)] group-hover:bg-violet-700">
-                    <span>פתחי</span>
-                    <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-                  </div>
-                </div>
-              </Link>
-
-              <Link
-                to="/admin/dashboard"
-                className="lisan-enter group flex flex-col sm:flex-row min-h-[170px] items-center justify-between gap-4 overflow-hidden rounded-[24px] border border-white/80 bg-white p-5 shadow-card transition hover:-translate-y-1.5 hover:shadow-[0_24px_56px_rgba(124,58,237,0.18)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
-                aria-label="ניהול מערכת"
-                dir="ltr"
-                style={{ '--lisan-enter-delay': '700ms' }}
-              >
-                <div className="min-w-0 flex-1 text-center sm:text-right" dir="rtl">
-                  <h2 className="text-xl font-black text-slate-900">ניהול מערכת</h2>
-                  <p className="mt-1.5 text-sm leading-6 text-slate-600">מעבר ללוח הניהול של ליסאן.</p>
-                  <div className="mt-3 inline-flex h-10 items-center gap-2 rounded-full bg-violet-600 px-5 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:scale-[1.03] hover:shadow-[0_12px_24px_rgba(124,58,237,0.25)] group-hover:bg-violet-700">
-                    <span>פתחי</span>
-                    <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-                  </div>
-                </div>
-
-                <span className="hidden sm:flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-700 transition group-hover:bg-violet-600 group-hover:text-white">
-                  <Settings className="h-6 w-6" aria-hidden="true" />
-                </span>
-              </Link>
-            </>
-          ) : null}
+          {teacherManagementAction}
         </section>
 
         {/* Links Modal */}
