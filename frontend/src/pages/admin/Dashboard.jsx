@@ -405,6 +405,10 @@ function AdminDashboard() {
   const sectionRefs = useRef({});
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, []);
+
+  useEffect(() => {
     const loadUsers = async () => {
       try {
         const token = getStoredToken();
@@ -623,7 +627,7 @@ function AdminDashboard() {
       </style>
 
       <div className="mx-auto w-full max-w-7xl" dir="rtl">
-        <header className="admin-dashboard-header sticky top-3 z-40 flex flex-wrap items-center justify-between gap-2 md:top-4 md:flex-nowrap md:gap-2 lg:gap-3">
+        <header className="admin-dashboard-header fixed left-3 right-3 top-3 z-50 mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 md:left-6 md:right-6 md:top-4 md:flex-nowrap md:gap-2 lg:left-8 lg:right-8 lg:gap-3">
           <div className="admin-dashboard-brand flex items-center gap-2">
             <button
               type="button"
@@ -814,6 +818,8 @@ function AdminDashboard() {
             </button>
           </div>
         </header>
+
+        <div className="h-14 md:h-16" aria-hidden="true" />
 
         <section className="relative mt-3 overflow-hidden rounded-[22px] border border-violet-100/70 bg-white/75 shadow-[0_16px_42px_rgba(109,40,217,0.1)] md:mt-5 md:rounded-[26px] md:shadow-[0_18px_48px_rgba(109,40,217,0.1)] lg:mt-8 lg:rounded-[30px] lg:shadow-[0_22px_70px_rgba(109,40,217,0.11)]">
           <div
