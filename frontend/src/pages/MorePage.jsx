@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import BottomNav from '../components/BottomNav.jsx';
 import LanguageToggle from '../components/LanguageToggle.jsx';
 import LisanLogo from '../components/LisanLogo.jsx';
-import { getStoredToken } from '../services/auth.js';
+import { getStoredToken, getStoredUser } from '../services/auth.js';
 
 const API_BASE_URL = '/api';
 
@@ -122,6 +122,8 @@ function MoreTopHeader() {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
   const isArabic = i18n.language === 'ar';
+  const user = getStoredUser();
+  const homeTarget = user?.role === 'teacher' ? '/teacher/dashboard' : '/home';
   const text = labels[isArabic ? 'ar' : 'he'];
   const sectionButtons = [
     {
@@ -163,7 +165,7 @@ function MoreTopHeader() {
       <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-4">
         <button
           type="button"
-          onClick={() => navigate('/home')}
+          onClick={() => navigate(homeTarget)}
           className="justify-self-start rounded-2xl transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
           aria-label="דף הבית"
           title="דף הבית"
