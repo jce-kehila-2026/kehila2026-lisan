@@ -9,6 +9,7 @@ import {
   Home as HomeIcon,
   Link as LinkIcon,
   LogOut,
+  Menu,
   MessageCircle,
   Search,
   Star,
@@ -209,39 +210,42 @@ function SectionTabBar({ sections, activeSection, onSectionClick, label }) {
   );
 }
 
-function StudentHomeHeader({ sections, activeSection, onSectionClick, label, logoTarget = '/home' }) {
+function StudentHomeHeader({
+  logoTarget = '/home',
+  headerAction = null,
+  sections,
+  activeSection,
+  onSectionClick,
+  label,
+}) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const reduceMotion = useReducedMotion();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleSectionClick = (id) => {
+    onSectionClick(id);
+    setMenuOpen(false);
+  };
 
   return (
-    <header className="lisan-enter z-50 flex flex-col gap-3 sm:gap-5 lg:sticky lg:top-3" style={{ '--lisan-enter-delay': '0ms' }}>
-      <div className="grid items-center gap-2 sm:gap-4 grid-cols-[auto_1fr_auto]">
+    <header
+      className="lisan-enter relative z-50 lg:sticky lg:top-3"
+      style={{ '--lisan-enter-delay': '0ms' }}
+    >
+      <div className="grid items-center gap-2 grid-cols-[auto_1fr_auto] sm:gap-4">
         <button
           type="button"
           onClick={() => navigate(logoTarget)}
-          className="col-start-1 row-start-1 justify-self-start rounded-2xl transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+          className="col-start-1 justify-self-start rounded-2xl transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
           aria-label="דף הבית"
           title="דף הבית"
         >
           <LisanLogo className="h-12 sm:h-24" />
         </button>
 
-        <div className="col-start-3 row-start-1 flex items-center gap-1.5 justify-self-end sm:gap-2">
-          <LanguageToggle />
-          <button
-            type="button"
-            onClick={() => navigate('/login')}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/85 bg-white/88 text-slate-600 shadow-[0_12px_28px_rgba(124,58,237,0.12)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-12 sm:w-12"
-            aria-label={t('logout')}
-            title={t('logout')}
-          >
-            <LogOut className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
-          </button>
-        </div>
-
         <nav
-          className="col-start-1 col-end-4 row-start-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3 lg:col-start-2 lg:col-end-3 lg:row-start-1"
+          className="col-start-2 hidden flex-wrap items-center justify-center gap-2 sm:flex sm:gap-3"
           aria-label={label}
         >
           {sections.map((section) => {
@@ -281,12 +285,74 @@ function StudentHomeHeader({ sections, activeSection, onSectionClick, label, log
           })}
         </nav>
 
+        <div className="col-start-3 flex items-center gap-1.5 justify-self-end sm:gap-2">
+          <button
+            type="button"
+            onClick={() => setMenuOpen((open) => !open)}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/85 bg-white/88 text-slate-600 shadow-[0_12px_28px_rgba(124,58,237,0.12)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:hidden"
+            aria-label={label}
+            aria-expanded={menuOpen}
+          >
+            <Menu className="h-4 w-4" aria-hidden="true" />
+          </button>
+
+          {headerAction}
+          <LanguageToggle />
+          <button
+            type="button"
+            onClick={() => navigate('/login')}
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/85 bg-white/88 text-slate-600 shadow-[0_12px_28px_rgba(124,58,237,0.12)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-12 sm:w-12"
+            aria-label={t('logout')}
+            title={t('logout')}
+          >
+            <LogOut className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
+          </button>
+        </div>
       </div>
+
+      {menuOpen ? (
+        <>
+          <button
+            type="button"
+            aria-label={label}
+            onClick={() => setMenuOpen(false)}
+            className="fixed inset-0 z-40 sm:hidden"
+          />
+          <div className="lisan-enter absolute inset-x-0 top-full z-50 mt-2 grid gap-1.5 rounded-[22px] border border-white/80 bg-white p-2 shadow-card sm:hidden">
+            {sections.map((section) => {
+              const Icon = section.icon;
+              const isActive = activeSection === section.id;
+
+              return (
+                <button
+                  key={section.id}
+                  type="button"
+                  aria-current={isActive ? 'true' : undefined}
+                  onClick={() => handleSectionClick(section.id)}
+                  className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-base font-black transition ${
+                    isActive
+                      ? 'bg-violet-50 text-violet-700'
+                      : 'text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                  <span>{section.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      ) : null}
     </header>
   );
 }
 
-function Home({ logoTarget = '/home', teacherManagementAction = null, teacherQuickAction = null }) {
+function Home({
+  logoTarget = '/home',
+  teacherManagementAction = null,
+  teacherQuickAction = null,
+  headerAction = null,
+}) {
   const { t, i18n } = useTranslation();
   const storedUser = getStoredUser();
   const isArabic = i18n.language === 'ar';
@@ -393,7 +459,7 @@ function Home({ logoTarget = '/home', teacherManagementAction = null, teacherQui
         { id: 'section-games', ref: gamesRef },
         { id: 'section-resources', ref: resourcesRef },
       ];
-      const marker = window.scrollY + 112;
+      const marker = window.scrollY + 180;
       let currentSection = 'section-hero';
 
       for (const section of sectionRefs) {
@@ -799,18 +865,19 @@ function Home({ logoTarget = '/home', teacherManagementAction = null, teacherQui
       <div className="app-page-container relative pb-32" dir="rtl">
 
         <StudentHomeHeader
+          logoTarget={logoTarget}
+          headerAction={headerAction}
           sections={sections}
           activeSection={activeSection}
           onSectionClick={scrollToSection}
           label={sectionNavigationLabel}
-          logoTarget={logoTarget}
         />
 
         {/* ── Hero ──────────────────────────────────────────────── */}
         <section
           ref={heroRef}
           id="section-hero"
-          className="lisan-enter relative mt-12 overflow-hidden rounded-[34px] border border-white/85 bg-cover bg-center shadow-[0_24px_70px_rgba(91,33,182,0.14)] transition hover:-translate-y-0.5 hover:shadow-[0_30px_78px_rgba(124,58,237,0.18)]"
+          className="lisan-enter relative mt-8 overflow-hidden rounded-[34px] border border-white/85 bg-cover bg-center shadow-[0_24px_70px_rgba(91,33,182,0.14)] transition hover:-translate-y-0.5 hover:shadow-[0_30px_78px_rgba(124,58,237,0.18)]"
           style={{
             '--lisan-enter-delay': '150ms',
             '--hero-image-x': '0px',
