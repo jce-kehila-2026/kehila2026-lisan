@@ -29,8 +29,10 @@ function ChatWindow({
   loadingLabel = 'Loading…',
   emptyTitle,
   emptyDescription,
-  emptyPrompts = [],
-  onPromptClick,
+  onReadAloud,
+  readAloudLoadingId = null,
+  readAloudPlayingId = null,
+  readAloudLabel = '',
 }) {
   const bottomRef = useRef(null);
 
@@ -49,8 +51,6 @@ function ChatWindow({
       <ChatEmptyState
         title={emptyTitle}
         description={emptyDescription}
-        prompts={emptyPrompts}
-        onPromptClick={onPromptClick}
       />
     );
   }
@@ -76,6 +76,16 @@ function ChatWindow({
             fallbackUsed={message.fallbackUsed}
             fallbackReason={message.fallbackReason}
             pronunciationScore={message.pronunciationScore}
+            onReadAloud={
+              message.role === 'assistant' && typeof onReadAloud === 'function'
+                ? () => onReadAloud(message)
+                : null
+            }
+            readAloudDisabled={Boolean(readAloudLoadingId) || Boolean(readAloudPlayingId)}
+            readAloudLoading={
+              readAloudLoadingId === message.localId || readAloudPlayingId === message.localId
+            }
+            readAloudLabel={readAloudLabel}
           />
         ))}
       </AnimatePresence>

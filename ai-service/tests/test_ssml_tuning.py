@@ -103,6 +103,11 @@ class TestBuildSsml:
         ssml = build_ssml("שלום")
         assert '<break' not in ssml
 
+    def test_ambiguous_second_person_forms_are_feminine_for_tts(self):
+        ssml = build_ssml("אני רואה אותך וזה מתאים לך.")
+        assert "אוֹתָךְ" in ssml
+        assert "לָךְ" in ssml
+
 
 # ---------------------------------------------------------------------------
 # VoiceChatResponse schema
