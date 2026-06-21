@@ -201,7 +201,7 @@ router.put(
 router.get(
   '/analytics/full',
   requireAuth,
-  requireRole('admin'),
+  requireRole('admin', 'teacher'),
   adminController.getFullAnalytics
 );
 

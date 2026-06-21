@@ -225,7 +225,7 @@ function topAnalyticsLevel(metricMap) {
   return { level: topLevel, value: Math.max(0, topValue) };
 }
 
-function AnalyticsOverview({ navigate, userRole }) {
+function AnalyticsOverview({ navigate }) {
   const [analytics, setAnalytics] = useState(null);
 
   useEffect(() => {
@@ -286,16 +286,14 @@ function AnalyticsOverview({ navigate, userRole }) {
           </h2>
         </div>
 
-        {userRole === 'admin' ? (
-          <button
-            type="button"
-            onClick={() => navigate('/admin/analytics')}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-violet-600 px-5 py-2 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
-          >
-            <BarChart3 className="h-4 w-4" aria-hidden="true" />
-            צפייה בניתוח הנתונים המלא
-          </button>
-        ) : null}
+        <button
+          type="button"
+          onClick={() => navigate('/admin/analytics')}
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-violet-600 px-5 py-2 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+        >
+          <BarChart3 className="h-4 w-4" aria-hidden="true" />
+          צפייה בניתוח הנתונים המלא
+        </button>
       </div>
 
       <div className="mt-4 grid gap-3 lg:grid-cols-[1.2fr_1fr_1.1fr]">
@@ -853,7 +851,7 @@ function AdminDashboard() {
           </div>
         </section>
 
-        <AnalyticsOverview navigate={navigate} userRole={user?.role} />
+        <AnalyticsOverview navigate={navigate} />
 
         <section className="mt-3 grid grid-cols-1 gap-3 sm:mt-6 sm:gap-4 md:grid-cols-2 xl:grid-cols-4">
           {stats.map((stat) => (
