@@ -14,7 +14,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Bot, UserRound } from 'lucide-react';
+import { Bot, Loader2, UserRound, Volume2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { bubbleMotion } from '../ui/motion.js';
 import { getPronunciationFeedback } from '../../services/chat.js';
@@ -40,6 +40,10 @@ function ChatMessage({
   fallbackUsed = false,
   fallbackReason = null,
   pronunciationScore = null,
+  onReadAloud = null,
+  readAloudDisabled = false,
+  readAloudLoading = false,
+  readAloudLabel = '',
 }) {
   const { t } = useTranslation();
   const isUser = role === 'user';
@@ -66,6 +70,22 @@ function ChatMessage({
           <span className="chat-message__label">
             {isUser ? t('chatYouLabel') : t('chatAssistantLabel')}
           </span>
+          {!isUser && textHe && typeof onReadAloud === 'function' ? (
+            <button
+              type="button"
+              className="chat-message__read-aloud"
+              onClick={onReadAloud}
+              disabled={readAloudDisabled || readAloudLoading || pending}
+              aria-label={readAloudLabel}
+              title={readAloudLabel}
+            >
+              {readAloudLoading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+              ) : (
+                <Volume2 className="h-3.5 w-3.5" aria-hidden="true" />
+              )}
+            </button>
+          ) : null}
         </div>
 
         {/* Primary Hebrew text — always RTL */}

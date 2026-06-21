@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from '../pages/Home.jsx';
 import PlaceholderPage from '../pages/PlaceholderPage.jsx';
 import Chatbot from '../pages/Chatbot.jsx';
+import ChatbotPage from '../pages/ChatbotPage.jsx';
 import GamesPage from '../pages/GamesPage.jsx';
 import MorePage from '../pages/MorePage.jsx';
 import ProfilePage from '../pages/ProfilePage.jsx';
@@ -68,7 +69,7 @@ function AppRoutes() {
         <Route path="/games" element={<GamesPage />} />
         <Route path="/links" element={<PlaceholderPage titleKey="links" />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/chatbot" element={<Chatbot />} />
+        <Route path="/chatbot" element={<ChatbotPage />} />
         <Route path="/scenario/:id" element={<ScenarioChat />} />
         <Route
           path="/more"

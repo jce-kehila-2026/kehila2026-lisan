@@ -119,6 +119,8 @@ function Chatbot({
   const [sending, setSending] = useState(false);
   const [inputMode, setInputMode] = useState('text');
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [readingMessageId, setReadingMessageId] = useState(null);
+  const [voiceEditBusy, setVoiceEditBusy] = useState(false);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [reviewedChats, setReviewedChats] = useState(() => {
     try { return JSON.parse(sessionStorage.getItem('lisan-reviewed-chats') || '[]'); } catch { return []; }
@@ -138,11 +140,17 @@ function Chatbot({
   const transcriptOriginRef = useRef(null);
   const consumedTranscriptRef = useRef('');
 
-  // ── Auto-transcribe when recorder produces a blob ──
+  // ── Route a finished recording by mode ──
+  //   handsfree → server STT (Azure) + chat + Azure TTS via /chats/voice
+  //   voiceEdit → in-browser Whisper (kept as backup; transcribe-to-edit)
   useEffect(() => {
-    if (recorder.audioBlob) {
-      whisper.transcribe(recorder.audioBlob);
-      recorder.clearAudio();
+    if (!recorder.audioBlob) return;
+    const blob = recorder.audioBlob;
+    recorder.clearAudio();
+    if (transcriptOriginRef.current === 'handsfree') {
+      sendVoiceMessage(blob);
+    } else {
+      transcribeVoiceEdit(blob);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recorder.audioBlob]);
@@ -217,8 +225,8 @@ function Chatbot({
 
   // ── Shared send helper (used by form submit AND handsfree auto-send) ──
   const sendTextMessage = useCallback(
-    async (text) => {
-      const trimmed = text.trim();
+    async (messageText) => {
+      const trimmed = messageText.trim();
       if (!trimmed || sending || !chatId) return null;
 
       const tempUserMessage = {
@@ -295,6 +303,158 @@ function Chatbot({
     window.speechSynthesis.speak(utterance);
   }, []);
 
+  // ── Audio playback: prefer Azure MP3 (audioBase64); fall back to the
+  //    browser speechSynthesis if it's missing or fails to play. ──
+  const audioElementRef = useRef(null);
+
+  const stopAudioPlayback = useCallback(() => {
+    if (audioElementRef.current) {
+      try { audioElementRef.current.pause(); } catch { /* ignore */ }
+      audioElementRef.current = null;
+    }
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    setIsSpeaking(false);
+  }, []);
+
+  const playReplyAudio = useCallback((audioBase64, fallbackText) => {
+    if (audioBase64) {
+      try {
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+          window.speechSynthesis.cancel();
+        }
+        const audio = new Audio(`data:audio/mp3;base64,${audioBase64}`);
+        audioElementRef.current = audio;
+        setIsSpeaking(true);
+        audio.onended = () => {
+          setIsSpeaking(false);
+          audioElementRef.current = null;
+        };
+        audio.onerror = () => {
+          audioElementRef.current = null;
+          speakReply(fallbackText);
+        };
+        audio.play().catch(() => {
+          audioElementRef.current = null;
+          speakReply(fallbackText);
+        });
+        return;
+      } catch {
+        // fall through to browser TTS
+      }
+    }
+    speakReply(fallbackText);
+  }, [speakReply]);
+
+  const readMessageAloud = useCallback(async (message) => {
+    const replyText = (message?.text || '').trim();
+    if (!replyText) return;
+
+    stopAudioPlayback();
+    setReadingMessageId(message.id);
+
+    try {
+      const data = await request('/chats/tts', {
+        method: 'POST',
+        body: JSON.stringify({ text: replyText }),
+      });
+      playReplyAudio(data.audioBase64 || null, replyText);
+    } catch (err) {
+      console.error('Read aloud failed:', err);
+      speakReply(replyText);
+    } finally {
+      setReadingMessageId(null);
+    }
+  }, [playReplyAudio, speakReply, stopAudioPlayback]);
+
+  // ── Handsfree voice turn: upload audio → Azure STT + chat + Azure TTS ──
+  const sendVoiceMessage = useCallback(
+    async (blob) => {
+      if (!blob || sending || !chatId) return;
+      setSending(true);
+      try {
+        const token = getStoredToken();
+        const form = new FormData();
+        // Normalize to plain audio/webm (backend allow-list is exact-match).
+        const file = new File([blob], 'voice.webm', { type: 'audio/webm' });
+        form.append('audio', file);
+        form.append('conversationId', chatId);
+        form.append('level', 'A1');
+
+        const response = await fetch(`${API_BASE_URL}/chats/voice`, {
+          method: 'POST',
+          headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+          body: form,
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'Voice request failed');
+        }
+
+        const userText = (data.transcribedText || '').trim();
+        const replyText = data.answerHe || data.text || '';
+
+        if (userText) {
+          setMessages((cur) => [
+            ...cur,
+            { id: createMessageId('user'), role: 'user', text: userText },
+          ]);
+        }
+        if (replyText) {
+          setMessages((cur) => [
+            ...cur,
+            { id: createMessageId('bot'), role: 'bot', text: replyText },
+          ]);
+        }
+        playReplyAudio(data.audioBase64 || null, replyText);
+      } catch (err) {
+        console.error('Voice message failed:', err);
+        setMessages((cur) => [
+          ...cur,
+          { id: createMessageId('bot'), role: 'bot', text: text.serverError },
+        ]);
+      } finally {
+        setSending(false);
+      }
+    },
+    [chatId, sending, playReplyAudio, text.serverError],
+  );
+
+  // ── Voice-edit STT via Azure (server); Whisper is the fallback only. ──
+  const transcribeVoiceEdit = useCallback(
+    async (blob) => {
+      if (!blob) return;
+      setVoiceEditBusy(true);
+      try {
+        const token = getStoredToken();
+        const form = new FormData();
+        const file = new File([blob], 'voice.webm', { type: 'audio/webm' });
+        form.append('audio', file);
+
+        const response = await fetch(`${API_BASE_URL}/chats/transcribe`, {
+          method: 'POST',
+          headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+          body: form,
+        });
+        const data = await response.json().catch(() => ({}));
+        const transcript = (data?.transcribedText || '').trim();
+
+        if (response.ok && transcript) {
+          setInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
+        } else {
+          whisper.transcribe(blob); // fallback to in-browser Whisper
+        }
+      } catch (err) {
+        console.error('Server STT failed, using Whisper fallback:', err);
+        whisper.transcribe(blob);
+      } finally {
+        setVoiceEditBusy(false);
+      }
+    },
+    [whisper],
+  );
+
   // ── Single consumer for completed transcripts (routed by origin) ──
   useEffect(() => {
     if (whisper.status !== 'done') return;
@@ -333,10 +493,7 @@ function Chatbot({
       recorder.stopRecording();
     }
 
-    if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-    }
-    setIsSpeaking(false);
+    stopAudioPlayback();
     speakingUtteranceRef.current = null;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputMode]);
@@ -346,6 +503,10 @@ function Chatbot({
     return () => {
       if (typeof window !== 'undefined' && window.speechSynthesis) {
         window.speechSynthesis.cancel();
+      }
+      if (audioElementRef.current) {
+        try { audioElementRef.current.pause(); } catch { /* ignore */ }
+        audioElementRef.current = null;
       }
     };
   }, []);
@@ -549,6 +710,20 @@ function Chatbot({
                     }`}
                 >
                   <span>{msg.text}</span>
+                  {msg.role === 'bot' && msg.text ? (
+                    <button
+                      type="button"
+                      onClick={() => readMessageAloud(msg)}
+                      disabled={readingMessageId === msg.id}
+                      aria-label="Read aloud"
+                      title="Read aloud"
+                      dir="ltr"
+                      className="mt-2 flex w-fit items-center gap-1 rounded-full border border-violet-200 bg-white/80 px-2.5 py-1 text-xs font-semibold text-violet-700 transition hover:bg-white disabled:cursor-wait disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-violet-400"
+                    >
+                      <Volume2 className="h-3.5 w-3.5" aria-hidden="true" />
+                      <span>Read aloud</span>
+                    </button>
+                  ) : null}
                 </div>
               ))
             )}
@@ -643,6 +818,9 @@ function Chatbot({
 
                   {isRecording && (
                     <p className="text-xs font-semibold text-rose-500">{text.recording}</p>
+                  )}
+                  {voiceEditBusy && (
+                    <p className="text-xs text-violet-600">{text.transcribing}</p>
                   )}
                   {whisper.status === 'loading-model' && (
                     <p className="text-xs text-violet-600">

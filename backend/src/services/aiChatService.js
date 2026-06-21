@@ -66,6 +66,14 @@ function getAiVoiceServiceUrl() {
   return `${normalizeAiServiceBaseUrl()}/api/ai/chat/voice`;
 }
 
+function getAiTranscribeServiceUrl() {
+  return `${normalizeAiServiceBaseUrl()}/api/ai/chat/transcribe`;
+}
+
+function getAiTtsServiceUrl() {
+  return `${normalizeAiServiceBaseUrl()}/api/ai/chat/tts`;
+}
+
 async function sendChatMessageToAi({
   message,
   level = 'A1',
@@ -141,6 +149,73 @@ async function sendVoiceMessageToAi({
 }
 
 /**
+ * STT-only: forward an audio clip to ai-service and return { transcribedText }.
+ * Used by the voice-edit flow (transcribe, then the student edits before send).
+ */
+async function transcribeAudioViaAi({
+  audioBuffer,
+  fileName = 'voice.webm',
+  mimeType = 'audio/webm',
+  userId = null,
+  userToken = null,
+}) {
+  try {
+    const formData = new FormData();
+    const audioBlob = new Blob([audioBuffer], { type: mimeType });
+
+    formData.append('audio', audioBlob, fileName);
+    if (userId) formData.append('userId', userId);
+
+    const response = await axios.post(
+      getAiTranscribeServiceUrl(),
+      formData,
+      createAiRequestConfig({
+        timeout: getAiVoiceServiceTimeoutMs(),
+        headers: {
+          ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {}),
+          ...(userId ? { 'X-User-ID': userId } : {}),
+        }
+      })
+    );
+
+    return response.data;
+  } catch (error) {
+    throw mapAiServiceError(error);
+  }
+}
+
+async function synthesizeTextViaAi({
+  text,
+  isFallback = false,
+  pronunciationScore = null,
+  userId = null,
+  userToken = null,
+}) {
+  try {
+    const response = await axios.post(
+      getAiTtsServiceUrl(),
+      {
+        text,
+        isFallback,
+        pronunciationScore,
+      },
+      createAiRequestConfig({
+        timeout: getAiVoiceServiceTimeoutMs(),
+        headers: {
+          'Content-Type': 'application/json',
+          ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {}),
+          ...(userId ? { 'X-User-ID': userId } : {}),
+        }
+      })
+    );
+
+    return response.data;
+  } catch (error) {
+    throw mapAiServiceError(error);
+  }
+}
+
+/**
  * Normalises every shape ai-service or axios may throw into:
  *   { status, code, message, details? }
  *
@@ -199,7 +274,10 @@ module.exports = {
   getAiServiceTimeoutMs,
   getAiVoiceServiceTimeoutMs,
   getAiVoiceServiceUrl,
+  getAiTtsServiceUrl,
   mapAiServiceError,
   sendChatMessageToAi,
   sendVoiceMessageToAi,
+  synthesizeTextViaAi,
+  transcribeAudioViaAi,
 };

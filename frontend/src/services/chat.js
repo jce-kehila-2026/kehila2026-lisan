@@ -1,6 +1,7 @@
 export const CHAT_API_PATH = '/api/chat';
 export const CHAT_CONVERSATIONS_API_PATH = `${CHAT_API_PATH}/conversations`;
 export const CHAT_VOICE_API_PATH = `${CHAT_API_PATH}/voice`;
+export const CHAT_TTS_API_PATH = `${CHAT_API_PATH}/tts`;
 
 export const DEFAULT_CHAT_LEVEL = 'A1';
 
@@ -337,6 +338,35 @@ export async function sendVoiceMessage({
   }
 
   return normalizeVoiceChatResponse(responseBody);
+}
+
+export async function synthesizeSpeech({
+  text,
+  isFallback = false,
+  pronunciationScore = null,
+}) {
+  const response = await fetch(CHAT_TTS_API_PATH, {
+    method: 'POST',
+    headers: getChatHeaders(),
+    body: JSON.stringify({
+      text: typeof text === 'string' ? text.trim() : '',
+      isFallback: isFallback === true,
+      pronunciationScore,
+    }),
+  });
+
+  const responseBody = await readJsonSafe(response);
+
+  if (!response.ok) {
+    throw createChatApiError(response, responseBody, 'chatTextToSpeechFailed');
+  }
+
+  return {
+    audioBase64: responseBody.audioBase64 ?? null,
+    ssmlText: responseBody.ssmlText ?? null,
+    fallbackUsed: responseBody.fallbackUsed === true,
+    fallbackReason: responseBody.fallbackReason ?? null,
+  };
 }
 
 function normalizeConversationSummary(payload = {}) {
