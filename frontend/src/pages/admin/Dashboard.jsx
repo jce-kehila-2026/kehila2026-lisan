@@ -30,6 +30,8 @@ import {
 } from '../../data/adminMockData.js';
 import { getFullAnalytics } from '../../services/adminApi.js';
 import AdminNavStrip from '../../components/admin/AdminNavStrip.jsx';
+import LisanHeader from '../../components/LisanHeader.jsx';
+import AdminHeroVisual from '../../components/admin/AdminHeroVisual.jsx';
 
 import {
   getStoredToken,
@@ -546,10 +548,7 @@ function AdminDashboard() {
 
   const handleLogout = () => {
     logout();
-
-    navigate('/admin/login', {
-      replace: true,
-    });
+    navigate('/teacher/login', { replace: true });
   };
 
   const handleSectionShortcutClick = (sectionId) => {
@@ -625,229 +624,95 @@ function AdminDashboard() {
       </style>
 
       <div className="mx-auto w-full max-w-7xl" dir="rtl">
-        <header className="admin-dashboard-header fixed left-3 right-3 top-3 z-50 mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 md:left-6 md:right-6 md:top-4 md:flex-nowrap md:gap-2 lg:left-8 lg:right-8 lg:gap-3">
-          <div className="admin-dashboard-brand flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                setMobileNavOpen((isOpen) => !isOpen);
-                setNotificationsOpen(false);
-              }}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-[14px] border border-violet-100/80 bg-white/90 text-violet-700 shadow-[0_10px_24px_rgba(109,40,217,0.09)] transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 md:hidden"
-              aria-label="פתיחת ניווט"
-              aria-expanded={mobileNavOpen}
-              aria-controls="admin-dashboard-mobile-menu"
-            >
-              {mobileNavOpen ? (
-                <X className="h-5 w-5" aria-hidden="true" />
-              ) : (
-                <Menu className="h-5 w-5" aria-hidden="true" />
-              )}
-            </button>
 
-            <button
-              type="button"
-              onClick={() => navigate('/admin/dashboard')}
-              className="admin-dashboard-logo inline-flex min-h-12 items-center gap-2 rounded-[18px] border border-violet-100/80 bg-white/90 px-2.5 py-1.5 text-right shadow-[0_10px_28px_rgba(109,40,217,0.08)] transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_14px_34px_rgba(109,40,217,0.12)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 lg:min-h-14 lg:gap-3 lg:rounded-[20px] lg:px-3 lg:py-2"
-              aria-label="חזרה ללוח הניהול"
-            >
-              <img
-                src="/logo.png"
-                alt=""
-                className="h-9 w-9 rounded-[12px] object-contain shadow-[0_12px_28px_rgba(109,40,217,0.12)] lg:h-11 lg:w-11 lg:rounded-[14px]"
-              />
-
-              <span className="flex flex-col leading-none">
-                <span className="text-xl font-black tracking-normal text-slate-950 lg:text-2xl">
-                  ליסאן
-                </span>
-                <span className="mt-0.5 hidden text-xs font-semibold leading-5 text-slate-500 md:block lg:mt-1 lg:text-sm">
-                  ללמוד עברית בצעדים רגועים וברורים
-                </span>
-              </span>
-            </button>
-
-            {mobileNavOpen ? (
-              <div
-                id="admin-dashboard-mobile-menu"
-                className="admin-dashboard-mobile-menu fixed right-3 top-[4.5rem] z-30 w-[min(21rem,calc(100vw-1.5rem))] rounded-[24px] border border-violet-100/80 bg-white/95 p-3 text-right shadow-[0_22px_55px_rgba(109,40,217,0.16)] backdrop-blur [animation:lisanDropdownIn_160ms_ease-out] md:hidden"
-                dir="rtl"
-              >
-                <nav className="grid gap-2" aria-label="ניווט מנהלת">
-                  {dashboardSections.map((section) => {
-                    const Icon = section.icon;
-                    const isActive = activeSectionId === section.id;
-
-                    return (
-                      <button
-                        key={section.id}
-                        type="button"
-                        onClick={() => handleMobileSectionShortcutClick(section.id)}
-                        className={`flex min-h-11 w-full items-center justify-between gap-3 rounded-2xl border px-3 py-2 text-sm font-black transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
-                          isActive
-                            ? 'border-violet-200 bg-violet-100 text-violet-900 shadow-[0_10px_24px_rgba(109,40,217,0.12)]'
-                            : 'border-transparent bg-violet-50/65 text-violet-900/80 hover:border-violet-100 hover:bg-white'
-                        }`}
-                        aria-current={isActive ? 'true' : undefined}
-                      >
-                        <span className="flex items-center gap-2">
-                          <Icon className="h-4 w-4" aria-hidden="true" />
-                          <span>{section.navLabel}</span>
-                        </span>
-                        <ChevronLeft className="h-4 w-4 text-violet-500" aria-hidden="true" />
-                      </button>
-                    );
-                  })}
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileNavOpen(false);
-                      navigate('/teacher/dashboard');
-                    }}
-                    className="mt-1 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl bg-violet-600 px-3 py-2 text-sm font-black text-white shadow-[0_12px_26px_rgba(109,40,217,0.22)] transition hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
-                    aria-label="תצוגת תלמיד"
-                  >
-                    <Eye className="h-4 w-4" aria-hidden="true" />
-                    <span>תצוגת תלמיד</span>
-                  </button>
-                </nav>
-              </div>
-            ) : null}
-          </div>
-
-          <div className="hidden md:contents">
-            <AdminNavStrip
-              activeSectionId={selectedSectionId}
-              dashboardMode
-              onSectionClick={handleSectionShortcutClick}
-            />
-          </div>
-
-          <div className="hidden">
-            <nav
-              className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto py-0.5 text-right [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-              aria-label="ניווט מהיר בלוח הניהול"
-            >
-              {dashboardSections.map((section) => {
-                const isActive = activeSectionId === section.id;
-                const Icon = section.icon;
-
-                return (
-                  <button
-                    key={section.id}
-                    type="button"
-                    onClick={() => handleSectionShortcutClick(section.id)}
-                    className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-black transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
-                      isActive
-                        ? 'border-white/80 bg-white text-violet-800 shadow-[0_10px_24px_rgba(109,40,217,0.18)]'
-                        : 'border-white/50 bg-white/42 text-violet-900/75 hover:bg-white/70 hover:text-violet-800'
-                    }`}
-                    aria-current={isActive ? 'true' : undefined}
-                  >
-                    <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-                    <span>{section.navLabel}</span>
-                  </button>
-                );
-              })}
-            </nav>
-
-            <button
-              type="button"
-              onClick={() => navigate('/teacher/dashboard')}
-              className="inline-flex shrink-0 items-center gap-2 rounded-[18px] bg-violet-600 px-4 py-2.5 text-sm font-black text-white shadow-[0_12px_26px_rgba(109,40,217,0.22)] transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
-              aria-label="תצוגת תלמיד"
-            >
-              <Eye className="h-4 w-4" aria-hidden="true" />
-              <span>תצוגת תלמיד</span>
-            </button>
-          </div>
-
-          <div className="admin-dashboard-actions flex shrink-0 items-center gap-2 lg:gap-3">
-            <div className="relative">
+        <LisanHeader
+          sections={dashboardSections.map((s) => ({ id: s.id, label: s.navLabel, icon: s.icon }))}
+          activeSection={selectedSectionId}
+          onSectionClick={handleSectionShortcutClick}
+          logoTarget="/admin/dashboard"
+          onLogout={handleLogout}
+          navLabel="ניווט מהיר בלוח הניהול"
+          extraLeft={
+            <div className="flex items-center gap-1.5">
+              {/* Student-view button */}
               <button
                 type="button"
-                onClick={() => {
-                  setNotificationsOpen((isOpen) => !isOpen);
-                  setMobileNavOpen(false);
-                }}
-                className="relative flex h-11 w-11 items-center justify-center rounded-[16px] border border-violet-100/80 bg-white/90 text-violet-700 shadow-[0_10px_28px_rgba(109,40,217,0.08)] transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 lg:h-12 lg:w-12 lg:rounded-[18px]"
-                aria-label="התראות"
-                aria-expanded={notificationsOpen}
+                onClick={() => navigate('/teacher/dashboard')}
+                className="inline-flex h-9 items-center gap-1.5 rounded-full border border-violet-200/80 bg-white/80 px-2.5 text-xs font-black text-violet-700 shadow-sm transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-10 sm:px-3 sm:text-sm"
+                aria-label="תצוגת תלמיד"
+                title="תצוגת תלמיד"
               >
-                <Bell className="h-5 w-5" aria-hidden="true" />
-                <span className="absolute -left-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[11px] font-black text-white">
-                  {dashboardNotifications.length}
-                </span>
+                <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">תצוגת תלמיד</span>
               </button>
 
-              {notificationsOpen ? (
-                <div className="admin-dashboard-notifications-menu fixed left-1/2 top-[4.5rem] z-30 w-[min(20rem,calc(100vw-1.5rem))] -translate-x-1/2 origin-top rounded-[24px] border border-violet-100/80 bg-white/95 p-3 text-right shadow-[0_22px_55px_rgba(109,40,217,0.16)] backdrop-blur [animation:lisanDropdownIn_160ms_ease-out] md:absolute md:left-0 md:top-14 md:w-[min(20rem,calc(100vw-2rem))] md:translate-x-0 md:origin-top-left">
-                  <div className="mb-2 flex items-center justify-between gap-3 px-2">
-                    <h2 className="text-sm font-black text-[#160A52]">
-                      התראות
-                    </h2>
-                    <span className="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-black text-violet-700">
+              {/* Notifications */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNotificationsOpen((isOpen) => !isOpen);
+                    setMobileNavOpen(false);
+                  }}
+                  className="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/80 bg-white/80 text-violet-700 shadow-sm transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-10 sm:w-10"
+                  aria-label="התראות"
+                  aria-expanded={notificationsOpen}
+                >
+                  <Bell className="h-4 w-4" aria-hidden="true" />
+                  {dashboardNotifications.length > 0 ? (
+                    <span className="absolute -left-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-black text-white">
                       {dashboardNotifications.length}
                     </span>
-                  </div>
+                  ) : null}
+                </button>
 
-                  <div className="space-y-2">
-                    {dashboardNotifications.map((notification) => (
-                      <div
-                        key={notification}
-                        className="rounded-2xl bg-violet-50/70 px-3 py-3 text-sm font-semibold leading-6 text-slate-700"
-                      >
-                        {notification}
-                      </div>
-                    ))}
+                {notificationsOpen ? (
+                  <div className="admin-dashboard-notifications-menu fixed left-1/2 top-20 z-50 w-[min(20rem,calc(100vw-1.5rem))] -translate-x-1/2 rounded-[20px] border border-violet-100/80 bg-white/96 p-3 text-right shadow-[0_16px_48px_rgba(109,40,217,0.16)] backdrop-blur [animation:lisanDropdownIn_160ms_ease-out] md:absolute md:left-0 md:top-12 md:translate-x-0" dir="rtl">
+                    <div className="mb-2 flex items-center justify-between gap-3 px-2">
+                      <h2 className="text-sm font-black text-[#160A52]">התראות</h2>
+                      <span className="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-black text-violet-700">
+                        {dashboardNotifications.length}
+                      </span>
+                    </div>
+                    <div className="space-y-2">
+                      {dashboardNotifications.map((notification) => (
+                        <div key={notification} className="rounded-2xl bg-violet-50/70 px-3 py-3 text-sm font-semibold leading-6 text-slate-700">
+                          {notification}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ) : null}
+                ) : null}
+              </div>
+            </div>
+          }
+        />
+
+        <section
+          className="relative mt-8 overflow-hidden rounded-[24px] border border-violet-100/70 bg-white/75 shadow-[0_16px_42px_rgba(109,40,217,0.1)] md:mt-10 md:rounded-[28px]"
+          style={{ maxHeight: '140px' }}
+        >
+          {/* Full layout: image left, gradient, text right */}
+          <div className="flex h-full min-h-[140px] items-stretch" dir="ltr">
+
+            {/* Visual — far left edge */}
+            <div className="relative w-[34%] shrink-0 overflow-hidden" aria-hidden="true">
+              <AdminHeroVisual type="dashboard" />
             </div>
 
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="inline-flex min-h-11 items-center gap-2 rounded-[16px] border border-violet-100/80 bg-white/90 px-3 py-1.5 text-xs font-black text-slate-700 shadow-[0_10px_28px_rgba(109,40,217,0.08)] transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 lg:min-h-12 lg:gap-3 lg:rounded-[18px] lg:px-5 lg:py-2 lg:text-sm"
-            >
-              <UserRound className="h-5 w-5 text-violet-700" aria-hidden="true" />
-              יציאה
-            </button>
-          </div>
-        </header>
-
-        <div className="h-14 md:h-16" aria-hidden="true" />
-
-        <section className="relative mt-3 overflow-hidden rounded-[22px] border border-violet-100/70 bg-white/75 shadow-[0_16px_42px_rgba(109,40,217,0.1)] md:mt-5 md:rounded-[28px] md:shadow-[0_20px_56px_rgba(109,40,217,0.1)] lg:mt-8 lg:rounded-[30px] lg:shadow-[0_22px_70px_rgba(109,40,217,0.11)]">
-          <div
-            className="grid min-h-[108px] items-stretch md:min-h-[220px] md:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)] lg:min-h-[260px] lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]"
-            dir="ltr"
-          >
-            <div className="relative min-h-[88px] overflow-hidden md:min-h-[210px]">
-              <img
-                src="/images/teacher-dashboard-hero.png"
-                alt=""
-                className="h-full min-h-[88px] w-full object-contain object-center md:min-h-[210px] md:object-contain lg:object-cover lg:object-left"
-              />
-            </div>
-
-            <div
-              className="flex flex-col justify-center px-4 py-2.5 text-right md:px-8 md:py-6 lg:px-12 lg:py-8"
-              dir="rtl"
-            >
-              <p className="text-xs font-black text-violet-700 md:text-sm">
+            {/* Text — right side with gap from visual */}
+            <div className="flex flex-1 flex-col justify-center text-right" style={{ paddingLeft: '4px', paddingRight: '20px' }} dir="rtl">
+              <p className="text-xs font-black text-violet-700 mb-1">
                 שלום {user?.name || 'מנהלת'}
               </p>
-
-              <h1 className="mt-1.5 text-lg font-black leading-tight text-slate-950 md:mt-3 md:text-4xl lg:text-5xl">
+              <h1 className="text-3xl font-black leading-tight text-slate-950 md:text-4xl">
                 לוח בקרה לניהול מערכת ליסאן
               </h1>
-
-              <p className="mt-1 max-w-2xl text-xs font-semibold leading-5 text-slate-600 md:mt-3 md:text-base md:leading-7 lg:mt-4 lg:leading-8">
+              <p className="mt-1 text-sm font-semibold text-slate-600">
                 ניהול תלמידות, מורות, שיחות וחומרי למידה במערכת.
               </p>
             </div>
+
           </div>
         </section>
 

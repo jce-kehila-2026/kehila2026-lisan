@@ -172,9 +172,18 @@ router.post('/tts', requireAuth, async (req, res) => {
 // upstream: if the client buffer fills, axios pauses reading from ai-service.
 router.post('/:chatId/stream', requireAuth, async (req, res) => {
   let upstream;
+
   try {
     const { chatId } = req.params;
-    const { text, level = 'A1', includeArabic = false } = req.body;
+
+    const {
+      text,
+      level = 'A1',
+      includeArabic = false,
+      scenario = null,
+      activityTitle = null,
+      activitySubtitle = null,
+    } = req.body;
 
     if (!text) {
       return res.status(400).json({
@@ -185,11 +194,12 @@ router.post('/:chatId/stream', requireAuth, async (req, res) => {
     }
 
     const userToken = req.headers.authorization?.replace('Bearer ', '') || null;
+
     const config = createAiRequestConfig({
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'text/event-stream',
-        ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {}),
+        Accept: 'text/event-stream',
+        ...(userToken ? { Authorization: `Bearer ${userToken}` } : {}),
       },
       responseType: 'stream',
       timeout: STREAM_TIMEOUT_MS,
@@ -203,6 +213,9 @@ router.post('/:chatId/stream', requireAuth, async (req, res) => {
         includeArabic,
         sessionId: chatId,
         userId: req.user?.uid || undefined,
+        scenario: scenario || undefined,
+        activityTitle: activityTitle || undefined,
+        activitySubtitle: activitySubtitle || undefined,
       },
       config
     );
@@ -226,10 +239,19 @@ router.post('/:chatId/stream', requireAuth, async (req, res) => {
     if (res.headersSent && !res.writableEnded) {
       try {
         res.write('data: [ERROR]\n\n');
-      } catch (_) { /* ignored */ }
-      try { res.end(); } catch (_) { /* ignored */ }
+      } catch (_) {
+        /* ignored */
+      }
+
+      try {
+        res.end();
+      } catch (_) {
+        /* ignored */
+      }
+
       return;
     }
+
     if (!res.headersSent) {
       const status = error?.response?.status || 502;
       return res.status(status).json({
@@ -240,7 +262,11 @@ router.post('/:chatId/stream', requireAuth, async (req, res) => {
     }
   } finally {
     if (upstream?.data?.destroy && !upstream.data.destroyed) {
-      try { upstream.data.destroy(); } catch (_) { /* ignored */ }
+      try {
+        upstream.data.destroy();
+      } catch (_) {
+        /* ignored */
+      }
     }
   }
 });
@@ -260,20 +286,23 @@ router.post('/:chatId/pronunciation', requireAuth, async (req, res) => {
     }
 
     const userToken = req.headers.authorization?.replace('Bearer ', '') || null;
+
     const response = await axios.post(
       `${normalizeAiServiceBaseUrl()}/api/ai/pronunciation/assess`,
       { audioBase64, transcribedText, level, sessionId: chatId },
       createAiRequestConfig({
         headers: {
           'Content-Type': 'application/json',
-          ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {}),
+          ...(userToken ? { Authorization: `Bearer ${userToken}` } : {}),
           ...(req.user?.uid ? { 'X-User-ID': req.user.uid } : {}),
         },
       })
     );
+
     return res.status(200).json(response.data);
   } catch (error) {
     const status = error?.response?.status || 502;
+
     return res.status(status).json({
       success: false,
       error: 'Pronunciation assessment failed',

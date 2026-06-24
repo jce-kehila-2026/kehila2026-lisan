@@ -4,6 +4,7 @@ import { Gamepad2 } from 'lucide-react';
 import BottomNav from '../components/BottomNav.jsx';
 import PageHeader from '../components/PageHeader.jsx';
 import VocabGame from '../components/VocabGame.jsx';
+import StudentHeroVisual from '../components/student/StudentHeroVisual.jsx';
 
 const pageText = {
   ar: {
@@ -27,16 +28,24 @@ function GamesPage() {
       <div className="relative mx-auto min-h-[calc(100vh-2.5rem)] w-full max-w-[1480px] pb-32 sm:min-h-[780px]">
         <PageHeader />
 
-        <section className="mt-6 rounded-[28px] border border-white/80 bg-white/90 p-5 shadow-card sm:p-6">
-          <div className="flex items-center gap-4 text-right" dir="rtl">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-700">
-              <Gamepad2 className="h-7 w-7" aria-hidden="true" />
+        <section className="mt-12 overflow-hidden rounded-[28px] border border-white/80 bg-[linear-gradient(135deg,#FFFFFF_0%,#F7F0FF_48%,#FFF5FB_100%)] shadow-card sm:mt-14 lg:mt-16">
+          <div className="grid min-h-[170px] lg:grid-cols-[minmax(0,0.46fr)_minmax(0,0.54fr)]" dir="ltr">
+            <div className="min-h-[150px] lg:min-h-[170px]">
+              <StudentHeroVisual type="games" />
             </div>
-            <div className="min-w-0">
-              <h1 className="text-2xl font-black text-slate-950">{text.title}</h1>
-              <p className="mt-1 text-sm font-bold leading-6 text-slate-600">
-                {text.description}
-              </p>
+
+            <div className="flex items-center px-5 py-5 text-right sm:px-6 lg:px-8" dir="rtl">
+              <div className="flex items-center gap-4">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-700 shadow-[0_10px_26px_rgba(124,58,237,0.12)]">
+                  <Gamepad2 className="h-7 w-7" aria-hidden="true" />
+                </div>
+                <div className="min-w-0">
+                  <h1 className="text-2xl font-black text-slate-950 sm:text-3xl">{text.title}</h1>
+                  <p className="mt-1 text-sm font-bold leading-6 text-slate-600 sm:text-base sm:leading-7">
+                    {text.description}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </section>

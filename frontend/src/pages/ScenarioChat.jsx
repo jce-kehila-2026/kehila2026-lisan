@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import Chatbot from './Chatbot.jsx';
+import ChatbotPage from './ChatbotPage.jsx';
 import {
   getStudentStoryById,
   getStudentStorySubtitle,
@@ -122,13 +122,18 @@ function ScenarioChat() {
     },
   };
 
+  const pageTitle = scenario.title || (scenario.titleKey ? t(scenario.titleKey) : '');
+  const pageSubtitle = pickLocalized(scenario.subtitle, language);
+  const pageInitialMessage = pickLocalized(scenario.initialMessage, language);
+  const pagePlaceholderResponse = pickLocalized(scenario.placeholderResponse, language);
+
   return (
-    <Chatbot
-      title={scenario.title || t(scenario.titleKey)}
-      subtitle={pickLocalized(scenario.subtitle, language)}
-      initialMessage={pickLocalized(scenario.initialMessage, language)}
-      placeholderResponse={pickLocalized(scenario.placeholderResponse, language)}
-      scenario={id}
+    <ChatbotPage
+      activityId={id}
+      title={pageTitle}
+      subtitle={pageSubtitle}
+      initialMessage={pageInitialMessage}
+      placeholderResponse={pagePlaceholderResponse}
     />
   );
 }

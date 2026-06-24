@@ -13,7 +13,6 @@ import SharedChatRoom from './pages/SharedChatRoom.jsx';
 import TeacherMore from './pages/teacher/More.jsx';
 import AdminDashboard from './pages/admin/Dashboard.jsx';
 import AdminAnalytics from './pages/admin/Analytics.jsx';
-import AdminLogin from './pages/admin/Login.jsx';
 import AdminConversations from './pages/admin/Conversations.jsx';
 import AdminNotifications from './pages/admin/Notifications.jsx';
 import AdminProgress from './pages/admin/Progress.jsx';
@@ -80,9 +79,7 @@ function AdminScrollToTop() {
   const location = useLocation();
 
   useEffect(() => {
-    if (location.pathname.startsWith('/admin/')) {
-      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, [location.pathname]);
 
   return null;
@@ -97,7 +94,6 @@ function App() {
         <Route path="/" element={<Navigate to={SKIP_AUTH ? '/home' : '/login'} replace />} />
         <Route path="/login" element={<StudentLogin />} />
         <Route path="/forgot-access" element={<ForgotAccess />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/teacher/login" element={<TeacherLogin />} />
         <Route
           path="/home"
@@ -198,7 +194,7 @@ function App() {
         <Route
           path="/admin/register-student"
           element={
-            <ProtectedRoute role="admin">
+            <ProtectedRoute role={['admin', 'teacher']}>
               <ExistingPlaceholderPage titleKey="adminRegisterStudent" />
             </ProtectedRoute>
           }
@@ -206,7 +202,7 @@ function App() {
         <Route
           path="/admin/remove-student"
           element={
-            <ProtectedRoute role="admin">
+            <ProtectedRoute role={['admin', 'teacher']}>
               <ExistingPlaceholderPage titleKey="adminRemoveStudent" />
             </ProtectedRoute>
           }
@@ -214,7 +210,7 @@ function App() {
         <Route
           path="/admin/edit-student"
           element={
-            <ProtectedRoute role="admin">
+            <ProtectedRoute role={['admin', 'teacher']}>
               <ExistingPlaceholderPage titleKey="adminEditStudent" />
             </ProtectedRoute>
           }

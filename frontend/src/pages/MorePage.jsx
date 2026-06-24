@@ -18,8 +18,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import BottomNav from '../components/BottomNav.jsx';
-import LanguageToggle from '../components/LanguageToggle.jsx';
-import LisanLogo from '../components/LisanLogo.jsx';
+import LisanHeader from '../components/LisanHeader.jsx';
+import StudentHeroVisual from '../components/student/StudentHeroVisual.jsx';
 import { getStoredToken, getStoredUser } from '../services/auth.js';
 
 const API_BASE_URL = '/api';
@@ -119,93 +119,31 @@ const glassCardClass =
   'border border-white/72 bg-white/50 shadow-[0_16px_38px_rgba(124,58,237,0.1)] backdrop-blur-lg';
 
 function MoreTopHeader() {
-  const navigate = useNavigate();
   const { i18n } = useTranslation();
   const isArabic = i18n.language === 'ar';
   const user = getStoredUser();
   const homeTarget = user?.role === 'teacher' ? '/teacher/dashboard' : '/home';
   const text = labels[isArabic ? 'ar' : 'he'];
-  const sectionButtons = [
-    {
-      label: text.continueReading,
-      icon: BookOpen,
-      sectionId: 'history-continue-reading',
-    },
-    {
-      label: text.recentActivity,
-      icon: Star,
-      sectionId: 'history-recent-activity',
-    },
-    {
-      label: text.savedTitle,
-      icon: Heart,
-      sectionId: 'history-saved-words',
-    },
-    {
-      label: text.socialPractice,
-      icon: MessageCircle,
-      sectionId: 'history-social-practice',
-    },
-    {
-      label: text.chatHistory,
-      icon: Search,
-      sectionId: 'history-chat-history',
-    },
+
+  const sections = [
+    { id: 'history-continue-reading', label: text.continueReading, icon: BookOpen },
+    { id: 'history-recent-activity',  label: text.recentActivity,  icon: Star },
+    { id: 'history-saved-words',      label: text.savedTitle,      icon: Heart },
+    { id: 'history-social-practice',  label: text.socialPractice,  icon: MessageCircle },
+    { id: 'history-chat-history',     label: text.chatHistory,     icon: Search },
   ];
 
-  const scrollToSection = (sectionId) => {
-    document.getElementById(sectionId)?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    });
+  const handleSectionClick = (id) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
-    <header className="lisan-enter z-50 rounded-[20px] border border-white/80 bg-white/54 px-3 py-3 shadow-[0_14px_36px_rgba(124,58,237,0.12)] backdrop-blur-xl sm:rounded-[24px] sm:px-5 sm:py-4 lg:sticky lg:top-3" style={{ '--lisan-enter-delay': '0ms' }}>
-      <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-4">
-        <button
-          type="button"
-          onClick={() => navigate(homeTarget)}
-          className="justify-self-start rounded-2xl transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
-          aria-label="דף הבית"
-          title="דף הבית"
-        >
-          <LisanLogo className="h-14 sm:h-24" />
-        </button>
-
-        <div className="flex items-center gap-1.5 justify-self-end sm:gap-2">
-          <LanguageToggle />
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/85 bg-white/90 text-slate-600 shadow-[0_12px_28px_rgba(124,58,237,0.12)] transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-11 sm:w-11"
-            aria-label={isArabic ? 'رجوع' : 'חזרה'}
-            title={isArabic ? 'رجوع' : 'חזרה'}
-          >
-            <LogOut className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
-          </button>
-        </div>
-
-        <nav className="col-start-1 col-end-4 row-start-2 flex flex-nowrap items-center justify-start gap-2 overflow-x-auto py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:justify-center sm:gap-3 lg:col-start-2 lg:col-end-3 lg:row-start-1" aria-label={isArabic ? 'أقسام السجل' : 'אזורי היסטוריה'}>
-          {sectionButtons.map((item) => {
-            const Icon = item.icon;
-
-            return (
-              <button
-                key={item.sectionId}
-                type="button"
-                onClick={() => scrollToSection(item.sectionId)}
-                className="inline-flex h-10 min-w-max shrink-0 items-center justify-center gap-2 rounded-[18px] border border-white/80 bg-white/74 px-3.5 text-sm font-black text-violet-700 shadow-[0_10px_24px_rgba(124,58,237,0.1)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-12 sm:gap-2.5 sm:rounded-[22px] sm:px-5 sm:text-base sm:shadow-[0_12px_30px_rgba(124,58,237,0.12)]"
-              >
-                <span>{item.label}</span>
-                <Icon className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
-              </button>
-            );
-          })}
-        </nav>
-
-      </div>
-    </header>
+    <LisanHeader
+      sections={sections}
+      onSectionClick={handleSectionClick}
+      logoTarget={homeTarget}
+      navLabel={isArabic ? 'أقسام السجل' : 'אזורי היסטוריה'}
+    />
   );
 }
 
@@ -359,7 +297,7 @@ function MorePage() {
     fallback: true,
   }));
 
-  const visibleHistory = (filteredConversations.length > 0 ? filteredConversations : fallbackHistory).slice(0, 5);
+  const visibleHistory = (filteredConversations.length > 0 ? filteredConversations : fallbackHistory).slice(0, 2);
   const [storedSavedWords, setStoredSavedWords] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem('lisan-saved-words') || '[]');
@@ -398,24 +336,25 @@ function MorePage() {
       >
         <MoreTopHeader />
 
-        <section
-          className="history-hero-card relative mt-4 overflow-hidden rounded-[24px] border border-white/80 bg-cover p-4 shadow-card sm:mt-6 sm:rounded-[28px] sm:p-7 lg:min-h-[390px] lg:p-8"
-          style={{
-            backgroundImage: 'url("/images/history.png")',
-          }}
-        >
-          <div className="pointer-events-none absolute inset-0 bg-transparent" />
-          <div className="relative grid min-h-[210px] items-center sm:min-h-[280px] md:grid-cols-[0.24fr_minmax(0,0.38fr)_0.38fr]" dir="ltr">
-            <div className="text-center md:col-start-2" dir="rtl">
-              <span className="inline-flex rounded-full bg-violet-50/90 px-3 py-1.5 text-xs font-black text-violet-700 sm:px-4 sm:py-2 sm:text-sm">
+        <section className="history-hero-card relative mt-4 overflow-hidden rounded-[24px] border border-white/80 bg-[linear-gradient(135deg,#FFFFFF_0%,#F7F0FF_48%,#FFF5FB_100%)] shadow-card sm:mt-6 sm:rounded-[28px]">
+          <div className="grid min-h-[160px] lg:grid-cols-[minmax(0,0.46fr)_minmax(0,0.54fr)]" dir="ltr">
+            <div className="min-h-[150px] lg:min-h-[170px]">
+              <StudentHeroVisual type="resources" />
+            </div>
+
+            <div className="flex items-center justify-between gap-4 px-5 py-5 text-right sm:px-6 lg:px-8" dir="rtl">
+              <div>
+                <h1 className="text-3xl font-black leading-tight text-violet-700 sm:text-4xl">
+                  {text.title}
+                </h1>
+                <p className="mt-1 text-sm font-bold leading-6 text-slate-700 sm:text-base">
+                  {text.subtitle}
+                </p>
+              </div>
+
+              <div className="hidden shrink-0 rounded-full bg-violet-50/90 px-4 py-2 text-sm font-black text-violet-700 shadow-[0_10px_24px_rgba(124,58,237,0.10)] sm:inline-flex">
                 {text.heroKicker}
-              </span>
-              <h1 className="mt-3 text-3xl font-black leading-tight text-violet-700 sm:mt-4 sm:text-5xl lg:text-6xl">
-                {text.title}
-              </h1>
-              <p className="mx-auto mt-2 max-w-[18rem] text-base font-bold leading-7 text-slate-700 sm:mt-4 sm:max-w-2xl sm:text-xl sm:leading-8">
-                {text.subtitle}
-              </p>
+              </div>
             </div>
           </div>
         </section>

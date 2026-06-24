@@ -17,9 +17,9 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import LisanHeader from '../components/LisanHeader.jsx';
 import BottomNav from '../components/BottomNav.jsx';
-import LanguageToggle from '../components/LanguageToggle.jsx';
-import LisanLogo from '../components/LisanLogo.jsx';
+import StudentHeroVisual from '../components/student/StudentHeroVisual.jsx';
 import { getCurrentUser, getStoredToken, getStoredUser } from '../services/auth.js';
 import {
   gameCatalog,
@@ -157,74 +157,29 @@ function SegmentedControl({ options, value, onChange }) {
 }
 
 function ProfileTopHeader() {
-  const navigate = useNavigate();
-  const { i18n, t } = useTranslation();
+  const { i18n } = useTranslation();
   const isArabic = i18n.language === 'ar';
   const storedUser = getStoredUser();
   const homeTarget = storedUser?.role === 'teacher' ? '/teacher/dashboard' : '/home';
   const text = labels[isArabic ? 'ar' : 'he'];
-  const navItems = [
-    { label: text.learningJourney, icon: Target, sectionId: 'profile-learning-journey' },
-    { label: text.achievements, icon: Trophy, sectionId: 'profile-achievements' },
-    { label: text.settings, icon: SlidersHorizontal, sectionId: 'profile-settings' },
+
+  const sections = [
+    { id: 'profile-learning-journey', label: text.learningJourney, icon: Target },
+    { id: 'profile-achievements',     label: text.achievements,    icon: Trophy },
+    { id: 'profile-settings',         label: text.settings,        icon: SlidersHorizontal },
   ];
 
-  const scrollToProfileSection = (sectionId) => {
-    const section = document.getElementById(sectionId);
-    if (!section) return;
-
-    section.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    });
+  const handleSectionClick = (id) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
-    <header className="lisan-enter z-50 rounded-[20px] border border-white/80 bg-white/54 px-3 py-3 shadow-[0_14px_36px_rgba(124,58,237,0.12)] backdrop-blur-xl sm:rounded-[24px] sm:px-5 sm:py-4 lg:sticky lg:top-3" style={{ '--lisan-enter-delay': '0ms' }}>
-      <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-4">
-        <button
-          type="button"
-          onClick={() => navigate(homeTarget)}
-          className="justify-self-start rounded-2xl transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
-          aria-label="דף הבית"
-          title="דף הבית"
-        >
-          <LisanLogo className="h-14 sm:h-24" />
-        </button>
-
-        <div className="flex items-center gap-1.5 justify-self-end sm:gap-2">
-          <LanguageToggle />
-          <button
-            type="button"
-            onClick={() => navigate('/login')}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/85 bg-white/90 text-slate-600 shadow-[0_12px_28px_rgba(124,58,237,0.12)] transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-11 sm:w-11"
-            aria-label={t('logout')}
-            title={t('logout')}
-          >
-            <LogOut className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
-          </button>
-        </div>
-
-        <nav className="col-start-1 col-end-4 row-start-2 flex flex-nowrap items-center justify-start gap-2 overflow-x-auto py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:justify-center sm:gap-3 lg:col-start-2 lg:col-end-3 lg:row-start-1" aria-label={isArabic ? 'تنقل الملف الشخصي' : 'ניווט פרופיל'}>
-          {navItems.map((item) => {
-            const Icon = item.icon;
-
-            return (
-              <button
-                key={item.sectionId}
-                type="button"
-                onClick={() => scrollToProfileSection(item.sectionId)}
-                className="inline-flex h-10 min-w-max shrink-0 items-center justify-center gap-2 rounded-[18px] border border-white/80 bg-white/66 px-3.5 text-sm font-black text-violet-700 shadow-[0_10px_24px_rgba(124,58,237,0.1)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-12 sm:gap-2.5 sm:rounded-[22px] sm:px-5 sm:text-base sm:shadow-[0_12px_30px_rgba(124,58,237,0.12)]"
-              >
-                <span>{item.label}</span>
-                <Icon className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
-              </button>
-            );
-          })}
-        </nav>
-
-      </div>
-    </header>
+    <LisanHeader
+      sections={sections}
+      onSectionClick={handleSectionClick}
+      logoTarget={homeTarget}
+      navLabel={isArabic ? 'تنقل الملف الشخصي' : 'ניווט פרופיל'}
+    />
   );
 }
 
@@ -394,30 +349,30 @@ function ProfilePage() {
       <div className={`app-page-container relative pb-32 ${textScaleClass}`} dir="rtl">
         <ProfileTopHeader />
 
-        <section
-          className={`profile-hero-card relative mt-4 overflow-hidden rounded-[24px] border border-white/85 bg-cover sm:mt-5 sm:rounded-[28px] lg:min-h-[250px] ${surfaceClass}`}
-          style={{
-            backgroundImage: 'url("/images/profileHeroNew.png")',
-          }}
-        >
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.02)_0%,rgba(255,255,255,0.14)_30%,rgba(255,255,255,0.32)_52%,rgba(255,255,255,0.06)_100%)]" />
-          <div className="relative grid min-h-[210px] p-4 sm:min-h-[260px] sm:p-8 lg:min-h-[250px] lg:grid-cols-[0.18fr_minmax(0,0.38fr)_0.44fr]" dir="ltr">
-            <div className="flex min-w-0 flex-col items-center justify-center text-center lg:col-start-2 lg:items-center lg:text-center" dir="rtl">
-              <h2 className={`text-5xl font-black leading-tight sm:text-6xl lg:text-7xl ${headingTextClass}`}>
-                {user?.name || 'Lisan Student'}
-              </h2>
-              <p className={`mt-3 flex items-center justify-center gap-2 text-base font-bold sm:mt-4 sm:text-xl ${mutedTextClass}`}>
-                {loading ? 'Loading...' : text.subtitle}
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-100 text-violet-700 shadow-[0_10px_24px_rgba(124,58,237,0.12)] sm:h-10 sm:w-10">
-                  <Sparkles className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
-                </span>
-              </p>
-              <div className="mt-4 inline-flex mx-auto w-fit items-center gap-2 rounded-full border border-violet-100 bg-white/86 px-4 py-2 text-sm font-black text-violet-700 shadow-[0_12px_28px_rgba(124,58,237,0.1)] sm:mt-6 sm:gap-3 sm:px-6 sm:py-2.5 sm:text-base">
-                <span>{text.level}</span>
-                <span className="text-lg sm:text-xl">{user?.level || 'A1'}</span>
-              </div>
+        <section className={`profile-hero-card relative mt-4 overflow-hidden rounded-[24px] border border-white/85 bg-[linear-gradient(135deg,#FFFFFF_0%,#F7F0FF_48%,#FFF5FB_100%)] sm:mt-5 sm:rounded-[28px] ${surfaceClass}`}>
+          <div className="grid min-h-[160px] lg:grid-cols-[minmax(0,0.46fr)_minmax(0,0.54fr)]" dir="ltr">
+            <div className="min-h-[150px] lg:min-h-[170px]">
+              <StudentHeroVisual type="profile" />
             </div>
 
+            <div className="flex items-center justify-between gap-4 px-5 py-5 text-right sm:px-6 lg:px-8" dir="rtl">
+              <div>
+                <h2 className="text-3xl font-black leading-tight text-violet-700 sm:text-4xl">
+                  {user?.name || 'Lisan Student'}
+                </h2>
+                <p className={`mt-1 text-sm font-bold sm:text-base ${mutedTextClass}`}>
+                  {loading ? 'Loading...' : text.subtitle}
+                </p>
+              </div>
+
+              <div className="inline-flex shrink-0 items-center gap-2 rounded-full border border-violet-100 bg-white/86 px-4 py-2 text-sm font-black text-violet-700 shadow-[0_8px_20px_rgba(124,58,237,0.10)]">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-100 text-violet-700">
+                  <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                </span>
+                <span>{text.level}</span>
+                <span className="text-base">{user?.level || 'A1'}</span>
+              </div>
+            </div>
           </div>
         </section>
 

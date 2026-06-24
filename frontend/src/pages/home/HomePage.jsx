@@ -6,10 +6,6 @@ import { getStoredUser } from '../../services/auth.js';
 function HomePage() {
   const user = getStoredUser();
 
-  if (user?.role === 'admin') {
-    return <Navigate to="/admin/dashboard" replace />;
-  }
-
   if (user?.role === 'teacher') {
     return <Navigate to="/admin/dashboard" replace />;
   }
