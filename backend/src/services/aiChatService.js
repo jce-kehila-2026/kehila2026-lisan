@@ -82,6 +82,8 @@ async function sendChatMessageToAi({
   sessionId = null,
   userToken = null,
   scenario = null,
+  activityTitle = null,
+  activitySubtitle = null,
 }) {
   try {
     const response = await axios.post(
@@ -91,16 +93,18 @@ async function sendChatMessageToAi({
         level,
         includeArabic,
         voiceMode: false,
-        ...(userId && { userId }),
-        ...(sessionId && { sessionId }),
-        ...(scenario && { scenario }),
+        ...(userId ? { userId } : {}),
+        ...(sessionId ? { sessionId } : {}),
+        ...(scenario ? { scenario } : {}),
+        ...(activityTitle ? { activityTitle } : {}),
+        ...(activitySubtitle ? { activitySubtitle } : {}),
       },
       createAiRequestConfig({
         headers: {
           'Content-Type': 'application/json',
-          ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {}),
+          ...(userToken ? { Authorization: `Bearer ${userToken}` } : {}),
           ...(userId ? { 'X-User-ID': userId } : {}),
-        }
+        },
       })
     );
 
@@ -119,6 +123,9 @@ async function sendVoiceMessageToAi({
   userId = null,
   sessionId = null,
   userToken = null,
+  scenario = null,
+  activityTitle = null,
+  activitySubtitle = null,
 }) {
   try {
     const formData = new FormData();
@@ -127,8 +134,26 @@ async function sendVoiceMessageToAi({
     formData.append('audio', audioBlob, fileName);
     formData.append('level', level);
     formData.append('includeArabic', String(includeArabic));
-    if (userId) formData.append('userId', userId);
-    if (sessionId) formData.append('sessionId', sessionId);
+
+    if (userId) {
+      formData.append('userId', userId);
+    }
+
+    if (sessionId) {
+      formData.append('sessionId', sessionId);
+    }
+
+    if (scenario) {
+      formData.append('scenario', scenario);
+    }
+
+    if (activityTitle) {
+      formData.append('activityTitle', activityTitle);
+    }
+
+    if (activitySubtitle) {
+      formData.append('activitySubtitle', activitySubtitle);
+    }
 
     const response = await axios.post(
       getAiVoiceServiceUrl(),
@@ -136,9 +161,9 @@ async function sendVoiceMessageToAi({
       createAiRequestConfig({
         timeout: getAiVoiceServiceTimeoutMs(),
         headers: {
-          ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {}),
+          ...(userToken ? { Authorization: `Bearer ${userToken}` } : {}),
           ...(userId ? { 'X-User-ID': userId } : {}),
-        }
+        },
       })
     );
 
@@ -164,7 +189,10 @@ async function transcribeAudioViaAi({
     const audioBlob = new Blob([audioBuffer], { type: mimeType });
 
     formData.append('audio', audioBlob, fileName);
-    if (userId) formData.append('userId', userId);
+
+    if (userId) {
+      formData.append('userId', userId);
+    }
 
     const response = await axios.post(
       getAiTranscribeServiceUrl(),
@@ -172,9 +200,9 @@ async function transcribeAudioViaAi({
       createAiRequestConfig({
         timeout: getAiVoiceServiceTimeoutMs(),
         headers: {
-          ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {}),
+          ...(userToken ? { Authorization: `Bearer ${userToken}` } : {}),
           ...(userId ? { 'X-User-ID': userId } : {}),
-        }
+        },
       })
     );
 
@@ -203,9 +231,9 @@ async function synthesizeTextViaAi({
         timeout: getAiVoiceServiceTimeoutMs(),
         headers: {
           'Content-Type': 'application/json',
-          ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {}),
+          ...(userToken ? { Authorization: `Bearer ${userToken}` } : {}),
           ...(userId ? { 'X-User-ID': userId } : {}),
-        }
+        },
       })
     );
 
@@ -236,19 +264,26 @@ function mapAiServiceError(error) {
   if (error?.response) {
     const status = error.response.status || 502;
     const data = error.response.data || {};
-    // FastAPI puts the human-readable error in "detail"
+
     const message =
       data.error ||
       (typeof data.detail === 'string' ? data.detail : null) ||
       (Array.isArray(data.detail) ? JSON.stringify(data.detail) : null) ||
       'AI service returned an error';
+
     const code =
       data.code ||
-      (status === 429 ? 'AI_RATE_LIMITED' :
-       status === 401 ? 'AI_UNAUTHORIZED' :
-       status === 403 ? 'AI_FORBIDDEN' :
-       'AI_SERVICE_BAD_STATUS');
-    return { status, code, message, details: data };
+      (status === 429 ? 'AI_RATE_LIMITED'
+        : status === 401 ? 'AI_UNAUTHORIZED'
+          : status === 403 ? 'AI_FORBIDDEN'
+            : 'AI_SERVICE_BAD_STATUS');
+
+    return {
+      status,
+      code,
+      message,
+      details: data,
+    };
   }
 
   if (error?.request) {

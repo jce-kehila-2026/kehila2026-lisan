@@ -15,6 +15,9 @@ const {
 
 router.use(adminRateLimit);
 
+// Teachers have full admin access — every route that was admin-only now accepts
+// both roles. The single requireRole call below is a router-level guard;
+// individual route guards below still list roles explicitly for clarity.
 const getAiServiceBase = () => normalizeAiServiceBaseUrl();
 
 const upload = multer({
@@ -24,17 +27,17 @@ const upload = multer({
   }
 });
 
-router.get('/users', requireAuth, requireRole('admin'), adminController.getAllUsers);
+router.get('/users', requireAuth, requireRole('admin', 'teacher'), adminController.getAllUsers);
 
-router.get('/chat/stats', requireAuth, requireRole('admin'), adminController.getChatStats);
+router.get('/chat/stats', requireAuth, requireRole('admin', 'teacher'), adminController.getChatStats);
 
-router.post('/users', requireAuth, requireRole('admin'), adminController.createUser);
+router.post('/users', requireAuth, requireRole('admin', 'teacher'), adminController.createUser);
 
-router.put('/users/:id', requireAuth, requireRole('admin'), adminController.updateUser);
+router.put('/users/:id', requireAuth, requireRole('admin', 'teacher'), adminController.updateUser);
 
-router.delete('/users/:id', requireAuth, requireRole('admin'), adminController.deleteUser);
+router.delete('/users/:id', requireAuth, requireRole('admin', 'teacher'), adminController.deleteUser);
 
-router.get('/ai/analytics', requireAuth, requireRole('admin'), async (req, res) => {
+router.get('/ai/analytics', requireAuth, requireRole('admin', 'teacher'), async (req, res) => {
   try {
     const response = await axios.get(
       `${getAiServiceBase()}/api/ai/analytics`,
@@ -56,7 +59,7 @@ router.get('/ai/analytics', requireAuth, requireRole('admin'), async (req, res) 
 router.post(
   '/ai/circuits/reset',
   requireAuth,
-  requireRole('admin'),
+  requireRole('admin', 'teacher'),
   async (req, res) => {
     try {
       const response = await axios.post(
@@ -80,7 +83,7 @@ router.post(
   }
 );
 
-router.get('/ai/logs', requireAuth, requireRole('admin'), async (req, res) => {
+router.get('/ai/logs', requireAuth, requireRole('admin', 'teacher'), async (req, res) => {
   try {
     const { provider, status, limit = 100 } = req.query;
 
@@ -116,7 +119,7 @@ router.get('/ai/logs', requireAuth, requireRole('admin'), async (req, res) => {
 router.post(
   '/audio-recordings',
   requireAuth,
-  requireRole('admin'),
+  requireRole('admin', 'teacher'),
   upload.fields([
     { name: 'audioFile', maxCount: 1 },
     { name: 'jsonFile', maxCount: 1 }
@@ -127,21 +130,21 @@ router.post(
 router.get(
   '/audio-recordings',
   requireAuth,
-  requireRole('admin'),
+  requireRole('admin', 'teacher'),
   adminController.getAudioRecordings
 );
 
 router.get(
   '/audio-recordings/:id',
   requireAuth,
-  requireRole('admin'),
+  requireRole('admin', 'teacher'),
   adminController.getAudioRecordingById
 );
 
 router.put(
   '/audio-recordings/:id',
   requireAuth,
-  requireRole('admin'),
+  requireRole('admin', 'teacher'),
   upload.fields([
     { name: 'audioFile', maxCount: 1 },
     { name: 'jsonFile', maxCount: 1 }
@@ -152,49 +155,49 @@ router.put(
 router.delete(
   '/audio-recordings/:id',
   requireAuth,
-  requireRole('admin'),
+  requireRole('admin', 'teacher'),
   adminController.deleteAudioRecording
 );
 
 router.get(
   '/conversations',
   requireAuth,
-  requireRole('admin'),
+  requireRole('admin', 'teacher'),
   adminController.getAllConversations
 );
 
 router.get(
   '/conversations/:id',
   requireAuth,
-  requireRole('admin'),
+  requireRole('admin', 'teacher'),
   adminController.getConversationById
 );
 
 router.get(
   '/words/pending',
   requireAuth,
-  requireRole('admin'),
+  requireRole('admin', 'teacher'),
   adminController.getPendingWords
 );
 
 router.post(
   '/words',
   requireAuth,
-  requireRole('admin'),
+  requireRole('admin', 'teacher'),
   adminController.createWord
 );
 
 router.put(
   '/words/:id/approve',
   requireAuth,
-  requireRole('admin'),
+  requireRole('admin', 'teacher'),
   adminController.approveWord
 );
 
 router.put(
   '/words/:id/reject',
   requireAuth,
-  requireRole('admin'),
+  requireRole('admin', 'teacher'),
   adminController.rejectWord
 );
 

@@ -2,14 +2,13 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft,
   BookOpen,
+  BotMessageSquare,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   Gamepad2,
   Home as HomeIcon,
   Link as LinkIcon,
-  LogOut,
-  Menu,
   MessageCircle,
   Search,
   Star,
@@ -21,10 +20,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, useReducedMotion } from 'framer-motion';
 
-import { useCountUp } from '../hooks/useCountUp.js';
+import LisanHeader from '../components/LisanHeader.jsx';
 import BottomNav from '../components/BottomNav.jsx';
-import LanguageToggle from '../components/LanguageToggle.jsx';
-import LisanLogo from '../components/LisanLogo.jsx';
+import StudentHeroVisual from '../components/student/StudentHeroVisual.jsx';
+import { useCountUp } from '../hooks/useCountUp.js';
 import {
   getStudentStorySubtitle,
   getStudentStoryTitle,
@@ -210,143 +209,6 @@ function SectionTabBar({ sections, activeSection, onSectionClick, label }) {
   );
 }
 
-function StudentHomeHeader({
-  logoTarget = '/home',
-  headerAction = null,
-  sections,
-  activeSection,
-  onSectionClick,
-  label,
-}) {
-  const navigate = useNavigate();
-  const { t } = useTranslation();
-  const reduceMotion = useReducedMotion();
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  const handleSectionClick = (id) => {
-    onSectionClick(id);
-    setMenuOpen(false);
-  };
-
-  return (
-    <header
-      className="lisan-enter relative z-50 lg:sticky lg:top-3"
-      style={{ '--lisan-enter-delay': '0ms' }}
-    >
-      <div className="grid items-center gap-2 grid-cols-[auto_1fr_auto] sm:gap-4">
-        <button
-          type="button"
-          onClick={() => navigate(logoTarget)}
-          className="col-start-1 justify-self-start rounded-2xl transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
-          aria-label="דף הבית"
-          title="דף הבית"
-        >
-          <LisanLogo className="h-12 sm:h-24" />
-        </button>
-
-        <nav
-          className="col-start-2 hidden flex-wrap items-center justify-center gap-2 sm:flex sm:gap-3"
-          aria-label={label}
-        >
-          {sections.map((section) => {
-            const Icon = section.icon;
-            const isActive = activeSection === section.id;
-
-            return (
-              <button
-                key={section.id}
-                type="button"
-                aria-controls={section.id}
-                aria-current={isActive ? 'true' : undefined}
-                aria-pressed={isActive}
-                onClick={() => onSectionClick(section.id)}
-                className={`relative inline-flex h-10 min-w-[88px] items-center justify-center gap-1.5 rounded-[18px] px-3 text-sm font-black shadow-[0_10px_24px_rgba(124,58,237,0.12)] backdrop-blur transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-14 sm:min-w-[132px] sm:gap-3 sm:rounded-[24px] sm:px-6 sm:text-lg sm:shadow-[0_14px_34px_rgba(124,58,237,0.12)] ${
-                  isActive
-                    ? 'text-violet-700'
-                    : 'bg-white/72 text-violet-700 hover:-translate-y-0.5 hover:bg-white'
-                }`}
-              >
-                {isActive ? (
-                  <motion.span
-                    layoutId="lisan-home-header-pill"
-                    aria-hidden="true"
-                    className="absolute inset-0 -z-10 rounded-[18px] bg-white/88 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.88),0_12px_28px_rgba(124,58,237,0.14)] sm:rounded-[24px] sm:shadow-[inset_0_0_0_1px_rgba(221,214,254,0.88),0_16px_36px_rgba(124,58,237,0.16)]"
-                    transition={
-                      reduceMotion
-                        ? { duration: 0 }
-                        : { type: 'spring', stiffness: 380, damping: 32 }
-                    }
-                  />
-                ) : null}
-                <span>{section.label}</span>
-                <Icon className="h-4 w-4 shrink-0 sm:h-6 sm:w-6" aria-hidden="true" />
-              </button>
-            );
-          })}
-        </nav>
-
-        <div className="col-start-3 flex items-center gap-1.5 justify-self-end sm:gap-2">
-          <button
-            type="button"
-            onClick={() => setMenuOpen((open) => !open)}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/85 bg-white/88 text-slate-600 shadow-[0_12px_28px_rgba(124,58,237,0.12)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:hidden"
-            aria-label={label}
-            aria-expanded={menuOpen}
-          >
-            <Menu className="h-4 w-4" aria-hidden="true" />
-          </button>
-
-          {headerAction}
-          <LanguageToggle />
-          <button
-            type="button"
-            onClick={() => navigate('/login')}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/85 bg-white/88 text-slate-600 shadow-[0_12px_28px_rgba(124,58,237,0.12)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-12 sm:w-12"
-            aria-label={t('logout')}
-            title={t('logout')}
-          >
-            <LogOut className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
-          </button>
-        </div>
-      </div>
-
-      {menuOpen ? (
-        <>
-          <button
-            type="button"
-            aria-label={label}
-            onClick={() => setMenuOpen(false)}
-            className="fixed inset-0 z-40 sm:hidden"
-          />
-          <div className="lisan-enter absolute inset-x-0 top-full z-50 mt-2 grid gap-1.5 rounded-[22px] border border-white/80 bg-white p-2 shadow-card sm:hidden">
-            {sections.map((section) => {
-              const Icon = section.icon;
-              const isActive = activeSection === section.id;
-
-              return (
-                <button
-                  key={section.id}
-                  type="button"
-                  aria-current={isActive ? 'true' : undefined}
-                  onClick={() => handleSectionClick(section.id)}
-                  className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-base font-black transition ${
-                    isActive
-                      ? 'bg-violet-50 text-violet-700'
-                      : 'text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
-                  <span>{section.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </>
-      ) : null}
-    </header>
-  );
-}
-
 function Home({
   logoTarget = '/home',
   teacherManagementAction = null,
@@ -354,6 +216,7 @@ function Home({
   headerAction = null,
 }) {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const storedUser = getStoredUser();
   const isArabic = i18n.language === 'ar';
 
@@ -371,6 +234,7 @@ function Home({
     : 'בחרי חברות לתרגול משותף ומהיר';
   const heroGamesLabel = isArabic ? 'للألعاب' : 'למשחקים';
   const heroDictionaryLabel = isArabic ? 'للقاموس' : 'למילון';
+  const heroAiChatLabel = isArabic ? 'محادثة AI' : 'שיחה עם AI';
   const heroLearningStreakLabel = isArabic ? 'رغبة للتعلم' : 'רצף למידה';
   const heroDaysSuffix = isArabic ? 'أيام متتالية' : 'ימים ברצף';
   const streakLabel = isArabic ? 'جلسات' : 'שיחות';
@@ -420,7 +284,6 @@ function Home({
   const gamesRef = useRef(null);
   const resourcesRef = useRef(null);
   const gamesScrollerRef = useRef(null);
-  const gamesDragRef = useRef({ active: false, startX: 0, scrollLeft: 0 });
 
   const sections = useMemo(
     () => [
@@ -433,6 +296,11 @@ function Home({
         id: 'section-activities',
         label: isArabic ? 'نشاطات' : 'פעילויות',
         icon: Zap,
+      },
+      {
+        id: 'section-dictionary',
+        label: isArabic ? 'القاموس' : 'מילון',
+        icon: BookOpen,
       },
       {
         id: 'section-games',
@@ -457,6 +325,7 @@ function Home({
         { id: 'section-hero', ref: heroRef },
         { id: 'section-activities', ref: activitiesRef },
         { id: 'section-games', ref: gamesRef },
+        { id: 'section-dictionary', ref: { current: document.getElementById('section-dictionary') } },
         { id: 'section-resources', ref: resourcesRef },
       ];
       const marker = window.scrollY + 180;
@@ -572,14 +441,29 @@ function Home({
   }, []);
 
   const scrollToSection = (id) => {
+    setActiveSection(id);
+
+    if (id === 'section-hero') {
+      window.scrollTo({ top: 0, behavior: shouldReduceMotion() ? 'auto' : 'smooth' });
+      return;
+    }
+
     const el = document.getElementById(id);
     if (!el) return;
 
-    setActiveSection(id);
-    const top = el.getBoundingClientRect().top + window.scrollY;
+    if (id === 'section-dictionary') {
+      el.scrollIntoView({ behavior: shouldReduceMotion() ? 'auto' : 'smooth', block: 'center' });
+      return;
+    }
+
+    // Center other sections vertically, accounting for the sticky header (~64px)
+    const rect = el.getBoundingClientRect();
+    const headerOffset = 64;
+    const centeredTop =
+      window.scrollY + rect.top - (window.innerHeight - rect.height) / 2 + headerOffset;
 
     window.scrollTo({
-      top,
+      top: Math.max(0, centeredTop),
       behavior: shouldReduceMotion() ? 'auto' : 'smooth',
     });
   };
@@ -786,10 +670,39 @@ function Home({
       return;
     }
 
-    const utterance = new SpeechSynthesisUtterance(hebrewWord);
-    utterance.lang = 'he-IL';
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
+    const spokenText = typeof hebrewWord === 'string' ? hebrewWord.trim() : '';
+    if (!spokenText) return;
+
+    const doSpeak = () => {
+      const utterance = new SpeechSynthesisUtterance(spokenText);
+      utterance.lang = 'he-IL';
+      utterance.rate = 0.85;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+
+      const voices = window.speechSynthesis.getVoices();
+      const hebrewVoice =
+        voices.find((v) => v.lang === 'he-IL') ||
+        voices.find((v) => v.lang === 'he') ||
+        voices.find((v) => String(v.lang || '').startsWith('he-')) ||
+        null;
+
+      if (hebrewVoice) {
+        utterance.voice = hebrewVoice;
+      }
+
+      window.speechSynthesis.cancel();
+      window.setTimeout(() => {
+        window.speechSynthesis.speak(utterance);
+      }, 50);
+    };
+
+    const voices = window.speechSynthesis.getVoices();
+    if (voices && voices.length > 0) {
+      doSpeak();
+    } else {
+      window.speechSynthesis.addEventListener('voiceschanged', doSpeak, { once: true });
+    }
   };
 
   const scrollGames = (direction) => {
@@ -803,29 +716,8 @@ function Home({
     });
   };
 
-  const handleGamesPointerDown = (event) => {
-    const scroller = gamesScrollerRef.current;
-    if (!scroller) return;
-
-    gamesDragRef.current = {
-      active: true,
-      startX: event.clientX,
-      scrollLeft: scroller.scrollLeft,
-    };
-    scroller.setPointerCapture?.(event.pointerId);
-  };
-
-  const handleGamesPointerMove = (event) => {
-    const scroller = gamesScrollerRef.current;
-    const drag = gamesDragRef.current;
-    if (!scroller || !drag.active) return;
-
-    event.preventDefault();
-    scroller.scrollLeft = drag.scrollLeft - (event.clientX - drag.startX);
-  };
-
-  const stopGamesDrag = () => {
-    gamesDragRef.current.active = false;
+  const openGameCategory = (categoryKey) => {
+    navigate(`/games?category=${encodeURIComponent(categoryKey)}`);
   };
 
   const handleGamesWheel = (event) => {
@@ -861,23 +753,24 @@ function Home({
       };
 
   return (
-    <main className="min-h-screen overflow-x-clip bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] text-slate-900">
+    <main className="min-h-screen rounded-[28px] bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] text-slate-900">
       <div className="app-page-container relative pb-32" dir="rtl">
 
-        <StudentHomeHeader
+        <LisanHeader
           logoTarget={logoTarget}
-          headerAction={headerAction}
+          extraLeft={headerAction}
           sections={sections}
           activeSection={activeSection}
           onSectionClick={scrollToSection}
-          label={sectionNavigationLabel}
+          navLabel={sectionNavigationLabel}
+          onLogout={() => navigate('/login')}
         />
 
         {/* ── Hero ──────────────────────────────────────────────── */}
         <section
           ref={heroRef}
           id="section-hero"
-          className="lisan-enter relative mt-8 overflow-hidden rounded-[34px] border border-white/85 bg-cover bg-center shadow-[0_24px_70px_rgba(91,33,182,0.14)] transition hover:-translate-y-0.5 hover:shadow-[0_30px_78px_rgba(124,58,237,0.18)]"
+          className="lisan-enter relative mt-2 overflow-hidden rounded-[34px] border border-white/85 bg-[linear-gradient(135deg,#FFFFFF_0%,#F1E8FF_42%,#ECFEFF_74%,#FFF2C7_100%)] shadow-[0_28px_78px_rgba(91,33,182,0.18)] transition hover:-translate-y-0.5 hover:shadow-[0_30px_78px_rgba(124,58,237,0.18)]"
           style={{
             '--lisan-enter-delay': '150ms',
             '--hero-image-x': '0px',
@@ -887,10 +780,13 @@ function Home({
             '--hero-light-opacity': '0.2',
             '--hero-haze-opacity': '0.28',
             '--hero-glyph-drift': '0px',
-            backgroundImage: 'url("/images/HADD.png")',
           }}
         >
-          <div className="pointer-events-none absolute inset-0 bg-white/10" />
+          <div className="pointer-events-none absolute inset-0">
+            <StudentHeroVisual type="home" wide fadeRight={false} className="opacity-100" />
+          </div>
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.02)_0%,rgba(255,255,255,0.18)_40%,rgba(255,255,255,0.58)_66%,rgba(255,255,255,0.88)_100%)]" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-[46%] bg-[radial-gradient(circle_at_60%_42%,rgba(255,255,255,0.96),rgba(255,255,255,0.58)_54%,transparent_78%)]" />
 
           <div
             className="relative min-h-[320px]"
@@ -901,7 +797,16 @@ function Home({
               className="relative z-10 flex min-h-[320px] w-full min-w-0 items-center justify-start p-4 text-right sm:p-5 lg:min-h-[360px] lg:p-6"
               dir="rtl"
             >
-              <div className="w-full max-w-[460px] rounded-[26px] border border-white/70 bg-white/55 p-4 shadow-[0_18px_50px_rgba(91,33,182,0.12)] backdrop-blur-md sm:p-5 lg:p-6">
+              <div
+                className="w-full max-w-[480px] sm:p-6 lg:p-7"
+                style={{
+                  background: 'linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(248,244,255,0.93) 50%, rgba(236,254,255,0.88) 100%)',
+                  borderRadius: '28px',
+                  border: '1px solid rgba(221,214,254,0.6)',
+                  boxShadow: '0 26px 66px rgba(91,33,182,0.17), 0 8px 22px rgba(14,165,233,0.08), inset 0 1px 0 rgba(255,255,255,0.92)',
+                  padding: '20px 22px 24px',
+                }}
+              >
                 {/* Name + Level + Streak */}
                 <div className="flex flex-wrap-reverse items-center justify-between gap-3">
                   <p className="text-base font-black text-slate-800 lg:text-lg">
@@ -923,7 +828,7 @@ function Home({
                 </div>
 
                 {/* Greeting */}
-                <h1 className="mt-4 flex items-center justify-end gap-3 text-[clamp(1.9rem,2.7vw,3.2rem)] font-black leading-tight text-slate-950">
+                <h1 className="mt-4 flex items-center justify-start gap-3 text-[clamp(1.9rem,2.7vw,3.2rem)] font-black leading-tight text-slate-950 text-right">
                   {t('homeGreeting')}
                   <span className="text-violet-600">☼</span>
                 </h1>
@@ -932,24 +837,57 @@ function Home({
                   {t('homeIntro')}
                 </p>
 
-                <div className="mt-4 flex flex-wrap justify-end gap-3">
+                {/* ── Action buttons ── */}
+                <div className="mt-5 flex items-center justify-center gap-2">
+
+                  {/* Games — secondary pill */}
                   <Link
                     to="/games"
-                    className="inline-flex h-12 min-w-[150px] items-center justify-center gap-3 rounded-full bg-violet-600 px-6 text-base font-black text-white shadow-[0_14px_30px_rgba(124,58,237,0.28)] transition hover:-translate-y-0.5 hover:bg-violet-700 hover:shadow-[0_18px_36px_rgba(124,58,237,0.36)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.98]"
+                    className="group inline-flex h-[52px] flex-1 items-center justify-center gap-2 rounded-[22px] border border-violet-200/60 bg-white/80 px-3 text-sm font-black text-violet-700 shadow-[0_4px_14px_rgba(124,58,237,0.08)] backdrop-blur transition hover:-translate-y-0.5 hover:border-violet-300/80 hover:bg-violet-50 hover:shadow-[0_8px_20px_rgba(124,58,237,0.14)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.97]"
                   >
-                    <Gamepad2 className="h-5 w-5" aria-hidden="true" />
+                    <Gamepad2 className="h-4 w-4 shrink-0 text-violet-500" aria-hidden="true" />
                     <span>{heroGamesLabel}</span>
                   </Link>
+
+                  {/* AI Chat — primary hero CTA */}
+                  <Link
+                    to="/chatbot"
+                    className="relative inline-flex h-[52px] flex-[1.45] items-center justify-center gap-2.5 overflow-hidden rounded-[22px] px-5 text-[15px] font-black text-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.97]"
+                    style={{
+                      background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%)',
+                      boxShadow: '0 8px 24px rgba(109,40,217,0.35), 0 2px 6px rgba(109,40,217,0.18), inset 0 1px 0 rgba(255,255,255,0.15)',
+                      transition: 'transform 0.18s ease, box-shadow 0.18s ease',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.transform = 'translateY(-3px)';
+                      e.currentTarget.style.boxShadow = '0 16px 36px rgba(109,40,217,0.42), 0 4px 10px rgba(109,40,217,0.22), inset 0 1px 0 rgba(255,255,255,0.18)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.transform = '';
+                      e.currentTarget.style.boxShadow = '0 8px 24px rgba(109,40,217,0.35), 0 2px 6px rgba(109,40,217,0.18), inset 0 1px 0 rgba(255,255,255,0.15)';
+                    }}
+                  >
+                    <span
+                      className="pointer-events-none absolute inset-0 rounded-[22px] bg-violet-400"
+                      style={{ animation: 'lisan-chatbot-pulse 2.6s cubic-bezier(0.4,0,0.6,1) infinite' }}
+                      aria-hidden="true"
+                    />
+                    <span className="pointer-events-none absolute inset-x-0 top-0 h-[40%] rounded-t-[22px] bg-gradient-to-b from-white/20 to-transparent" aria-hidden="true" />
+                    <BotMessageSquare className="relative h-5 w-5 shrink-0" aria-hidden="true" />
+                    <span className="relative">{heroAiChatLabel}</span>
+                  </Link>
+
+                  {/* Dictionary — secondary pill */}
                   <button
                     type="button"
                     onClick={() => {
                       document
                         .getElementById('section-dictionary')
-                        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }}
-                    className="inline-flex h-12 min-w-[150px] items-center justify-center gap-3 rounded-full border border-violet-100 bg-violet-100/75 px-6 text-base font-black text-violet-700 shadow-[0_14px_30px_rgba(124,58,237,0.12)] backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-violet-100 hover:shadow-[0_18px_36px_rgba(124,58,237,0.18)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.98]"
+                    className="inline-flex h-[52px] flex-1 items-center justify-center gap-2 rounded-[22px] border border-violet-200/60 bg-white/80 px-3 text-sm font-black text-violet-700 shadow-[0_4px_14px_rgba(124,58,237,0.08)] backdrop-blur transition hover:-translate-y-0.5 hover:border-violet-300/80 hover:bg-violet-50 hover:shadow-[0_8px_20px_rgba(124,58,237,0.14)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.97]"
                   >
-                    <BookOpen className="h-5 w-5" aria-hidden="true" />
+                    <BookOpen className="h-4 w-4 shrink-0 text-violet-500" aria-hidden="true" />
                     <span>{heroDictionaryLabel}</span>
                   </button>
                 </div>
@@ -1223,11 +1161,6 @@ function Home({
               ref={gamesScrollerRef}
               className="lisan-games-carousel flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain px-1 pb-3 pt-1 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden"
               dir="ltr"
-              onPointerDown={handleGamesPointerDown}
-              onPointerMove={handleGamesPointerMove}
-              onPointerUp={stopGamesDrag}
-              onPointerCancel={stopGamesDrag}
-              onPointerLeave={stopGamesDrag}
               onWheel={handleGamesWheel}
             >
               {gameCategories.map((category) => {
@@ -1241,9 +1174,10 @@ function Home({
                   : 0;
 
                 return (
-                  <Link
+                  <button
                     key={category.key}
-                    to={`/games?category=${category.key}`}
+                    type="button"
+                    onClick={() => openGameCategory(category.key)}
                     className={`group flex min-h-[184px] w-[76%] shrink-0 snap-start flex-col items-center justify-between gap-3 rounded-2xl border bg-white/78 p-4 text-center shadow-[inset_0_0_0_1px_rgba(221,214,254,0.45),0_16px_34px_rgba(124,58,237,0.1)] backdrop-blur-sm transition hover:-translate-y-1 hover:shadow-[0_20px_42px_rgba(124,58,237,0.17)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:w-[260px] lg:w-[280px] ${colors.border}`}
                     dir="rtl"
                   >
@@ -1271,7 +1205,7 @@ function Home({
                         style={{ width: `${progress}%` }}
                       />
                     </span>
-                  </Link>
+                  </button>
                 );
               })}
             </div>

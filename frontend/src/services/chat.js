@@ -62,6 +62,8 @@ export function buildChatRequest({
   includeArabic = false,
   clientMessageId = null,
   scenario = null,
+  activityTitle = null,
+  activitySubtitle = null,
 }) {
   return {
     message: typeof message === 'string' ? message.trim() : '',
@@ -70,6 +72,8 @@ export function buildChatRequest({
     includeArabic: includeArabic === true,
     clientMessageId,
     scenario: scenario || null,
+    activityTitle: activityTitle || null,
+    activitySubtitle: activitySubtitle || null,
   };
 }
 
@@ -189,14 +193,22 @@ function createChatApiError(response, responseBody = {}, fallbackMessage) {
   });
 }
 
-async function createConversation({ title, level = DEFAULT_CHAT_LEVEL, scenario = null }) {
+async function createConversation({
+  title,
+  level = DEFAULT_CHAT_LEVEL,
+  scenario = null,
+  activityTitle = null,
+  activitySubtitle = null,
+}) {
   const response = await fetch(CHAT_API_PATH, {
     method: 'POST',
     headers: getChatHeaders(),
     body: JSON.stringify({
-      title: title || 'Hebrew practice',
+      title: activityTitle || title || 'Hebrew practice',
       level,
       ...(scenario ? { scenario } : {}),
+      ...(activityTitle ? { activityTitle } : {}),
+      ...(activitySubtitle ? { activitySubtitle } : {}),
     }),
   });
 
@@ -237,16 +249,21 @@ export async function sendChatMessage({
   level = DEFAULT_CHAT_LEVEL,
   includeArabic = false,
   scenario = null,
+  activityTitle = null,
+  activitySubtitle = null,
 }) {
   const trimmedMessage = typeof message === 'string' ? message.trim() : '';
   let activeConversationId = conversationId;
 
   if (!activeConversationId) {
     const conversation = await createConversation({
-      title: trimmedMessage || 'Hebrew practice',
+      title: activityTitle || trimmedMessage || 'Hebrew practice',
       level,
       scenario,
+      activityTitle,
+      activitySubtitle,
     });
+
     activeConversationId = conversation?.id || null;
   }
 
@@ -264,6 +281,9 @@ export async function sendChatMessage({
     level,
     includeArabic,
     clientMessageId: createClientMessageId(),
+    scenario,
+    activityTitle,
+    activitySubtitle,
   });
 
   const response = await fetch(`${CHAT_API_PATH}/${activeConversationId}/ai-message`, {
@@ -272,6 +292,11 @@ export async function sendChatMessage({
     body: JSON.stringify({
       text: requestPayload.message,
       clientMessageId: requestPayload.clientMessageId,
+      level: requestPayload.level,
+      includeArabic: requestPayload.includeArabic,
+      scenario: requestPayload.scenario,
+      activityTitle: requestPayload.activityTitle,
+      activitySubtitle: requestPayload.activitySubtitle,
     }),
   });
 
@@ -293,13 +318,29 @@ export async function sendVoiceMessage({
   conversationId = null,
   level = DEFAULT_CHAT_LEVEL,
   includeArabic = false,
+  scenario = null,
+  activityTitle = null,
+  activitySubtitle = null,
 }) {
   const formData = new FormData();
   formData.append('audio', audioBlob, 'voice-message.webm');
   formData.append('level', level);
   formData.append('includeArabic', String(includeArabic));
+
   if (conversationId) {
     formData.append('conversationId', conversationId);
+  }
+
+  if (scenario) {
+    formData.append('scenario', scenario);
+  }
+
+  if (activityTitle) {
+    formData.append('activityTitle', activityTitle);
+  }
+
+  if (activitySubtitle) {
+    formData.append('activitySubtitle', activitySubtitle);
   }
 
   const token = localStorage.getItem('lisan-token');
@@ -374,6 +415,9 @@ function normalizeConversationSummary(payload = {}) {
     id: payload.id ?? '',
     title: payload.title ?? 'Hebrew practice',
     level: payload.level ?? DEFAULT_CHAT_LEVEL,
+    scenario: payload.scenario ?? null,
+    activityTitle: payload.activityTitle ?? null,
+    activitySubtitle: payload.activitySubtitle ?? null,
     updatedAt: payload.updatedAt ?? null,
     createdAt: payload.createdAt ?? null,
     lastMessageAt: payload.lastMessageAt ?? null,

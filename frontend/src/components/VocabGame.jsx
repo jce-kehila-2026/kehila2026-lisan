@@ -126,12 +126,52 @@ const LABELS = {
   },
 };
 
+function getHebrewVoice() {
+  if (typeof window === 'undefined' || !window.speechSynthesis) {
+    return null;
+  }
+
+  const voices = window.speechSynthesis.getVoices?.() || [];
+
+  return (
+    voices.find((voice) => voice.lang === 'he-IL') ||
+    voices.find((voice) => voice.lang === 'he') ||
+    voices.find((voice) => String(voice.lang || '').startsWith('he-')) ||
+    null
+  );
+}
+
 function pronounce(text) {
-  if (typeof window === 'undefined' || !window.speechSynthesis) return;
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'he-IL';
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utterance);
+  const spokenText = typeof text === 'string' ? text.trim() : '';
+
+  if (!spokenText || typeof window === 'undefined' || !window.speechSynthesis) {
+    return;
+  }
+
+  const doSpeak = () => {
+    const utterance = new SpeechSynthesisUtterance(spokenText);
+    utterance.lang = 'he-IL';
+    utterance.rate = 0.85;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    const hebrewVoice = getHebrewVoice();
+    if (hebrewVoice) {
+      utterance.voice = hebrewVoice;
+    }
+
+    window.speechSynthesis.cancel();
+    window.setTimeout(() => {
+      window.speechSynthesis.speak(utterance);
+    }, 50);
+  };
+
+  const voices = window.speechSynthesis.getVoices?.() || [];
+  if (voices.length > 0) {
+    doSpeak();
+  } else {
+    window.speechSynthesis.addEventListener('voiceschanged', doSpeak, { once: true });
+  }
 }
 
 function shuffle(arr) {
@@ -232,18 +272,27 @@ function VocabGame() {
   const starCount = quizDone ? starsForScore(score, questions.length) : 0;
 
   useEffect(() => {
-    if (searchParams.get('view') === 'completed') {
+    const viewParam = searchParams.get('view');
+    const categoryParam = searchParams.get('category');
+
+    if (viewParam === 'completed') {
       setView('completed');
+      setActiveCategory(null);
+      setActiveLevel(null);
+      return;
+    }
+
+    if (categoryParam && gameCatalog[categoryParam]) {
+      setActiveCategory(categoryParam);
+      setActiveLevel(null);
+      setCardIndex(0);
+      setFlipped(false);
+      setQuestions([]);
+      setQIndex(0);
+      setSelected(null);
+      setView('levels');
     }
   }, [searchParams]);
-
-  useEffect(() => {
-    if (!searchParams.has('category')) return;
-    const next = new URLSearchParams(searchParams);
-    next.delete('category');
-    setSearchParams(next, { replace: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     const token = getStoredToken();
@@ -322,7 +371,13 @@ function VocabGame() {
   const openCategory = (key) => {
     setActiveCategory(key);
     setActiveLevel(null);
+    setCardIndex(0);
+    setFlipped(false);
+    setQuestions([]);
+    setQIndex(0);
+    setSelected(null);
     setView('levels');
+    setSearchParams({ category: key }, { replace: false });
   };
 
   const backToCategories = () => {
@@ -602,7 +657,7 @@ function VocabGame() {
                       <button
                         type="button"
                         onClick={() => pronounce(word.hebrew)}
-                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-50 text-violet-700 transition hover:bg-violet-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-50 text-violet-700 shadow-sm transition hover:bg-violet-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-95"
                         aria-label={text.listen}
                       >
                         <Volume2 className="h-5 w-5" aria-hidden="true" />
@@ -769,7 +824,7 @@ function VocabGame() {
             <button
               type="button"
               onClick={() => pronounce(currentCard.hebrew)}
-              className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-4 py-2 text-sm font-bold text-violet-700 transition hover:bg-violet-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+              className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-4 py-2 text-sm font-bold text-violet-700 shadow-sm transition hover:bg-violet-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-95"
             >
               <Volume2 className="h-4 w-4" aria-hidden="true" />
               {text.listen}
@@ -866,9 +921,19 @@ function VocabGame() {
 
           <div className="mx-auto max-w-md text-center">
             <p className="text-sm font-bold text-slate-500">{text.questionPrompt}</p>
-            <p key={qIndex} className="lisan-cheer mt-1 text-4xl font-black text-slate-900">
-              {currentQuestion.hebrew}
-            </p>
+            <div className="mt-1 flex flex-wrap items-center justify-center gap-3">
+              <p key={qIndex} className="lisan-cheer text-4xl font-black text-slate-900">
+                {currentQuestion.hebrew}
+              </p>
+              <button
+                type="button"
+                onClick={() => pronounce(currentQuestion.hebrew)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-violet-50 text-violet-700 shadow-sm transition hover:bg-violet-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-95"
+                aria-label={text.listen}
+              >
+                <Volume2 className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </div>
           </div>
           <div className="mx-auto mt-6 grid max-w-md gap-3">
             {currentQuestion.options.map((option, optIdx) => {

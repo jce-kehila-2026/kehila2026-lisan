@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import Button from '../../components/ui/Button.jsx';
 import AdminPageHeader from '../../components/admin/AdminPageHeader.jsx';
+import AdminHeroVisual from '../../components/admin/AdminHeroVisual.jsx';
 import {
   adminLevels,
   adminStudentsSeed,
@@ -560,34 +561,22 @@ function Students() {
       <div className="mx-auto w-full max-w-7xl" dir="rtl">
         <AdminPageHeader icon={Users} label="ניהול תלמידות" />
 
-        <section className="relative mt-3 overflow-hidden rounded-[24px] border border-[#EEE5FF] bg-white/75 shadow-card backdrop-blur-[8px] md:mt-6 md:rounded-[2rem]">
-          <div
-            className="absolute left-0 top-0 h-full w-1/2 bg-violet-200/25 blur-3xl"
-            aria-hidden="true"
-          />
-
-          <div className="relative flex min-h-[132px] flex-col md:min-h-[260px] lg:flex-row lg:items-stretch">
-            <div className="flex flex-col justify-center p-4 md:p-7 lg:w-[58%] lg:py-8">
-              <p className="inline-flex items-center gap-2 text-sm font-black text-violet-700">
+<section
+          className="relative mt-8 overflow-hidden rounded-[24px] border border-violet-100/70 bg-white/75 shadow-[0_16px_42px_rgba(109,40,217,0.1)] md:mt-10 md:rounded-[28px]"
+          style={{ maxHeight: '140px' }}
+        >
+          <div className="flex h-full min-h-[140px] items-stretch" dir="ltr">
+            <div className="relative w-[34%] shrink-0 overflow-hidden" aria-hidden="true">
+              <AdminHeroVisual type="students" />
+            </div>
+            <div className="flex flex-1 flex-col justify-center text-right" style={{ paddingLeft: '4px', paddingRight: '20px' }} dir="rtl">
+              <p className="inline-flex w-full items-center justify-start gap-2 text-xs font-black text-violet-700 mb-1 text-right">
                 <Users className="h-4 w-4" aria-hidden="true" />
                 ניהול תלמידות
               </p>
-
-              <h1 className="mt-2 text-[clamp(1.65rem,7vw,2.1rem)] font-black leading-tight text-slate-950 md:text-[clamp(2.2rem,4.2vw,4.25rem)]">
-                תלמידות במערכת
-              </h1>
-
-              <p className="mt-2 text-sm font-semibold leading-6 text-slate-600 md:mt-3 md:text-base md:leading-7">
-                ניהול תלמידות, רמות, שיוך למורות, עריכה, מחיקה והשהיה דרך המערכת.
-              </p>
-            </div>
-
-            <div className="relative flex min-h-[72px] items-center justify-center overflow-hidden bg-violet-50/35 md:min-h-[210px] lg:w-[42%] lg:bg-violet-50/20">
-              <img
-                src="/addS.png"
-                alt="Add Student"
-                className="h-full min-h-[72px] w-full object-contain object-center md:min-h-[210px]"
-              />
+              <h1 className="text-2xl font-black leading-tight text-slate-950 md:text-3xl">תלמידות במערכת</h1>
+              <p className="mt-1 text-sm font-semibold text-slate-600">ניהול תלמידות, רמות, שיוך למורות, עריכה, מחיקה והשהיה דרך המערכת.</p>
+              
             </div>
           </div>
         </section>

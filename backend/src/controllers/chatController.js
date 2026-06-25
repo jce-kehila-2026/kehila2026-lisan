@@ -23,33 +23,69 @@ function shouldStoreVoiceAudio() {
 
 exports.createChat = async (req, res) => {
   try {
-    const { title, scenario } = req.body;
+    const { title } = req.body || {};
+    const activityContext = resolveActivityContext({ body: req.body });
 
     const userId = req.user.uid;
     const userPreferences = await getUserChatPreferences(userId);
     const effectiveLevel = await resolveEffectiveUserLevel(req);
+
+    const effectiveTitle =
+      activityContext.activityTitle ||
+      normalizeOptionalString(title) ||
+      DEFAULT_CHAT_TITLE;
+
+    // Keep only the last 2 chats per user — delete the oldest when a 3rd is created.
+    // Sort in JS (not Firestore) to avoid needing a composite index.
+    const existingChatsSnap = await db.collection('chatSessions')
+      .where('userId', '==', userId)
+      .get();
+
+    if (existingChatsSnap.size >= 2) {
+      const sorted = existingChatsSnap.docs
+        .slice()
+        .sort((a, b) => {
+          const aTime = a.data().startedAt?.toMillis?.() || 0;
+          const bTime = b.data().startedAt?.toMillis?.() || 0;
+          return aTime - bTime;
+        });
+      // Delete all but the most recent one (keep 1, new one will be #2)
+      const toDelete = sorted.slice(0, sorted.length - 1);
+      await Promise.all(toDelete.map((doc) => doc.ref.delete()));
+    }
+
     const { chatId, chat } = await createChatSession({
       userId,
       level: effectiveLevel,
-      title,
+      title: effectiveTitle,
       defaultIncludeArabic: userPreferences.defaultIncludeArabic,
       defaultTitle: DEFAULT_CHAT_TITLE,
-      scenario,
+      scenario: activityContext.scenario,
+      activityTitle: activityContext.activityTitle,
+      activitySubtitle: activityContext.activitySubtitle,
     });
+
+    const activityFields = buildActivityFields(activityContext);
+
+    if (Object.keys(activityFields).length > 0) {
+      await db.collection('chatSessions').doc(chatId).set(activityFields, { merge: true });
+    }
 
     return res.status(201).json({
       success: true,
       chat: {
         id: chatId,
         userId,
-        title: chat.title,
+        title: activityContext.activityTitle || chat.title,
         level: chat.level,
         defaultIncludeArabic: chat.defaultIncludeArabic === true,
-        scenario: chat.scenario || null,
+        scenario: activityContext.scenario || chat.scenario || null,
+        activityTitle: activityContext.activityTitle || chat.activityTitle || null,
+        activitySubtitle: activityContext.activitySubtitle || chat.activitySubtitle || null,
         messages: [],
         startedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
+        updatedAt: new Date().toISOString(),
+      },
     });
   } catch (error) {
     logChatError('create_chat_failed', error, {
@@ -59,7 +95,7 @@ exports.createChat = async (req, res) => {
     return res.status(500).json({
       success: false,
       error: 'Server error',
-      code: 'SERVER_ERROR'
+      code: 'SERVER_ERROR',
     });
   }
 };
@@ -89,18 +125,21 @@ exports.getMyChats = async (req, res) => {
         userId: data.userId,
         title: data.title,
         level: data.level,
+        scenario: data.scenario || null,
+        activityTitle: data.activityTitle || null,
+        activitySubtitle: data.activitySubtitle || null,
         isArchived: data.isArchived === true,
         archivedAt: data.archivedAt || null,
         startedAt: data.startedAt || null,
         updatedAt: data.updatedAt || null,
         messages: data.messages || [],
-        messagesCount: data.messages ? data.messages.length : 0
+        messagesCount: data.messages ? data.messages.length : 0,
       });
     });
 
     return res.status(200).json({
       success: true,
-      chats
+      chats,
     });
   } catch (error) {
     logChatError('get_my_chats_failed', error, {
@@ -111,7 +150,7 @@ exports.getMyChats = async (req, res) => {
     return res.status(500).json({
       success: false,
       error: 'Server error',
-      code: 'SERVER_ERROR'
+      code: 'SERVER_ERROR',
     });
   }
 };
@@ -130,7 +169,7 @@ exports.getChatById = async (req, res) => {
       return res.status(404).json({
         success: false,
         error: 'Chat not found',
-        code: 'CHAT_NOT_FOUND'
+        code: 'CHAT_NOT_FOUND',
       });
     }
 
@@ -140,7 +179,7 @@ exports.getChatById = async (req, res) => {
       return res.status(403).json({
         success: false,
         error: 'Access denied',
-        code: 'ACCESS_DENIED'
+        code: 'ACCESS_DENIED',
       });
     }
 
@@ -148,8 +187,11 @@ exports.getChatById = async (req, res) => {
       success: true,
       chat: {
         id: chatDoc.id,
-        ...chat
-      }
+        ...chat,
+        scenario: chat.scenario || null,
+        activityTitle: chat.activityTitle || null,
+        activitySubtitle: chat.activitySubtitle || null,
+      },
     });
   } catch (error) {
     logChatError('get_chat_by_id_failed', error, {
@@ -160,7 +202,7 @@ exports.getChatById = async (req, res) => {
     return res.status(500).json({
       success: false,
       error: 'Server error',
-      code: 'SERVER_ERROR'
+      code: 'SERVER_ERROR',
     });
   }
 };
@@ -170,16 +212,14 @@ exports.sendAiMessage = async (req, res) => {
 
   try {
     const userId = req.user.uid;
-
     const { chatId } = req.params;
-
-    const { text } = req.body;
+    const text = normalizeOptionalString(req.body?.text);
 
     if (!text) {
       return res.status(400).json({
         success: false,
         error: 'Text is required',
-        code: 'MISSING_TEXT'
+        code: 'MISSING_TEXT',
       });
     }
 
@@ -193,7 +233,7 @@ exports.sendAiMessage = async (req, res) => {
       return res.status(404).json({
         success: false,
         error: 'Chat not found',
-        code: 'CHAT_NOT_FOUND'
+        code: 'CHAT_NOT_FOUND',
       });
     }
 
@@ -203,11 +243,34 @@ exports.sendAiMessage = async (req, res) => {
       return res.status(403).json({
         success: false,
         error: 'Access denied',
-        code: 'ACCESS_DENIED'
+        code: 'ACCESS_DENIED',
       });
     }
 
-    // حفظ رسالة المستخدم
+    const activityContext = resolveActivityContext({
+      body: req.body,
+      chat,
+    });
+
+    const activityPatch = buildMissingActivityPatch({
+      chat,
+      activityContext,
+    });
+
+    if (Object.keys(activityPatch).length > 0) {
+      await chatRef.set(activityPatch, { merge: true });
+    }
+
+    const effectiveLevel =
+      normalizeOptionalString(req.body?.level) ||
+      normalizeOptionalString(chat.level) ||
+      'A1';
+
+    const includeArabic = resolveIncludeArabicPreference(
+      req.body?.includeArabic,
+      chat.defaultIncludeArabic === true
+    );
+
     const existingTextMessagePair = normalizedClientMessageId
       ? findStoredMessagePairByClientMessageId(chat.messages, normalizedClientMessageId)
       : null;
@@ -218,6 +281,9 @@ exports.sendAiMessage = async (req, res) => {
         userMessage: existingTextMessagePair.userMessage,
         aiMessage: existingTextMessagePair.assistantMessage,
         deduplicated: true,
+        scenario: activityContext.scenario,
+        activityTitle: activityContext.activityTitle,
+        activitySubtitle: activityContext.activitySubtitle,
       });
     }
 
@@ -225,54 +291,56 @@ exports.sendAiMessage = async (req, res) => {
       sender: 'user',
       text,
       clientMessageId: normalizedClientMessageId,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     await applyAutoTitleToChatIfNeeded({
       chatRef,
       chat,
       firstUserMessageText: text,
-      fallbackTitle: DEFAULT_CHAT_TITLE,
+      fallbackTitle: activityContext.activityTitle || DEFAULT_CHAT_TITLE,
     });
 
     if (!existingTextMessagePair?.userMessage) {
       await chatRef.update({
         messages: admin.firestore.FieldValue.arrayUnion(userMessage),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
     }
 
     const userToken = req.headers.authorization?.replace('Bearer ', '') || null;
+
     const aiResponse = await sendChatMessageToAi({
       message: text,
-      level: chat.level || 'A1',
-      includeArabic: chat.defaultIncludeArabic === true,
+      level: effectiveLevel,
+      includeArabic,
       userId,
       sessionId: chatId,
       userToken,
-      scenario: chat.scenario || null,
+      scenario: activityContext.scenario,
+      activityTitle: activityContext.activityTitle,
+      activitySubtitle: activityContext.activitySubtitle,
     });
-
 
     const aiText =
       aiResponse?.answerHe ||
       'אני מבין. בוא נמשיך לתרגל.';
 
-    // حفظ رد الـ AI
     const aiMessage = {
       sender: 'ai',
       text: aiText,
       replyToClientMessageId: normalizedClientMessageId,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     await chatRef.update({
       messages: admin.firestore.FieldValue.arrayUnion(aiMessage),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
     const inputTokens = aiResponse?.inputTokens || 0;
     const outputTokens = aiResponse?.outputTokens || 0;
+
     if (inputTokens > 0 || outputTokens > 0) {
       await db.collection('tokenUsage').add({
         userId,
@@ -282,7 +350,9 @@ exports.sendAiMessage = async (req, res) => {
         provider: aiResponse?.provider || null,
         model: aiResponse?.model || null,
         type: 'text',
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
+        scenario: activityContext.scenario,
+        activityTitle: activityContext.activityTitle,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
     }
 
@@ -297,6 +367,9 @@ exports.sendAiMessage = async (req, res) => {
       contextChunkIds: aiResponse?.contextChunkIds || [],
       fallbackUsed: aiResponse?.fallbackUsed === true,
       fallbackReason: aiResponse?.fallbackReason || null,
+      scenario: activityContext.scenario,
+      activityTitle: activityContext.activityTitle,
+      activitySubtitle: activityContext.activitySubtitle,
     });
   } catch (error) {
     logChatError('send_ai_message_failed', error, {
@@ -308,7 +381,7 @@ exports.sendAiMessage = async (req, res) => {
     return res.status(error.status || 500).json({
       success: false,
       error: error.message || 'AI service failed',
-      code: error.code || 'AI_SERVICE_ERROR'
+      code: error.code || 'AI_SERVICE_ERROR',
     });
   }
 };
@@ -322,7 +395,7 @@ exports.archiveConversation = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'Conversation id is required',
-        code: 'MISSING_CONVERSATION_ID'
+        code: 'MISSING_CONVERSATION_ID',
       });
     }
 
@@ -333,7 +406,7 @@ exports.archiveConversation = async (req, res) => {
       return res.status(404).json({
         success: false,
         error: 'Chat not found',
-        code: 'CHAT_NOT_FOUND'
+        code: 'CHAT_NOT_FOUND',
       });
     }
 
@@ -343,7 +416,7 @@ exports.archiveConversation = async (req, res) => {
       return res.status(403).json({
         success: false,
         error: 'Access denied',
-        code: 'ACCESS_DENIED'
+        code: 'ACCESS_DENIED',
       });
     }
 
@@ -378,7 +451,7 @@ exports.archiveConversation = async (req, res) => {
     return res.status(500).json({
       success: false,
       error: 'Server error',
-      code: 'SERVER_ERROR'
+      code: 'SERVER_ERROR',
     });
   }
 };
@@ -395,7 +468,7 @@ exports.saveChatPreferences = async (req, res) => {
       return res.status(404).json({
         success: false,
         error: 'User not found',
-        code: 'USER_NOT_FOUND'
+        code: 'USER_NOT_FOUND',
       });
     }
 
@@ -411,7 +484,7 @@ exports.saveChatPreferences = async (req, res) => {
       success: true,
       preferences: {
         defaultIncludeArabic,
-      }
+      },
     });
   } catch (error) {
     logChatError('save_chat_preferences_failed', error, {
@@ -421,7 +494,7 @@ exports.saveChatPreferences = async (req, res) => {
     return res.status(500).json({
       success: false,
       error: 'Server error',
-      code: 'SERVER_ERROR'
+      code: 'SERVER_ERROR',
     });
   }
 };
@@ -436,6 +509,11 @@ exports.sendVoiceMessage = async (req, res) => {
   let includeArabic = false;
   let audioFile = null;
   let existingVoiceMessagePair = null;
+  let activityContext = {
+    scenario: null,
+    activityTitle: null,
+    activitySubtitle: null,
+  };
 
   try {
     const userId = req.user.uid;
@@ -444,13 +522,14 @@ exports.sendVoiceMessage = async (req, res) => {
       level = 'A1',
       clientMessageId = null,
     } = req.body || {};
+
     audioFile = req.file;
 
     if (!audioFile) {
       return res.status(400).json({
         success: false,
         error: 'Audio file is required',
-        code: 'VOICE_FILE_REQUIRED'
+        code: 'VOICE_FILE_REQUIRED',
       });
     }
 
@@ -458,7 +537,7 @@ exports.sendVoiceMessage = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'Audio file is empty',
-        code: 'VOICE_FILE_EMPTY'
+        code: 'VOICE_FILE_EMPTY',
       });
     }
 
@@ -466,20 +545,48 @@ exports.sendVoiceMessage = async (req, res) => {
       return res.status(413).json({
         success: false,
         error: 'Audio file is too large',
-        code: 'VOICE_FILE_TOO_LARGE'
+        code: 'VOICE_FILE_TOO_LARGE',
       });
     }
 
     const normalizedConversationId = normalizeOptionalString(conversationId);
     normalizedClientMessageId = normalizeOptionalString(clientMessageId);
+
     normalizedLevel = normalizedConversationId
       ? normalizeOptionalString(level) || 'A1'
       : await resolveEffectiveUserLevel(req);
+
+    const requestedActivityContext = resolveActivityContext({
+      body: req.body,
+    });
+
     ({ chatId, chatRef, chat } = await ensureVoiceConversation({
       userId,
       conversationId: normalizedConversationId,
       level: normalizedLevel,
+      scenario: requestedActivityContext.scenario,
+      activityTitle: requestedActivityContext.activityTitle,
+      activitySubtitle: requestedActivityContext.activitySubtitle,
     }));
+
+    activityContext = resolveActivityContext({
+      body: req.body,
+      chat,
+    });
+
+    const activityPatch = buildMissingActivityPatch({
+      chat,
+      activityContext,
+    });
+
+    if (Object.keys(activityPatch).length > 0) {
+      await chatRef.set(activityPatch, { merge: true });
+      chat = {
+        ...chat,
+        ...activityPatch,
+      };
+    }
+
     includeArabic = resolveIncludeArabicPreference(
       req.body?.includeArabic,
       chat?.defaultIncludeArabic === true
@@ -495,6 +602,7 @@ exports.sendVoiceMessage = async (req, res) => {
           chatId,
           userMessage: existingVoiceMessagePair.userMessage,
           assistantMessage: existingVoiceMessagePair.assistantMessage,
+          activityContext,
         })
       );
     }
@@ -519,16 +627,20 @@ exports.sendVoiceMessage = async (req, res) => {
       clientMessageId: normalizedClientMessageId,
       level: normalizedLevel,
       includeArabic,
+      scenario: activityContext.scenario,
+      activityTitle: activityContext.activityTitle,
+      activitySubtitle: activityContext.activitySubtitle,
       audio: {
         fieldName: audioFile.fieldname,
         originalName: audioFile.originalname,
         mimeType: audioFile.mimetype,
         size: audioFile.size,
         audioUrl: uploadedAudio?.audioUrl || null,
-      }
+      },
     };
 
     const userToken = req.headers.authorization?.replace('Bearer ', '') || null;
+
     const aiVoiceResponse = await sendVoiceMessageToAi({
       audioBuffer: audioFile.buffer,
       fileName: audioFile.originalname || 'voice-message.webm',
@@ -538,8 +650,10 @@ exports.sendVoiceMessage = async (req, res) => {
       userId,
       sessionId: chatId,
       userToken,
+      scenario: activityContext.scenario,
+      activityTitle: activityContext.activityTitle,
+      activitySubtitle: activityContext.activitySubtitle,
     });
-
 
     const userVoiceMessage = {
       sender: 'user',
@@ -571,7 +685,7 @@ exports.sendVoiceMessage = async (req, res) => {
         chatRef,
         chat,
         firstUserMessageText: aiVoiceResponse.transcribedText,
-        fallbackTitle: DEFAULT_VOICE_CHAT_TITLE,
+        fallbackTitle: activityContext.activityTitle || DEFAULT_VOICE_CHAT_TITLE,
       });
     }
 
@@ -581,11 +695,12 @@ exports.sendVoiceMessage = async (req, res) => {
 
     await chatRef.update({
       messages: admin.firestore.FieldValue.arrayUnion(...messagesToPersist),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
     const inputTokens = aiVoiceResponse?.inputTokens || 0;
     const outputTokens = aiVoiceResponse?.outputTokens || 0;
+
     if (inputTokens > 0 || outputTokens > 0) {
       await db.collection('tokenUsage').add({
         userId,
@@ -595,7 +710,9 @@ exports.sendVoiceMessage = async (req, res) => {
         provider: aiVoiceResponse?.provider || null,
         model: aiVoiceResponse?.model || null,
         type: 'voice',
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
+        scenario: activityContext.scenario,
+        activityTitle: activityContext.activityTitle,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
     }
 
@@ -607,12 +724,16 @@ exports.sendVoiceMessage = async (req, res) => {
       pronunciationScore: aiVoiceResponse?.pronunciationScore ?? null,
       ssmlText: aiVoiceResponse?.ssmlText ?? null,
       suggestedNextPrompts: aiVoiceResponse?.suggestedNextPrompts || [],
+      scenario: activityContext.scenario,
+      activityTitle: activityContext.activityTitle,
+      activitySubtitle: activityContext.activitySubtitle,
     });
   } catch (error) {
     logChatError('send_voice_message_failed', error, {
       userId: req.user?.uid || null,
       conversationId: chatId,
       clientMessageId: normalizedClientMessageId,
+      scenario: activityContext.scenario,
     });
 
     if (chatRef && audioFile) {
@@ -642,6 +763,9 @@ exports.sendVoiceMessage = async (req, res) => {
       conversationId: chatId,
       fallbackUsed: true,
       fallbackReason: error.code || 'AI_SERVICE_ERROR',
+      scenario: activityContext.scenario,
+      activityTitle: activityContext.activityTitle,
+      activitySubtitle: activityContext.activitySubtitle,
     });
   }
 };
@@ -650,13 +774,14 @@ exports.addMessage = async (req, res) => {
   try {
     const userId = req.user.uid;
     const { chatId } = req.params;
-    const { sender, text } = req.body;
+    const { sender } = req.body;
+    const text = normalizeOptionalString(req.body?.text);
 
     if (!sender || !text) {
       return res.status(400).json({
         success: false,
         error: 'sender and text are required',
-        code: 'MISSING_REQUIRED_FIELDS'
+        code: 'MISSING_REQUIRED_FIELDS',
       });
     }
 
@@ -666,7 +791,7 @@ exports.addMessage = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: 'Invalid sender',
-        code: 'INVALID_SENDER'
+        code: 'INVALID_SENDER',
       });
     }
 
@@ -680,7 +805,7 @@ exports.addMessage = async (req, res) => {
       return res.status(404).json({
         success: false,
         error: 'Chat not found',
-        code: 'CHAT_NOT_FOUND'
+        code: 'CHAT_NOT_FOUND',
       });
     }
 
@@ -690,24 +815,24 @@ exports.addMessage = async (req, res) => {
       return res.status(403).json({
         success: false,
         error: 'Access denied',
-        code: 'ACCESS_DENIED'
+        code: 'ACCESS_DENIED',
       });
     }
 
     const message = {
       sender,
       text,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     await chatRef.update({
       messages: admin.firestore.FieldValue.arrayUnion(message),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
     return res.status(201).json({
       success: true,
-      message
+      message,
     });
   } catch (error) {
     logChatError('add_message_failed', error, {
@@ -718,7 +843,7 @@ exports.addMessage = async (req, res) => {
     return res.status(500).json({
       success: false,
       error: 'Server error',
-      code: 'SERVER_ERROR'
+      code: 'SERVER_ERROR',
     });
   }
 };
@@ -738,7 +863,7 @@ exports.deleteChat = async (req, res) => {
       return res.status(404).json({
         success: false,
         error: 'Chat not found',
-        code: 'CHAT_NOT_FOUND'
+        code: 'CHAT_NOT_FOUND',
       });
     }
 
@@ -748,7 +873,7 @@ exports.deleteChat = async (req, res) => {
       return res.status(403).json({
         success: false,
         error: 'Access denied',
-        code: 'ACCESS_DENIED'
+        code: 'ACCESS_DENIED',
       });
     }
 
@@ -756,7 +881,7 @@ exports.deleteChat = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: 'Chat deleted successfully'
+      message: 'Chat deleted successfully',
     });
   } catch (error) {
     logChatError('delete_chat_failed', error, {
@@ -767,7 +892,7 @@ exports.deleteChat = async (req, res) => {
     return res.status(500).json({
       success: false,
       error: 'Server error',
-      code: 'SERVER_ERROR'
+      code: 'SERVER_ERROR',
     });
   }
 };
@@ -806,6 +931,56 @@ function resolveIncludeArabicPreference(rawValue, defaultValue = false) {
   return parseBooleanFlag(rawValue);
 }
 
+function resolveActivityContext({ body = {}, chat = {} } = {}) {
+  return {
+    scenario:
+      normalizeOptionalString(body?.scenario) ||
+      normalizeOptionalString(chat?.scenario),
+    activityTitle:
+      normalizeOptionalString(body?.activityTitle) ||
+      normalizeOptionalString(chat?.activityTitle),
+    activitySubtitle:
+      normalizeOptionalString(body?.activitySubtitle) ||
+      normalizeOptionalString(chat?.activitySubtitle),
+  };
+}
+
+function buildActivityFields(activityContext = {}) {
+  const fields = {};
+
+  if (activityContext.scenario) {
+    fields.scenario = activityContext.scenario;
+  }
+
+  if (activityContext.activityTitle) {
+    fields.activityTitle = activityContext.activityTitle;
+  }
+
+  if (activityContext.activitySubtitle) {
+    fields.activitySubtitle = activityContext.activitySubtitle;
+  }
+
+  return fields;
+}
+
+function buildMissingActivityPatch({ chat = {}, activityContext = {} } = {}) {
+  const patch = {};
+
+  if (activityContext.scenario && chat.scenario !== activityContext.scenario) {
+    patch.scenario = activityContext.scenario;
+  }
+
+  if (activityContext.activityTitle && chat.activityTitle !== activityContext.activityTitle) {
+    patch.activityTitle = activityContext.activityTitle;
+  }
+
+  if (activityContext.activitySubtitle && chat.activitySubtitle !== activityContext.activitySubtitle) {
+    patch.activitySubtitle = activityContext.activitySubtitle;
+  }
+
+  return patch;
+}
+
 async function getUserChatPreferences(userId) {
   if (!userId) {
     return {
@@ -838,17 +1013,20 @@ async function getUserChatPreferences(userId) {
 
 async function resolveEffectiveUserLevel(req) {
   const tokenLevel = normalizeOptionalString(req?.user?.level);
+
   if (tokenLevel) {
     return tokenLevel;
   }
 
   const userId = normalizeOptionalString(req?.user?.uid);
+
   if (!userId) {
     return 'A1';
   }
 
   try {
     const userDoc = await db.collection('users').doc(userId).get();
+
     if (!userDoc.exists) {
       return 'A1';
     }
@@ -867,7 +1045,18 @@ async function ensureVoiceConversation({
   userId,
   conversationId = null,
   level = 'A1',
+  scenario = null,
+  activityTitle = null,
+  activitySubtitle = null,
 }) {
+  const requestedActivityContext = resolveActivityContext({
+    body: {
+      scenario,
+      activityTitle,
+      activitySubtitle,
+    },
+  });
+
   if (conversationId) {
     const chatRef = db.collection('chatSessions').doc(conversationId);
     const chatDoc = await chatRef.get();
@@ -876,37 +1065,70 @@ async function ensureVoiceConversation({
       throw {
         status: 404,
         code: 'CHAT_NOT_FOUND',
-        message: 'Chat not found'
+        message: 'Chat not found',
       };
     }
 
     const chat = chatDoc.data();
+
     if (chat.userId !== userId) {
       throw {
         status: 403,
         code: 'ACCESS_DENIED',
-        message: 'Access denied'
+        message: 'Access denied',
       };
+    }
+
+    const activityContext = resolveActivityContext({
+      body: requestedActivityContext,
+      chat,
+    });
+
+    const activityPatch = buildMissingActivityPatch({
+      chat,
+      activityContext,
+    });
+
+    if (Object.keys(activityPatch).length > 0) {
+      await chatRef.set(activityPatch, { merge: true });
     }
 
     return {
       chatId: conversationId,
       chatRef,
-      chat,
+      chat: {
+        ...chat,
+        ...activityPatch,
+      },
       isNewConversation: false,
     };
   }
 
   const userPreferences = await getUserChatPreferences(userId);
+
   const createdChat = await createChatSession({
     userId,
     level,
+    title: requestedActivityContext.activityTitle || DEFAULT_VOICE_CHAT_TITLE,
     defaultIncludeArabic: userPreferences.defaultIncludeArabic,
     defaultTitle: DEFAULT_VOICE_CHAT_TITLE,
+    scenario: requestedActivityContext.scenario,
+    activityTitle: requestedActivityContext.activityTitle,
+    activitySubtitle: requestedActivityContext.activitySubtitle,
   });
+
+  const activityFields = buildActivityFields(requestedActivityContext);
+
+  if (Object.keys(activityFields).length > 0) {
+    await db.collection('chatSessions').doc(createdChat.chatId).set(activityFields, { merge: true });
+  }
 
   return {
     ...createdChat,
+    chat: {
+      ...createdChat.chat,
+      ...activityFields,
+    },
     isNewConversation: true,
   };
 }
@@ -954,7 +1176,7 @@ async function persistFailedVoiceAttempt({
 
   await chatRef.update({
     messages: admin.firestore.FieldValue.arrayUnion(...messagesToPersist),
-    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   });
 }
 
@@ -1004,6 +1226,7 @@ function buildVoiceIdempotentResponse({
   chatId,
   userMessage,
   assistantMessage,
+  activityContext = {},
 }) {
   return {
     success: true,
@@ -1019,15 +1242,19 @@ function buildVoiceIdempotentResponse({
     conversationId: chatId,
     audioUrl: userMessage?.audioUrl || null,
     audioStored: Boolean(userMessage?.audioUrl),
+    scenario: activityContext.scenario || null,
+    activityTitle: activityContext.activityTitle || null,
+    activitySubtitle: activityContext.activitySubtitle || null,
   };
 }
 
 function logChatError(event, error, context = {}) {
-  // PII redaction: hash userId before it hits any sink (stdout/Sentry/log aggregator)
   const safeContext = { ...context };
+
   if (safeContext.userId !== undefined) {
     safeContext.userId = hashUserId(safeContext.userId);
   }
+
   logger.error(
     {
       event,
@@ -1042,9 +1269,14 @@ exports.submitChatReview = async (req, res) => {
   try {
     const userId = req.user.uid;
     const { chatId } = req.params;
-    const { rating, comment = '', role = 'student', scenario = null } = req.body || {};
+    const { rating, comment = '', role = 'student' } = req.body || {};
+
+    const activityContext = resolveActivityContext({
+      body: req.body,
+    });
 
     const numericRating = Number(rating);
+
     if (!Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5) {
       return res.status(400).json({
         success: false,
@@ -1052,6 +1284,7 @@ exports.submitChatReview = async (req, res) => {
         code: 'VALIDATION_ERROR',
       });
     }
+
     if (role !== 'student' && role !== 'teacher') {
       return res.status(400).json({
         success: false,
@@ -1064,7 +1297,9 @@ exports.submitChatReview = async (req, res) => {
       chatId: chatId || null,
       userId,
       role,
-      scenario: scenario || null,
+      scenario: activityContext.scenario || null,
+      activityTitle: activityContext.activityTitle || null,
+      activitySubtitle: activityContext.activitySubtitle || null,
       rating: numericRating,
       comment: String(comment).slice(0, 1000),
       status: 'pending',
@@ -1073,11 +1308,16 @@ exports.submitChatReview = async (req, res) => {
 
     const ref = await db.collection('chatReviews').add(review);
 
-    return res.status(201).json({ success: true, id: ref.id, review });
+    return res.status(201).json({
+      success: true,
+      id: ref.id,
+      review,
+    });
   } catch (error) {
     logChatError('submit_chat_review_failed', error, {
       userId: req.user?.uid || null,
     });
+
     return res.status(500).json({
       success: false,
       error: 'Server error',

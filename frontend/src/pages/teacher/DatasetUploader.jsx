@@ -3,6 +3,7 @@ import { Upload, FileAudio, Play, Loader2, CheckCircle2, AlertCircle, Download, 
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import AdminPageHeader from '../../components/admin/AdminPageHeader.jsx';
+import AdminHeroVisual from '../../components/admin/AdminHeroVisual.jsx';
 
 const recentUploads = [
   {
@@ -179,28 +180,28 @@ function DatasetUploader() {
       <div className="mx-auto w-full max-w-7xl pb-12" dir="rtl">
         <AdminPageHeader icon={FilePlus2} label="העלאת חומרים" />
 
-        <section className="lisan-admin-hero lisan-admin-inner-hero relative mt-3 overflow-hidden rounded-[24px] border border-white/80 bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] shadow-[0_26px_70px_rgba(91,33,182,0.14)] md:mt-6 md:rounded-[28px]">
-          <div className="pointer-events-none absolute left-0 top-0 h-full w-1/2 bg-violet-200/35 blur-3xl" />
-
-          <div className="relative grid min-h-[132px] gap-0 md:min-h-[260px] lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]" dir="ltr">
-            <div className="relative flex min-h-[72px] items-center justify-center overflow-hidden bg-violet-50/30 p-0 md:min-h-[210px]">
-              <img
-                src="/add11.png"
-                alt=""
-                className="h-full min-h-[72px] w-full object-contain object-right md:min-h-[210px]"
-                aria-hidden="true"
-              />
+        <section
+          className="relative mt-8 overflow-hidden rounded-[24px] border border-violet-100/70 bg-white/75 shadow-[0_16px_42px_rgba(109,40,217,0.1)] md:mt-10 md:rounded-[28px]"
+          style={{ maxHeight: '140px' }}
+        >
+          <div className="flex h-full min-h-[140px] items-stretch" dir="ltr">
+            <div className="relative w-[34%] shrink-0 overflow-hidden" aria-hidden="true">
+              <AdminHeroVisual type="materials" />
             </div>
 
-            <div className="flex flex-col justify-center px-4 py-3 text-right md:px-10 md:py-8 lg:px-12" dir="rtl">
-              <p className="inline-flex items-center gap-2 text-xs font-black text-violet-700 md:text-sm">
+            <div
+              className="flex flex-1 flex-col justify-center text-right"
+              style={{ paddingLeft: '4px', paddingRight: '20px' }}
+              dir="rtl"
+            >
+              <p className="mb-1 inline-flex w-full items-center justify-start gap-2 text-right text-xs font-black text-violet-700">
                 <FilePlus2 className="h-4 w-4" aria-hidden="true" />
                 ניהול חומרי למידה
               </p>
-              <h1 className="mt-2 text-xl font-black leading-tight text-slate-950 md:mt-3 md:text-4xl lg:text-5xl">
+              <h1 className="text-2xl font-black leading-tight text-slate-950 md:text-3xl">
                 העלאת קבצי שמע וחומרי תרגול
               </h1>
-              <p className="mt-1.5 text-sm font-semibold leading-6 text-slate-600 md:mt-4 md:text-base md:leading-8">
+              <p className="mt-1 text-sm font-semibold text-slate-600">
                 העלי הקלטה או קובץ שמע, צרי תמלול אוטומטי, והפיקי קובצי נתונים לתרגול במערכת ליסאן.
               </p>
             </div>

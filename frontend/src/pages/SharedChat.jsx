@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import BottomNav from '../components/BottomNav.jsx';
 import PageHeader from '../components/PageHeader.jsx';
+import StudentHeroVisual from '../components/student/StudentHeroVisual.jsx';
 import { getStoredToken, getStoredUser } from '../services/auth.js';
 
 const API_BASE_URL = '/api';
@@ -278,85 +279,95 @@ function SharedChat() {
   };
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#F8F5FF_0%,#FFF7FB_52%,#F8F5FF_100%)] px-3 py-4 pt-8 text-slate-900 sm:px-4 sm:py-6 sm:pt-10 md:px-6 md:py-8 md:pt-12 lg:px-8">
       <div
         className="relative mx-auto min-h-[calc(100vh-2rem)] w-full max-w-[1680px] pb-32 sm:min-h-[780px]"
         dir="rtl"
       >
         <PageHeader showBack />
 
-        <section className="mt-6 rounded-3xl bg-white p-5 shadow-card sm:p-6">
-          <div className="flex items-center gap-4">
-            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-700">
-              <MessageCircle className="h-7 w-7" aria-hidden="true" />
-            </span>
+        <section className="mt-6 overflow-hidden rounded-3xl border border-white/80 bg-[linear-gradient(135deg,#FFFFFF_0%,#F7F0FF_48%,#FFF5FB_100%)] shadow-card">
+          <div className="grid min-h-[160px] lg:grid-cols-[minmax(0,0.46fr)_minmax(0,0.54fr)]" dir="ltr">
+            <div className="min-h-[150px] lg:min-h-[170px]">
+              <StudentHeroVisual type="shared" />
+            </div>
 
-            <div>
-              <p className="text-sm font-semibold text-violet-700">
-                {text.eyebrow}
-              </p>
+            <div className="flex items-center px-5 py-5 text-right sm:px-6 lg:px-8" dir="rtl">
+              <div className="flex items-center gap-4">
+                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-violet-700 shadow-[0_10px_26px_rgba(124,58,237,0.12)]">
+                  <MessageCircle className="h-7 w-7" aria-hidden="true" />
+                </span>
 
-              <h1 className="mt-1 text-2xl font-bold leading-tight text-slate-950">
-                {text.title}
-              </h1>
+                <div>
+                  <p className="text-sm font-semibold text-violet-700">
+                    {text.eyebrow}
+                  </p>
+
+                  <h1 className="mt-1 text-2xl font-bold leading-tight text-slate-950">
+                    {text.title}
+                  </h1>
+                </div>
+              </div>
             </div>
           </div>
 
-          <label className="mt-5 flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-            <Search className="h-5 w-5 text-slate-400" aria-hidden="true" />
+          <div className="px-5 pb-5 sm:px-6 sm:pb-6">
+            <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white/78 px-4 py-3 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.55)] backdrop-blur">
+              <Search className="h-5 w-5 text-slate-400" aria-hidden="true" />
 
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder={text.search}
-              className="min-w-0 flex-1 bg-transparent text-sm outline-none"
-            />
-          </label>
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={text.search}
+                className="min-w-0 flex-1 bg-transparent text-sm outline-none"
+              />
+            </label>
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            {loadingUsers ? (
-              <p className="text-sm font-semibold text-slate-500">
-                {text.loadingUsers}
-              </p>
-            ) : filteredUsers.length === 0 ? (
-              <p className="text-sm font-semibold text-slate-500">
-                {text.noUsers}
-              </p>
-            ) : (
-              filteredUsers.map((user) => {
-                const selected = selectedIds.includes(user.id);
+            <div className="mt-4 flex flex-wrap gap-2">
+              {loadingUsers ? (
+                <p className="text-sm font-semibold text-slate-500">
+                  {text.loadingUsers}
+                </p>
+              ) : filteredUsers.length === 0 ? (
+                <p className="text-sm font-semibold text-slate-500">
+                  {text.noUsers}
+                </p>
+              ) : (
+                filteredUsers.map((user) => {
+                  const selected = selectedIds.includes(user.id);
 
-                return (
-                  <button
-                    key={user.id}
-                    type="button"
-                    onClick={() => toggleUser(user.id)}
-                    className={`rounded-full px-4 py-2 text-sm font-bold transition ${
-                      selected
-                        ? 'bg-violet-600 text-white'
-                        : 'bg-violet-50 text-violet-700 hover:bg-violet-100'
-                    }`}
-                  >
-                    {user.name || text.userFallback} · {labels[user.role] || user.role || 'user'}
-                  </button>
-                );
-              })
-            )}
+                  return (
+                    <button
+                      key={user.id}
+                      type="button"
+                      onClick={() => toggleUser(user.id)}
+                      className={`rounded-full px-4 py-2 text-sm font-bold transition ${
+                        selected
+                          ? 'bg-violet-600 text-white'
+                          : 'bg-white/80 text-violet-700 hover:bg-violet-100'
+                      }`}
+                    >
+                      {user.name || text.userFallback} · {labels[user.role] || user.role || 'user'}
+                    </button>
+                  );
+                })
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={startConversation}
+              disabled={selectedIds.length === 0 || creatingChat}
+              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-violet-600 px-4 py-3 text-sm font-bold text-white shadow-button transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+            >
+              <Send className="h-4 w-4" aria-hidden="true" />
+              {creatingChat ? text.opening : text.start}
+            </button>
+
+            {status ? (
+              <p className="mt-3 text-sm font-bold text-violet-700">{status}</p>
+            ) : null}
           </div>
-
-          <button
-            type="button"
-            onClick={startConversation}
-            disabled={selectedIds.length === 0 || creatingChat}
-            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-violet-600 px-4 py-3 text-sm font-bold text-white shadow-button transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:bg-slate-300"
-          >
-            <Send className="h-4 w-4" aria-hidden="true" />
-            {creatingChat ? text.opening : text.start}
-          </button>
-
-          {status ? (
-            <p className="mt-3 text-sm font-bold text-violet-700">{status}</p>
-          ) : null}
         </section>
 
         <section className="mt-5 rounded-3xl bg-white p-5 shadow-card sm:p-6">
