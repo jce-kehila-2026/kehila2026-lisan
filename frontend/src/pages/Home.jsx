@@ -788,28 +788,23 @@ function Home({
         <section
           ref={heroRef}
           id="section-hero"
-          className="lisan-enter relative mt-0 overflow-hidden"
-          style={{ '--lisan-enter-delay': '150ms' }}
+          className="lisan-enter relative mt-4 overflow-hidden rounded-[34px] border border-white/85 bg-cover bg-center shadow-[0_24px_70px_rgba(91,33,182,0.14)] sm:mt-6"
+          style={{ '--lisan-enter-delay': '150ms', backgroundImage: 'url("/images/HADD.png")' }}
         >
-          {/* Soft ambient glow backdrop — modern, on-brand, sits behind the card */}
-          <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-            <div className="absolute -top-16 right-[8%] h-72 w-72 rounded-full bg-violet-300/40 blur-3xl" />
-            <div className="absolute top-1/2 left-[6%] h-64 w-64 -translate-y-1/2 rounded-full bg-fuchsia-200/45 blur-3xl" />
-            <div className="absolute bottom-0 left-1/3 h-56 w-56 rounded-full bg-sky-200/35 blur-3xl" />
-          </div>
+          <div className="pointer-events-none absolute inset-0 bg-white/10" />
 
 
           <div
-            className="relative"
+            className="relative min-h-[340px]"
             dir="rtl"
           >
             {/* Content */}
             <div
-              className="relative z-10 flex w-full min-w-0 items-center justify-center p-3 text-right sm:p-4"
+              className="relative z-10 flex min-h-[340px] w-full min-w-0 items-center justify-start p-4 text-right sm:p-5 lg:min-h-[380px] lg:p-6"
               dir="rtl"
             >
               <div
-                className="w-full sm:p-6 lg:p-7"
+                className="w-full max-w-[480px] sm:p-6 lg:p-7"
                 style={{
                   background: 'linear-gradient(160deg, rgba(255,255,255,0.82) 0%, rgba(248,244,255,0.74) 50%, rgba(236,254,255,0.70) 100%)',
                   borderRadius: '28px',

@@ -115,6 +115,7 @@ function LisanHeader({
   onLogout = null,
   navLabel = 'ניווט',
   forceMenu = false,
+  wideNav = false,
 }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -154,7 +155,7 @@ function LisanHeader({
               <button
                 type="button"
                 onClick={() => setMenuOpen((o) => !o)}
-                className={`flex h-9 w-9 items-center justify-center rounded-full border border-white/80 bg-white/80 text-slate-600 shadow-[0_2px_8px_rgba(109,40,217,0.08)] transition hover:bg-violet-50 hover:text-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-10 sm:w-10${forceMenu ? '' : ' min-[800px]:hidden'}`}
+                className={`flex h-9 w-9 items-center justify-center rounded-full border border-white/80 bg-white/80 text-slate-600 shadow-[0_2px_8px_rgba(109,40,217,0.08)] transition hover:bg-violet-50 hover:text-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-10 sm:w-10${forceMenu ? '' : wideNav ? ' min-[1100px]:hidden' : ' min-[800px]:hidden'}`}
                 aria-label={navLabel}
                 aria-expanded={menuOpen}
               >
@@ -174,7 +175,7 @@ function LisanHeader({
           {/* Center: nav (desktop only) */}
           {sections.length > 0 ? (
             <nav
-              className={`hidden flex-1 items-center justify-center gap-0.5${forceMenu ? '' : ' min-[800px]:flex'} min-[800px]:gap-0.5`}
+              className={`hidden flex-1 items-center justify-center gap-0.5${forceMenu ? '' : wideNav ? ' min-[1100px]:flex min-[1100px]:gap-0.5' : ' min-[800px]:flex min-[800px]:gap-0.5'}`}
               aria-label={navLabel}
             >
               {sections.map((section) => (
@@ -226,7 +227,8 @@ function LisanHeader({
                 'bg-white/95 backdrop-blur-xl',
                 'p-2',
                 'shadow-[0_12px_40px_rgba(109,40,217,0.14)]',
-                ...(forceMenu ? [] : ['min-[800px]:hidden']),
+                ...(forceMenu || wideNav ? [] : ['min-[800px]:hidden']),
+                ...(wideNav && !forceMenu ? ['min-[1100px]:hidden'] : []),
               ].join(' ')}
             >
               {sections.map((section) => {

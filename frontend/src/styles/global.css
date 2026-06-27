@@ -2715,8 +2715,8 @@ a {
 }
 
 .history-hero-card {
-  background-position: center 64%;
-  background-size: 135% auto;
+  background-position: center center;
+  background-size: cover;
 }
 
 @media (min-width: 640px) {
@@ -2732,8 +2732,8 @@ a {
   }
 
   .history-hero-card {
-    background-position: center 72%;
-    background-size: 106% auto;
+    background-position: center center;
+    background-size: cover;
   }
 }
 

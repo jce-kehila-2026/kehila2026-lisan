@@ -19,7 +19,6 @@ import { useTranslation } from 'react-i18next';
 
 import BottomNav from '../components/BottomNav.jsx';
 import LisanHeader from '../components/LisanHeader.jsx';
-import StudentHeroVisual from '../components/student/StudentHeroVisual.jsx';
 import { getStoredToken, getStoredUser } from '../services/auth.js';
 
 const API_BASE_URL = '/api';
@@ -143,7 +142,7 @@ function MoreTopHeader() {
       onSectionClick={handleSectionClick}
       logoTarget={homeTarget}
       navLabel={isArabic ? 'أقسام السجل' : 'אזורי היסטוריה'}
-      forceMenu
+      wideNav
     />
   );
 }
@@ -337,25 +336,22 @@ function MorePage() {
       >
         <MoreTopHeader />
 
-        <section className="history-hero-card relative mt-4 overflow-hidden rounded-[24px] border border-white/80 bg-[linear-gradient(135deg,#FFFFFF_0%,#F7F0FF_48%,#FFF5FB_100%)] shadow-card sm:mt-6 sm:rounded-[28px]">
-          <div className="grid min-h-[160px] lg:grid-cols-[minmax(0,0.46fr)_minmax(0,0.54fr)]" dir="ltr">
-            <div className="min-h-[150px] lg:min-h-[170px]">
-              <StudentHeroVisual type="resources" />
-            </div>
-
-            <div className="flex items-center justify-between gap-4 px-5 py-5 text-right sm:px-6 lg:px-8" dir="rtl">
-              <div>
-                <h1 className="text-3xl font-black leading-tight text-violet-700 sm:text-4xl">
-                  {text.title}
-                </h1>
-                <p className="mt-1 text-sm font-bold leading-6 text-slate-700 sm:text-base">
-                  {text.subtitle}
-                </p>
-              </div>
-
-              <div className="hidden shrink-0 rounded-full bg-violet-50/90 px-4 py-2 text-sm font-black text-violet-700 shadow-[0_10px_24px_rgba(124,58,237,0.10)] sm:inline-flex">
+        <section
+          className="history-hero-card relative mt-4 overflow-hidden rounded-[24px] border border-white/80 bg-cover shadow-card sm:mt-6 sm:rounded-[28px]"
+          style={{ backgroundImage: 'url("/images/profile-hebrew-learning.png")' }}
+        >
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.04)_0%,rgba(255,255,255,0.18)_40%,rgba(255,255,255,0.55)_100%)]" />
+          <div className="relative flex min-h-[200px] items-center justify-start px-5 py-6 text-right sm:px-6 sm:min-h-[220px] lg:px-8" dir="rtl">
+            <div className="max-w-[480px] rounded-[20px] bg-white/70 p-5 backdrop-blur-md shadow-[0_12px_30px_rgba(91,33,182,0.1)]">
+              <div className="mb-3 inline-flex rounded-full bg-violet-50/90 px-4 py-2 text-sm font-black text-violet-700 shadow-[0_10px_24px_rgba(124,58,237,0.10)]">
                 {text.heroKicker}
               </div>
+              <h1 className="text-3xl font-black leading-tight text-violet-700 sm:text-4xl">
+                {text.title}
+              </h1>
+              <p className="mt-2 text-sm font-bold leading-6 text-slate-700 sm:text-base">
+                {text.subtitle}
+              </p>
             </div>
           </div>
         </section>
