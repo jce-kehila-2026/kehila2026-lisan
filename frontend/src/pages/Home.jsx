@@ -968,7 +968,7 @@ function Home({
             <button
               type="button"
               onClick={() => scrollActivities(1)}
-              className="absolute right-0 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-violet-700 shadow-[0_14px_32px_rgba(124,58,237,0.18)] backdrop-blur transition hover:-translate-y-[55%] hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 md:flex"
+              className="absolute right-0 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-violet-700 shadow-[0_14px_32px_rgba(124,58,237,0.18)] backdrop-blur transition hover:-translate-y-[55%] hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
               aria-label={isArabic ? 'تمرير الأنشطة يميناً' : 'גלילה ימינה בפעילויות'}
             >
               <ChevronRight className="h-5 w-5" aria-hidden="true" />
@@ -988,7 +988,7 @@ function Home({
             <button
               type="button"
               onClick={() => scrollActivities(-1)}
-              className="absolute left-0 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-violet-700 shadow-[0_14px_32px_rgba(124,58,237,0.18)] backdrop-blur transition hover:-translate-y-[55%] hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 md:flex"
+              className="absolute left-0 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-violet-700 shadow-[0_14px_32px_rgba(124,58,237,0.18)] backdrop-blur transition hover:-translate-y-[55%] hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
               aria-label={isArabic ? 'تمرير الأنشطة يساراً' : 'גלילה שמאלה בפעילויות'}
             >
               <ChevronLeft className="h-5 w-5" aria-hidden="true" />
@@ -1176,7 +1176,7 @@ function Home({
             <button
               type="button"
               onClick={() => scrollGames(1)}
-              className="absolute right-0 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-violet-700 shadow-[0_14px_32px_rgba(124,58,237,0.18)] backdrop-blur transition hover:-translate-y-[55%] hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 md:flex"
+              className="absolute right-0 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-violet-700 shadow-[0_14px_32px_rgba(124,58,237,0.18)] backdrop-blur transition hover:-translate-y-[55%] hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
               aria-label={isArabic ? 'تمرير الألعاب يميناً' : 'גלילה ימינה במשחקים'}
             >
               <ChevronRight className="h-5 w-5" aria-hidden="true" />
@@ -1238,7 +1238,7 @@ function Home({
             <button
               type="button"
               onClick={() => scrollGames(-1)}
-              className="absolute left-0 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-violet-700 shadow-[0_14px_32px_rgba(124,58,237,0.18)] backdrop-blur transition hover:-translate-y-[55%] hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 md:flex"
+              className="absolute left-0 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-violet-700 shadow-[0_14px_32px_rgba(124,58,237,0.18)] backdrop-blur transition hover:-translate-y-[55%] hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
               aria-label={isArabic ? 'تمرير الألعاب يساراً' : 'גלילה שמאלה במשחקים'}
             >
               <ChevronLeft className="h-5 w-5" aria-hidden="true" />

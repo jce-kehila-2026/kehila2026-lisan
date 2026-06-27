@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Upload, FileAudio, Play, Loader2, CheckCircle2, AlertCircle, Download, FilePlus2 } from 'lucide-react';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
@@ -30,6 +31,7 @@ const recentUploads = [
 ];
 
 function DatasetUploader() {
+  const { t } = useTranslation();
   const [audioFile, setAudioFile] = useState(null);
   const [loadingModel, setLoadingModel] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -132,7 +134,7 @@ function DatasetUploader() {
       }
     } catch (err) {
       console.error('Audio processing error:', err);
-      setError('שגיאה בעיבוד קובץ השמע. ודאי שהקובץ בפורמט נתמך ונסה שוב.');
+      setError(t('teacher.uploader.alerts.audioError'));
       setTranscribing(false);
     }
   };
@@ -178,7 +180,7 @@ function DatasetUploader() {
   return (
     <main className="lisan-admin-page min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] px-3 py-3 text-slate-900 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-7xl pb-12" dir="rtl">
-        <AdminPageHeader icon={FilePlus2} label="העלאת חומרים" />
+        <AdminPageHeader icon={FilePlus2} label={t('teacher.uploader.header')} />
 
         <section
           className="relative mt-8 overflow-hidden rounded-[24px] border border-violet-100/70 bg-white/75 shadow-[0_16px_42px_rgba(109,40,217,0.1)] md:mt-10 md:max-h-[140px] md:rounded-[28px]"
@@ -195,13 +197,13 @@ function DatasetUploader() {
             >
               <p className="mb-1 inline-flex w-full items-center justify-start gap-2 text-right text-xs font-black text-violet-700">
                 <FilePlus2 className="h-4 w-4" aria-hidden="true" />
-                ניהול חומרי למידה
+                {t('teacher.uploader.heroBadge')}
               </p>
               <h1 className="text-2xl font-black leading-tight text-slate-950 md:text-3xl">
-                העלאת קבצי שמע וחומרי תרגול
+                {t('teacher.uploader.heroTitle')}
               </h1>
               <p className="mt-2 pb-2 text-sm font-semibold leading-6 text-slate-600">
-                העלי הקלטה או קובץ שמע, צרי תמלול אוטומטי, והפיקי קובצי נתונים לתרגול במערכת ליסאן.
+                {t('teacher.uploader.heroSubtitle')}
               </p>
             </div>
           </div>
@@ -217,7 +219,7 @@ function DatasetUploader() {
             />
             <FileAudio className="h-10 w-10 text-violet-600" />
             <p className="mt-4 text-sm font-bold text-slate-700">
-              {audioFile ? audioFile.name : 'לחצי כאן לבחירת קובץ שמע'}
+              {audioFile ? audioFile.name : t('teacher.uploader.upload.placeholder')}
             </p>
             {!audioFile && (
               <p className="mt-2 text-xs font-semibold text-slate-500">
@@ -238,7 +240,7 @@ function DatasetUploader() {
               ) : (
                 <Play className="h-5 w-5 fill-current" />
               )}
-              {transcribing ? 'מתמלל את השמע...' : 'התחילי תמלול'}
+              {transcribing ? t('teacher.uploader.upload.transcribing') : t('teacher.uploader.upload.startTranscribing')}
             </button>
           )}
 
@@ -248,8 +250,8 @@ function DatasetUploader() {
               <div className="flex items-center gap-3">
                 <Loader2 className="h-5 w-5 animate-spin text-amber-600" />
                 <div className="flex-1">
-                  <p className="text-sm font-bold text-amber-800">מוריד מודל זיהוי קולי</p>
-                  <p className="mt-1 text-xs text-amber-700">בפעם הראשונה זה עשוי לקחת קצת זמן (~75MB).</p>
+                  <p className="text-sm font-bold text-amber-800">{t('teacher.uploader.loading.title')}</p>
+                  <p className="mt-1 text-xs text-amber-700">{t('teacher.uploader.loading.subtitle')}</p>
                 </div>
               </div>
               <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-amber-200/50">
@@ -274,11 +276,11 @@ function DatasetUploader() {
         <section className="mt-4 rounded-[2rem] border border-white/70 bg-white/90 p-4 shadow-[0_22px_60px_rgba(91,33,182,0.11)] backdrop-blur sm:mt-5 sm:p-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-xs font-black text-violet-700">העלאות אחרונות</p>
-              <h2 className="mt-1 text-lg font-black text-slate-950 sm:text-xl">חומרי תרגול שעלו לאחרונה</h2>
+              <p className="text-xs font-black text-violet-700">{t('teacher.uploader.recent.title')}</p>
+              <h2 className="mt-1 text-lg font-black text-slate-950 sm:text-xl">{t('teacher.uploader.recent.subtitle')}</h2>
             </div>
             <span className="w-fit rounded-full border border-violet-100 bg-violet-50 px-3 py-1 text-xs font-black text-violet-700">
-              {recentUploads.length ? `${recentUploads.length} פריטים` : 'אין פריטים'}
+              {recentUploads.length ? `${recentUploads.length}${t('teacher.uploader.recent.itemsSuffix')}` : t('teacher.uploader.recent.noItems')}
             </span>
           </div>
 
@@ -295,13 +297,13 @@ function DatasetUploader() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="truncate text-sm font-black text-slate-950">{material.name}</h3>
-                      <p className="mt-1 text-xs font-semibold text-slate-500">הועלה בתאריך {material.uploadDate}</p>
+                      <p className="mt-1 text-xs font-semibold text-slate-500">{t('teacher.uploader.recent.uploadedPrefix')}{material.uploadDate}</p>
                     </div>
                   </div>
 
                   <div className="mt-4 flex flex-wrap items-center gap-2 text-xs font-bold">
-                    <span className="rounded-full bg-white px-3 py-1 text-slate-700 shadow-sm">מורה: {material.teacher}</span>
-                    <span className="rounded-full bg-violet-600 px-3 py-1 text-white shadow-sm">רמה {material.level}</span>
+                    <span className="rounded-full bg-white px-3 py-1 text-slate-700 shadow-sm">{t('teacher.uploader.recent.teacherPrefix')}{material.teacher}</span>
+                    <span className="rounded-full bg-violet-600 px-3 py-1 text-white shadow-sm">{t('teacher.uploader.recent.levelPrefix')}{material.level}</span>
                   </div>
                 </article>
               ))}
@@ -311,8 +313,8 @@ function DatasetUploader() {
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-violet-700 shadow-[0_12px_28px_rgba(109,40,217,0.12)]">
                 <Upload className="h-5 w-5" aria-hidden="true" />
               </div>
-              <h3 className="mt-3 text-sm font-black text-slate-950">עדיין לא הועלו חומרי תרגול</h3>
-              <p className="mt-1 text-xs font-semibold text-slate-500">לאחר העלאה, החומרים האחרונים יוצגו כאן בצורה מסודרת.</p>
+              <h3 className="mt-3 text-sm font-black text-slate-950">{t('teacher.uploader.recent.noUploadsTitle')}</h3>
+              <p className="mt-1 text-xs font-semibold text-slate-500">{t('teacher.uploader.recent.noUploadsDesc')}</p>
             </div>
           )}
         </section>
@@ -322,7 +324,7 @@ function DatasetUploader() {
           <section className="mt-5 rounded-[2rem] border border-white/70 bg-white/90 p-4 shadow-[0_22px_60px_rgba(91,33,182,0.11)] backdrop-blur sm:p-6">
             <div className="flex items-center gap-2 text-[#5E60CE]">
               <CheckCircle2 className="h-5 w-5 text-[#64DFDF]" />
-              <h2 className="font-bold">תמלול הושלם</h2>
+              <h2 className="font-bold">{t('teacher.uploader.transcription.completed')}</h2>
             </div>
             
             <textarea
@@ -333,7 +335,7 @@ function DatasetUploader() {
             />
             
             <p className="mt-2 text-xs text-slate-500">
-              ניתן לערוך את הטקסט למעלה במידת הצורך.
+              {t('teacher.uploader.transcription.editNote')}
             </p>
           </section>
         )}
@@ -341,14 +343,14 @@ function DatasetUploader() {
         {/* Metadata and Generation */}
         {transcription && (
           <section className="mt-5 rounded-[2rem] border border-white/70 bg-white/90 p-4 shadow-[0_22px_60px_rgba(91,33,182,0.11)] backdrop-blur sm:p-6">
-            <h2 className="text-xl font-bold text-slate-900">הוספת מידע וייצוא</h2>
+            <h2 className="text-xl font-bold text-slate-900">{t('teacher.uploader.export.title')}</h2>
             
             <label className="mt-5 block">
-              <span className="text-sm font-bold text-slate-800">תרגום לערבית</span>
+              <span className="text-sm font-bold text-slate-800">{t('teacher.uploader.export.arabicLabel')}</span>
               <textarea
                 value={arabicTranslation}
                 onChange={(e) => setArabicTranslation(e.target.value)}
-                placeholder="أدخل الترجمة هنا..."
+                placeholder={t('teacher.uploader.export.arabicPlaceholder')}
                 className="mt-2 min-h-[100px] w-full resize-y rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-7 text-slate-800 outline-none focus:border-[#4EA8DE] focus:bg-white"
                 dir="rtl"
               />
@@ -356,7 +358,7 @@ function DatasetUploader() {
 
             <div className="mt-4 grid grid-cols-2 gap-4">
               <label className="block">
-                <span className="text-sm font-bold text-slate-800">רמה</span>
+                <span className="text-sm font-bold text-slate-800">{t('teacher.uploader.export.levelLabel')}</span>
                 <select
                   value={level}
                   onChange={(e) => setLevel(e.target.value)}
@@ -371,7 +373,7 @@ function DatasetUploader() {
               </label>
 
               <label className="block">
-                <span className="text-sm font-bold text-slate-800">קטגוריה</span>
+                <span className="text-sm font-bold text-slate-800">{t('teacher.uploader.export.categoryLabel')}</span>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
@@ -404,7 +406,7 @@ function DatasetUploader() {
               ) : (
                 <Download className="h-5 w-5" />
               )}
-              {isGeneratingJSON ? 'מייצר נתונים...' : 'הורדת קובץ JSON למאגר'}
+              {isGeneratingJSON ? t('teacher.uploader.export.generating') : t('teacher.uploader.export.downloadBtn')}
             </button>
           </section>
         )}

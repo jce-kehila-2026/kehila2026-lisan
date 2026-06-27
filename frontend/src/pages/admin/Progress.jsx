@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   GraduationCap,
   Link2,
@@ -98,6 +99,7 @@ function Modal({ children, onClose, title, description }) {
 }
 
 function CreateUserForm({ onCancel, onSubmit, saving }) {
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -117,22 +119,22 @@ function CreateUserForm({ onCancel, onSubmit, saving }) {
       onSubmit(form);
     }}>
       <label className="grid gap-2 text-sm font-black text-slate-700">
-        שם
+        {t('admin.progress.form.name')}
         <input value={form.name} onChange={setField('name')} className={fieldClass} required />
       </label>
 
       <label className="grid gap-2 text-sm font-black text-slate-700">
-        אימייל
+        {t('admin.progress.form.email')}
         <input type="email" value={form.email} onChange={setField('email')} className={fieldClass} required />
       </label>
 
       <label className="grid gap-2 text-sm font-black text-slate-700">
-        סיסמה
+        {t('admin.progress.form.password')}
         <input type="password" value={form.password} onChange={setField('password')} className={fieldClass} required />
       </label>
 
       <label className="grid gap-2 text-sm font-black text-slate-700">
-        תפקיד
+        {t('admin.progress.form.role')}
         <select value={form.role} onChange={setField('role')} className={fieldClass}>
           <option value="teacher">Teacher</option>
           <option value="admin">Admin</option>
@@ -142,7 +144,7 @@ function CreateUserForm({ onCancel, onSubmit, saving }) {
 
       {form.role === 'student' ? (
         <label className="grid gap-2 text-sm font-black text-slate-700">
-          רמה
+          {t('admin.progress.form.level')}
           <select value={form.level} onChange={setField('level')} className={fieldClass}>
             <option value="A1">A1</option>
             <option value="A2">A2</option>
@@ -154,10 +156,10 @@ function CreateUserForm({ onCancel, onSubmit, saving }) {
 
       <div className="mt-2 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <button type="button" onClick={onCancel} className="rounded-2xl bg-slate-100 px-5 py-3 text-sm font-black text-slate-700">
-          ביטול
+          {t('admin.progress.form.cancel')}
         </button>
         <button type="submit" disabled={saving} className="rounded-2xl bg-violet-600 px-5 py-3 text-sm font-black text-white shadow-button">
-          {saving ? 'יוצר...' : 'יצירת משתמש'}
+          {saving ? t('admin.progress.form.creating') : t('admin.progress.form.createUser')}
         </button>
       </div>
     </form>
@@ -165,6 +167,7 @@ function CreateUserForm({ onCancel, onSubmit, saving }) {
 }
 
 function TeacherForm({ initialValue, onCancel, onSubmit, saving }) {
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     ...initialValue,
     levels: getTeacherLevels(initialValue),
@@ -191,17 +194,17 @@ function TeacherForm({ initialValue, onCancel, onSubmit, saving }) {
       onSubmit(form);
     }}>
       <label className="grid gap-2 text-sm font-black text-slate-700">
-        שם המורה
+        {t('admin.progress.form.teacherName')}
         <input value={form.name} onChange={setField('name')} className={fieldClass} required />
       </label>
 
       <label className="grid gap-2 text-sm font-black text-slate-700">
-        אימייל
+        {t('admin.progress.form.email')}
         <input type="email" value={form.email || ''} onChange={setField('email')} className={fieldClass} required />
       </label>
 
       <div className="grid gap-2 text-sm font-black text-slate-700">
-        רמות
+        {t('admin.progress.form.levels')}
         <div className="grid gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:grid-cols-3">
           {adminLevels.map((level) => {
             const checked = (form.levels || []).includes(level);
@@ -229,16 +232,16 @@ function TeacherForm({ initialValue, onCancel, onSubmit, saving }) {
       </div>
 
       <label className="grid gap-2 text-sm font-black text-slate-700">
-        סיסמה חדשה optional
-        <input type="password" value={form.password || ''} onChange={setField('password')} className={fieldClass} placeholder="השאר ריק כדי לא לשנות" />
+        {t('admin.progress.form.newPassword')}
+        <input type="password" value={form.password || ''} onChange={setField('password')} className={fieldClass} placeholder={t('admin.progress.form.leaveEmptyPlaceholder')} />
       </label>
 
       <div className="mt-2 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <button type="button" onClick={onCancel} className="rounded-2xl bg-slate-100 px-5 py-3 text-sm font-black text-slate-700">
-          ביטול
+          {t('admin.progress.form.cancel')}
         </button>
         <button type="submit" disabled={saving} className="rounded-2xl bg-violet-600 px-5 py-3 text-sm font-black text-white shadow-button">
-          {saving ? 'שומרת...' : 'שמירת שינויים'}
+          {saving ? t('admin.progress.form.saving') : t('admin.progress.form.saveChanges')}
         </button>
       </div>
     </form>
@@ -246,6 +249,7 @@ function TeacherForm({ initialValue, onCancel, onSubmit, saving }) {
 }
 
 function AssignmentForm({ allStudents, assignedIds, onCancel, onSubmit, saving, teacher }) {
+  const { t } = useTranslation();
   const teacherLevels = getTeacherLevels(teacher);
   const allowedLevels = teacherLevels;
   const allowedStudentIds = allStudents
@@ -290,7 +294,7 @@ function AssignmentForm({ allStudents, assignedIds, onCancel, onSubmit, saving, 
       <div className="grid max-h-80 gap-2 overflow-y-auto rounded-2xl border border-slate-100 bg-slate-50 p-3">
         {visibleStudents.length === 0 ? (
           <p className="rounded-2xl bg-white px-4 py-3 text-sm font-bold text-slate-500">
-            אין תלמידות ברמה זו.
+            {t('admin.progress.assign.noStudentsInLevel')}
           </p>
         ) : visibleStudents.map((student) => {
           const checked = selectedIds.includes(student.id);
@@ -305,15 +309,15 @@ function AssignmentForm({ allStudents, assignedIds, onCancel, onSubmit, saving, 
       </div>
 
       <p className="text-sm font-semibold text-slate-500">
-        השיוך יתעדכן עבור {teacher.name}.
+        {t('admin.progress.assign.assignmentUpdatePrefix')}{teacher.name}.
       </p>
 
       <div className="mt-2 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <button type="button" onClick={onCancel} className="rounded-2xl bg-slate-100 px-5 py-3 text-sm font-black text-slate-700">
-          ביטול
+          {t('admin.progress.form.cancel')}
         </button>
         <button type="submit" disabled={saving} className="rounded-2xl bg-violet-600 px-5 py-3 text-sm font-black text-white shadow-button">
-          {saving ? 'משייכת...' : 'שמירת שיוך'}
+          {saving ? t('admin.progress.assign.assigning') : t('admin.progress.assign.saveAssignment')}
         </button>
       </div>
     </form>
@@ -321,6 +325,7 @@ function AssignmentForm({ allStudents, assignedIds, onCancel, onSubmit, saving, 
 }
 
 function TeachersManagement() {
+  const { t } = useTranslation();
   const [teachers, setTeachers] = useState([]);
   const [students, setStudents] = useState([]);
   const [modal, setModal] = useState(null);
@@ -540,7 +545,7 @@ function TeachersManagement() {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] px-3 py-3 text-slate-900 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-7xl" dir="rtl">
-        <AdminPageHeader icon={GraduationCap} label="ניהול מורות" />
+        <AdminPageHeader icon={GraduationCap} label={t('admin.progress.header')} />
 
 <section
           className="relative mt-8 overflow-hidden rounded-[24px] border border-violet-100/70 bg-white/75 shadow-[0_16px_42px_rgba(109,40,217,0.1)] md:mt-10 md:rounded-[28px]"
@@ -553,11 +558,11 @@ function TeachersManagement() {
             <div className="flex flex-1 flex-col justify-center text-right" style={{ paddingLeft: '4px', paddingRight: '20px' }} dir="rtl">
               <p className="inline-flex w-full items-center justify-start gap-2 text-xs font-black text-violet-700 mb-1 text-right">
                 <GraduationCap className="h-4 w-4" />
-                ניהול משתמשים ומורות
+                {t('admin.progress.heroBadge')}
               </p>
-              <h1 className="text-2xl font-black leading-tight text-slate-950 md:text-3xl">מורות, אדמינים ושיוך תלמידות</h1>
-              <p className="mt-1 text-sm font-semibold text-slate-600">ניהול מורות, יצירת אדמינים חדשים ושיוך תלמידות למורה אחת או יותר.</p>
-              <button type="button" onClick={() => setModal('create-user')} className="mt-2 inline-flex items-center gap-1.5 rounded-xl bg-violet-600 px-3 py-1.5 text-xs font-black text-white shadow-sm transition hover:bg-violet-700"><UserPlus className="h-3.5 w-3.5" />הוספת משתמש</button>
+              <h1 className="text-2xl font-black leading-tight text-slate-950 md:text-3xl">{t('admin.progress.heroTitle')}</h1>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{t('admin.progress.heroSubtitle')}</p>
+              <button type="button" onClick={() => setModal('create-user')} className="mt-2 inline-flex items-center gap-1.5 rounded-xl bg-violet-600 px-3 py-1.5 text-xs font-black text-white shadow-sm transition hover:bg-violet-700"><UserPlus className="h-3.5 w-3.5" />{t('admin.progress.heroAddUser')}</button>
             </div>
           </div>
         </section>
@@ -569,19 +574,19 @@ function TeachersManagement() {
               <input
                 value={teacherQuery}
                 onChange={(event) => setTeacherQuery(event.target.value)}
-                placeholder="חיפוש לפי שם מורה"
+                placeholder={t('admin.progress.searchTeacherPlaceholder')}
                 className="min-w-0 flex-1 bg-transparent text-sm font-bold text-slate-800 outline-none placeholder:text-slate-400"
               />
             </label>
 
             <label className="grid gap-1 text-xs font-black text-violet-700">
-              רמת לימוד
+              {t('admin.progress.levelFilter')}
               <select
                 value={levelFilter}
                 onChange={(event) => setLevelFilter(event.target.value)}
                 className="min-h-12 rounded-2xl border border-violet-100 bg-violet-50/60 px-4 text-sm font-black text-slate-800 outline-none transition focus:border-violet-300 focus:bg-white focus:ring-4 focus:ring-violet-100"
               >
-                <option value="all">כל הרמות</option>
+                <option value="all">{t('admin.progress.allLevels')}</option>
                 {adminLevels.map((level) => (
                   <option key={level} value={level}>
                     {level}
@@ -595,21 +600,21 @@ function TeachersManagement() {
               <input
                 value={studentQuery}
                 onChange={(event) => setStudentQuery(event.target.value)}
-                placeholder="חיפוש לפי שם תלמידה"
+                placeholder={t('admin.progress.searchStudentPlaceholder')}
                 className="min-w-0 flex-1 bg-transparent text-sm font-bold text-slate-800 outline-none placeholder:text-slate-400"
               />
             </label>
           </div>
 
           <p className="mt-3 text-xs font-black text-violet-700">
-            מוצגות {filteredTeachers.length} מתוך {teachers.length} מורות
+            {t('admin.progress.showingPrefix')}{filteredTeachers.length}{t('admin.progress.showingMiddle')}{teachers.length}{t('admin.progress.showingSuffix')}
           </p>
         </section>
 
         <section className={`mt-5 gap-4 ${getTeachersLayoutClass()}`}>
           {filteredTeachers.length === 0 ? (
             <div className="w-full rounded-[1.75rem] border border-violet-100 bg-white/85 p-8 text-center text-sm font-black text-slate-500 shadow-card">
-              לא נמצאו מורות שמתאימות לחיפוש.
+              {t('admin.progress.noTeachersFound')}
             </div>
           ) : filteredTeachers.map((teacher) => {
             const assignedStudents = studentsByTeacher[teacher.id] || [];
@@ -627,7 +632,7 @@ function TeachersManagement() {
                   </span>
 
                   <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-700">
-                    {assignedStudents.length} תלמידות
+                    {assignedStudents.length}{t('admin.progress.studentsCountSuffix')}
                   </span>
                 </div>
 
@@ -641,13 +646,13 @@ function TeachersManagement() {
 
                 <div className="mt-4 rounded-2xl bg-slate-50 px-4 py-3">
                   <p className="text-xs font-black text-slate-400">
-                    רמות לימוד
+                    {t('admin.progress.studyLevels')}
                   </p>
 
                   <div className="mt-2 grid gap-2">
                     {visibleLevels.length === 0 ? (
                       <p className="text-sm font-semibold text-slate-500">
-                        לא הוגדרו רמות למורה זו.
+                        {t('admin.progress.noLevelsDefined')}
                       </p>
                     ) : visibleLevels.map((level) => {
                       const levelKey = `${teacher.id}:${level}`;
@@ -696,7 +701,7 @@ function TeachersManagement() {
                                   );
                                 })
                               ) : (
-                                <li>אין תלמידות ברמה זו</li>
+                                <li>{t('admin.progress.noStudentsInLevel')}</li>
                               )}
                             </ul>
                           ) : null}
@@ -712,7 +717,7 @@ function TeachersManagement() {
                     setModal('edit');
                   }} className="inline-flex items-center gap-2 rounded-full bg-violet-50 px-3 py-2 text-xs font-black text-violet-700 hover:bg-violet-100">
                     <Pencil className="h-4 w-4" />
-                    עריכה
+                    {t('admin.progress.editBtn')}
                   </button>
 
                   <button type="button" onClick={() => {
@@ -720,7 +725,7 @@ function TeachersManagement() {
                     setModal('assign');
                   }} className="inline-flex items-center gap-2 rounded-full bg-violet-50 px-3 py-2 text-xs font-black text-violet-700 hover:bg-violet-100">
                     <Link2 className="h-4 w-4" />
-                    שיוך תלמידות
+                    {t('admin.progress.assignBtn')}
                   </button>
 
                   <button type="button" onClick={() => {
@@ -728,7 +733,7 @@ function TeachersManagement() {
                     setModal('delete');
                   }} className="inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-2 text-xs font-black text-red-700 hover:bg-red-100">
                     <Trash2 className="h-4 w-4" />
-                    מחיקה
+                    {t('admin.progress.deleteBtn')}
                   </button>
                 </div>
               </article>
@@ -738,19 +743,19 @@ function TeachersManagement() {
       </div>
 
       {modal === 'create-user' ? (
-        <Modal title="הוספת משתמש חדש" description="יצירת תלמידה, מורה או אדמין חדש." onClose={closeModal}>
+        <Modal title={t('admin.progress.modal.createUserTitle')} description={t('admin.progress.modal.createUserDesc')} onClose={closeModal}>
           <CreateUserForm onCancel={closeModal} onSubmit={submitCreateUser} saving={saving} />
         </Modal>
       ) : null}
 
       {modal === 'edit' && selectedTeacher ? (
-        <Modal title="עריכת משתמש" description="עדכון פרטי מורה או אדמין." onClose={closeModal}>
+        <Modal title={t('admin.progress.modal.editUserTitle')} description={t('admin.progress.modal.editUserDesc')} onClose={closeModal}>
           <TeacherForm initialValue={{ ...selectedTeacher, password: '' }} onCancel={closeModal} onSubmit={submitTeacherEdit} saving={saving} />
         </Modal>
       ) : null}
 
       {modal === 'assign' && selectedTeacher ? (
-        <Modal title="שיוך תלמידות" description="בחירת תלמידות שישויכו למורה." onClose={closeModal}>
+        <Modal title={t('admin.progress.modal.assignTitle')} description={t('admin.progress.modal.assignDesc')} onClose={closeModal}>
           <AssignmentForm
             allStudents={students}
             assignedIds={students
@@ -765,18 +770,18 @@ function TeachersManagement() {
       ) : null}
 
       {modal === 'delete' && selectedTeacher ? (
-        <Modal title="מחיקת משתמש" onClose={closeModal}>
+        <Modal title={t('admin.progress.modal.deleteUserTitle')} onClose={closeModal}>
           <div className="mt-5 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-bold leading-7 text-red-700">
-            למחוק את {selectedTeacher.name}?
+            {t('admin.progress.modal.deleteConfirmPrefix')}{selectedTeacher.name}?
           </div>
 
           <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button type="button" onClick={closeModal} className="rounded-2xl bg-slate-100 px-5 py-3 text-sm font-black text-slate-700">
-              ביטול
+              {t('admin.progress.form.cancel')}
             </button>
 
             <button type="button" onClick={confirmDelete} disabled={saving} className="rounded-2xl bg-red-600 px-5 py-3 text-sm font-black text-white">
-              {saving ? 'מוחקת...' : 'מחיקה'}
+              {saving ? t('admin.progress.form.deleting') : t('admin.progress.deleteBtn')}
             </button>
           </div>
         </Modal>

@@ -143,6 +143,7 @@ function MoreTopHeader() {
       onSectionClick={handleSectionClick}
       logoTarget={homeTarget}
       navLabel={isArabic ? 'أقسام السجل' : 'אזורי היסטוריה'}
+      forceMenu
     />
   );
 }

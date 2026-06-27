@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Star, Check, X, MessageCircle } from 'lucide-react';
 import PageHeader from '../../components/PageHeader.jsx';
 import BottomNav from '../../components/BottomNav.jsx';
@@ -7,10 +8,10 @@ import { getStoredToken } from '../../services/auth.js';
 const API_BASE_URL = 'http://localhost:3000/api';
 
 const STATUS_TABS = [
-  { key: 'pending', label: 'ממתינות' },
-  { key: 'confirmed', label: 'אושרו' },
-  { key: 'rejected', label: 'נדחו' },
-  { key: 'all', label: 'הכול' },
+  { key: 'pending', label: 'teacher.reviews.tabs.pending' },
+  { key: 'confirmed', label: 'teacher.reviews.tabs.confirmed' },
+  { key: 'rejected', label: 'teacher.reviews.tabs.rejected' },
+  { key: 'all', label: 'teacher.reviews.tabs.all' },
 ];
 
 function Stars({ value }) {
@@ -24,6 +25,7 @@ function Stars({ value }) {
 }
 
 function TeacherReviews() {
+  const { t } = useTranslation();
   const [status, setStatus] = useState('pending');
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -80,15 +82,15 @@ function TeacherReviews() {
               <MessageCircle className="h-6 w-6" aria-hidden="true" />
             </span>
             <div>
-              <h1 className="text-2xl font-black text-slate-950">משובי שיחות</h1>
-              <p className="mt-1 text-sm font-bold text-slate-500">דירוגי התלמידים על השיחות — אשרו או דחו</p>
+              <h1 className="text-2xl font-black text-slate-950">{t('teacher.reviews.header.title')}</h1>
+              <p className="mt-1 text-sm font-bold text-slate-500">{t('teacher.reviews.header.subtitle')}</p>
             </div>
           </div>
 
           <div className="mt-5 inline-flex rounded-full border border-slate-200 bg-slate-50 p-1">
             {STATUS_TABS.map((tab) => (
               <button key={tab.key} type="button" onClick={() => setStatus(tab.key)} className={`rounded-full px-4 py-2 text-sm font-bold transition ${status === tab.key ? 'bg-violet-600 text-white shadow-sm' : 'text-slate-600 hover:bg-white'}`}>
-                {tab.label}
+                {t(tab.label)}
               </button>
             ))}
           </div>
@@ -96,9 +98,9 @@ function TeacherReviews() {
 
         <section className="mt-5 grid gap-4">
           {loading ? (
-            <div className="rounded-[22px] border border-white/80 bg-white p-6 text-center text-sm font-bold text-slate-500 shadow-card">טוען...</div>
+            <div className="rounded-[22px] border border-white/80 bg-white p-6 text-center text-sm font-bold text-slate-500 shadow-card">{t('teacher.reviews.loading')}</div>
           ) : reviews.length === 0 ? (
-            <div className="rounded-[22px] border border-white/80 bg-white p-6 text-center text-sm font-bold text-slate-500 shadow-card">אין משובים להצגה</div>
+            <div className="rounded-[22px] border border-white/80 bg-white p-6 text-center text-sm font-bold text-slate-500 shadow-card">{t('teacher.reviews.noReviews')}</div>
           ) : (
             reviews.map((r) => (
               <article key={r.id} className="rounded-[22px] border border-white/80 bg-white p-5 shadow-card">
@@ -108,15 +110,15 @@ function TeacherReviews() {
                       <Stars value={r.rating} />
                       <span className="text-sm font-black text-slate-700">{r.rating}/5</span>
                     </div>
-                    <p className="mt-2 text-base font-black text-slate-900">{r.studentName || 'תלמיד/ה'}</p>
+                    <p className="mt-2 text-base font-black text-slate-900">{r.studentName || t('teacher.reviews.card.defaultStudentName')}</p>
                     {r.scenario ? (
-                      <span className="mt-1 inline-block rounded-full bg-violet-50 px-3 py-1 text-xs font-bold text-violet-700">פעילות: {r.scenario}</span>
+                      <span className="mt-1 inline-block rounded-full bg-violet-50 px-3 py-1 text-xs font-bold text-violet-700">{t('teacher.reviews.card.scenarioPrefix')}{r.scenario}</span>
                     ) : (
-                      <span className="mt-1 inline-block rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">צ'אט חופשי</span>
+                      <span className="mt-1 inline-block rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">{t('teacher.reviews.card.freeChat')}</span>
                     )}
                   </div>
                   <span className={`rounded-full px-3 py-1 text-xs font-bold ${r.status === 'confirmed' ? 'bg-emerald-50 text-emerald-700' : r.status === 'rejected' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-700'}`}>
-                    {r.status === 'confirmed' ? 'אושר' : r.status === 'rejected' ? 'נדחה' : 'ממתין'}
+                    {r.status === 'confirmed' ? t('teacher.reviews.status.confirmed') : r.status === 'rejected' ? t('teacher.reviews.status.rejected') : t('teacher.reviews.status.pending')}
                   </span>
                 </div>
 
@@ -124,10 +126,10 @@ function TeacherReviews() {
 
                 <div className="mt-4 flex justify-end gap-2">
                   <button type="button" disabled={busyId === r.id} onClick={() => setReviewStatus(r.id, 'confirmed')} className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-emerald-700 disabled:opacity-40">
-                    <Check className="h-4 w-4" aria-hidden="true" />אשר
+                    <Check className="h-4 w-4" aria-hidden="true" />{t('teacher.reviews.actions.confirm')}
                   </button>
                   <button type="button" disabled={busyId === r.id} onClick={() => setReviewStatus(r.id, 'rejected')} className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-bold text-red-600 shadow-sm transition hover:bg-red-50 disabled:opacity-40">
-                    <X className="h-4 w-4" aria-hidden="true" />דחה
+                    <X className="h-4 w-4" aria-hidden="true" />{t('teacher.reviews.actions.reject')}
                   </button>
                 </div>
               </article>

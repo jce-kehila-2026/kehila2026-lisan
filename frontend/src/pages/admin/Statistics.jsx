@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   BarChart3,
   BookOpenCheck,
@@ -53,15 +54,16 @@ function LevelBarChart({ metric, title, icon: Icon }) {
 }
 
 function WeeklyActivityChart() {
+  const { t } = useTranslation();
   const maxValue = Math.max(...weeklyActivity.map((item) => item.value));
 
   return (
     <article className="rounded-[28px] border border-white/80 bg-white/82 p-5 shadow-[0_20px_54px_rgba(109,40,217,0.12)] backdrop-blur lg:col-span-2">
       <div className="mb-5 flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-black text-[#160A52]">פעילות שבועית</h2>
+          <h2 className="text-lg font-black text-[#160A52]">{t('admin.statistics.weeklyActivity')}</h2>
           <p className="mt-1 text-sm font-semibold text-slate-500">
-            כניסות ופעולות למידה לפי יום
+            {t('admin.statistics.weeklyActivityDesc')}
           </p>
         </div>
         <LineChart className="h-6 w-6 text-violet-700" aria-hidden="true" />
@@ -84,13 +86,14 @@ function WeeklyActivityChart() {
 }
 
 function FeatureUsageChart() {
+  const { t } = useTranslation();
   const maxValue = Math.max(...featureUsage.map((item) => item.value));
   const total = featureUsage.reduce((sum, item) => sum + item.value, 0);
 
   return (
     <article className="rounded-[28px] border border-white/80 bg-white/82 p-5 shadow-[0_20px_54px_rgba(109,40,217,0.12)] backdrop-blur">
       <div className="mb-5 flex items-center justify-between gap-3">
-        <h2 className="text-lg font-black text-[#160A52]">השוואת שימוש בתכונות</h2>
+        <h2 className="text-lg font-black text-[#160A52]">{t('admin.statistics.featureUsage')}</h2>
         <Sparkles className="h-6 w-6 text-violet-700" aria-hidden="true" />
       </div>
 
@@ -132,6 +135,7 @@ function InsightCard({ label, value, description, icon: Icon }) {
 }
 
 function Statistics() {
+  const { t } = useTranslation();
   const activeLevel = getTopLevel('entries');
   const storiesLevel = getTopLevel('stories');
   const chatLevel = getTopLevel('chat');
@@ -139,48 +143,48 @@ function Statistics() {
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] px-3 py-3 text-slate-900 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-7xl pb-12" dir="rtl">
-        <AdminPageHeader icon={BarChart3} label="סטטיסטיקות" />
+        <AdminPageHeader icon={BarChart3} label={t('admin.statistics.header')} />
 
         <section className="mt-3 overflow-hidden rounded-[24px] border border-white/80 bg-[linear-gradient(135deg,rgba(255,255,255,0.86)_0%,rgba(245,240,255,0.84)_48%,rgba(255,241,248,0.82)_100%)] p-4 shadow-[0_26px_70px_rgba(91,33,182,0.14)] backdrop-blur md:mt-6 md:rounded-[30px] md:p-7">
           <p className="inline-flex items-center gap-2 rounded-full bg-violet-100/80 px-3 py-1 text-xs font-black text-violet-700">
             <BarChart3 className="h-4 w-4" aria-hidden="true" />
-            דשבורד אנליטיקה
+            {t('admin.statistics.badge')}
           </p>
           <h1 className="mt-2 text-[clamp(1.65rem,7vw,2.1rem)] font-black leading-tight text-slate-950 md:mt-3 md:text-[clamp(2.3rem,4.6vw,4.6rem)]">
-            סטטיסטיקות שימוש ולמידה
+            {t('admin.statistics.title')}
           </h1>
           <p className="mt-2 max-w-4xl text-sm font-semibold leading-6 text-slate-600 md:mt-3 md:text-base md:leading-7">
-            מבט מורחב על פעילות תלמידות, מורות, רמות לימוד ושימוש בתכונות המרכזיות של ליסאן. הנתונים כאן הם נתוני דמו קדמיים בלבד.
+            {t('admin.statistics.subtitle')}
           </p>
         </section>
 
         <section className="mt-5 grid gap-4 md:grid-cols-3">
           <InsightCard
             icon={PieChart}
-            label="הרמה הפעילה ביותר"
+            label={t('admin.statistics.mostActiveLevel')}
             value={activeLevel.level}
-            description={`${activeLevel.entries} כניסות ופעולות למידה השבוע`}
+            description={`${activeLevel.entries}${t('admin.statistics.entriesThisWeekSuffix')}`}
           />
           <InsightCard
             icon={BookOpenCheck}
-            label="שימוש סיפורים מוביל"
+            label={t('admin.statistics.topStoriesUsage')}
             value={storiesLevel.level}
-            description={`${storiesLevel.stories} פעולות צפייה ותרגול בסיפורים`}
+            description={`${storiesLevel.stories}${t('admin.statistics.storiesActionsSuffix')}`}
           />
           <InsightCard
             icon={MessageSquareText}
-            label="שימוש שיחות מוביל"
+            label={t('admin.statistics.topChatUsage')}
             value={chatLevel.level}
-            description={`${chatLevel.chat} פעולות צ'אט ותרגול שיחה`}
+            description={`${chatLevel.chat}${t('admin.statistics.chatActionsSuffix')}`}
           />
         </section>
 
         <section className="mt-5 grid gap-4 lg:grid-cols-2">
-          <LevelBarChart metric="students" title="תלמידות לפי רמה" icon={PieChart} />
-          <LevelBarChart metric="teachers" title="מורות לפי רמה" icon={PieChart} />
-          <LevelBarChart metric="entries" title="כניסות לאפליקציה לפי רמה" icon={BarChart3} />
-          <LevelBarChart metric="stories" title="שימוש בסיפורים לפי רמה" icon={BookOpenCheck} />
-          <LevelBarChart metric="chat" title="שימוש בצ'אט לפי רמה" icon={MessageSquareText} />
+          <LevelBarChart metric="students" title={t('admin.statistics.studentsByLevel')} icon={PieChart} />
+          <LevelBarChart metric="teachers" title={t('admin.statistics.teachersByLevel')} icon={PieChart} />
+          <LevelBarChart metric="entries" title={t('admin.statistics.entriesByLevel')} icon={BarChart3} />
+          <LevelBarChart metric="stories" title={t('admin.statistics.storiesByLevel')} icon={BookOpenCheck} />
+          <LevelBarChart metric="chat" title={t('admin.statistics.chatByLevel')} icon={MessageSquareText} />
           <FeatureUsageChart />
           <WeeklyActivityChart />
         </section>
