@@ -181,10 +181,9 @@ function DatasetUploader() {
         <AdminPageHeader icon={FilePlus2} label="העלאת חומרים" />
 
         <section
-          className="relative mt-8 overflow-hidden rounded-[24px] border border-violet-100/70 bg-white/75 shadow-[0_16px_42px_rgba(109,40,217,0.1)] md:mt-10 md:rounded-[28px]"
-          style={{ maxHeight: '140px' }}
+          className="relative mt-8 overflow-hidden rounded-[24px] border border-violet-100/70 bg-white/75 shadow-[0_16px_42px_rgba(109,40,217,0.1)] md:mt-10 md:max-h-[140px] md:rounded-[28px]"
         >
-          <div className="flex h-full min-h-[140px] items-stretch" dir="ltr">
+          <div className="flex min-h-[140px] items-stretch" dir="ltr">
             <div className="relative w-[34%] shrink-0 overflow-hidden" aria-hidden="true">
               <AdminHeroVisual type="materials" />
             </div>
