@@ -349,82 +349,72 @@ function ProfilePage() {
       <div className={`app-page-container relative pb-32 ${textScaleClass}`} dir="rtl">
         <ProfileTopHeader />
 
-        <section className={`profile-hero-card relative mt-4 overflow-hidden rounded-[24px] border border-white/85 bg-[linear-gradient(135deg,#FFFFFF_0%,#F7F0FF_48%,#FFF5FB_100%)] sm:mt-5 sm:rounded-[28px] ${surfaceClass}`}>
-          <div className="grid min-h-[160px] lg:grid-cols-[minmax(0,0.46fr)_minmax(0,0.54fr)]" dir="ltr">
-            <div className="min-h-[150px] lg:min-h-[170px]">
-              <StudentHeroVisual type="profile" />
-            </div>
+        <section
+          className={`relative mt-4 overflow-hidden rounded-[24px] border border-white/85 bg-cover sm:mt-5 sm:rounded-[28px] ${surfaceClass}`}
+          style={{
+            backgroundImage: 'url("/images/profilePhoto.png")',
+            backgroundPosition: 'center 52%',
+          }}
+        >
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.04)_0%,rgba(255,255,255,0.18)_40%,rgba(255,255,255,0.55)_100%)]" />
+          <div className="relative grid gap-6 p-6 sm:p-8 lg:grid-cols-2 lg:items-center" dir="rtl">
 
-            <div className="flex items-center justify-between gap-4 px-5 py-5 text-right sm:px-6 lg:px-8" dir="rtl">
-              <div>
-                <h2 className="text-3xl font-black leading-tight text-violet-700 sm:text-4xl">
-                  {user?.name || 'Lisan Student'}
-                </h2>
-                <p className={`mt-1 text-sm font-bold sm:text-base ${mutedTextClass}`}>
-                  {loading ? 'Loading...' : text.subtitle}
-                </p>
-              </div>
-
-              <div className="inline-flex shrink-0 items-center gap-2 rounded-full border border-violet-100 bg-white/86 px-4 py-2 text-sm font-black text-violet-700 shadow-[0_8px_20px_rgba(124,58,237,0.10)]">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-100 text-violet-700">
-                  <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+            {/* Hero identity — name, subtitle, level */}
+            <div className="flex min-w-0 flex-col items-center justify-center text-center">
+              <h2 className={`text-4xl font-black leading-tight sm:text-5xl lg:text-6xl ${headingTextClass}`}>
+                {user?.name || 'Lisan Student'}
+              </h2>
+              <p className={`mt-4 flex items-center justify-center gap-2 text-lg font-bold sm:text-xl ${mutedTextClass}`}>
+                {loading ? 'Loading...' : text.subtitle}
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-100 text-violet-700 shadow-[0_10px_24px_rgba(124,58,237,0.12)]">
+                  <Sparkles className="h-6 w-6" aria-hidden="true" />
                 </span>
+              </p>
+              <div className="mt-6 inline-flex mx-auto w-fit items-center gap-3 rounded-full border border-violet-100 bg-white/86 px-6 py-2.5 text-base font-black text-violet-700 shadow-[0_12px_28px_rgba(124,58,237,0.1)]">
                 <span>{text.level}</span>
-                <span className="text-base">{user?.level || 'A1'}</span>
+                <span className="text-xl">{user?.level || 'A1'}</span>
               </div>
             </div>
-          </div>
-        </section>
 
-
-        <section id="profile-learning-journey" className={`scroll-mt-8 mt-4 rounded-[24px] border p-4 sm:mt-5 sm:rounded-[28px] sm:p-7 lg:min-h-[170px] ${glassSectionClass}`}>
-          <div className="grid gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-[240px_minmax(0,1fr)_240px]">
-            <div className="flex items-center justify-center border-violet-100 md:col-span-2 xl:col-span-1 xl:border-l">
-              <div
-                className="grid h-28 w-28 place-items-center rounded-full sm:h-44 sm:w-44"
-                style={{
-                  background: `conic-gradient(#6d28d9 ${gameProgressPct * 3.6}deg, #f1eafd 0deg)`,
-                }}
-              >
-                <div className="grid h-20 w-20 place-items-center rounded-full bg-white text-center shadow-inner sm:h-32 sm:w-32">
-                  <div>
-                    <p className="text-2xl font-black text-slate-950 sm:text-3xl">{gameProgressPct}%</p>
-                    <p className="mt-0.5 text-[10px] font-black text-slate-600 sm:mt-1 sm:text-xs">{text.totalProgress}</p>
+            {/* Learning journey — progress ring + journey + next target, on a translucent panel */}
+            <div className="rounded-[22px] border border-white/70 bg-white/72 p-5 shadow-[0_16px_40px_rgba(91,33,182,0.1)] backdrop-blur-md sm:p-6">
+              <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <div
+                  className="grid h-32 w-32 shrink-0 place-items-center rounded-full sm:h-36 sm:w-36"
+                  style={{ background: `conic-gradient(#6d28d9 ${gameProgressPct * 3.6}deg, #f1eafd 0deg)` }}
+                >
+                  <div className="grid h-24 w-24 place-items-center rounded-full bg-white text-center shadow-inner sm:h-28 sm:w-28">
+                    <div>
+                      <p className="text-2xl font-black text-slate-950 sm:text-3xl">{gameProgressPct}%</p>
+                      <p className="mt-1 text-xs font-black text-slate-600">{text.totalProgress}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="min-w-0 flex-1 text-right">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <p className="text-3xl font-black text-violet-700">{user?.level || 'A1'}</p>
+                    <div>
+                      <h2 className={`text-xl font-black ${headingTextClass}`}>{text.learningJourney}</h2>
+                      <p className={`mt-1 text-sm font-bold ${mutedTextClass}`}>{text.grammarLevel}</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 h-3 overflow-hidden rounded-full bg-violet-50">
+                    <div className="h-full rounded-full bg-violet-600" style={{ width: `${gameProgressPct}%` }} />
+                  </div>
+                  <p className={`mt-2 text-sm font-bold ${mutedTextClass}`}>{xpPoints} / 1000 {text.xpPoints}</p>
+                  <div className="mt-4 flex items-center gap-3 border-t border-violet-100 pt-4">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-50 text-violet-700">
+                      <Target className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <div>
+                      <h2 className={`text-lg font-black ${headingTextClass}`}>{text.nextTarget}</h2>
+                      <p className={`text-sm font-bold ${mutedTextClass}`}>{text.wordsLeft.replace('{{count}}', wordsLeft)}</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col justify-center text-right">
-              <div className="flex flex-wrap items-center justify-center gap-2 text-center sm:justify-start sm:gap-3 sm:text-right">
-                <p className="text-3xl font-black text-violet-700 sm:text-4xl">{user?.level || 'A1'}</p>
-                <div>
-                  <h2 className={`text-xl font-black sm:text-2xl ${headingTextClass}`}>{text.learningJourney}</h2>
-                  <p className={`mt-1 text-sm font-bold sm:text-base ${mutedTextClass}`}>{text.grammarLevel}</p>
-                </div>
-              </div>
-              <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-violet-50 sm:mt-4 sm:h-3">
-                <div className="h-full rounded-full bg-violet-600" style={{ width: `${gameProgressPct}%` }} />
-              </div>
-              <p className={`mt-2 text-sm font-bold sm:mt-3 sm:text-base ${mutedTextClass}`}>
-                {xpPoints} / 1000 {text.xpPoints}
-              </p>
-            </div>
-
-            <div className="flex flex-col justify-center border-violet-100 text-right md:col-span-2 xl:col-span-1 xl:border-r xl:pr-6">
-              <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-50 text-violet-700 sm:h-11 sm:w-11">
-                  <Target className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
-                </span>
-                <div>
-                  <h2 className={`text-xl font-black sm:text-2xl ${headingTextClass}`}>{text.nextTarget}</h2>
-                  <p className={`mt-1 text-sm font-bold sm:text-base ${mutedTextClass}`}>{text.wordsGoal}</p>
-                </div>
-              </div>
-              <p className={`mt-3 text-lg font-black sm:mt-5 sm:text-xl ${headingTextClass}`}>
-                {text.wordsLeft.replace('{{count}}', wordsLeft)}
-              </p>
-            </div>
           </div>
         </section>
 
