@@ -201,7 +201,7 @@ function DatasetUploader() {
               <h1 className="text-2xl font-black leading-tight text-slate-950 md:text-3xl">
                 העלאת קבצי שמע וחומרי תרגול
               </h1>
-              <p className="mt-1 text-sm font-semibold text-slate-600">
+              <p className="mt-2 pb-2 text-sm font-semibold leading-6 text-slate-600">
                 העלי הקלטה או קובץ שמע, צרי תמלול אוטומטי, והפיקי קובצי נתונים לתרגול במערכת ליסאן.
               </p>
             </div>

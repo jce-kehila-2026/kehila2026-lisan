@@ -91,10 +91,10 @@ function SectionButton({ section, isActive, onClick }) {
       aria-current={isActive ? 'true' : undefined}
       className={[
         'inline-flex shrink-0 items-center gap-1.5',
-        'rounded-full px-3 py-1.5 text-xs font-black',
+        'rounded-full px-2.5 py-1.5 text-xs font-black',
         'transition-all duration-200',
         'focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2',
-        'sm:gap-2 sm:px-4 sm:py-2 sm:text-sm',
+        'min-[800px]:gap-2 min-[800px]:px-3 min-[800px]:py-2 min-[800px]:text-sm',
         isActive
           ? 'bg-white/90 text-violet-800 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.9),0_4px_16px_rgba(109,40,217,0.12)]'
           : 'text-violet-700/80 hover:bg-white/50 hover:text-violet-800',
@@ -148,23 +148,32 @@ function LisanHeader({
           ].join(' ')}
         >
           {/* Right: logo */}
-          <button
-            type="button"
-            onClick={() => navigate(logoTarget)}
-            className="shrink-0 rounded-2xl transition hover:scale-[1.04] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
-            aria-label="דף הבית"
-          >
-            <img
-              src="/images/loggo.png"
-              alt="Lisan"
-              className="h-12 w-auto object-contain sm:h-14"
-            />
-          </button>
+          <div className="flex shrink-0 items-center gap-2">
+            {sections.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => setMenuOpen((o) => !o)}
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/80 bg-white/80 text-slate-600 shadow-[0_2px_8px_rgba(109,40,217,0.08)] transition hover:bg-violet-50 hover:text-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-10 sm:w-10 min-[800px]:hidden"
+                aria-label={navLabel}
+                aria-expanded={menuOpen}
+              >
+                {menuOpen ? <X className="h-4 w-4" aria-hidden="true" /> : <Menu className="h-4 w-4" aria-hidden="true" />}
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => navigate(logoTarget)}
+              className="shrink-0 rounded-2xl transition hover:scale-[1.04] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+              aria-label="דף הבית"
+            >
+              <img src="/images/loggo.png" alt="Lisan" className="h-12 w-auto object-contain sm:h-14" />
+            </button>
+          </div>
 
           {/* Center: nav (desktop only) */}
           {sections.length > 0 ? (
             <nav
-              className="hidden flex-1 items-center justify-center gap-0.5 sm:flex md:gap-1"
+              className="hidden flex-1 items-center justify-center gap-0.5 min-[800px]:flex min-[800px]:gap-0.5"
               aria-label={navLabel}
             >
               {sections.map((section) => (
@@ -195,19 +204,7 @@ function LisanHeader({
               <LogOut className="h-4 w-4" aria-hidden="true" />
             </button>
 
-            {sections.length > 0 ? (
-              <button
-                type="button"
-                onClick={() => setMenuOpen((o) => !o)}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/80 bg-white/80 text-slate-600 shadow-[0_2px_8px_rgba(109,40,217,0.08)] transition hover:bg-violet-50 hover:text-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:hidden"
-                aria-label={navLabel}
-                aria-expanded={menuOpen}
-              >
-                {menuOpen
-                  ? <X className="h-4 w-4" aria-hidden="true" />
-                  : <Menu className="h-4 w-4" aria-hidden="true" />}
-              </button>
-            ) : null}
+
           </div>
         </div>
 
@@ -218,7 +215,7 @@ function LisanHeader({
               type="button"
               aria-label="סגירת תפריט"
               onClick={() => setMenuOpen(false)}
-              className="fixed inset-0 -z-10 sm:hidden"
+              className="fixed inset-0 -z-10 min-[800px]:hidden"
             />
             <div
               className={[
@@ -228,7 +225,7 @@ function LisanHeader({
                 'bg-white/95 backdrop-blur-xl',
                 'p-2',
                 'shadow-[0_12px_40px_rgba(109,40,217,0.14)]',
-                'sm:hidden',
+                'min-[800px]:hidden',
               ].join(' ')}
             >
               {sections.map((section) => {
