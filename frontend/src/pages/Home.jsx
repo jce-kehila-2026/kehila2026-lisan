@@ -22,7 +22,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 
 import LisanHeader from '../components/LisanHeader.jsx';
 import BottomNav from '../components/BottomNav.jsx';
-import StudentHeroVisual from '../components/student/StudentHeroVisual.jsx';
+
 import { useCountUp } from '../hooks/useCountUp.js';
 import {
   getStudentStorySubtitle,
@@ -284,6 +284,7 @@ function Home({
   const gamesRef = useRef(null);
   const resourcesRef = useRef(null);
   const gamesScrollerRef = useRef(null);
+  const activitiesScrollerRef = useRef(null);
 
   const sections = useMemo(
     () => [
@@ -732,6 +733,22 @@ function Home({
     scroller.scrollLeft += horizontalDelta;
   };
 
+  const scrollActivities = (direction) => {
+    const scroller = activitiesScrollerRef.current;
+    if (!scroller) return;
+    const distance = Math.min(scroller.clientWidth * 0.8, 620);
+    scroller.scrollBy({ left: direction * distance, behavior: shouldReduceMotion() ? 'auto' : 'smooth' });
+  };
+
+  const handleActivitiesWheel = (event) => {
+    const scroller = activitiesScrollerRef.current;
+    if (!scroller) return;
+    const horizontalDelta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+    if (horizontalDelta === 0) return;
+    event.preventDefault();
+    scroller.scrollLeft += horizontalDelta;
+  };
+
   const gamesText = isArabic
     ? {
         title: 'لعبة الكلمات',
@@ -753,7 +770,8 @@ function Home({
       };
 
   return (
-    <main className="min-h-screen rounded-[28px] bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] text-slate-900">
+    <main className="relative min-h-screen rounded-[28px] bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] text-slate-900">
+
       <div className="app-page-container relative pb-32" dir="rtl">
 
         <LisanHeader
@@ -770,89 +788,62 @@ function Home({
         <section
           ref={heroRef}
           id="section-hero"
-          className="lisan-enter relative mt-2 overflow-hidden rounded-[34px] border border-white/85 bg-[linear-gradient(135deg,#FFFFFF_0%,#F1E8FF_42%,#ECFEFF_74%,#FFF2C7_100%)] shadow-[0_28px_78px_rgba(91,33,182,0.18)] transition hover:-translate-y-0.5 hover:shadow-[0_30px_78px_rgba(124,58,237,0.18)]"
-          style={{
-            '--lisan-enter-delay': '150ms',
-            '--hero-image-x': '0px',
-            '--hero-image-y': '0px',
-            '--hero-image-scale': '1.03',
-            '--hero-light-x': '-42%',
-            '--hero-light-opacity': '0.2',
-            '--hero-haze-opacity': '0.28',
-            '--hero-glyph-drift': '0px',
-          }}
+          className="lisan-enter relative mt-0 overflow-hidden"
+          style={{ '--lisan-enter-delay': '150ms' }}
         >
-          <div className="pointer-events-none absolute inset-0">
-            <StudentHeroVisual type="home" wide fadeRight={false} className="opacity-100" />
+          {/* Soft ambient glow backdrop — modern, on-brand, sits behind the card */}
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+            <div className="absolute -top-16 right-[8%] h-72 w-72 rounded-full bg-violet-300/40 blur-3xl" />
+            <div className="absolute top-1/2 left-[6%] h-64 w-64 -translate-y-1/2 rounded-full bg-fuchsia-200/45 blur-3xl" />
+            <div className="absolute bottom-0 left-1/3 h-56 w-56 rounded-full bg-sky-200/35 blur-3xl" />
           </div>
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.02)_0%,rgba(255,255,255,0.18)_40%,rgba(255,255,255,0.58)_66%,rgba(255,255,255,0.88)_100%)]" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-[46%] bg-[radial-gradient(circle_at_60%_42%,rgba(255,255,255,0.96),rgba(255,255,255,0.58)_54%,transparent_78%)]" />
+
 
           <div
-            className="relative min-h-[320px]"
+            className="relative"
             dir="rtl"
           >
             {/* Content */}
             <div
-              className="relative z-10 flex min-h-[320px] w-full min-w-0 items-center justify-start p-4 text-right sm:p-5 lg:min-h-[360px] lg:p-6"
+              className="relative z-10 flex w-full min-w-0 items-center justify-center p-3 text-right sm:p-4"
               dir="rtl"
             >
               <div
-                className="w-full max-w-[480px] sm:p-6 lg:p-7"
+                className="w-full sm:p-6 lg:p-7"
                 style={{
-                  background: 'linear-gradient(160deg, rgba(255,255,255,0.97) 0%, rgba(248,244,255,0.93) 50%, rgba(236,254,255,0.88) 100%)',
+                  background: 'linear-gradient(160deg, rgba(255,255,255,0.82) 0%, rgba(248,244,255,0.74) 50%, rgba(236,254,255,0.70) 100%)',
                   borderRadius: '28px',
                   border: '1px solid rgba(221,214,254,0.6)',
                   boxShadow: '0 26px 66px rgba(91,33,182,0.17), 0 8px 22px rgba(14,165,233,0.08), inset 0 1px 0 rgba(255,255,255,0.92)',
-                  padding: '20px 22px 24px',
+                  padding: '16px 20px 20px',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
                 }}
               >
-                {/* Name + Level + Streak */}
-                <div className="flex flex-wrap-reverse items-center justify-between gap-3">
-                  <p className="text-base font-black text-slate-800 lg:text-lg">
+                {/* Name */}
+                <div className="flex items-center justify-center">
+                  <p className="text-sm font-bold text-slate-500 lg:text-base">
                     {loading ? loadingLabel : t('welcome', { name: student.name || studentNameFallback })}
                   </p>
-
-                  <div className="flex items-center gap-2">
-                    {/* Streak badge */}
-                    <div className="flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-3 py-1.5 text-sm font-black text-amber-600 shadow-[0_8px_20px_rgba(245,158,11,0.12)]">
-                        <Flame className="h-3.5 w-3.5 text-amber-500" aria-hidden="true" />
-                      <span>{loading ? '...' : student.chatsCount} {streakLabel}</span>
-                    </div>
-
-                    {/* Level badge */}
-                    <div className="rounded-full bg-violet-100 px-4 py-1.5 text-sm font-black text-violet-700 shadow-[0_8px_20px_rgba(124,58,237,0.1)]">
-                      {t('level')} {loading ? '...' : student.level || 'A1'}
-                    </div>
-                  </div>
                 </div>
 
                 {/* Greeting */}
-                <h1 className="mt-4 flex items-center justify-start gap-3 text-[clamp(1.9rem,2.7vw,3.2rem)] font-black leading-tight text-slate-950 text-right">
+                <h1 className="mt-1 flex items-center justify-center gap-3 text-[clamp(1.7rem,2.6vw,2.8rem)] font-black leading-tight text-slate-950 text-center">
                   {t('homeGreeting')}
                   <span className="text-violet-600">☼</span>
                 </h1>
 
-                <p className="mt-2 max-w-2xl text-base font-medium leading-6 text-slate-600 sm:text-[clamp(0.95rem,1vw,1.05rem)]">
+                <p className="mt-2 mx-auto max-w-xl text-center text-base font-medium leading-6 text-slate-600 sm:text-[clamp(1rem,1.1vw,1.15rem)]">
                   {t('homeIntro')}
                 </p>
 
                 {/* ── Action buttons ── */}
-                <div className="mt-5 flex items-center justify-center gap-2">
-
-                  {/* Games — secondary pill */}
-                  <Link
-                    to="/games"
-                    className="group inline-flex h-[52px] flex-1 items-center justify-center gap-2 rounded-[22px] border border-violet-200/60 bg-white/80 px-3 text-sm font-black text-violet-700 shadow-[0_4px_14px_rgba(124,58,237,0.08)] backdrop-blur transition hover:-translate-y-0.5 hover:border-violet-300/80 hover:bg-violet-50 hover:shadow-[0_8px_20px_rgba(124,58,237,0.14)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.97]"
-                  >
-                    <Gamepad2 className="h-4 w-4 shrink-0 text-violet-500" aria-hidden="true" />
-                    <span>{heroGamesLabel}</span>
-                  </Link>
+                <div className="mt-5 grid grid-cols-2 gap-2.5 sm:flex sm:items-center sm:justify-center">
 
                   {/* AI Chat — primary hero CTA */}
                   <Link
                     to="/chatbot"
-                    className="relative inline-flex h-[52px] flex-[1.45] items-center justify-center gap-2.5 overflow-hidden rounded-[22px] px-5 text-[15px] font-black text-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.97]"
+                    className="relative inline-flex h-full min-h-[112px] w-full flex-[1.45] items-center justify-center gap-2.5 overflow-hidden whitespace-nowrap rounded-[22px] px-5 text-[15px] font-black text-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.97] sm:h-[52px] sm:min-h-0 sm:w-auto"
                     style={{
                       background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 50%, #5b21b6 100%)',
                       boxShadow: '0 8px 24px rgba(109,40,217,0.35), 0 2px 6px rgba(109,40,217,0.18), inset 0 1px 0 rgba(255,255,255,0.15)',
@@ -877,53 +868,62 @@ function Home({
                     <span className="relative">{heroAiChatLabel}</span>
                   </Link>
 
-                  {/* Dictionary — secondary pill */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      document
-                        .getElementById('section-dictionary')
-                        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }}
-                    className="inline-flex h-[52px] flex-1 items-center justify-center gap-2 rounded-[22px] border border-violet-200/60 bg-white/80 px-3 text-sm font-black text-violet-700 shadow-[0_4px_14px_rgba(124,58,237,0.08)] backdrop-blur transition hover:-translate-y-0.5 hover:border-violet-300/80 hover:bg-violet-50 hover:shadow-[0_8px_20px_rgba(124,58,237,0.14)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.97]"
-                  >
-                    <BookOpen className="h-4 w-4 shrink-0 text-violet-500" aria-hidden="true" />
-                    <span>{heroDictionaryLabel}</span>
-                  </button>
+                  <div className="flex flex-col gap-2.5 sm:contents">
+                    {/* Games — secondary pill */}
+                    <Link
+                      to="/games"
+                      className="group inline-flex flex-1 items-center justify-center gap-2 rounded-[22px] border border-violet-200/60 bg-white/80 px-3 text-[15px] font-black text-violet-700 shadow-[0_4px_14px_rgba(124,58,237,0.08)] backdrop-blur transition hover:-translate-y-0.5 hover:border-violet-300/80 hover:bg-violet-50 hover:shadow-[0_8px_20px_rgba(124,58,237,0.14)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.97] sm:h-[52px] sm:flex-1"
+                    >
+                      <Gamepad2 className="h-4 w-4 shrink-0 text-violet-500" aria-hidden="true" />
+                      <span>{heroGamesLabel}</span>
+                    </Link>
+
+                    {/* Dictionary — secondary pill */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        document
+                          .getElementById('section-dictionary')
+                          ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }}
+                      className="inline-flex flex-1 items-center justify-center gap-2 rounded-[22px] border border-violet-200/60 bg-white/80 px-3 text-[15px] font-black text-violet-700 shadow-[0_4px_14px_rgba(124,58,237,0.08)] backdrop-blur transition hover:-translate-y-0.5 hover:border-violet-300/80 hover:bg-violet-50 hover:shadow-[0_8px_20px_rgba(124,58,237,0.14)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-[0.97] sm:h-[52px] sm:flex-1"
+                    >
+                      <BookOpen className="h-4 w-4 shrink-0 text-violet-500" aria-hidden="true" />
+                      <span>{heroDictionaryLabel}</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Stats — clickable */}
-                <div className="mt-4 grid grid-cols-2 gap-3">
-                  <Link
-                    to="/shared-chat"
-                    className="group flex min-h-[86px] items-center justify-between rounded-[20px] border border-violet-100 bg-violet-50/70 p-3 text-right transition hover:-translate-y-0.5 hover:bg-violet-100/80 hover:shadow-[0_10px_24px_rgba(124,58,237,0.12)] focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                <div className="mt-4 mx-auto grid w-full max-w-2xl grid-cols-2 gap-3">
+                  <div
+                    className="flex min-h-[86px] items-center justify-between rounded-[20px] border border-violet-100 bg-violet-50/70 px-5 p-3 text-right transition"
                   >
-                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-100 text-violet-700">
-                      <MessageCircle className="h-6 w-6" aria-hidden="true" />
-                    </span>
-                    <span>
-                      <span className="block text-sm font-bold text-slate-500">{chatsLabel}</span>
+                    <span className="flex flex-col items-end">
+                      <span className="block whitespace-nowrap text-xs font-bold text-slate-500 sm:text-sm">{chatsLabel}</span>
                       <span className="mt-1 block text-3xl font-black text-violet-700">
                         {loading ? '–' : chatsDisplay}
                       </span>
                     </span>
-                  </Link>
-
-                  <Link
-                    to="/games"
-                    className="group flex min-h-[86px] items-center justify-between rounded-[20px] border border-amber-100 bg-amber-50/75 p-3 text-right transition hover:-translate-y-0.5 hover:bg-amber-100/80 hover:shadow-[0_10px_24px_rgba(245,158,11,0.14)] focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
-                  >
-                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-amber-600">
-                      <Flame className="h-6 w-6" aria-hidden="true" />
+                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-100 text-violet-700">
+                      <MessageCircle className="h-6 w-6" aria-hidden="true" />
                     </span>
-                    <span>
-                      <span className="block text-sm font-bold text-slate-500">{heroLearningStreakLabel}</span>
+                  </div>
+
+                  <div
+                    className="flex min-h-[86px] items-center justify-between rounded-[20px] border border-amber-100 bg-amber-50/75 px-5 p-3 text-right transition"
+                  >
+                    <span className="flex flex-col items-end">
+                      <span className="block whitespace-nowrap text-xs font-bold text-slate-500 sm:text-sm">{heroLearningStreakLabel}</span>
                       <span className="mt-1 block text-3xl font-black text-amber-600">
                         {loading ? '–' : chatsDisplay}
                       </span>
                       <span className="mt-0.5 block text-xs font-bold text-slate-500">{heroDaysSuffix}</span>
                     </span>
-                  </Link>
+                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+                      <Flame className="h-6 w-6" aria-hidden="true" />
+                    </span>
+                  </div>
                 </div>
 
                 {/* Progress */}
@@ -964,10 +964,35 @@ function Home({
             {teacherQuickAction}
           </div>
 
-          <div className="mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-hidden overscroll-x-contain pb-2 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden">
-            {studentStories.map((activity) => (
-              <ActivityShortcut key={activity.id} activity={activity} />
-            ))}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => scrollActivities(1)}
+              className="absolute right-0 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-violet-700 shadow-[0_14px_32px_rgba(124,58,237,0.18)] backdrop-blur transition hover:-translate-y-[55%] hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+              aria-label={isArabic ? 'تمرير الأنشطة يميناً' : 'גלילה ימינה בפעילויות'}
+            >
+              <ChevronRight className="h-5 w-5" aria-hidden="true" />
+            </button>
+
+            <div
+              ref={activitiesScrollerRef}
+              className="mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto overflow-y-hidden overscroll-x-contain pb-2 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden"
+              dir="ltr"
+              onWheel={handleActivitiesWheel}
+            >
+              {studentStories.map((activity) => (
+                <ActivityShortcut key={activity.id} activity={activity} />
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => scrollActivities(-1)}
+              className="absolute left-0 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-violet-700 shadow-[0_14px_32px_rgba(124,58,237,0.18)] backdrop-blur transition hover:-translate-y-[55%] hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+              aria-label={isArabic ? 'تمرير الأنشطة يساراً' : 'גלילה שמאלה בפעילויות'}
+            >
+              <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+            </button>
           </div>
         </section>
 
@@ -1151,7 +1176,7 @@ function Home({
             <button
               type="button"
               onClick={() => scrollGames(1)}
-              className="absolute right-0 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-violet-700 shadow-[0_14px_32px_rgba(124,58,237,0.18)] backdrop-blur transition hover:-translate-y-[55%] hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 md:flex"
+              className="absolute right-0 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-violet-700 shadow-[0_14px_32px_rgba(124,58,237,0.18)] backdrop-blur transition hover:-translate-y-[55%] hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
               aria-label={isArabic ? 'تمرير الألعاب يميناً' : 'גלילה ימינה במשחקים'}
             >
               <ChevronRight className="h-5 w-5" aria-hidden="true" />
@@ -1213,7 +1238,7 @@ function Home({
             <button
               type="button"
               onClick={() => scrollGames(-1)}
-              className="absolute left-0 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-violet-700 shadow-[0_14px_32px_rgba(124,58,237,0.18)] backdrop-blur transition hover:-translate-y-[55%] hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 md:flex"
+              className="absolute left-0 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-violet-700 shadow-[0_14px_32px_rgba(124,58,237,0.18)] backdrop-blur transition hover:-translate-y-[55%] hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
               aria-label={isArabic ? 'تمرير الألعاب يساراً' : 'גלילה שמאלה במשחקים'}
             >
               <ChevronLeft className="h-5 w-5" aria-hidden="true" />

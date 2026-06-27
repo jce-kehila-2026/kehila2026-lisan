@@ -63,14 +63,14 @@ function BottomNav() {
           const active = location.pathname === item.to;
           return (
             <Link key={item.to} to={item.to}
-              className={`relative mx-auto flex flex-col items-center justify-center rounded-2xl px-2 py-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
+              className={`relative mx-auto flex flex-col items-center justify-start rounded-2xl px-2 py-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
                 active ? 'text-violet-700' : 'text-slate-500 hover:-translate-y-0.5 hover:bg-slate-50 hover:text-violet-700'
               }`}
               aria-label={t(item.labelKey)}
             >
               {active && <motion.span layoutId="lisan-nav-indicator" aria-hidden="true" className="absolute inset-0 -z-10 rounded-2xl bg-violet-50" transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 400, damping: 34 }} />}
               <Icon className="h-6 w-6" aria-hidden="true" />
-              <span className="mt-1">{t(item.labelKey)}</span>
+              <span className="mt-1 text-center leading-tight whitespace-normal">{t(item.labelKey)}</span>
             </Link>
           );
         })}
@@ -81,7 +81,7 @@ function BottomNav() {
           const active = location.pathname === item.to;
           return (
             <Link key={item.to} to={item.to}
-              className={`relative mx-auto flex flex-col items-center justify-center rounded-2xl px-2 py-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
+              className={`relative mx-auto flex flex-col items-center justify-start rounded-2xl px-2 py-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
                 active ? 'text-violet-700' : 'text-slate-500 hover:-translate-y-0.5 hover:bg-slate-50 hover:text-violet-700'
               }`}
               aria-label={t(item.labelKey)}
@@ -95,7 +95,7 @@ function BottomNav() {
                   </span>
                 )}
               </span>
-              <span className="mt-1">{t(item.labelKey)}</span>
+              <span className="mt-1 text-center leading-tight whitespace-normal">{t(item.labelKey)}</span>
             </Link>
           );
         })}
@@ -121,14 +121,14 @@ function BottomNav() {
           const active = location.pathname === item.to;
           return (
             <Link key={item.to} to={item.to}
-              className={`relative mx-auto flex flex-col items-center justify-center rounded-2xl px-2 py-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
+              className={`relative mx-auto flex flex-col items-center justify-start rounded-2xl px-2 py-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
                 active ? 'text-violet-700' : 'text-slate-500 hover:-translate-y-0.5 hover:bg-slate-50 hover:text-violet-700'
               }`}
               aria-label={t(item.labelKey)}
             >
               {active && <motion.span layoutId="lisan-nav-indicator" aria-hidden="true" className="absolute inset-0 -z-10 rounded-2xl bg-violet-50" transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 400, damping: 34 }} />}
               <Icon className="h-6 w-6" aria-hidden="true" />
-              <span className="mt-1">{t(item.labelKey)}</span>
+              <span className="mt-1 text-center leading-tight whitespace-normal">{t(item.labelKey)}</span>
             </Link>
           );
         })}
@@ -139,14 +139,14 @@ function BottomNav() {
           const active = location.pathname === item.to;
           return (
             <Link key={item.to} to={item.to}
-              className={`relative mx-auto flex flex-col items-center justify-center rounded-2xl px-2 py-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
+              className={`relative mx-auto flex flex-col items-center justify-start rounded-2xl px-2 py-2 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
                 active ? 'text-violet-700' : 'text-slate-500 hover:-translate-y-0.5 hover:bg-slate-50 hover:text-violet-700'
               }`}
               aria-label={t(item.labelKey)}
             >
               {active && <motion.span layoutId="lisan-nav-indicator" aria-hidden="true" className="absolute inset-0 -z-10 rounded-2xl bg-violet-50" transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 400, damping: 34 }} />}
               <Icon className="h-6 w-6" aria-hidden="true" />
-              <span className="mt-1">{t(item.labelKey)}</span>
+              <span className="mt-1 text-center leading-tight whitespace-normal">{t(item.labelKey)}</span>
             </Link>
           );
         })}

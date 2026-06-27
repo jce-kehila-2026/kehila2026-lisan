@@ -176,6 +176,14 @@ input {
   backdrop-filter: blur(18px);
 }
 
+/* Hero section: no outer frame — its inner card is the only surface */
+.app-page-container > section#section-hero {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  border-color: transparent !important;
+}
+
 .app-page-container > section,
 .app-page-container section[class*="rounded-\\[28px\\]"],
 .app-page-container section[class*="rounded-3xl"] {

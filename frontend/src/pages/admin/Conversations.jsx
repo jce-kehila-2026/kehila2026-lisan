@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Clock3,
   Eye,
@@ -11,6 +12,7 @@ import {
 } from 'lucide-react';
 import AdminPageHeader from '../../components/admin/AdminPageHeader.jsx';
 import AdminHeroVisual from '../../components/admin/AdminHeroVisual.jsx';
+import i18n from '../../i18n/index.js';
 
 const API_BASE_URL = '/api';
 
@@ -100,7 +102,7 @@ function normalizeDate(value) {
 
 function formatDate(value) {
   const normalized = normalizeDate(value);
-  if (!normalized) return 'לא ידוע';
+  if (!normalized) return i18n.t('admin.conversations.dateUnknown');
 
   return new Intl.DateTimeFormat('he-IL', {
     day: '2-digit',
@@ -113,14 +115,14 @@ function formatDate(value) {
 
 function statusLabel(conversation) {
   if (conversation.status) return conversation.status;
-  if (conversation.isArchived) return 'בארכיון';
-  return 'ממתינה לבדיקה';
+  if (conversation.isArchived) return i18n.t('admin.conversations.statusArchived');
+  return i18n.t('admin.conversations.statusPending');
 }
 
 function statusClass(status) {
-  if (status === 'נבדקה') return 'border-emerald-100 bg-emerald-50 text-emerald-700';
-  if (status === 'דורשת תשומת לב') return 'border-amber-100 bg-amber-50 text-amber-700';
-  if (status === 'בארכיון') return 'border-slate-200 bg-slate-100 text-slate-600';
+  if (status === 'נבדקה' || status === i18n.t('admin.conversations.statusReviewed')) return 'border-emerald-100 bg-emerald-50 text-emerald-700';
+  if (status === 'דורשת תשומת לב' || status === i18n.t('admin.conversations.statusNeedsAttention')) return 'border-amber-100 bg-amber-50 text-amber-700';
+  if (status === 'בארכיון' || status === i18n.t('admin.conversations.statusArchived')) return 'border-slate-200 bg-slate-100 text-slate-600';
   return 'border-violet-100 bg-violet-50 text-violet-700';
 }
 
@@ -140,7 +142,7 @@ function previewFromConversation(conversation) {
   const lastMessage = messages[messages.length - 1];
   const text = lastMessage?.text || lastMessage?.transcribedText;
 
-  return text || conversation.title || 'פתחי את השיחה כדי לראות את הפרטים המלאים.';
+  return text || conversation.title || i18n.t('admin.conversations.openToSeeDetails');
 }
 
 function normalizeConversation(rawConversation, studentNamesById = {}) {
@@ -149,13 +151,13 @@ function normalizeConversation(rawConversation, studentNamesById = {}) {
     rawConversation.userName ||
     studentNamesById[rawConversation.userId] ||
     rawConversation.userId ||
-    'תלמידה';
+    i18n.t('admin.conversations.student');
 
   return {
     id: rawConversation.id,
     userId: rawConversation.userId || '',
     studentName,
-    title: rawConversation.title || 'שיחה',
+    title: rawConversation.title || i18n.t('admin.conversations.conversation'),
     level: rawConversation.level || 'A1',
     status: statusLabel(rawConversation),
     preview: previewFromConversation(rawConversation),
@@ -183,6 +185,7 @@ function SummaryCard({ icon: Icon, label, value }) {
 }
 
 function ReviewButton({ onClick }) {
+  const { t } = useTranslation();
   return (
     <button
       type="button"
@@ -190,19 +193,20 @@ function ReviewButton({ onClick }) {
       className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-violet-600 px-4 py-2 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
     >
       <Eye className="h-4 w-4" aria-hidden="true" />
-      צפייה / בדיקה
+      {t('admin.conversations.viewReviewBtn')}
     </button>
   );
 }
 
 function ConversationCard({ conversation, conversationCount, onReview }) {
+  const { t } = useTranslation();
   const status = statusLabel(conversation);
 
   return (
     <article className={`rounded-[24px] border border-white/80 bg-white/90 p-4 shadow-[0_18px_42px_rgba(109,40,217,0.12)] transition hover:-translate-y-1 hover:shadow-[0_24px_56px_rgba(124,58,237,0.16)] ${conversationCardClass(conversationCount)}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-black text-violet-700">תלמידה</p>
+          <p className="text-xs font-black text-violet-700">{t('admin.conversations.student')}</p>
           <h2 className="mt-1 break-words text-xl font-black leading-tight text-slate-950">
             {conversation.studentName}
           </h2>
@@ -221,10 +225,10 @@ function ConversationCard({ conversation, conversationCount, onReview }) {
 
       <div className="mt-4 grid grid-cols-2 gap-2 text-sm font-bold text-slate-600">
         <span className="rounded-2xl bg-white/80 px-3 py-2 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.65)]">
-          רמה: {conversation.level}
+          {t('admin.conversations.levelPrefix')}{conversation.level}
         </span>
         <span className="rounded-2xl bg-white/80 px-3 py-2 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.65)]">
-          הודעות: {conversation.messagesCount}
+          {t('admin.conversations.messagesPrefix')}{conversation.messagesCount}
         </span>
       </div>
 
@@ -249,6 +253,7 @@ function ConversationReviewModal({
   onNoteChange,
   onReject,
 }) {
+  const { t } = useTranslation();
   if (!conversation) {
     return null;
   }
@@ -267,7 +272,7 @@ function ConversationReviewModal({
         <div className="flex items-start justify-between gap-4 border-b border-violet-100 bg-[linear-gradient(135deg,#F3ECFF_0%,#FFFFFF_65%,#F8F2FF_100%)] p-4 sm:p-6">
           <div>
             <p className="inline-flex rounded-full bg-violet-100 px-3 py-1 text-xs font-black text-violet-700">
-              בדיקת שיחה
+              {t('admin.conversations.reviewBadge')}
             </p>
             <h2
               id="conversation-review-title"
@@ -284,7 +289,7 @@ function ConversationReviewModal({
             type="button"
             onClick={onClose}
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-violet-100 bg-white text-violet-700 shadow-sm transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500"
-            aria-label="סגירת חלון בדיקה"
+            aria-label={t('admin.conversations.closeReviewModal')}
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -293,7 +298,7 @@ function ConversationReviewModal({
         <div className="p-4 sm:p-6">
           {loading ? (
             <div className="flex min-h-[180px] items-center justify-center rounded-[24px] bg-violet-50/70 text-sm font-black text-violet-700">
-              טוען את פרטי השיחה...
+              {t('admin.conversations.loadingConversationDetails')}
             </div>
           ) : (
             <>
@@ -305,17 +310,17 @@ function ConversationReviewModal({
 
               <div className="grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl bg-violet-50/80 p-4">
-                  <p className="text-xs font-black text-violet-700">רמה</p>
+                  <p className="text-xs font-black text-violet-700">{t('admin.conversations.level')}</p>
                   <p className="mt-1 text-2xl font-black text-slate-950">{conversation.level}</p>
                 </div>
                 <div className="rounded-2xl bg-violet-50/80 p-4">
-                  <p className="text-xs font-black text-violet-700">סטטוס</p>
+                  <p className="text-xs font-black text-violet-700">{t('admin.conversations.status')}</p>
                   <span className={`mt-2 inline-flex rounded-full border px-3 py-1 text-xs font-black ${statusClass(status)}`}>
                     {status}
                   </span>
                 </div>
                 <div className="rounded-2xl bg-violet-50/80 p-4">
-                  <p className="text-xs font-black text-violet-700">הודעות</p>
+                  <p className="text-xs font-black text-violet-700">{t('admin.conversations.messages')}</p>
                   <p className="mt-1 text-2xl font-black text-slate-950">
                     {conversation.messagesCount}
                   </p>
@@ -323,11 +328,11 @@ function ConversationReviewModal({
               </div>
 
               <label className="mt-4 block rounded-[24px] border border-violet-100 bg-violet-50/70 p-4 text-sm font-black text-violet-800">
-                הערות מנהלת
+                {t('admin.conversations.adminNotes')}
                 <textarea
                   value={note}
                   onChange={(event) => onNoteChange(event.target.value)}
-                  placeholder="כתבי הערה לבדיקה פנימית של השיחה..."
+                  placeholder={t('admin.conversations.notesPlaceholder')}
                   className="mt-2 min-h-24 w-full resize-none rounded-2xl border border-violet-100 bg-white p-3 text-sm font-semibold leading-6 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-violet-400 focus:ring-4 focus:ring-violet-100"
                 />
               </label>
@@ -338,14 +343,14 @@ function ConversationReviewModal({
                   onClick={onApprove}
                   className="inline-flex min-h-11 items-center justify-center rounded-full bg-violet-600 px-4 py-2 text-sm font-black text-white shadow-button transition hover:bg-violet-700"
                 >
-                  אישור
+                  {t('admin.conversations.approveBtn')}
                 </button>
                 <button
                   type="button"
                   onClick={onReject}
                   className="inline-flex min-h-11 items-center justify-center rounded-full border border-violet-100 bg-white px-4 py-2 text-sm font-black text-violet-700 transition hover:bg-violet-50"
                 >
-                  דחייה
+                  {t('admin.conversations.rejectBtn')}
                 </button>
               </div>
             </>
@@ -357,6 +362,7 @@ function ConversationReviewModal({
 }
 
 function Conversations() {
+  const { t } = useTranslation();
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -434,7 +440,7 @@ function Conversations() {
         }),
       );
     } catch (openError) {
-      setConversationError(openError.message || 'לא ניתן לטעון את פרטי השיחה.');
+      setConversationError(openError.message || t('admin.conversations.errorLoadingDetails'));
       setSelectedConversation(conversation);
     } finally {
       setConversationLoading(false);
@@ -495,7 +501,7 @@ function Conversations() {
   return (
     <main className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] px-3 py-3 text-slate-900 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-7xl pb-12" dir="rtl">
-        <AdminPageHeader icon={MessageSquareText} label="מרכז סקירת שיחות" />
+        <AdminPageHeader icon={MessageSquareText} label={t('admin.conversations.pageHeader')} />
 
 <section
           className="relative mt-8 overflow-hidden rounded-[24px] border border-violet-100/70 bg-white/75 shadow-[0_16px_42px_rgba(109,40,217,0.1)] md:mt-10 md:rounded-[28px]"
@@ -508,10 +514,10 @@ function Conversations() {
             <div className="flex flex-1 flex-col justify-center text-right" style={{ paddingLeft: '4px', paddingRight: '20px' }} dir="rtl">
               <p className="inline-flex w-full items-center justify-start gap-2 text-xs font-black text-violet-700 mb-1 text-right">
                 <MessageSquareText className="h-4 w-4" aria-hidden="true" />
-                בדיקת שיחות
+                {t('admin.conversations.heroBadge')}
               </p>
-              <h1 className="text-2xl font-black leading-tight text-slate-950 md:text-3xl">שיחות AI לבדיקה</h1>
-              <p className="mt-1 text-sm font-semibold text-slate-600">סקירת שיחות לימודיות, זיהוי שיחות שמצריכות תשומת לב ומעבר מהיר לפרטי השיחה.</p>
+              <h1 className="text-2xl font-black leading-tight text-slate-950 md:text-3xl">{t('admin.conversations.heroTitle')}</h1>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{t('admin.conversations.heroSubtitle')}</p>
               
             </div>
           </div>
@@ -527,14 +533,14 @@ function Conversations() {
           <div className="rounded-[2rem] border border-white/70 bg-white/90 p-4 shadow-[0_22px_60px_rgba(91,33,182,0.11)] backdrop-blur sm:p-6">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <h2 className="text-xl font-black text-slate-950">רשימת שיחות</h2>
+                <h2 className="text-xl font-black text-slate-950">{t('admin.conversations.listTitle')}</h2>
                 <p className="mt-1 text-sm font-semibold text-slate-500">
-                  {loading ? 'טוען שיחות...' : `${filteredConversations.length} שיחות מוצגות`}
+                  {loading ? t('admin.conversations.loadingConversations') : `${filteredConversations.length}${t('admin.conversations.showingConversations')}`}
                 </p>
               </div>
 
               <label className="relative block w-full lg:w-80">
-                <span className="sr-only">חיפוש שיחות</span>
+                <span className="sr-only">{t('admin.conversations.searchAria')}</span>
                 <Search
                   className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-violet-500"
                   aria-hidden="true"
@@ -543,7 +549,7 @@ function Conversations() {
                   type="search"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="חיפוש תלמידה, רמה או תקציר..."
+                  placeholder={t('admin.conversations.searchPlaceholder')}
                   className="h-12 w-full rounded-full border border-violet-100 bg-violet-50/70 py-3 pl-4 pr-12 text-right text-sm font-bold text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-100"
                 />
               </label>
@@ -564,12 +570,12 @@ function Conversations() {
               <table className="w-full border-collapse bg-white/95 text-right">
                 <thead>
                   <tr className="bg-violet-50/80 text-sm font-black text-violet-800">
-                    <th className="px-4 py-4">תלמידה</th>
-                    <th className="px-4 py-4">תאריך</th>
-                    <th className="px-4 py-4">רמה</th>
-                    <th className="px-4 py-4">סטטוס</th>
-                    <th className="px-4 py-4">תקציר</th>
-                    <th className="px-4 py-4">פעולה</th>
+                    <th className="px-4 py-4">{t('admin.conversations.table.student')}</th>
+                    <th className="px-4 py-4">{t('admin.conversations.table.date')}</th>
+                    <th className="px-4 py-4">{t('admin.conversations.table.level')}</th>
+                    <th className="px-4 py-4">{t('admin.conversations.table.status')}</th>
+                    <th className="px-4 py-4">{t('admin.conversations.table.summary')}</th>
+                    <th className="px-4 py-4">{t('admin.conversations.table.action')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -620,7 +626,7 @@ function Conversations() {
 
             {!loading && filteredConversations.length === 0 ? (
               <div className="mt-5 rounded-[24px] border border-violet-100 bg-white/90 p-8 text-center text-sm font-bold text-slate-500 shadow-[0_14px_36px_rgba(109,40,217,0.1)]">
-                אין שיחות להצגה כרגע.
+                {t('admin.conversations.noConversations')}
               </div>
             ) : null}
           </div>

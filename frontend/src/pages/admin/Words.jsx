@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../i18n/index.js';
 import {
   BookOpenCheck,
   CheckCircle2,
@@ -63,9 +65,9 @@ function normalizeWord(rawWord) {
 }
 
 function statusLabel(status) {
-  if (status === 'approved') return 'מאושרת';
-  if (status === 'rejected') return 'נדחתה';
-  return 'ממתינה';
+  if (status === 'approved') return i18n.t('admin.words.status.approved');
+  if (status === 'rejected') return i18n.t('admin.words.status.rejected');
+  return i18n.t('admin.words.status.pending');
 }
 
 function statusClass(status) {
@@ -99,6 +101,7 @@ function LevelSelect({ level, onChange }) {
 }
 
 function WordActions({ isBusy, onApprove, onReject }) {
+  const { t } = useTranslation();
   return (
     <div className="grid gap-2 sm:flex sm:flex-wrap">
       <button
@@ -108,7 +111,7 @@ function WordActions({ isBusy, onApprove, onReject }) {
         className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-violet-600 px-4 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:bg-violet-700 disabled:opacity-50 sm:h-10"
       >
         <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
-        אישור
+        {t('admin.words.actions.approve')}
       </button>
 
       <button
@@ -118,7 +121,7 @@ function WordActions({ isBusy, onApprove, onReject }) {
         className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-violet-100 bg-white px-4 text-sm font-black text-violet-700 transition hover:-translate-y-0.5 hover:bg-violet-50 disabled:opacity-50 sm:h-10"
       >
         <XCircle className="h-4 w-4" aria-hidden="true" />
-        דחייה
+        {t('admin.words.actions.reject')}
       </button>
     </div>
   );
@@ -132,11 +135,12 @@ function WordReviewCard({
   word,
   wordCount,
 }) {
+  const { t } = useTranslation();
   return (
     <article className={`rounded-[24px] border border-white/80 bg-white/90 p-4 shadow-[0_18px_42px_rgba(109,40,217,0.12)] transition hover:-translate-y-1 hover:shadow-[0_24px_56px_rgba(124,58,237,0.16)] ${reviewCardClass(wordCount)}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-black text-violet-700">מילה חדשה</p>
+          <p className="text-xs font-black text-violet-700">{t('admin.words.card.newWord')}</p>
           <h3 className="mt-1 break-words text-2xl font-black leading-tight text-slate-950">
             {word.word}
           </h3>
@@ -149,23 +153,23 @@ function WordReviewCard({
 
       <div className="mt-4 grid gap-3">
         <div className="rounded-[18px] bg-violet-50/70 p-3">
-          <p className="text-xs font-black text-violet-700">תרגום / משמעות</p>
+          <p className="text-xs font-black text-violet-700">{t('admin.words.card.translation')}</p>
           <p className="mt-1 break-words text-base font-bold leading-7 text-slate-800">
             {word.translation}
           </p>
         </div>
 
         <div className="rounded-[18px] bg-white/80 p-3 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.65)]">
-          <p className="text-xs font-black text-violet-700">משפט לדוגמה</p>
+          <p className="text-xs font-black text-violet-700">{t('admin.words.card.example')}</p>
           <p className="mt-1 break-words text-sm font-semibold leading-7 text-slate-600">
-            {word.example || 'אין משפט לדוגמה'}
+            {word.example || t('admin.words.card.noExample')}
           </p>
         </div>
       </div>
 
       <div className="mt-4">
         <label className="block text-xs font-black text-violet-700">
-          רמת למידה
+          {t('admin.words.card.level')}
           <span className="mt-2 block">
             <LevelSelect
               level={word.level}
@@ -193,6 +197,7 @@ function WordReviewCard({
 }
 
 function Words() {
+  const { t } = useTranslation();
   const [words, setWords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [usingMockData, setUsingMockData] = useState(false);
@@ -285,7 +290,7 @@ function Words() {
     updateWord(id, (word) => ({
       ...word,
       savedLevel: word.level,
-      feedback: 'הרמה נשמרה',
+      feedback: t('admin.words.alerts.levelSaved'),
     }));
   };
 
@@ -338,7 +343,7 @@ function Words() {
   return (
     <main className="min-h-screen overflow-x-hidden bg-[radial-gradient(circle_at_12%_8%,rgba(221,214,254,0.54),transparent_30%),linear-gradient(180deg,#FBF8FF_0%,#FFF8FC_48%,#F4EEFF_100%)] px-3 py-3 text-slate-900 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-7xl pb-12" dir="rtl">
-        <AdminPageHeader icon={BookOpenCheck} label="בדיקת מילים" />
+        <AdminPageHeader icon={BookOpenCheck} label={t('admin.words.header')} />
 
 <section
           className="relative mt-8 overflow-hidden rounded-[24px] border border-violet-100/70 bg-white/75 shadow-[0_16px_42px_rgba(109,40,217,0.1)] md:mt-10 md:rounded-[28px]"
@@ -351,10 +356,10 @@ function Words() {
             <div className="flex flex-1 flex-col justify-center text-right" style={{ paddingLeft: '4px', paddingRight: '20px' }} dir="rtl">
               <p className="inline-flex w-full items-center justify-start gap-2 text-xs font-black text-violet-700 mb-1 text-right">
                 <BookOpenCheck className="h-4 w-4" aria-hidden="true" />
-                בדיקת מילים
+                {t('admin.words.heroBadge')}
               </p>
-              <h1 className="text-2xl font-black leading-tight text-slate-950 md:text-3xl">בדיקת מילים חדשות</h1>
-              <p className="mt-1 text-sm font-semibold text-slate-600">אשרי מילים חדשות, דחי מילים לא מתאימות וסווגי כל מילה לפי רמת הלמידה.</p>
+              <h1 className="text-2xl font-black leading-tight text-slate-950 md:text-3xl">{t('admin.words.heroTitle')}</h1>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{t('admin.words.heroSubtitle')}</p>
               
             </div>
           </div>
@@ -364,15 +369,15 @@ function Words() {
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <h2 className="text-xl font-black text-slate-950">
-                מילים ממתינות לבדיקה
+                {t('admin.words.pendingWordsTitle')}
               </h2>
               <p className="mt-1 text-sm font-semibold text-slate-500">
-                {loading ? 'טוען מילים...' : `${filteredWords.length} מילים מוצגות`}
+                {loading ? t('admin.words.loadingWords') : `${filteredWords.length}${t('admin.words.wordsDisplayedSuffix')}`}
               </p>
             </div>
 
             <label className="relative block w-full lg:w-80">
-              <span className="sr-only">חיפוש מילים</span>
+              <span className="sr-only">{t('admin.words.searchAria')}</span>
               <Search
                 className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-violet-500"
                 aria-hidden="true"
@@ -381,7 +386,7 @@ function Words() {
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="חיפוש מילה, תרגום או דוגמה..."
+                placeholder={t('admin.words.searchPlaceholder')}
                 className="h-12 w-full rounded-full border border-violet-100 bg-violet-50/70 py-3 pl-4 pr-12 text-right text-sm font-bold text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-100"
               />
             </label>
@@ -408,7 +413,7 @@ function Words() {
 
             {!loading && filteredWords.length === 0 ? (
               <div className="rounded-[24px] border border-violet-100 bg-white/90 p-8 text-center text-sm font-bold text-slate-500 shadow-[0_14px_36px_rgba(109,40,217,0.1)]">
-                אין מילים להצגה כרגע.
+                {t('admin.words.noWordsToDisplay')}
               </div>
             ) : null}
           </div>
@@ -417,12 +422,12 @@ function Words() {
             <table className="w-full border-collapse bg-white/95 text-right">
               <thead>
                 <tr className="bg-violet-50/80 text-sm font-black text-violet-800">
-                  <th className="px-4 py-4">מילה</th>
-                  <th className="px-4 py-4">תרגום / משמעות</th>
-                  <th className="px-4 py-4">משפט לדוגמה</th>
-                  <th className="px-4 py-4">סטטוס</th>
-                  <th className="px-4 py-4">רמה</th>
-                  <th className="px-4 py-4">פעולות</th>
+                  <th className="px-4 py-4">{t('admin.words.table.word')}</th>
+                  <th className="px-4 py-4">{t('admin.words.table.translation')}</th>
+                  <th className="px-4 py-4">{t('admin.words.table.example')}</th>
+                  <th className="px-4 py-4">{t('admin.words.table.status')}</th>
+                  <th className="px-4 py-4">{t('admin.words.table.level')}</th>
+                  <th className="px-4 py-4">{t('admin.words.table.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -444,7 +449,7 @@ function Words() {
                         {word.translation}
                       </td>
                       <td className="max-w-sm px-4 py-4 text-sm font-semibold leading-6 text-slate-600">
-                        {word.example || 'אין משפט לדוגמה'}
+                        {word.example || t('admin.words.card.noExample')}
                       </td>
                       <td className="px-4 py-4">
                         <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-black ${statusClass(word.status)}`}>
@@ -472,7 +477,7 @@ function Words() {
 
             {!loading && filteredWords.length === 0 ? (
               <div className="bg-white p-8 text-center text-sm font-bold text-slate-500">
-                אין מילים להצגה כרגע.
+                {t('admin.words.noWordsToDisplay')}
               </div>
             ) : null}
           </div>

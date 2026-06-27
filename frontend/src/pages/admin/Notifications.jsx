@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Bell,
   Check,
@@ -45,6 +46,7 @@ function notificationCardClass(count) {
 }
 
 function Notifications() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [notifications, setNotifications] = useState([]);
@@ -131,7 +133,7 @@ function Notifications() {
       );
     } catch (requestError) {
       console.error('Failed to mark notification as read:', requestError);
-      setError('אירעה שגיאה בעדכון ההתראה.');
+      setError(t('admin.notifications.errorUpdating'));
     } finally {
       setMarkingId(null);
     }
@@ -150,25 +152,25 @@ function Notifications() {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] px-3 py-3 text-slate-900 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-6xl" dir="rtl">
-        <AdminPageHeader icon={Bell} label="התראות מערכת" />
+        <AdminPageHeader icon={Bell} label={t('admin.notifications.pageHeader')} />
 
         <section className="mt-3 overflow-hidden rounded-[24px] border border-[#EEE5FF] bg-white/75 p-4 shadow-card backdrop-blur-[8px] md:mt-6 md:rounded-[2rem] md:p-7">
           <p className="inline-flex items-center gap-2 text-sm font-black text-violet-700">
             <Bell className="h-4 w-4" aria-hidden="true" />
-            התראות מערכת
+            {t('admin.notifications.badge')}
           </p>
 
           <h1 className="mt-2 text-[clamp(1.65rem,7vw,2.1rem)] font-black leading-tight text-slate-950 md:text-[clamp(2.2rem,4.2vw,4.25rem)]">
-            ההתראות שלי
+            {t('admin.notifications.title')}
           </h1>
 
           <p className="mt-2 max-w-4xl text-sm font-semibold leading-6 text-slate-600 md:mt-3 md:text-base md:leading-7">
-            כאן מופיעות התראות חדשות על הודעות ושיחות במערכת.
+            {t('admin.notifications.subtitle')}
           </p>
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <span className="rounded-full bg-violet-50 px-4 py-2 text-sm font-black text-violet-700">
-              {unreadCount} לא נקראו
+              {unreadCount}{t('admin.notifications.unreadCountSuffix')}
             </span>
 
             <button
@@ -181,7 +183,7 @@ function Notifications() {
                 className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`}
                 aria-hidden="true"
               />
-              רענון
+              {t('admin.notifications.refreshBtn')}
             </button>
           </div>
         </section>
@@ -195,11 +197,11 @@ function Notifications() {
         <section className="mt-5 flex flex-wrap justify-center gap-3">
           {loading ? (
             <div className="rounded-[1.75rem] border border-white/70 bg-white/95 p-8 text-center text-sm font-black text-slate-500 shadow-card">
-              טוען התראות...
+              {t('admin.notifications.loading')}
             </div>
           ) : notifications.length === 0 ? (
             <div className="rounded-[1.75rem] border border-white/70 bg-white/95 p-8 text-center text-sm font-black text-slate-500 shadow-card">
-              אין התראות כרגע.
+              {t('admin.notifications.noNotifications')}
             </div>
           ) : (
             notifications.map((notification) => (
@@ -219,7 +221,7 @@ function Notifications() {
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <h2 className="text-lg font-black text-slate-950">
-                        {notification.title || 'התראה חדשה'}
+                        {notification.title || t('admin.notifications.newNotificationFallback')}
                       </h2>
 
                       <span className="text-xs font-bold text-slate-400">
@@ -244,7 +246,7 @@ function Notifications() {
                           onClick={() => openNotification(notification)}
                           className="rounded-2xl bg-violet-600 px-4 py-2 text-sm font-black text-white transition hover:bg-violet-700"
                         >
-                          פתיחת השיחה
+                          {t('admin.notifications.openConversationBtn')}
                         </button>
                       ) : null}
 
@@ -256,7 +258,7 @@ function Notifications() {
                           className="inline-flex items-center gap-2 rounded-2xl bg-white px-4 py-2 text-sm font-black text-violet-700 transition hover:bg-violet-100 disabled:cursor-not-allowed disabled:opacity-60"
                         >
                           <Check className="h-4 w-4" aria-hidden="true" />
-                          {markingId === notification.id ? 'מעדכן...' : 'סימון כנקראה'}
+                          {markingId === notification.id ? t('admin.notifications.updatingBtn') : t('admin.notifications.markAsReadBtn')}
                         </button>
                       ) : null}
                     </div>

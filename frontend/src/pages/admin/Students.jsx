@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../i18n/index.js';
 import {
   Ban,
   GraduationCap,
@@ -57,7 +59,7 @@ function teacherNames(teachers, teacherIds = []) {
     .map((teacherId) => teachers.find((teacher) => teacher.id === teacherId)?.name)
     .filter(Boolean);
 
-  return names.length > 0 ? names.join(', ') : 'לא שויכה';
+  return names.length > 0 ? names.join(', ') : i18n.t('admin.students.teacherNotAssigned');
 }
 
 function Modal({ children, onClose, title, description }) {
@@ -83,7 +85,7 @@ function Modal({ children, onClose, title, description }) {
             type="button"
             onClick={onClose}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-50 text-slate-600 transition hover:bg-violet-50 hover:text-violet-700"
-            aria-label="סגירה"
+            aria-label={i18n.t('admin.students.modal.close')}
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -105,6 +107,7 @@ function Field({ children, label }) {
 }
 
 function StudentForm({ initialValue, mode, onCancel, onSubmit, saving, teachers }) {
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     ...initialValue,
     teacherIds: getStudentTeacherIds(initialValue),
@@ -145,7 +148,7 @@ function StudentForm({ initialValue, mode, onCancel, onSubmit, saving, teachers 
   return (
     <form className="mt-5 grid gap-4" onSubmit={submitForm}>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="שם התלמידה">
+        <Field label={t('admin.students.form.name')}>
           <input
             value={form.name}
             onChange={setField('name')}
@@ -154,7 +157,7 @@ function StudentForm({ initialValue, mode, onCancel, onSubmit, saving, teachers 
           />
         </Field>
 
-        <Field label="אימייל">
+        <Field label={t('admin.students.form.email')}>
           <input
             type="email"
             value={form.email}
@@ -166,18 +169,18 @@ function StudentForm({ initialValue, mode, onCancel, onSubmit, saving, teachers 
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label={isEdit ? 'סיסמה חדשה (אופציונלי)' : 'סיסמה זמנית'}>
+        <Field label={isEdit ? t('admin.students.form.newPasswordOpt') : t('admin.students.form.tempPassword')}>
           <input
             type="password"
             value={form.password}
             onChange={setField('password')}
             className={fieldClass}
             required={!isEdit}
-            placeholder={isEdit ? 'השאר ריק כדי לא לשנות סיסמה' : ''}
+            placeholder={isEdit ? t('admin.students.form.leaveEmptyPlaceholder') : ''}
           />
         </Field>
 
-        <Field label="רמת לימוד">
+        <Field label={t('admin.students.form.level')}>
           <select value={form.level} onChange={setField('level')} className={fieldClass}>
             {adminLevels.map((level) => (
               <option key={level} value={level}>
@@ -189,7 +192,7 @@ function StudentForm({ initialValue, mode, onCancel, onSubmit, saving, teachers 
       </div>
 
       <div className="rounded-3xl border border-[#EEE5FF] bg-white p-4 shadow-sm">
-        <p className="text-sm font-black text-slate-800">מורות שנבחרו</p>
+        <p className="text-sm font-black text-slate-800">{t('admin.students.form.selectedTeachers')}</p>
 
         <div className="relative mt-3">
           <button
@@ -200,8 +203,8 @@ function StudentForm({ initialValue, mode, onCancel, onSubmit, saving, teachers 
           >
             <span>
               {form.teacherIds.length > 0
-                ? `${form.teacherIds.length} מורות נבחרו`
-                : 'בחרי מורות'}
+                ? `${form.teacherIds.length}${t('admin.students.form.teachersSelectedSuffix')}`
+                : t('admin.students.form.selectTeachers')}
             </span>
             <span className="text-lg leading-none text-violet-600" aria-hidden="true">
               {teachersOpen ? '−' : '+'}
@@ -212,7 +215,7 @@ function StudentForm({ initialValue, mode, onCancel, onSubmit, saving, teachers 
             <div className="absolute left-0 right-0 top-full z-10 mt-2 max-h-56 overflow-y-auto rounded-2xl border border-[#EEE5FF] bg-white shadow-xl">
               {teachers.length === 0 ? (
                 <div className="px-4 py-3 text-sm font-bold text-slate-500">
-                  אין מורות זמינות
+                  {t('admin.students.form.noTeachersAvailable')}
                 </div>
               ) : (
                 <div className="divide-y divide-[#EEE5FF]">
@@ -261,7 +264,7 @@ function StudentForm({ initialValue, mode, onCancel, onSubmit, saving, teachers 
           onClick={onCancel}
           className="rounded-2xl bg-slate-100 px-5 py-3 text-sm font-black text-slate-700 transition hover:bg-slate-200"
         >
-          ביטול
+          {t('admin.students.form.cancel')}
         </button>
 
         <button
@@ -270,7 +273,7 @@ function StudentForm({ initialValue, mode, onCancel, onSubmit, saving, teachers 
           className="inline-flex items-center justify-center gap-2 rounded-2xl bg-violet-600 px-5 py-3 text-sm font-black text-white shadow-button transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
-          {saving ? 'שומרת...' : isEdit ? 'שמירת שינויים' : 'הוספת תלמידה'}
+          {saving ? t('admin.students.form.saving') : isEdit ? t('admin.students.form.saveChanges') : t('admin.students.form.addStudent')}
         </button>
       </div>
     </form>
@@ -327,6 +330,7 @@ function FilterSelect({ label, value, onChange, children }) {
 }
 
 function Students() {
+  const { t } = useTranslation();
   const [students, setStudents] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [query, setQuery] = useState('');
@@ -425,7 +429,7 @@ function Students() {
         };
 
         setStudents((current) => [newStudent, ...current]);
-        setSuccess('התלמידה נוספה בהצלחה');
+        setSuccess(t('admin.students.alerts.studentAdded'));
         closeModal();
         return;
       }
@@ -436,7 +440,7 @@ function Students() {
       });
 
       setStudents((current) => [data.student, ...current]);
-      setSuccess('התלמידה נוספה בהצלחה');
+      setSuccess(t('admin.students.alerts.studentAdded'));
       closeModal();
     } catch (requestError) {
       setError(requestError.message);
@@ -463,7 +467,7 @@ function Students() {
             student.id === selectedStudent.id ? updatedStudent : student,
           ),
         );
-        setSuccess('פרטי התלמידה עודכנו בהצלחה');
+        setSuccess(t('admin.students.alerts.studentUpdated'));
         closeModal();
         return;
       }
@@ -482,7 +486,7 @@ function Students() {
         ),
       );
 
-      setSuccess('פרטי התלמידה עודכנו בהצלחה');
+      setSuccess(t('admin.students.alerts.studentUpdated'));
       closeModal();
     } catch (requestError) {
       setError(requestError.message);
@@ -500,7 +504,7 @@ function Students() {
         setStudents((current) =>
           current.filter((student) => student.id !== selectedStudent.id),
         );
-        setSuccess('התלמידה נמחקה');
+        setSuccess(t('admin.students.alerts.studentDeleted'));
         closeModal();
         return;
       }
@@ -509,7 +513,7 @@ function Students() {
       setStudents((current) =>
         current.filter((student) => student.id !== selectedStudent.id),
       );
-      setSuccess('התלמידה נמחקה');
+      setSuccess(t('admin.students.alerts.studentDeleted'));
       closeModal();
     } catch (requestError) {
       setError(requestError.message);
@@ -532,8 +536,8 @@ function Students() {
         );
         setSuccess(
           nextStatus === 'suspended'
-            ? 'התלמידה הושהתה'
-            : 'התלמידה הוחזרה לפעילות',
+            ? t('admin.students.alerts.studentSuspended')
+            : t('admin.students.alerts.studentReactivated')
         );
         return;
       }
@@ -548,8 +552,8 @@ function Students() {
 
       setSuccess(
         data.student.status === 'suspended'
-          ? 'התלמידה הושהתה'
-          : 'התלמידה הוחזרה לפעילות',
+          ? t('admin.students.alerts.studentSuspended')
+          : t('admin.students.alerts.studentReactivated')
       );
     } catch (requestError) {
       setError(requestError.message);
@@ -559,7 +563,7 @@ function Students() {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] px-3 py-3 text-slate-900 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto w-full max-w-7xl" dir="rtl">
-        <AdminPageHeader icon={Users} label="ניהול תלמידות" />
+        <AdminPageHeader icon={Users} label={t('admin.students.header')} />
 
 <section
           className="relative mt-8 overflow-hidden rounded-[24px] border border-violet-100/70 bg-white/75 shadow-[0_16px_42px_rgba(109,40,217,0.1)] md:mt-10 md:rounded-[28px]"
@@ -572,10 +576,10 @@ function Students() {
             <div className="flex flex-1 flex-col justify-center text-right" style={{ paddingLeft: '4px', paddingRight: '20px' }} dir="rtl">
               <p className="inline-flex w-full items-center justify-start gap-2 text-xs font-black text-violet-700 mb-1 text-right">
                 <Users className="h-4 w-4" aria-hidden="true" />
-                ניהול תלמידות
+                {t('admin.students.heroBadge')}
               </p>
-              <h1 className="text-2xl font-black leading-tight text-slate-950 md:text-3xl">תלמידות במערכת</h1>
-              <p className="mt-1 text-sm font-semibold text-slate-600">ניהול תלמידות, רמות, שיוך למורות, עריכה, מחיקה והשהיה דרך המערכת.</p>
+              <h1 className="text-2xl font-black leading-tight text-slate-950 md:text-3xl">{t('admin.students.heroTitle')}</h1>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{t('admin.students.heroSubtitle')}</p>
               
             </div>
           </div>
@@ -589,14 +593,14 @@ function Students() {
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="חיפוש לפי שם, אימייל, רמה או מורה"
+                placeholder={t('admin.students.searchPlaceholder')}
                 className="min-w-0 flex-1 bg-transparent text-sm font-semibold outline-none placeholder:text-slate-400"
               />
             </label>
 
             <div className="grid gap-2 sm:grid-cols-3 lg:w-[34rem]">
-              <FilterSelect label="רמה" value={levelFilter} onChange={setLevelFilter}>
-                <option value="all">כל הרמות</option>
+              <FilterSelect label={t('admin.students.levelFilter')} value={levelFilter} onChange={setLevelFilter}>
+                <option value="all">{t('admin.students.allLevels')}</option>
                 {adminLevels.map((level) => (
                   <option key={level} value={level}>
                     {level}
@@ -604,8 +608,8 @@ function Students() {
                 ))}
               </FilterSelect>
 
-              <FilterSelect label="מורה" value={teacherFilter} onChange={setTeacherFilter}>
-                <option value="all">כל המורות</option>
+              <FilterSelect label={t('admin.students.teacherFilter')} value={teacherFilter} onChange={setTeacherFilter}>
+                <option value="all">{t('admin.students.allTeachers')}</option>
                 {teachers.map((teacher) => (
                   <option key={teacher.id} value={teacher.id}>
                     {teacher.name}
@@ -613,10 +617,10 @@ function Students() {
                 ))}
               </FilterSelect>
 
-              <FilterSelect label="סטטוס" value={statusFilter} onChange={setStatusFilter}>
-                <option value="all">כולן</option>
-                <option value="active">לא חסומות</option>
-                <option value="blocked">חסומות</option>
+              <FilterSelect label={t('admin.students.statusFilter')} value={statusFilter} onChange={setStatusFilter}>
+                <option value="all">{t('admin.students.allStatuses')}</option>
+                <option value="active">{t('admin.students.activeStatus')}</option>
+                <option value="blocked">{t('admin.students.blockedStatus')}</option>
               </FilterSelect>
             </div>
 
@@ -631,7 +635,7 @@ function Students() {
                   className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`}
                   aria-hidden="true"
                 />
-                רענון
+                {t('admin.students.refreshBtn')}
               </button>
 
               <button
@@ -640,7 +644,7 @@ function Students() {
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-violet-600 px-5 py-3 text-sm font-black text-white shadow-button transition hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
               >
                 <UserPlus className="h-5 w-5" aria-hidden="true" />
-                הוספת תלמידה
+                {t('admin.students.addBtn')}
               </button>
             </div>
           </div>
@@ -650,17 +654,17 @@ function Students() {
 
           <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-[#EEE5FF] bg-white">
             <div className="hidden grid-cols-[1fr_1.25fr_0.6fr_1.2fr_0.7fr_1.1fr] gap-3 bg-violet-50 px-4 py-3 text-xs font-black text-violet-700 md:grid">
-              <span>שם</span>
-              <span>אימייל</span>
-              <span>רמה</span>
-              <span>מורות</span>
-              <span>סטטוס</span>
-              <span>פעולות</span>
+              <span>{t('admin.students.table.name')}</span>
+              <span>{t('admin.students.table.email')}</span>
+              <span>{t('admin.students.table.level')}</span>
+              <span>{t('admin.students.table.teachers')}</span>
+              <span>{t('admin.students.table.status')}</span>
+              <span>{t('admin.students.table.actions')}</span>
             </div>
 
             {loading ? (
               <div className="p-8 text-center text-sm font-black text-slate-500">
-                טוענת תלמידות...
+                {t('admin.students.table.loading')}
               </div>
             ) : filteredStudents.length === 0 ? (
               <div className="grid justify-items-center gap-3 p-8 text-center">
@@ -668,7 +672,7 @@ function Students() {
                   <Users className="h-7 w-7" aria-hidden="true" />
                 </span>
                 <h2 className="text-base font-black text-slate-900">
-                  לא נמצאו תלמידות
+                  {t('admin.students.table.noStudentsFound')}
                 </h2>
               </div>
             ) : (
@@ -694,7 +698,7 @@ function Students() {
 
                     <div className="min-w-0">
                       <span className="mb-0.5 block text-[10px] font-black text-slate-400 md:hidden">
-                        רמה
+                        {t('admin.students.table.level')}
                       </span>
                       <span className="inline-flex max-w-full rounded-full bg-violet-50 px-2 py-0.5 text-[11px] font-black text-violet-700 md:px-3 md:py-1 md:text-xs">
                         {student.level}
@@ -703,11 +707,11 @@ function Students() {
 
                     <div className="min-w-0">
                       <span className="mb-0.5 block text-[10px] font-black text-slate-400 md:hidden">
-                        מורות
+                        {t('admin.students.table.teachers')}
                       </span>
                       {studentTeacherIds.length === 0 ? (
                         <span className="block truncate text-xs font-semibold text-slate-600 md:text-sm">
-                          לא שויכה
+                          {t('admin.students.teacherNotAssigned')}
                         </span>
                       ) : (
                         <span className="flex max-h-9 flex-wrap gap-1 overflow-hidden md:max-h-none md:gap-2 md:overflow-visible">
@@ -734,7 +738,7 @@ function Students() {
 
                     <div className="min-w-0">
                       <span className="mb-0.5 block text-[10px] font-black text-slate-400 md:hidden">
-                        סטטוס
+                        {t('admin.students.table.status')}
                       </span>
                       <span
                         className={`inline-flex max-w-full rounded-full px-2 py-0.5 text-[11px] font-black md:px-3 md:py-1 md:text-xs ${
@@ -743,14 +747,14 @@ function Students() {
                             : 'bg-green-50 text-green-700'
                         }`}
                       >
-                        {student.status === 'suspended' ? 'מושהית' : 'פעילה'}
+                        {student.status === 'suspended' ? t('admin.students.status.suspended') : t('admin.students.status.active')}
                       </span>
                     </div>
 
                     <div className="col-span-3 md:col-span-1">
                       <span className="flex flex-wrap justify-end gap-2 md:justify-start">
                         <ActionButton
-                          label="עריכת תלמידה"
+                          label={t('admin.students.actions.edit')}
                           onClick={() => {
                             setSelectedStudent(student);
                             setModal('edit');
@@ -760,7 +764,7 @@ function Students() {
                         </ActionButton>
 
                         <ActionButton
-                          label="השהיה או החזרה"
+                          label={t('admin.students.actions.suspendToggle')}
                           tone="warning"
                           onClick={() => toggleSuspend(student)}
                         >
@@ -772,7 +776,7 @@ function Students() {
                         </ActionButton>
 
                         <ActionButton
-                          label="מחיקת תלמידה"
+                          label={t('admin.students.actions.delete')}
                           tone="danger"
                           onClick={() => {
                             setSelectedStudent(student);
@@ -793,8 +797,8 @@ function Students() {
 
       {modal === 'add' ? (
         <Modal
-          title="הוספת תלמידה"
-          description="יצירת תלמידה חדשה ושיוך למורה אחת או יותר."
+          title={t('admin.students.modal.addTitle')}
+          description={t('admin.students.modal.addDesc')}
           onClose={closeModal}
         >
           <StudentForm
@@ -810,8 +814,8 @@ function Students() {
 
       {modal === 'edit' && selectedStudent ? (
         <Modal
-          title="עריכת תלמידה"
-          description="עדכון שם, אימייל, רמה ושיוך למורות."
+          title={t('admin.students.modal.editTitle')}
+          description={t('admin.students.modal.editDesc')}
           onClose={closeModal}
         >
           <StudentForm
@@ -831,9 +835,9 @@ function Students() {
       ) : null}
 
       {modal === 'delete' && selectedStudent ? (
-        <Modal title="מחיקת תלמידה" onClose={closeModal}>
+        <Modal title={t('admin.students.modal.deleteTitle')} onClose={closeModal}>
           <div className="mt-5 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-bold leading-7 text-red-700">
-            למחוק את {selectedStudent.name}? הפעולה תמחק את המשתמשת מהמערכת.
+            {t('admin.students.modal.deleteConfirmPrefix')}{selectedStudent.name}{t('admin.students.modal.deleteConfirmSuffix')}
           </div>
 
           <div className="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
@@ -842,7 +846,7 @@ function Students() {
               onClick={closeModal}
               className="rounded-2xl bg-slate-100 px-5 py-3 text-sm font-black text-slate-700 transition hover:bg-slate-200"
             >
-              ביטול
+              {t('admin.students.form.cancel')}
             </button>
 
             <button
@@ -851,7 +855,7 @@ function Students() {
               disabled={saving}
               className="rounded-2xl bg-red-600 px-5 py-3 text-sm font-black text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {saving ? 'מוחקת...' : 'מחיקה'}
+              {saving ? t('admin.students.form.deleting') : t('admin.students.actions.delete')}
             </button>
           </div>
         </Modal>
@@ -859,8 +863,8 @@ function Students() {
 
       {modal === 'teacher-students' && selectedTeacher ? (
         <Modal
-          title={`תלמידות של ${selectedTeacher.name}`}
-          description="רשימת התלמידות המשויכות למורה שנבחרה."
+          title={`${t('admin.students.modal.teacherStudentsPrefix')}${selectedTeacher.name}`}
+          description={t('admin.students.modal.teacherStudentsDesc')}
           onClose={closeModal}
         >
           <div className="mt-5 grid gap-3">

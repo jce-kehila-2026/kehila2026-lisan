@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight, CheckCircle2, Clock, LayoutDashboard } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import AdminNavStrip from '../../components/admin/AdminNavStrip.jsx';
 import AdminMobileMenu from '../../components/admin/AdminMobileMenu.jsx';
@@ -18,6 +19,7 @@ function demoCardClass(count) {
 
 function AdminDemoPage({ accentLabel, cards, description, icon: Icon, title }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#FCF8FF_0%,#F7F0FF_45%,#FFF6FB_100%)] px-3 py-4 text-slate-900 sm:px-4 sm:py-6 md:px-6 md:py-8 lg:px-8">
@@ -31,7 +33,7 @@ function AdminDemoPage({ accentLabel, cards, description, icon: Icon, title }) {
               className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-black text-violet-700 shadow-sm transition hover:bg-violet-50"
             >
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              חזרה ללוח הבקרה
+              {t('admin.demo.backToDashboard')}
             </button>
           </div>
           <div className="hidden md:contents">
@@ -39,7 +41,7 @@ function AdminDemoPage({ accentLabel, cards, description, icon: Icon, title }) {
           </div>
           <div className="inline-flex items-center gap-2 rounded-full bg-violet-50 px-4 py-2 text-sm font-black text-violet-700">
             <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
-            אזור ניהול
+            {t('admin.demo.adminArea')}
           </div>
         </header>
 
@@ -60,8 +62,8 @@ function AdminDemoPage({ accentLabel, cards, description, icon: Icon, title }) {
               </p>
             </div>
             <div className="rounded-2xl border border-violet-100 bg-violet-50 px-4 py-3 text-right">
-              <p className="text-xs font-black text-violet-700">מצב עמוד</p>
-              <p className="mt-1 text-sm font-bold text-slate-700">תצוגת הדגמה בלבד, ללא חיבור לשרת</p>
+              <p className="text-xs font-black text-violet-700">{t('admin.demo.pageStatus')}</p>
+              <p className="mt-1 text-sm font-bold text-slate-700">{t('admin.demo.demoOnlyDesc')}</p>
             </div>
           </div>
         </section>

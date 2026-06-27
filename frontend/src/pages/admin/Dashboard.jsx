@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Bell,
   BookOpenCheck,
@@ -32,6 +33,7 @@ import { getFullAnalytics } from '../../services/adminApi.js';
 import AdminNavStrip from '../../components/admin/AdminNavStrip.jsx';
 import LisanHeader from '../../components/LisanHeader.jsx';
 import AdminHeroVisual from '../../components/admin/AdminHeroVisual.jsx';
+import i18n from '../../i18n/index.js';
 
 import {
   getStoredToken,
@@ -41,57 +43,57 @@ import {
 
 const API_BASE_URL = '/api';
 
-const dashboardNotifications = [
-  'שיחה חדשה ממתינה לבדיקה',
-  'מילה חדשה נוספה למערכת',
-  'תלמידה חדשה נרשמה',
-  'חומר לימוד חדש הועלה',
+const getDashboardNotifications = () => [
+  i18n.t('admin.dashboard.notifications.newConversation'),
+  i18n.t('admin.dashboard.notifications.newWord'),
+  i18n.t('admin.dashboard.notifications.newStudent'),
+  i18n.t('admin.dashboard.notifications.newMaterial'),
 ];
 
-const dashboardSections = [
+const getDashboardSections = () => [
   {
-    title: 'ניהול תלמידות',
-    subtitle: 'טבלת תלמידות עם רמות, כיתות, שיוכים ופעולות ניהול מלאות.',
-    detail: 'כניסה לניהול תלמידות',
+    title: i18n.t('admin.dashboard.sections.students.title'),
+    subtitle: i18n.t('admin.dashboard.sections.students.subtitle'),
+    detail: i18n.t('admin.dashboard.sections.students.detail'),
     id: 'students',
-    navLabel: 'תלמידות',
+    navLabel: i18n.t('admin.dashboard.sections.students.navLabel'),
     icon: Users,
     to: '/admin/students',
   },
   {
-    title: 'ניהול מורות',
-    subtitle: 'מורות, כיתות, רמות לימוד ושיוך תלמידות.',
-    detail: 'כניסה מאובטחת לניהול מורות',
+    title: i18n.t('admin.dashboard.sections.teachers.title'),
+    subtitle: i18n.t('admin.dashboard.sections.teachers.subtitle'),
+    detail: i18n.t('admin.dashboard.sections.teachers.detail'),
     id: 'teachers',
-    navLabel: 'מורות',
+    navLabel: i18n.t('admin.dashboard.sections.teachers.navLabel'),
     icon: GraduationCap,
     to: '/admin/progress',
     requiresCode: true,
   },
   {
-    title: 'בדיקת שיחות',
-    subtitle: 'סקירת שיחות חדשות שממתינות לבדיקה.',
-    detail: 'רשימת שיחות חדשות לבדיקה',
+    title: i18n.t('admin.dashboard.sections.conversations.title'),
+    subtitle: i18n.t('admin.dashboard.sections.conversations.subtitle'),
+    detail: i18n.t('admin.dashboard.sections.conversations.detail'),
     id: 'conversations',
-    navLabel: 'שיחות',
+    navLabel: i18n.t('admin.dashboard.sections.conversations.navLabel'),
     icon: MessageSquareText,
     to: '/admin/conversations',
   },
   {
-    title: 'בדיקת מילים',
-    subtitle: 'סקירת מילים חדשות וסיווג לפי רמות לימוד.',
-    detail: 'ניהול מילים שממתינות לבדיקה',
+    title: i18n.t('admin.dashboard.sections.words.title'),
+    subtitle: i18n.t('admin.dashboard.sections.words.subtitle'),
+    detail: i18n.t('admin.dashboard.sections.words.detail'),
     id: 'words',
-    navLabel: 'מילים',
+    navLabel: i18n.t('admin.dashboard.sections.words.navLabel'),
     icon: BookOpenCheck,
     to: '/admin/words',
   },
   {
-    title: 'הוספת חומרים',
-    subtitle: 'העלאת חומרי לימוד וקבצי פעילות למערכת.',
-    detail: 'מעבר לעמוד העלאת החומרים',
+    title: i18n.t('admin.dashboard.sections.materials.title'),
+    subtitle: i18n.t('admin.dashboard.sections.materials.subtitle'),
+    detail: i18n.t('admin.dashboard.sections.materials.detail'),
     id: 'materials',
-    navLabel: 'חומרים',
+    navLabel: i18n.t('admin.dashboard.sections.materials.navLabel'),
     icon: FilePlus2,
     to: '/teacher/stories/upload',
   },
@@ -228,6 +230,7 @@ function topAnalyticsLevel(metricMap) {
 }
 
 function AnalyticsOverview({ navigate }) {
+  const { t } = useTranslation();
   const [analytics, setAnalytics] = useState(null);
 
   useEffect(() => {
@@ -268,10 +271,10 @@ function AnalyticsOverview({ navigate }) {
 
   const overview = analytics?.overview || {};
   const overviewStats = [
-    { name: 'שיחות AI', value: overview.totalAiChats || 0, color: 'bg-violet-500' },
-    { name: 'הודעות AI', value: overview.totalAiMessages || 0, color: 'bg-fuchsia-400' },
-    { name: 'הקלטות קוליות', value: overview.totalAudioRecordings || 0, color: 'bg-indigo-400' },
-    { name: 'צ׳אטים משותפים', value: overview.totalSharedChats || 0, color: 'bg-rose-300' },
+    { name: t('admin.dashboard.stats.aiChats'), value: overview.totalAiChats || 0, color: 'bg-violet-500' },
+    { name: t('admin.dashboard.stats.aiMessages'), value: overview.totalAiMessages || 0, color: 'bg-fuchsia-400' },
+    { name: t('admin.dashboard.stats.voiceRecordings'), value: overview.totalAudioRecordings || 0, color: 'bg-indigo-400' },
+    { name: t('admin.dashboard.stats.sharedChats'), value: overview.totalSharedChats || 0, color: 'bg-rose-300' },
   ];
   const maxOverviewStat = Math.max(1, ...overviewStats.map((item) => item.value));
 
@@ -281,10 +284,10 @@ function AnalyticsOverview({ navigate }) {
         <div>
           <p className="inline-flex items-center gap-2 rounded-full bg-violet-100/80 px-3 py-1 text-xs font-black text-violet-700">
             <Sparkles className="h-4 w-4" aria-hidden="true" />
-            מדדי ניהול
+            {t('admin.dashboard.overview.badge')}
           </p>
           <h2 className="mt-2 text-xl font-black text-[#160A52] sm:text-2xl">
-            סטטיסטיקות מערכת
+            {t('admin.dashboard.overview.title')}
           </h2>
         </div>
 
@@ -294,14 +297,14 @@ function AnalyticsOverview({ navigate }) {
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-violet-600 px-5 py-2 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
         >
           <BarChart3 className="h-4 w-4" aria-hidden="true" />
-          צפייה בניתוח הנתונים המלא
+          {t('admin.dashboard.overview.viewFullAnalytics')}
         </button>
       </div>
 
       <div className="mt-4 grid gap-3 lg:grid-cols-[1.2fr_1fr_1.1fr]">
         <article className="rounded-[22px] border border-violet-100/70 bg-white/72 p-4 shadow-[0_10px_28px_rgba(109,40,217,0.08)]">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <h3 className="text-sm font-black text-slate-800">חלוקת תלמידות לפי רמת לימוד</h3>
+            <h3 className="text-sm font-black text-slate-800">{t('admin.dashboard.overview.studentsDistribution')}</h3>
             <PieChart className="h-5 w-5 text-violet-600" aria-hidden="true" />
           </div>
           <MiniDistribution data={studentsByLevel} metric="students" />
@@ -311,21 +314,21 @@ function AnalyticsOverview({ navigate }) {
           <div className="grid grid-cols-3 gap-2 text-center">
             {[
               {
-                label: 'הרמה הפעילה ביותר בשיחות AI',
-                value: `רמה ${topChatLevel.level}`,
-                detail: `${formatCount(topChatLevel.value)} הודעות`,
+                label: t('admin.dashboard.overview.mostActiveAiLevel'),
+                value: `${t('admin.dashboard.overview.levelPrefix')}${topChatLevel.level}`,
+                detail: `${formatCount(topChatLevel.value)}${t('admin.dashboard.overview.messagesSuffix')}`,
                 icon: MessageSquareText,
               },
               {
-                label: 'ההתקדמות הגבוהה ביותר',
-                value: `רמה ${topProgressLevel.level}`,
-                detail: `${topProgressLevel.value}% התקדמות`,
+                label: t('admin.dashboard.overview.highestProgress'),
+                value: `${t('admin.dashboard.overview.levelPrefix')}${topProgressLevel.level}`,
+                detail: `${topProgressLevel.value}${t('admin.dashboard.overview.progressSuffix')}`,
                 icon: TrendingUp,
               },
               {
-                label: 'הכי הרבה הקלטות קוליות',
-                value: `רמה ${topAudioLevel.level}`,
-                detail: `${formatCount(topAudioLevel.value)} הקלטות`,
+                label: t('admin.dashboard.overview.mostAudioRecordings'),
+                value: `${t('admin.dashboard.overview.levelPrefix')}${topAudioLevel.level}`,
+                detail: `${formatCount(topAudioLevel.value)}${t('admin.dashboard.overview.recordingsSuffix')}`,
                 icon: Mic,
               },
             ].map((item) => {
@@ -345,7 +348,7 @@ function AnalyticsOverview({ navigate }) {
 
         <article className="rounded-[22px] border border-violet-100/70 bg-white/72 p-4 shadow-[0_10px_28px_rgba(109,40,217,0.08)]">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <h3 className="text-sm font-black text-slate-800">מילים באוצר המילים לפי רמה</h3>
+            <h3 className="text-sm font-black text-slate-800">{t('admin.dashboard.overview.wordsByLevel')}</h3>
             <BookOpenCheck className="h-5 w-5 text-violet-600" aria-hidden="true" />
           </div>
           <div className="flex h-24 items-end justify-between gap-2 rounded-2xl bg-violet-50/60 px-3 py-2">
@@ -368,7 +371,7 @@ function AnalyticsOverview({ navigate }) {
           <div key={stat.name} className="rounded-2xl bg-white/65 px-3 py-2 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.65)]">
             <div className="flex items-center justify-between gap-2 text-xs font-black text-slate-600">
               <span className="inline-flex items-center gap-1.5">
-                {stat.name === 'צ׳אטים משותפים' ? (
+                {stat.name === t('admin.dashboard.stats.sharedChats') ? (
                   <Share2 className="h-3.5 w-3.5 text-violet-500" aria-hidden="true" />
                 ) : null}
                 {stat.name}
@@ -389,6 +392,7 @@ function AnalyticsOverview({ navigate }) {
 }
 
 function AdminDashboard() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const user = getStoredUser();
@@ -503,27 +507,27 @@ function AdminDashboard() {
 
   const stats = [
     {
-      title: 'תלמידות',
+      title: t('admin.dashboard.metrics.students.title'),
       value: students.length,
-      detail: 'תלמידות פעילות במערכת',
+      detail: t('admin.dashboard.metrics.students.detail'),
       icon: UsersRound,
     },
     {
-      title: 'מורות',
+      title: t('admin.dashboard.metrics.teachers.title'),
       value: teachers.length,
-      detail: 'מורות פעילות במערכת',
+      detail: t('admin.dashboard.metrics.teachers.detail'),
       icon: GraduationCap,
     },
     {
-      title: 'מנהלות',
+      title: t('admin.dashboard.metrics.admins.title'),
       value: admins.length,
-      detail: 'מנהלות ואחראיות תוכן',
+      detail: t('admin.dashboard.metrics.admins.detail'),
       icon: ShieldCheck,
     },
     {
-      title: 'ממתינות לבדיקה',
+      title: t('admin.dashboard.metrics.pending.title'),
       value: adminReviewNotifications.length,
-      detail: 'התראות סקירת תוכן',
+      detail: t('admin.dashboard.metrics.pending.detail'),
       icon: ClipboardCheck,
     },
   ];
@@ -543,7 +547,7 @@ function AdminDashboard() {
       return;
     }
 
-    setTeacherCodeError('קוד שגוי');
+    setTeacherCodeError(t('admin.dashboard.modal.wrongCode'));
   };
 
   const handleLogout = () => {
@@ -626,12 +630,12 @@ function AdminDashboard() {
       <div className="mx-auto w-full max-w-7xl" dir="rtl">
 
         <LisanHeader
-          sections={dashboardSections.map((s) => ({ id: s.id, label: s.navLabel, icon: s.icon }))}
+          sections={getDashboardSections().map((s) => ({ id: s.id, label: s.navLabel, icon: s.icon }))}
           activeSection={selectedSectionId}
           onSectionClick={handleSectionShortcutClick}
           logoTarget="/admin/dashboard"
           onLogout={handleLogout}
-          navLabel="ניווט מהיר בלוח הניהול"
+          navLabel={t('admin.dashboard.header.quickNav')}
           extraLeft={
             <div className="flex items-center gap-1.5">
               {/* Student-view button */}
@@ -639,11 +643,11 @@ function AdminDashboard() {
                 type="button"
                 onClick={() => navigate('/teacher/dashboard')}
                 className="inline-flex h-9 items-center gap-1.5 rounded-full border border-violet-200/80 bg-white/80 px-2.5 text-xs font-black text-violet-700 shadow-sm transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-10 sm:px-3 sm:text-sm"
-                aria-label="תצוגת תלמיד"
-                title="תצוגת תלמיד"
+                aria-label={t('admin.dashboard.header.studentView')}
+                title={t('admin.dashboard.header.studentView')}
               >
                 <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
-                <span className="hidden sm:inline">תצוגת תלמיד</span>
+                <span className="hidden sm:inline">{t('admin.dashboard.header.studentView')}</span>
               </button>
 
               {/* Notifications */}
@@ -655,13 +659,13 @@ function AdminDashboard() {
                     setMobileNavOpen(false);
                   }}
                   className="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/80 bg-white/80 text-violet-700 shadow-sm transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-10 sm:w-10"
-                  aria-label="התראות"
+                  aria-label={t('admin.dashboard.header.notificationsAria')}
                   aria-expanded={notificationsOpen}
                 >
                   <Bell className="h-4 w-4" aria-hidden="true" />
-                  {dashboardNotifications.length > 0 ? (
+                  {getDashboardNotifications().length > 0 ? (
                     <span className="absolute -left-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-black text-white">
-                      {dashboardNotifications.length}
+                      {getDashboardNotifications().length}
                     </span>
                   ) : null}
                 </button>
@@ -669,13 +673,13 @@ function AdminDashboard() {
                 {notificationsOpen ? (
                   <div className="admin-dashboard-notifications-menu fixed left-1/2 top-20 z-50 w-[min(20rem,calc(100vw-1.5rem))] -translate-x-1/2 rounded-[20px] border border-violet-100/80 bg-white/96 p-3 text-right shadow-[0_16px_48px_rgba(109,40,217,0.16)] backdrop-blur [animation:lisanDropdownIn_160ms_ease-out] md:absolute md:left-0 md:top-12 md:translate-x-0" dir="rtl">
                     <div className="mb-2 flex items-center justify-between gap-3 px-2">
-                      <h2 className="text-sm font-black text-[#160A52]">התראות</h2>
+                      <h2 className="text-sm font-black text-[#160A52]">{t('admin.dashboard.header.notificationsTitle')}</h2>
                       <span className="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-black text-violet-700">
-                        {dashboardNotifications.length}
+                        {getDashboardNotifications().length}
                       </span>
                     </div>
                     <div className="space-y-2">
-                      {dashboardNotifications.map((notification) => (
+                      {getDashboardNotifications().map((notification) => (
                         <div key={notification} className="rounded-2xl bg-violet-50/70 px-3 py-3 text-sm font-semibold leading-6 text-slate-700">
                           {notification}
                         </div>
@@ -703,13 +707,13 @@ function AdminDashboard() {
             {/* Text — right side with gap from visual */}
             <div className="flex flex-1 flex-col justify-center text-right" style={{ paddingLeft: '4px', paddingRight: '20px' }} dir="rtl">
               <p className="text-xs font-black text-violet-700 mb-1">
-                שלום {user?.name || 'מנהלת'}
+                {t('admin.dashboard.hero.greeting')}{user?.name || t('admin.dashboard.hero.defaultAdminName')}
               </p>
               <h1 className="text-3xl font-black leading-tight text-slate-950 md:text-4xl">
-                לוח בקרה לניהול מערכת ליסאן
+                {t('admin.dashboard.hero.title')}
               </h1>
               <p className="mt-1 text-sm font-semibold text-slate-600">
-                ניהול תלמידות, מורות, שיחות וחומרי למידה במערכת.
+                {t('admin.dashboard.hero.subtitle')}
               </p>
             </div>
 
@@ -725,7 +729,7 @@ function AdminDashboard() {
         </section>
 
         <section className="mt-3 flex flex-wrap justify-center gap-3 sm:mt-6 sm:gap-5">
-          {dashboardSections.map((section) => (
+          {getDashboardSections().map((section) => (
             <DashboardSection
               key={section.id}
               layoutClass="w-full flex-none md:basis-[calc(50%_-_0.625rem)] lg:basis-[calc((100%_-_2.5rem)/3)]"
@@ -764,10 +768,10 @@ function AdminDashboard() {
                   id="teacher-code-title"
                   className="text-2xl font-black text-[#160A52]"
                 >
-                  קוד גישה
+                  {t('admin.dashboard.modal.accessCode')}
                 </h2>
                 <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
-                  יש להזין קוד גישה לניהול מורות
+                  {t('admin.dashboard.modal.subtitle')}
                 </p>
               </div>
 
@@ -775,14 +779,14 @@ function AdminDashboard() {
                 type="button"
                 onClick={closeTeacherCodeModal}
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-50 text-violet-700 transition hover:bg-violet-100 focus:outline-none focus:ring-2 focus:ring-violet-500"
-                aria-label="סגירה"
+                aria-label={t('admin.dashboard.modal.close')}
               >
                 <X className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
 
             <label className="mt-6 block text-sm font-black text-slate-700">
-              סיסמה
+              {t('admin.dashboard.modal.password')}
               <input
                 type="password"
                 value={teacherCode}
@@ -807,14 +811,14 @@ function AdminDashboard() {
                 onClick={closeTeacherCodeModal}
                 className="min-h-11 rounded-2xl border border-violet-100 bg-white px-5 py-2 text-sm font-black text-slate-700 transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
               >
-                ביטול
+                {t('admin.dashboard.modal.cancel')}
               </button>
 
               <button
                 type="submit"
-                className="min-h-11 rounded-2xl bg-violet-700 px-5 py-2 text-sm font-black text-white shadow-[0_14px_28px_rgba(109,40,217,0.22)] transition hover:bg-violet-800 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+                className="inline-flex min-h-12 w-full items-center justify-center rounded-2xl bg-violet-600 px-6 py-3 text-base font-black text-white shadow-[0_8px_20px_rgba(109,40,217,0.22)] transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
               >
-                אישור
+                {t('admin.dashboard.modal.submit')}
               </button>
             </div>
           </form>
