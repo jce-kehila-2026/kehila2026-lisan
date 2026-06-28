@@ -54,11 +54,17 @@ exports.createChat = async (req, res) => {
       await Promise.all(toDelete.map((doc) => doc.ref.delete()));
     }
 
+    const requestedDefaultIncludeArabic = req.body?.defaultIncludeArabic;
+    const effectiveDefaultIncludeArabic =
+      typeof requestedDefaultIncludeArabic !== 'undefined' && requestedDefaultIncludeArabic !== null
+        ? parseBooleanFlag(requestedDefaultIncludeArabic)
+        : userPreferences.defaultIncludeArabic;
+
     const { chatId, chat } = await createChatSession({
       userId,
       level: effectiveLevel,
       title: effectiveTitle,
-      defaultIncludeArabic: userPreferences.defaultIncludeArabic,
+      defaultIncludeArabic: effectiveDefaultIncludeArabic,
       defaultTitle: DEFAULT_CHAT_TITLE,
       scenario: activityContext.scenario,
       activityTitle: activityContext.activityTitle,
@@ -756,6 +762,27 @@ exports.sendVoiceMessage = async (req, res) => {
       }
     }
 
+    // Notify admins about AI voice failure (fire-and-forget)
+    try {
+      const adminSnap = await db.collection('users').where('role', '==', 'admin').get();
+      const errorCode = error.code || 'AI_SERVICE_ERROR';
+      const createdAt = new Date().toISOString();
+      await Promise.all(
+        adminSnap.docs.map((d) =>
+          db.collection('notifications').add({
+            userId: d.id,
+            type: 'ai_service_error',
+            title: 'תקלה בשירות ה-AI',
+            message: 'שירות ה-AI נכשל בשיחה קולית. קוד שגיאה: ' + errorCode,
+            relatedChatId: chatId || null,
+            errorCode,
+            isRead: false,
+            createdAt,
+          })
+        )
+      );
+    } catch (notifErr) { console.error('Failed to send AI error notification:', notifErr); }
+
     return res.status(error.status || 500).json({
       success: false,
       error: error.message || 'Voice gateway request failed',
@@ -1308,6 +1335,46 @@ exports.submitChatReview = async (req, res) => {
 
     const ref = await db.collection('chatReviews').add(review);
 
+    // Notify assigned teachers and admins (fire-and-forget)
+    try {
+      const userDoc = await db.collection('users').doc(userId).get();
+      const userData = userDoc.exists ? userDoc.data() : {};
+      const studentName = userData.name || 'תלמידה';
+      const teacherIds = Array.isArray(userData.teacherIds) ? userData.teacherIds : [];
+
+      const adminSnap = await db.collection('users').where('role', '==', 'admin').get();
+      const adminIds = adminSnap.docs.map((d) => d.id);
+
+      const recipients = [...new Set([...teacherIds, ...adminIds])].filter((id) => id !== userId);
+
+      if (recipients.length > 0) {
+        const stars = '★'.repeat(numericRating) + '☆'.repeat(5 - numericRating);
+        const activityLabel = activityContext.activityTitle || 'שיחה חופשית';
+        const createdAt = new Date().toISOString();
+
+        await Promise.all(
+          recipients.map((recipientId) =>
+            db.collection('notifications').add({
+              userId: recipientId,
+              type: 'chat_review_submitted',
+              title: studentName + ' סיימה שיחה',
+              message: studentName + ' סיימה שיחת "' + activityLabel + '" עם דירוג ' + stars,
+              ...(comment ? { preview: String(comment).slice(0, 200) } : {}),
+              relatedChatId: chatId || null,
+              relatedReviewId: ref.id,
+              studentId: userId,
+              studentName,
+              rating: numericRating,
+              isRead: false,
+              createdAt,
+            })
+          )
+        );
+      }
+    } catch (notifError) {
+      console.error('Failed to send review notifications:', notifError);
+    }
+
     return res.status(201).json({
       success: true,
       id: ref.id,
@@ -1325,3 +1392,4 @@ exports.submitChatReview = async (req, res) => {
     });
   }
 };
+

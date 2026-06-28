@@ -70,13 +70,13 @@ function formatDate(value) {
   const normalized = normalizeDate(value);
 
   if (!normalized) {
-    return t('admin.analytics.emptyText');
+    return '—';
   }
 
   const date = new Date(normalized);
 
   if (Number.isNaN(date.getTime())) {
-    return t('admin.analytics.emptyText');
+    return '—';
   }
 
   return new Intl.DateTimeFormat('he-IL', {
@@ -111,6 +111,7 @@ function average(numbers) {
 // ── small presentational building blocks ───────────────────────────────
 
 function AnalyticsHeroIllustration() {
+  const { t } = useTranslation();
   return (
     <svg
       viewBox="0 0 280 220"
@@ -241,7 +242,7 @@ function Panel({ title, subtitle, icon: Icon, children, className = '' }) {
         </div>
       ) : null}
 
-      {text}
+      {children}
     </section>
   );
 }
@@ -1315,7 +1316,7 @@ function AdminAnalytics() {
                       : 'text-slate-600 hover:bg-violet-50 hover:text-violet-700'
                   }`}
                 >
-                  {tab.label}
+                  {t(tab.label)}
                 </button>
               ))}
             </nav>

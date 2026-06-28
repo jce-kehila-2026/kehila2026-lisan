@@ -9,14 +9,16 @@ router.get('/my', requireAuth, async (req, res) => {
     const snapshot = await db
       .collection('notifications')
       .where('userId', '==', req.user.uid)
-      .orderBy('createdAt', 'desc')
-      .limit(50)
       .get();
 
-    const notifications = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    const notifications = snapshot.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .sort((a, b) => {
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return bTime - aTime;
+      })
+      .slice(0, 50);
 
     return res.status(200).json({
       notifications
