@@ -35,7 +35,6 @@ import {
 
 import BottomNav from '../components/BottomNav.jsx';
 import LisanHeader from '../components/LisanHeader.jsx';
-import StudentHeroVisual from '../components/student/StudentHeroVisual.jsx';
 import ChatComposer from '../components/chat/ChatComposer.jsx';
 import VoiceConsole from '../components/chat/VoiceConsole.jsx';
 import ConversationSidebar from '../components/chat/ConversationSidebar.jsx';
@@ -810,9 +809,6 @@ function ChatbotPage({
           <span className="chatbot-bg__blob chatbot-bg__blob--1" />
           <span className="chatbot-bg__blob chatbot-bg__blob--2" />
           <span className="chatbot-bg__blob chatbot-bg__blob--3" />
-          <div className="chatbot-bg__desk">
-            <StudentHeroVisual type="chat" transparentBackground fadeRight={false} />
-          </div>
         </div>
 
         <div className="relative z-10 mx-auto flex w-full max-w-[1240px] flex-1 min-h-0 flex-col gap-4 px-3 pb-28 pt-7 sm:px-4 lg:flex-row lg:gap-5">
