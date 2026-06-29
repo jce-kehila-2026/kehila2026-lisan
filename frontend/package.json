@@ -13,6 +13,7 @@
     "@huggingface/transformers": "^4.2.0",
     "@vitejs/plugin-react": "^4.2.0",
     "file-saver": "^2.0.5",
+    "firebase-functions": "^7.2.5",
     "framer-motion": "^12.40.0",
     "i18next": "^23.10.0",
     "jszip": "^3.10.1",

@@ -1,11 +1,13 @@
 const { admin, db } = require('../config/firebase');
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const axios = require('axios');
+
+const IDENTITY_TOOLKIT_SIGNIN_URL =
+  'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword';
 
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    
 
     if (!email || !password) {
       return res.status(400).json({
@@ -13,69 +15,63 @@ exports.login = async (req, res) => {
       });
     }
 
+    const apiKey = process.env.FB_WEB_API_KEY;
+
+    if (!apiKey) {
+      console.error('Login error: FB_WEB_API_KEY is not configured');
+      return res.status(500).json({ error: 'Server error' });
+    }
+
     const normalizedEmail = String(email).trim().toLowerCase();
 
-    const userSnapshot = await db
-      .collection('users')
-      .where('email', '==', normalizedEmail)
-      .limit(1)
-      .get();
+    // 1) Verify the credentials against Firebase Authentication (source of
+    //    truth for passwords). Admin SDK can't verify passwords, so we use the
+    //    Identity Toolkit REST endpoint with the public Web API key.
+    let uid;
 
-    if (userSnapshot.empty) {
-      return res.status(401).json({
-        error: 'Invalid credentials'
-      });
-    }
+    try {
+      const { data } = await axios.post(
+        `${IDENTITY_TOOLKIT_SIGNIN_URL}?key=${apiKey}`,
+        { email: normalizedEmail, password, returnSecureToken: true },
+        { timeout: 10000 }
+      );
+      uid = data.localId;
+    } catch (authError) {
+      const code = authError.response?.data?.error?.message || '';
 
-    const userDoc = userSnapshot.docs[0];
-    const user = userDoc.data();
-    const uid = userDoc.id;
-
-    if (user.isActive === false) {
-      return res.status(403).json({
-        error: 'User account is inactive'
-      });
-    }
-
-    const now = new Date();
-
-    if (user.lockedUntil && user.lockedUntil.toDate() > now) {
-      return res.status(423).json({
-        error: 'Account is locked',
-        unlockAt: user.lockedUntil.toDate().toISOString()
-      });
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.passwordHash || '');
-
-    if (!isPasswordValid) {
-      const failedAttempts = (user.failedLoginAttempts || 0) + 1;
-
-      const updateData = {
-        failedLoginAttempts: failedAttempts
-      };
-
-      if (failedAttempts >= 5) {
-        const lockedUntil = new Date(Date.now() + 10 * 60 * 1000);
-        updateData.lockedUntil = admin.firestore.Timestamp.fromDate(lockedUntil);
+      if (code === 'USER_DISABLED') {
+        return res.status(403).json({ error: 'User account is inactive' });
       }
 
-      await db.collection('users').doc(uid).update(updateData);
+      // INVALID_LOGIN_CREDENTIALS / EMAIL_NOT_FOUND / INVALID_PASSWORD / ...
+      if (authError.response) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
 
-      return res.status(failedAttempts >= 5 ? 423 : 401).json({
-        error: failedAttempts >= 5 ? 'Account is locked' : 'Invalid credentials',
-        ...(failedAttempts >= 5
-          ? { unlockAt: updateData.lockedUntil.toDate().toISOString() }
-          : {})
-      });
+      // Network / unexpected failure talking to Firebase Auth.
+      console.error('Login error (auth verify):', code || authError.message);
+      return res.status(500).json({ error: 'Server error' });
+    }
+
+    // 2) Load the profile (role/level/teachers/...) from Firestore, keyed by
+    //    the Firebase Auth uid.
+    const userDoc = await db.collection('users').doc(uid).get();
+
+    if (!userDoc.exists) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const user = userDoc.data();
+
+    if (user.isActive === false) {
+      return res.status(403).json({ error: 'User account is inactive' });
     }
 
     await db.collection('users').doc(uid).update({
-      failedLoginAttempts: 0,
-      lockedUntil: null,
       lastLoginAt: admin.firestore.FieldValue.serverTimestamp()
     });
 
+    // 3) Issue the app session token (unchanged — requireAuth verifies this).
     const token = jwt.sign(
       {
         uid,

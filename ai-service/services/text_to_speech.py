@@ -44,6 +44,7 @@ class TTSCircuitOpenError(TTSError):
 # Slow, clear rate for beginner Hebrew learners
 _VOICE_RATE = "slow"
 _VOICE_PITCH = "medium"
+_LEADING_PREROLL_MS = 250
 
 # Encouraging teacher pitch for correct/positive responses
 _POSITIVE_KEYWORDS = frozenset([
@@ -101,7 +102,8 @@ def build_ssml(
     Rules applied:
     - Rate: slow (A1 learners need time to process)
     - Pitch: medium normally; high on encouraging responses
-    - Pause: 300 ms before sentence end marker
+    - Pause: 250 ms before speech starts, so playback hardware is audible
+    - Pause: 250 ms before sentence end marker
     - Fallback answers use softer pitch and slower rate
     - High pronunciation score (>=80) → extra encouraging pitch
 
@@ -146,6 +148,7 @@ def build_ssml(
 
     prosody = (
         f'<prosody rate="{rate}" pitch="{pitch}">'
+        f'<break time="{_LEADING_PREROLL_MS}ms"/>'
         f'{spoken}'
         '</prosody>'
     )

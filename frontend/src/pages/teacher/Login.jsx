@@ -61,9 +61,6 @@ function TeacherLogin() {
           error={form.touched.password ? form.errors.password : ''}
         />
 
-        <Link className="forgot-link" to="/forgot-access">
-          {t('forgotAccess')}
-        </Link>
         {serverError ? <p className="form-error">{serverError}</p> : null}
 
         <Button type="submit" size="lg" loading={loading} disabled={!form.isValid || loading}>

@@ -104,7 +104,10 @@ def transcribe_audio(audio_bytes: bytes, filename: str = "audio.webm") -> str:
 
     Raises an STTError subclass on failure — never a naked exception.
     """
-    from services.voice_circuits import stt_circuit
+    # Whisper uses its own circuit (the fallback circuit) so primary-engine
+    # failures don't block it. Aliased to `stt_circuit` to keep the rest of
+    # this function unchanged.
+    from services.voice_circuits import whisper_circuit as stt_circuit
 
     # ── Circuit open? Skip the expensive call entirely ────────────────────
     if not stt_circuit.allow_request():

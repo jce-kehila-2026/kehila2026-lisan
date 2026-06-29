@@ -33,11 +33,20 @@ def _float_env(name: str, default: float) -> float:
         return default
 
 
-# ── STT circuit ───────────────────────────────────────────────────────────────
+# ── STT circuit (primary engine, e.g. Azure) ──────────────────────────────────
 stt_circuit = CircuitBreaker(
     failure_threshold=_int_env("STT_CIRCUIT_FAILURE_THRESHOLD", 3),
     window_seconds=_float_env("STT_CIRCUIT_WINDOW_SECONDS", 60.0),
     recovery_seconds=_float_env("STT_CIRCUIT_RECOVERY_SECONDS", 30.0),
+)
+
+# ── Whisper STT circuit (fallback engine) ─────────────────────────────────────
+# Separate from stt_circuit so a primary (Azure) outage that trips its breaker
+# does NOT also block the Whisper fallback, and vice-versa.
+whisper_circuit = CircuitBreaker(
+    failure_threshold=_int_env("WHISPER_CIRCUIT_FAILURE_THRESHOLD", 3),
+    window_seconds=_float_env("WHISPER_CIRCUIT_WINDOW_SECONDS", 60.0),
+    recovery_seconds=_float_env("WHISPER_CIRCUIT_RECOVERY_SECONDS", 30.0),
 )
 
 # ── TTS circuit ───────────────────────────────────────────────────────────────

@@ -230,7 +230,7 @@ function ProfilePage() {
         setProgress(progressData.progress);
 
         try {
-          const gameRes = await fetch('http://localhost:3000/api/progress/game', {
+          const gameRes = await fetch('/api/progress/game', {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (gameRes.ok) {

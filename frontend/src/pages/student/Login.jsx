@@ -74,9 +74,6 @@ function StudentLogin() {
         />
 
         <p className="login-helper">{t('contactTeacher')}</p>
-        <Link className="forgot-link" to="/forgot-access">
-          {t('forgotAccess')}
-        </Link>
         {serverError ? <p className="form-error">{serverError}</p> : null}
 
         <Button type="submit" size="lg" loading={loading} disabled={!form.isValid || loading}>

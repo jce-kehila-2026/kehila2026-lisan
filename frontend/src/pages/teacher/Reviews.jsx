@@ -5,7 +5,7 @@ import PageHeader from '../../components/PageHeader.jsx';
 import BottomNav from '../../components/BottomNav.jsx';
 import { getStoredToken } from '../../services/auth.js';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 const STATUS_TABS = [
   { key: 'pending', label: 'teacher.reviews.tabs.pending' },

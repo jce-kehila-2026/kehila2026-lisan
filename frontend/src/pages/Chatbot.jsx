@@ -579,7 +579,7 @@ function Chatbot({
     try {
       const token = getStoredToken();
       if (chatId) {
-        await fetch(`http://localhost:3000/api/chats/${chatId}/review`, {
+        await fetch(`/api/chats/${chatId}/review`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
           body: JSON.stringify({ rating, comment, role: 'student', scenario: scenario || null }),

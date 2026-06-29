@@ -292,7 +292,7 @@ function ChatbotPage({
       const token = getStoredToken ? getStoredToken() : null;
 
       if (conversationId) {
-        await fetch(`http://localhost:3000/api/chats/${conversationId}/review`, {
+        await fetch(`/api/chats/${conversationId}/review`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

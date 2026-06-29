@@ -18,7 +18,6 @@ import AdminNotifications from './pages/admin/Notifications.jsx';
 import AdminProgress from './pages/admin/Progress.jsx';
 import AdminStudents from './pages/admin/Students.jsx';
 import AdminWords from './pages/admin/Words.jsx';
-import ForgotAccess from './pages/ForgotAccess.jsx';
 import HomePage from './pages/home/HomePage.jsx';
 import TeacherHome from './pages/home/TeacherHome.jsx';
 import StudentLogin from './pages/student/Login.jsx';
@@ -94,7 +93,6 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to={SKIP_AUTH ? '/home' : '/login'} replace />} />
         <Route path="/login" element={<StudentLogin />} />
-        <Route path="/forgot-access" element={<ForgotAccess />} />
         <Route path="/teacher/login" element={<TeacherLogin />} />
         <Route
           path="/home"

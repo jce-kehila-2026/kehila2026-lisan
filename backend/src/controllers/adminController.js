@@ -1,5 +1,4 @@
 const { admin, db } = require('../config/firebase');
-const bcrypt = require('bcrypt');
 const fs = require('fs');
 const path = require('path');
 
@@ -214,18 +213,35 @@ exports.createUser = async (req, res) => {
       }
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    // Create the identity in Firebase Authentication (source of truth for
+    // credentials). The Firestore profile doc is keyed by the Auth uid.
+    let authUser;
+    try {
+      authUser = await admin.auth().createUser({
+        email: normalizedEmail,
+        password,
+        displayName: name
+      });
+    } catch (authError) {
+      if (authError.code === 'auth/email-already-exists') {
+        return res.status(409).json({
+          success: false,
+          error: 'User already exists',
+          code: 'USER_ALREADY_EXISTS'
+        });
+      }
+      throw authError;
+    }
+
+    const uid = authUser.uid;
 
     const userData = {
       email: normalizedEmail,
-      passwordHash,
       name,
       role,
       level: role === 'student' ? level || 'A1' : '',
       language: language || 'ar',
       isActive: true,
-      failedLoginAttempts: 0,
-      lockedUntil: null,
       pronunciationUsage: {
         monthlyLimit: 30,
         usedThisMonth: 0
@@ -238,7 +254,8 @@ exports.createUser = async (req, res) => {
       userData.teacherIds = normalizedTeacherIds;
     }
 
-    const docRef = await db.collection('users').add(userData);
+    await db.collection('users').doc(uid).set(userData);
+    const docRef = { id: uid };
 
     // Notify teachers & admins when a new student is created (fire-and-forget)
     if (role === 'student') {
@@ -384,21 +401,20 @@ exports.updateUser = async (req, res) => {
       }
     }
 
-    if (req.body.password !== undefined && req.body.password !== '') {
-      if (req.body.password.length < 6) {
-        return res.status(400).json({
-          success: false,
-          error: 'Password must be at least 6 characters',
-          code: 'WEAK_PASSWORD'
-        });
-      }
+    const newPassword =
+      req.body.password !== undefined && req.body.password !== ''
+        ? String(req.body.password)
+        : null;
 
-      updateData.passwordHash = await bcrypt.hash(req.body.password, 10);
-      updateData.failedLoginAttempts = 0;
-      updateData.lockedUntil = null;
+    if (newPassword !== null && newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        error: 'Password must be at least 6 characters',
+        code: 'WEAK_PASSWORD'
+      });
     }
 
-    if (Object.keys(updateData).length === 0) {
+    if (Object.keys(updateData).length === 0 && newPassword === null) {
       return res.status(400).json({
         success: false,
         error: 'No valid fields provided',
@@ -406,7 +422,32 @@ exports.updateUser = async (req, res) => {
       });
     }
 
-    await userRef.update(updateData);
+    // Sync credential/identity changes to Firebase Authentication.
+    const authUpdate = {};
+    if (updateData.email) authUpdate.email = updateData.email;
+    if (newPassword !== null) authUpdate.password = newPassword;
+    if (updateData.isActive !== undefined) {
+      authUpdate.disabled = updateData.isActive === false;
+    }
+
+    if (Object.keys(authUpdate).length > 0) {
+      try {
+        await admin.auth().updateUser(id, authUpdate);
+      } catch (authError) {
+        if (authError.code === 'auth/email-already-exists') {
+          return res.status(409).json({
+            success: false,
+            error: 'Email already exists',
+            code: 'EMAIL_ALREADY_EXISTS'
+          });
+        }
+        throw authError;
+      }
+    }
+
+    if (Object.keys(updateData).length > 0) {
+      await userRef.update(updateData);
+    }
 
     return res.status(200).json({
       success: true,
@@ -436,6 +477,14 @@ exports.deleteUser = async (req, res) => {
         error: 'User not found',
         code: 'USER_NOT_FOUND'
       });
+    }
+
+    try {
+      await admin.auth().deleteUser(id);
+    } catch (authError) {
+      if (authError.code !== 'auth/user-not-found') {
+        throw authError;
+      }
     }
 
     await userRef.delete();

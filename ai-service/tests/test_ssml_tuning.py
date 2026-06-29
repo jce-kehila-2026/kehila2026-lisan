@@ -81,13 +81,17 @@ class TestBuildSsml:
         ssml = build_ssml("נסה שוב.", is_fallback=True)
         assert 'rate="x-slow"' in ssml
 
+    def test_leading_break_inserted_before_text(self):
+        ssml = build_ssml("שלום")
+        assert '<prosody rate="slow" pitch="high"><break time="250ms"/>' in ssml
+
     def test_break_inserted_before_period(self):
         ssml = build_ssml("שלום.")
-        assert '<break time="250ms"/>' in ssml
+        assert ssml.count('<break time="250ms"/>') == 2
 
     def test_break_inserted_before_question_mark(self):
         ssml = build_ssml("מה שלומך?")
-        assert '<break time="250ms"/>' in ssml
+        assert ssml.count('<break time="250ms"/>') == 2
 
     def test_html_special_chars_escaped(self):
         ssml = build_ssml('A & B < C > D "E"')
@@ -98,10 +102,10 @@ class TestBuildSsml:
         ssml = build_ssml("שלום.")
         assert "שלום" in ssml
 
-    def test_no_break_for_text_without_terminal(self):
-        # Text without terminal punctuation should not add a break
+    def test_no_terminal_break_for_text_without_terminal(self):
+        # Text without terminal punctuation should only have the leading break
         ssml = build_ssml("שלום")
-        assert '<break' not in ssml
+        assert ssml.count('<break time="250ms"/>') == 1
 
     def test_ambiguous_second_person_forms_are_feminine_for_tts(self):
         ssml = build_ssml("אני רואה אותך וזה מתאים לך.")
