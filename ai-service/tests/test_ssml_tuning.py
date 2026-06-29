@@ -26,6 +26,7 @@ import wave
 
 os.environ.setdefault("AI_SERVICE_INTERNAL_SECRET", "")
 
+from services import text_to_speech as tts
 from services.text_to_speech import build_ssml
 from services.chat_schemas import VoiceChatResponse
 
@@ -111,6 +112,56 @@ class TestBuildSsml:
         ssml = build_ssml("אני רואה אותך וזה מתאים לך.")
         assert "אוֹתָךְ" in ssml
         assert "לָךְ" in ssml
+
+    def test_same_spelling_present_verbs_are_feminine_for_tts(self):
+        ssml = build_ssml("את רוצה מים ואת עושה שיעור.")
+        assert "אַתְּ" in ssml
+        assert "רוֹצָה" in ssml
+        assert "עוֹשָׂה" in ssml
+
+    def test_same_spelling_adjectives_are_feminine_for_tts(self):
+        ssml = build_ssml("את יפה, אבל היום את חולה.")
+        assert "יָפָה" in ssml
+        assert "חוֹלָה" in ssml
+
+    def test_common_second_person_past_forms_are_feminine_for_tts(self):
+        ssml = build_ssml("אמרת יפה, וכתבת תשובה טובה.")
+        assert "אָמַרְתְּ" in ssml
+        assert "כָּתַבְתְּ" in ssml
+
+    def test_explicit_masculine_context_is_not_forced_to_feminine(self):
+        ssml = build_ssml("הוא רוצה מים.")
+        assert "רוֹצָה" not in ssml
+        assert "רוצה" in ssml
+
+    def test_dicta_onnx_engine_still_forces_feminine_tts(self, monkeypatch):
+        tts._prepare_hebrew_for_feminine_tts_cached.cache_clear()
+        monkeypatch.setenv("TTS_NIQQUD_ENGINE", "dicta_onnx")
+        monkeypatch.setenv("DICTA_ONNX_MODEL_PATH", "C:/models/dicta.onnx")
+        monkeypatch.setattr(
+            tts,
+            "_dicta_onnx_diacritize",
+            lambda text, model_path: "אַתְּ רוֹצֶה מים",
+        )
+
+        ssml = build_ssml("את רוצה מים.")
+
+        assert "רוֹצָה" in ssml
+        assert "רוֹצֶה" not in ssml
+        tts._prepare_hebrew_for_feminine_tts_cached.cache_clear()
+
+    def test_dicta_onnx_missing_model_falls_back_to_feminine_layer(
+        self,
+        monkeypatch,
+    ):
+        tts._prepare_hebrew_for_feminine_tts_cached.cache_clear()
+        monkeypatch.setenv("TTS_NIQQUD_ENGINE", "dicta_onnx")
+        monkeypatch.setenv("DICTA_ONNX_MODEL_PATH", "C:/missing/dicta.onnx")
+
+        ssml = build_ssml("את רוצה מים.")
+
+        assert "רוֹצָה" in ssml
+        tts._prepare_hebrew_for_feminine_tts_cached.cache_clear()
 
 
 # ---------------------------------------------------------------------------

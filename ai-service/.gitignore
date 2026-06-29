@@ -5,3 +5,4 @@ __pycache__/
 *.webm
 evals/voice_stt_audio/
 results/
+models/*.onnx
