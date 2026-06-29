@@ -39,13 +39,15 @@ exports.login = async (req, res) => {
     } catch (authError) {
       const code = authError.response?.data?.error?.message || '';
 
+      console.error('Firebase auth error code:', code, '| email:', normalizedEmail);
+
       if (code === 'USER_DISABLED') {
         return res.status(403).json({ error: 'User account is inactive' });
       }
 
       // INVALID_LOGIN_CREDENTIALS / EMAIL_NOT_FOUND / INVALID_PASSWORD / ...
       if (authError.response) {
-        return res.status(401).json({ error: 'Invalid credentials' });
+        return res.status(401).json({ error: 'Invalid credentials', code });
       }
 
       // Network / unexpected failure talking to Firebase Auth.
