@@ -37,6 +37,7 @@ import {
 } from '../data/vocabGameCatalog.js';
 import { getCategoryMeta, COLOR_MAP } from '../data/vocabGameMeta.js';
 import { getStoredToken, getStoredUser } from '../services/auth.js';
+import { synthesizeSpeech } from '../services/chat.js';
 
 const API_BASE_URL = 'http://localhost:3000/api';
 const USEFUL_LINKS_DRIVE_URL =
@@ -702,7 +703,46 @@ function Home({
     if (voices && voices.length > 0) {
       doSpeak();
     } else {
-      window.speechSynthesis.addEventListener('voiceschanged', doSpeak, { once: true });
+      // Speak once, whichever trigger comes first. Some browsers (notably
+      // Chromium on Linux) populate voices lazily and may never fire
+      // 'voiceschanged', so a timeout guarantees we still attempt to speak.
+      let started = false;
+      const start = () => {
+        if (started) return;
+        started = true;
+        doSpeak();
+      };
+      window.speechSynthesis.addEventListener('voiceschanged', start, { once: true });
+      window.setTimeout(start, 250);
+    }
+  };
+
+  const speakWord = async (hebrewWord) => {
+    const spokenText = typeof hebrewWord === 'string' ? hebrewWord.trim() : '';
+    if (!spokenText) return;
+
+    let audioBase64 = null;
+    try {
+      ({ audioBase64 } = await synthesizeSpeech({ text: spokenText }));
+    } catch (error) {
+      // Azure TTS endpoint threw (e.g. 401 dead key) — use the browser voice.
+      pronounceHebrewWord(spokenText);
+      return;
+    }
+
+    // Endpoint responded OK but Azure produced no audio (audioBase64: null).
+    if (!audioBase64) {
+      pronounceHebrewWord(spokenText);
+      return;
+    }
+
+    try {
+      const audio = new Audio(`data:audio/mpeg;base64,${audioBase64}`);
+      // play() returns a promise that can reject (decode/autoplay) without
+      // throwing synchronously — await so the catch reaches the fallback.
+      await audio.play();
+    } catch (error) {
+      pronounceHebrewWord(spokenText);
     }
   };
 
@@ -1099,7 +1139,7 @@ function Home({
                         <td className="px-3 py-3 text-center">
                           <button
                             type="button"
-                            onClick={() => pronounceHebrewWord(word.hebrew)}
+                            onClick={() => speakWord(word.hebrew)}
                             className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-violet-50 text-violet-600 transition hover:-translate-y-0.5 hover:bg-violet-600 hover:text-white"
                             aria-label={`השמע את ${word.hebrew}`}
                           >

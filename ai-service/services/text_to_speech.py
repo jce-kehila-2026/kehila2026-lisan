@@ -21,7 +21,7 @@ logger = logging.getLogger("lisan.tts")
 
 
 # ── Exception hierarchy ───────────────────────────────────────────────────────
-
+    
 class TTSError(Exception):
     """TTS is disabled — caller returns audioBase64: null."""
     fallback_code: str = "TTS_DISABLED"
@@ -251,7 +251,7 @@ def synthesize_speech(
             return audio
 
         if result.reason == speechsdk.ResultReason.Canceled:
-            details = speechsdk.CancellationDetails.from_result(result)
+            details = speechsdk.CancellationDetails(result)
             tts_circuit.record_failure()
             error_details = (details.error_details or "").lower()
             if "authentication" in error_details or "401" in error_details:
