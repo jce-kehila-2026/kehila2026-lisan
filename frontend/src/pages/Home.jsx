@@ -37,6 +37,7 @@ import {
 } from '../data/vocabGameCatalog.js';
 import { getCategoryMeta, COLOR_MAP } from '../data/vocabGameMeta.js';
 import { getStoredToken, getStoredUser } from '../services/auth.js';
+import { synthesizeSpeech } from '../services/chat.js';
 
 const API_BASE_URL = 'http://localhost:3000/api';
 const USEFUL_LINKS_DRIVE_URL =
@@ -706,6 +707,20 @@ function Home({
     }
   };
 
+  const speakWord = async (hebrewWord) => {
+    const spokenText = typeof hebrewWord === 'string' ? hebrewWord.trim() : '';
+    if (!spokenText) return;
+    try {
+      const { audioBase64 } = await synthesizeSpeech({ text: spokenText });
+      if (!audioBase64) throw new Error('No audio returned');
+      const audio = new Audio(`data:audio/mpeg;base64,${audioBase64}`);
+      await audio.play();
+    } catch (error) {
+      // Azure TTS unavailable — fall back to the browser's built-in speech synthesis
+      pronounceHebrewWord(spokenText);
+    }
+  };
+
   const scrollGames = (direction) => {
     const scroller = gamesScrollerRef.current;
     if (!scroller) return;
@@ -1099,7 +1114,7 @@ function Home({
                         <td className="px-3 py-3 text-center">
                           <button
                             type="button"
-                            onClick={() => pronounceHebrewWord(word.hebrew)}
+                            onClick={() => speakWord(word.hebrew)}
                             className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-violet-50 text-violet-600 transition hover:-translate-y-0.5 hover:bg-violet-600 hover:text-white"
                             aria-label={`השמע את ${word.hebrew}`}
                           >
