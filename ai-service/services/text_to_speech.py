@@ -46,7 +46,7 @@ class TTSCircuitOpenError(TTSError):
 # Slow, clear rate for beginner Hebrew learners
 _VOICE_RATE = "slow"
 _VOICE_PITCH = "medium"
-_LEADING_PREROLL_MS = 250
+_LEADING_PREROLL_MS = 300
 _TTS_NIQQUD_ENGINE_ENV = "TTS_NIQQUD_ENGINE"
 _DICTA_ONNX_MODEL_PATH_ENV = "DICTA_ONNX_MODEL_PATH"
 _TTS_NIQQUD_CACHE_SIZE = 512
@@ -398,22 +398,31 @@ def build_ssml(
 
     prosody = (
         f'<prosody rate="{rate}" pitch="{pitch}">'
-        f'<break time="{_LEADING_PREROLL_MS}ms"/>'
         f'{spoken}'
         '</prosody>'
     )
 
-    # When a voice is supplied, wrap the prosody so speak_ssml_async picks
-    # the exact he-IL neural voice (otherwise Azure falls back to a default).
+    # Azure neural voices TRIM a plain leading <break>, so the first word got
+    # clipped by the player's audio-output startup latency. mstts:silence with
+    # type="Leading-exact" is the dedicated, un-trimmed leading silence — but it
+    # must live INSIDE <voice>. Only when no explicit voice is set (mstts then
+    # unavailable) do we fall back to a best-effort <break>.
+    leading = (
+        '<mstts:silence type="Leading-exact" '
+        f'value="{_LEADING_PREROLL_MS}ms"/>'
+    )
     if voice:
         voice_attr = html.escape(voice, quote=True)
-        prosody = f'<voice name="{voice_attr}">{prosody}</voice>'
+        body = f'<voice name="{voice_attr}">{leading}{prosody}</voice>'
+    else:
+        body = f'<break time="{_LEADING_PREROLL_MS}ms"/>{prosody}'
 
     ssml = (
         '<speak version="1.0" '
         'xmlns="http://www.w3.org/2001/10/synthesis" '
+        'xmlns:mstts="http://www.w3.org/2001/mstts" '
         'xml:lang="he-IL">'
-        f'{prosody}'
+        f'{body}'
         '</speak>'
     )
     return ssml

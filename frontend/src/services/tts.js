@@ -58,7 +58,23 @@ export async function speakHebrew(text) {
   }
   try {
     const audio = new Audio(`data:audio/mpeg;base64,${audioBase64}`);
-    await audio.play();
+    audio.preload = 'auto';
+    // Wait until the clip is buffered before playing so the audio output
+    // device is open before sound starts — otherwise the first word is
+    // clipped. Fallback timer guarantees playback if the event never fires.
+    await new Promise((resolve, reject) => {
+      let started = false;
+      const start = () => {
+        if (started) return;
+        started = true;
+        audio.play().then(resolve).catch(reject);
+      };
+      if (audio.readyState >= 3) start();
+      else {
+        audio.addEventListener('canplaythrough', start, { once: true });
+        window.setTimeout(start, 300);
+      }
+    });
   } catch {
     speakViaBrowser(spokenText);
   }

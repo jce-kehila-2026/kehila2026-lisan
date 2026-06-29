@@ -450,10 +450,26 @@ function ChatbotPage({
 
       setIsSpeaking(true);
 
-      audio.play().catch((error) => {
-        setIsSpeaking(false);
-        reject(error);
-      });
+      // Start playback only once the clip is buffered so the audio output
+      // device is open before sound begins — otherwise the first word gets
+      // clipped. A short fallback timer guarantees we still play if the
+      // 'canplaythrough' event never fires (e.g. some mobile browsers).
+      let started = false;
+      const startPlayback = () => {
+        if (started) return;
+        started = true;
+        audio.play().catch((error) => {
+          setIsSpeaking(false);
+          reject(error);
+        });
+      };
+      audio.preload = 'auto';
+      if (audio.readyState >= 3) {
+        startPlayback();
+      } else {
+        audio.addEventListener('canplaythrough', startPlayback, { once: true });
+        window.setTimeout(startPlayback, 300);
+      }
     } catch (error) {
       setIsSpeaking(false);
       reject(error);

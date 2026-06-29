@@ -325,6 +325,7 @@ function Chatbot({
           window.speechSynthesis.cancel();
         }
         const audio = new Audio(`data:audio/mp3;base64,${audioBase64}`);
+        audio.preload = 'auto';
         audioElementRef.current = audio;
         setIsSpeaking(true);
         audio.onended = () => {
@@ -335,10 +336,24 @@ function Chatbot({
           audioElementRef.current = null;
           speakReply(fallbackText);
         };
-        audio.play().catch(() => {
-          audioElementRef.current = null;
-          speakReply(fallbackText);
-        });
+        // Play only once buffered so the output device is open before sound
+        // starts — otherwise the first word is clipped. Fallback timer
+        // guarantees playback if 'canplaythrough' never fires.
+        let started = false;
+        const startPlayback = () => {
+          if (started) return;
+          started = true;
+          audio.play().catch(() => {
+            audioElementRef.current = null;
+            speakReply(fallbackText);
+          });
+        };
+        if (audio.readyState >= 3) {
+          startPlayback();
+        } else {
+          audio.addEventListener('canplaythrough', startPlayback, { once: true });
+          window.setTimeout(startPlayback, 300);
+        }
         return;
       } catch {
         // fall through to browser TTS
