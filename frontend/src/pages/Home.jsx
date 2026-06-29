@@ -703,20 +703,45 @@ function Home({
     if (voices && voices.length > 0) {
       doSpeak();
     } else {
-      window.speechSynthesis.addEventListener('voiceschanged', doSpeak, { once: true });
+      // Speak once, whichever trigger comes first. Some browsers (notably
+      // Chromium on Linux) populate voices lazily and may never fire
+      // 'voiceschanged', so a timeout guarantees we still attempt to speak.
+      let started = false;
+      const start = () => {
+        if (started) return;
+        started = true;
+        doSpeak();
+      };
+      window.speechSynthesis.addEventListener('voiceschanged', start, { once: true });
+      window.setTimeout(start, 250);
     }
   };
 
   const speakWord = async (hebrewWord) => {
     const spokenText = typeof hebrewWord === 'string' ? hebrewWord.trim() : '';
     if (!spokenText) return;
+
+    let audioBase64 = null;
     try {
-      const { audioBase64 } = await synthesizeSpeech({ text: spokenText });
-      if (!audioBase64) throw new Error('No audio returned');
+      ({ audioBase64 } = await synthesizeSpeech({ text: spokenText }));
+    } catch (error) {
+      // Azure TTS endpoint threw (e.g. 401 dead key) — use the browser voice.
+      pronounceHebrewWord(spokenText);
+      return;
+    }
+
+    // Endpoint responded OK but Azure produced no audio (audioBase64: null).
+    if (!audioBase64) {
+      pronounceHebrewWord(spokenText);
+      return;
+    }
+
+    try {
       const audio = new Audio(`data:audio/mpeg;base64,${audioBase64}`);
+      // play() returns a promise that can reject (decode/autoplay) without
+      // throwing synchronously — await so the catch reaches the fallback.
       await audio.play();
     } catch (error) {
-      // Azure TTS unavailable — fall back to the browser's built-in speech synthesis
       pronounceHebrewWord(spokenText);
     }
   };
