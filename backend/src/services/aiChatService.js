@@ -79,6 +79,7 @@ async function sendChatMessageToAi({
   level = 'A1',
   includeArabic = false,
   userId = null,
+  learnerName = null,
   sessionId = null,
   userToken = null,
   scenario = null,
@@ -94,6 +95,7 @@ async function sendChatMessageToAi({
         includeArabic,
         voiceMode: false,
         ...(userId ? { userId } : {}),
+        ...(learnerName ? { learnerName } : {}),
         ...(sessionId ? { sessionId } : {}),
         ...(scenario ? { scenario } : {}),
         ...(activityTitle ? { activityTitle } : {}),
@@ -121,6 +123,7 @@ async function sendVoiceMessageToAi({
   level = 'A1',
   includeArabic = false,
   userId = null,
+  learnerName = null,
   sessionId = null,
   userToken = null,
   scenario = null,
@@ -137,6 +140,10 @@ async function sendVoiceMessageToAi({
 
     if (userId) {
       formData.append('userId', userId);
+    }
+
+    if (learnerName) {
+      formData.append('learnerName', learnerName);
     }
 
     if (sessionId) {

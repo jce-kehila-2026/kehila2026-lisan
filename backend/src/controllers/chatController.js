@@ -276,6 +276,7 @@ exports.sendAiMessage = async (req, res) => {
       req.body?.includeArabic,
       chat.defaultIncludeArabic === true
     );
+    const learnerName = await resolveLearnerName(userId);
 
     const existingTextMessagePair = normalizedClientMessageId
       ? findStoredMessagePairByClientMessageId(chat.messages, normalizedClientMessageId)
@@ -321,6 +322,7 @@ exports.sendAiMessage = async (req, res) => {
       level: effectiveLevel,
       includeArabic,
       userId,
+      learnerName,
       sessionId: chatId,
       userToken,
       scenario: activityContext.scenario,
@@ -597,6 +599,7 @@ exports.sendVoiceMessage = async (req, res) => {
       req.body?.includeArabic,
       chat?.defaultIncludeArabic === true
     );
+    const learnerName = await resolveLearnerName(userId);
 
     existingVoiceMessagePair = normalizedClientMessageId
       ? findStoredMessagePairByClientMessageId(chat.messages, normalizedClientMessageId)
@@ -654,6 +657,7 @@ exports.sendVoiceMessage = async (req, res) => {
       level: normalizedLevel,
       includeArabic,
       userId,
+      learnerName,
       sessionId: chatId,
       userToken,
       scenario: activityContext.scenario,
@@ -1065,6 +1069,34 @@ async function resolveEffectiveUserLevel(req) {
       userId,
     });
     return 'A1';
+  }
+}
+
+async function resolveLearnerName(userId) {
+  const normalizedUserId = normalizeOptionalString(userId);
+
+  if (!normalizedUserId) {
+    return null;
+  }
+
+  try {
+    const userDoc = await db.collection('users').doc(normalizedUserId).get();
+
+    if (!userDoc.exists) {
+      return null;
+    }
+
+    const user = userDoc.data() || {};
+    return (
+      normalizeOptionalString(user.name) ||
+      normalizeOptionalString(user.displayName) ||
+      null
+    );
+  } catch (error) {
+    logChatError('resolve_learner_name_failed', error, {
+      userId: normalizedUserId,
+    });
+    return null;
   }
 }
 

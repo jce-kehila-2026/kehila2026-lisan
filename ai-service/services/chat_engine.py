@@ -75,6 +75,7 @@ TEXT_MAX_WORDS = int(os.getenv("CHAT_TEXT_MAX_WORDS", "30"))
 VOICE_MAX_WORDS = int(os.getenv("CHAT_VOICE_MAX_WORDS", "20"))
 TEXT_MAX_OUTPUT_TOKENS = int(os.getenv("CHAT_TEXT_MAX_TOKENS", "256"))
 VOICE_OUTPUT_TOKENS = int(os.getenv("CHAT_VOICE_MAX_TOKENS", "128"))
+TEXT_TEMPERATURE = float(os.getenv("CHAT_TEXT_TEMPERATURE", "0.45"))
 
 # Tier where vocabulary becomes "abstract" (finance / politics / theory:
 # בורסה, קריפטו, פילוסופיה, אלגוריתמים). At/above this rank a word is rejected
@@ -477,6 +478,8 @@ def _generate_chat_response_impl(payload: ChatRequest) -> ChatResponse:
 
     grammar_errors = detect_grammar_errors(request_context.message)
     grammar_hint = build_grammar_hint(grammar_errors)
+    history = CONVERSATION_MEMORY.get_history(request_context.session_id or "")
+    learner_context = _build_learner_context_block(request_context, history)
     system_message = _build_system_message(
         base_prompt=_load_prompt(request_context.voice_mode),
         vocabulary=build_allowed_vocabulary(bundle, _resolve_selected_chunks(bundle, retrieval_context.chunk_ids)),
@@ -484,13 +487,13 @@ def _generate_chat_response_impl(payload: ChatRequest) -> ChatResponse:
         voice_mode=request_context.voice_mode,
         grammar_hint=grammar_hint,
         include_arabic=request_context.raw_include_arabic,
+        learner_context=learner_context,
     )
 
-    history = CONVERSATION_MEMORY.get_history(request_context.session_id or "")
     call_opts = ProviderCallOptions(
         voice_mode=request_context.voice_mode,
         max_output_tokens=VOICE_OUTPUT_TOKENS if request_context.voice_mode else TEXT_MAX_OUTPUT_TOKENS,
-        temperature=VOICE_TEMPERATURE if request_context.voice_mode else 0.2,
+        temperature=VOICE_TEMPERATURE if request_context.voice_mode else TEXT_TEMPERATURE,
         history=tuple(history),
     )
     try:
@@ -787,12 +790,17 @@ def _generate_scenario_response(
         _log_response(response, request_context.provider, 0)
         return response
 
-    system_message = build_scenario_prompt(
-        request_context.scenario,
-        resolved_level,
-        request_context.raw_include_arabic,
-    )
     history = CONVERSATION_MEMORY.get_history(request_context.session_id or "")
+    learner_context = _build_learner_context_block(request_context, history)
+    system_message = (
+        build_scenario_prompt(
+            request_context.scenario,
+            resolved_level,
+            request_context.raw_include_arabic,
+        )
+        + "\n\n"
+        + learner_context
+    )
     call_opts = ProviderCallOptions(
         voice_mode=request_context.voice_mode,
         max_output_tokens=VOICE_OUTPUT_TOKENS if request_context.voice_mode else TEXT_MAX_OUTPUT_TOKENS,
@@ -1162,6 +1170,7 @@ def _build_request_context(payload: ChatRequest) -> ChatRequestContext:
         voice_mode=getattr(payload, "voiceMode", False),
         session_id=getattr(payload, "sessionId", None) or None,
         user_id=getattr(payload, "userId", None) or None,
+        learner_name=_clean_learner_name(getattr(payload, "learnerName", None)),
         scenario=getattr(payload, "scenario", None) or None,
         raw_include_arabic=bool(getattr(payload, "includeArabic", False)),
     )
@@ -2286,6 +2295,7 @@ def _build_system_message(
     voice_mode: bool = False,
     grammar_hint: str = "",
     include_arabic: bool = False,
+    learner_context: str = "",
 ) -> str:
     vocabulary_block = ", ".join(vocabulary)
     # Reinforce the two rules the model most often slips on, right next to the
@@ -2297,11 +2307,14 @@ def _build_system_message(
             "Reminder: the learner is FEMALE — use את and feminine verb forms, "
             "never אתה. Stay inside the current scene/role; continue what she "
             "just said, do not jump topics.\n"
-            "If she erred, correct briefly with the reason, then continue in "
-            "character with one short spoken line or question.\n"
+            "If she erred, correct briefly with the reason, then ask one "
+            "scene-specific hook question she can answer immediately.\n"
+            "The LAST Hebrew sentence MUST be exactly ONE short question. "
+            "Do not end with praise, a grammar note, or 'הבנת?'.\n"
             f"Keep it to 1-2 short spoken sentences, up to {VOICE_MAX_WORDS} Hebrew words.\n"
             "No punctuation except a final period or question mark.\n"
             "Use Hebrew only. No Arabic, no English, no digits.\n\n"
+            f"{learner_context}\n\n"
             f"Vocabulary to prefer (simplify harder words to these):\n{vocabulary_block}\n\n"
             f"Curriculum context (optional, for grounding):\n{context}"
         )
@@ -2312,7 +2325,11 @@ def _build_system_message(
             "never אתה. Stay inside the current scene/role she set up; build on "
             "what she just said and do not jump to an unrelated topic.\n"
             "If she erred, correct briefly WITH a one-clause reason, then "
-            "continue the conversation in character.\n"
+            "continue the conversation in character with one concrete hook question.\n"
+            "The LAST Hebrew sentence MUST be exactly ONE short question that "
+            "pulls her into the next turn. Prefer choice/action questions like "
+            "'את רוצה מים או קפה?' or 'מה את אומרת עכשיו?'. Never end with "
+            "only praise, only correction, or 'הבנת?'.\n"
             f"Keep it to 2-3 short Hebrew sentences, up to {TEXT_MAX_WORDS} Hebrew words.\n"
             + (
                 "After your Hebrew reply, add ONE final line that starts with "
@@ -2323,12 +2340,140 @@ def _build_system_message(
                 else "Use Hebrew only. Do not add Arabic or English.\n"
             )
             + "\n"
+            + f"{learner_context}\n\n"
             f"Vocabulary to prefer (simplify harder words to these):\n{vocabulary_block}\n\n"
             f"Curriculum context (optional, for grounding):\n{context}"
         )
     if grammar_hint:
         msg += f"\n\n{grammar_hint}"
     return msg
+
+
+def _build_learner_context_block(
+    request_context: ChatRequestContext,
+    history: list[dict[str, str]],
+) -> str:
+    learner_name = _resolve_learner_name_for_prompt(request_context)
+    recent_user_messages = [
+        str(item.get("content") or "").strip()
+        for item in history
+        if item.get("role") == "user" and str(item.get("content") or "").strip()
+    ][-5:]
+
+    current_message = (request_context.message or "").strip()
+    if current_message:
+        recent_user_messages.append(current_message)
+    recent_user_messages = recent_user_messages[-5:]
+
+    topics = _infer_conversation_topics(" ".join(recent_user_messages))
+    style = _infer_learner_style(recent_user_messages)
+    hook_mode = _choose_hook_mode(recent_user_messages)
+
+    lines = [
+        "Learner context for this turn:",
+    ]
+    if learner_name:
+        lines.append(
+            f"- Her name is {learner_name}. You already know it. "
+            "Do NOT ask her name; use it naturally only when it feels warm."
+        )
+    else:
+        lines.append(
+            "- Her name is not known. Do not make name-asking the default; ask "
+            "for it only if it genuinely fits the conversation."
+        )
+
+    if recent_user_messages:
+        joined_recent = " | ".join(_shorten_for_prompt(m) for m in recent_user_messages)
+        lines.append(f"- Recent learner turns: {joined_recent}")
+
+    if topics:
+        lines.append(f"- Likely active interests/topics: {', '.join(topics)}")
+
+    lines.append(f"- Conversation style to use now: {style}")
+    lines.append(f"- Next hook strategy: {hook_mode}")
+    lines.append(
+        "- Be adaptive: sometimes ask a curious personal follow-up, sometimes "
+        "a logical scene question, sometimes a smart choice question, but always "
+        "stay at her Hebrew level and keep the final Hebrew sentence a question."
+    )
+    return "\n".join(lines)
+
+
+def _resolve_learner_name_for_prompt(
+    request_context: ChatRequestContext,
+) -> str | None:
+    learner_name = _clean_learner_name(request_context.learner_name)
+    if learner_name and request_context.session_id:
+        CONVERSATION_MEMORY.set_fact(
+            request_context.session_id,
+            "learner_name",
+            learner_name,
+        )
+        return learner_name
+    if learner_name:
+        return learner_name
+    if request_context.session_id:
+        return CONVERSATION_MEMORY.get_fact(
+            request_context.session_id,
+            "learner_name",
+        )
+    return None
+
+
+def _clean_learner_name(value: str | None) -> str | None:
+    cleaned = re.sub(r"[\r\n\t]+", " ", (value or "")).strip()
+    cleaned = re.sub(r"\s{2,}", " ", cleaned)
+    if not cleaned or len(cleaned) > 40:
+        return None
+    return cleaned
+
+
+def _shorten_for_prompt(text: str, limit: int = 80) -> str:
+    compact = re.sub(r"\s+", " ", text).strip()
+    if len(compact) <= limit:
+        return compact
+    return compact[: limit - 1].rstrip() + "…"
+
+
+def _infer_conversation_topics(text: str) -> list[str]:
+    topic_markers = [
+        ("food/cafe", ("אוכל", "מים", "קפה", "תה", "מסעדה", "רעבה", "שותה")),
+        ("health/clinic", ("כואב", "רופא", "חולה", "יד", "ראש", "תרופה")),
+        ("shopping", ("קונה", "מוכר", "חנות", "כמה", "עולה", "כסף", "בגד")),
+        ("travel/directions", ("אוטובוס", "נוסעת", "הולכת", "לאן", "תחנה", "דרך")),
+        ("school/study", ("שיעור", "לומדת", "ספר", "מורה", "עברית", "כיתה")),
+        ("home/family", ("בית", "אמא", "אבא", "אחות", "אח", "משפחה")),
+    ]
+    found: list[str] = []
+    for label, markers in topic_markers:
+        if any(marker in text for marker in markers):
+            found.append(label)
+    return found[:3]
+
+
+def _infer_learner_style(messages: list[str]) -> str:
+    if not messages:
+        return "start warm and concrete; ask an easy first question."
+
+    avg_words = sum(len(hebrew_words(msg)) for msg in messages) / max(len(messages), 1)
+    asks_questions = any("?" in msg for msg in messages)
+    if avg_words <= 2:
+        return "she is answering very briefly; use choice questions to lower pressure."
+    if asks_questions:
+        return "she is curious; answer briefly, then ask a related smart follow-up."
+    return "she can handle a small conversational challenge; ask for one more detail."
+
+
+def _choose_hook_mode(messages: list[str]) -> str:
+    text = " ".join(messages)
+    if any(word in text for word in ("לא", "קשה", "לא יודעת", "טעיתי")):
+        return "confidence hook: reassure, then ask an easy either/or question."
+    if "?" in text:
+        return "curiosity hook: answer her question, then ask what she thinks or wants next."
+    if len(hebrew_words(text)) <= 8:
+        return "activation hook: ask for one simple action sentence."
+    return "personalized hook: connect to the last detail she gave and ask one natural follow-up."
 
 
 def _extract_arabic_gloss(raw_answer: str) -> str | None:

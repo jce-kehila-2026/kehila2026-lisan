@@ -6,9 +6,15 @@ from fastapi.testclient import TestClient
 
 from main import app
 from services.chat_cache import EXACT_RESPONSE_CACHE, get_level_bundle
-from services.chat_engine import _load_prompt
+from services.chat_engine import (
+    _build_learner_context_block,
+    _build_request_context,
+    _build_system_message,
+    _load_prompt,
+)
 from services.chat_guardrails import MAX_HEBREW_WORDS, count_hebrew_words, get_fallback_text
 from services.chat_provider import ChatProviderTimeoutError, ProviderResult
+from services.chat_schemas import ChatRequest
 
 import pytest
 import uuid
@@ -106,6 +112,68 @@ class TestPromptV2Contract:
         assert "FEMALE" in prompt
         assert "feminine" in prompt
         assert "Hebrew only" in prompt
+
+    def test_prompt_requires_hook_question_after_corrections(self):
+        prompt = _load_prompt()
+        assert "Every reply MUST end with exactly ONE short, easy question" in prompt
+        assert "After a correction" in prompt
+        assert "Do NOT end with a closed teacher sentence" in prompt
+
+    def test_runtime_system_message_reinforces_final_hook_question(self):
+        message = _build_system_message(
+            base_prompt=_load_prompt(),
+            vocabulary=["מים", "קפה"],
+            context="",
+        )
+
+        assert "The LAST Hebrew sentence MUST be exactly ONE short question" in message
+        assert "Never end with only praise" in message
+        assert "הבנת" in message
+
+    def test_runtime_system_message_can_include_known_learner_name(self):
+        request_context = _build_request_context(
+            ChatRequest(
+                message="שלום",
+                sessionId="prompt-known-name",
+                userId="student-1",
+                learnerName="Layan",
+            )
+        )
+        learner_context = _build_learner_context_block(
+            request_context,
+            history=[{"role": "user", "content": "אני רוצה קפה"}],
+        )
+        message = _build_system_message(
+            base_prompt=_load_prompt(),
+            vocabulary=["מים", "קפה"],
+            context="",
+            learner_context=learner_context,
+        )
+
+        assert "Her name is Layan" in message
+        assert "Do NOT ask her name" in message
+        assert "Recent learner turns" in message
+
+    def test_adaptive_context_infers_recent_topics_and_hook_style(self):
+        request_context = _build_request_context(
+            ChatRequest(
+                message="אני רוצה מים",
+                sessionId="prompt-adaptive-context",
+                learnerName="Dana",
+            )
+        )
+        learner_context = _build_learner_context_block(
+            request_context,
+            history=[
+                {"role": "user", "content": "שלום"},
+                {"role": "assistant", "content": "שלום Dana"},
+                {"role": "user", "content": "אני רוצה קפה"},
+            ],
+        )
+
+        assert "food/cafe" in learner_context
+        assert "Next hook strategy" in learner_context
+        assert "Dana" in learner_context
 
     def test_prompt_acceptance_dataset_has_50_questions(self):
         assert len(PROMPT_ACCEPTANCE_DATASET) == 50

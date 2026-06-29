@@ -344,6 +344,9 @@ async def chat_voice(
     level: str = Form(default="A1"),
     includeArabic: bool = Form(default=False),
     userId: str | None = Form(default=None),
+    learnerName: str | None = Form(default=None),
+    sessionId: str | None = Form(default=None),
+    scenario: str | None = Form(default=None),
     x_internal_service_secret: str | None = Header(default=None),
     authorization: str | None = Header(default=None),
 ) -> VoiceChatResponse:
@@ -422,6 +425,10 @@ async def chat_voice(
         level=level,
         includeArabic=includeArabic,
         voiceMode=True,
+        sessionId=sessionId,
+        userId=userId,
+        learnerName=learnerName,
+        scenario=scenario,
     )
 
     async def _run_pronunciation() -> int | None:

@@ -95,6 +95,17 @@ describe('sendChatMessageToAi', () => {
     assert.equal(capturedBody.sessionId, 'sess-abc');
   });
 
+  test('sends learnerName in body when provided', async () => {
+    let capturedBody = null;
+    _axiosPostImpl = async (_url, body) => { capturedBody = body; return { data: {} }; };
+    await sendChatMessageToAi({
+      message: 'שלום',
+      level: 'A1',
+      learnerName: 'Layan',
+    });
+    assert.equal(capturedBody.learnerName, 'Layan');
+  });
+
   test('omits userId from body when not provided', async () => {
     let capturedBody = null;
     _axiosPostImpl = async (_url, body) => { capturedBody = body; return { data: {} }; };
@@ -147,6 +158,17 @@ describe('sendVoiceMessageToAi', () => {
       sessionId: 'sess-xyz',
     });
     assert.equal(capturedForm.get('sessionId'), 'sess-xyz');
+  });
+
+  test('appends learnerName to FormData when provided', async () => {
+    let capturedForm = null;
+    _axiosPostImpl = async (_url, form) => { capturedForm = form; return { data: {} }; };
+    await sendVoiceMessageToAi({
+      audioBuffer: Buffer.from('audio'),
+      level: 'A1',
+      learnerName: 'Dana',
+    });
+    assert.equal(capturedForm.get('learnerName'), 'Dana');
   });
 
   test('throws mapped error on 503 response', async () => {

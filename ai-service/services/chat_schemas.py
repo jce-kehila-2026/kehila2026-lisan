@@ -12,6 +12,7 @@ class ChatRequest(BaseModel):
     voiceMode: bool = Field(default=False)
     sessionId: str | None = Field(default=None)
     userId: str | None = Field(default=None)
+    learnerName: str | None = Field(default=None)
     # Active "quick activity" mode (speaking/daily-word/letters/listening/quiz/
     # culture). When set, the engine runs an interactive role-play/activity that
     # leads the learner, instead of the generic tutor reply. None = normal chat.
@@ -102,6 +103,7 @@ class ChatRequestContext:
     voice_mode: bool = False
     session_id: str | None = None
     user_id: str | None = None
+    learner_name: str | None = None
     scenario: str | None = None
     # The learner's raw includeArabic preference (before the Hebrew-only scope
     # override). Used to attach a short Arabic gloss (answerAr) to LLM replies.

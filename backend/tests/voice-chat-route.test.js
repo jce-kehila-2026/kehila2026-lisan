@@ -237,13 +237,16 @@ function loadAppWithMocks(options = {}) {
     filename: aiServicePath,
     loaded: true,
     exports: {
-      sendChatMessageToAi: async () => ({
-        answerHe: 'בסדר.',
-        inputTokens: 12,
-        outputTokens: 8,
-        provider: 'mock-provider',
-        model: 'mock-model',
-      }),
+      sendChatMessageToAi: async (payload) => {
+        aiCalls.push(payload);
+        return {
+          answerHe: 'בסדר.',
+          inputTokens: 12,
+          outputTokens: 8,
+          provider: 'mock-provider',
+          model: 'mock-model',
+        };
+      },
       sendVoiceMessageToAi: async (payload) => {
         aiCalls.push(payload);
         if (options.aiError) {
@@ -918,6 +921,32 @@ test('POST /api/chat/:chatId/ai-message records token usage in Firestore on succ
   assert.equal(tokenUsage[0].type, 'text');
 });
 
+test('POST /api/chat/:chatId/ai-message forwards learner name to AI service', async () => {
+  const { app, seedUser, aiCalls } = loadAppWithMocks();
+  const token = createAuthToken({ uid: 'student-name-text' });
+  seedUser({
+    id: 'student-name-text',
+    name: 'Layan',
+    level: 'A1',
+    chatPreferences: { defaultIncludeArabic: false }
+  });
+
+  const createChatResponse = await request(app)
+    .post('/api/chat')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ title: 'Name chat', level: 'A1' });
+
+  const chatId = createChatResponse.body.chat.id;
+
+  const response = await request(app)
+    .post(`/api/chat/${chatId}/ai-message`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({ text: 'שלום' });
+
+  assert.equal(response.status, 200);
+  assert.equal(aiCalls.at(-1).learnerName, 'Layan');
+});
+
 test('POST /api/chat/voice records token usage in Firestore on success', async () => {
   const { app, tokenUsage } = loadAppWithMocks();
   const token = createAuthToken({ uid: 'student-tokens-voice' });
@@ -940,4 +969,26 @@ test('POST /api/chat/voice records token usage in Firestore on success', async (
   assert.equal(tokenUsage[0].provider, 'mock-provider');
   assert.equal(tokenUsage[0].model, 'mock-model');
   assert.equal(tokenUsage[0].type, 'voice');
+});
+
+test('POST /api/chat/voice forwards learner name to AI service', async () => {
+  const { app, seedUser, aiCalls } = loadAppWithMocks();
+  const token = createAuthToken({ uid: 'student-name-voice' });
+  seedUser({
+    id: 'student-name-voice',
+    name: 'Dana',
+    level: 'A1',
+  });
+
+  const response = await request(app)
+    .post('/api/chat/voice')
+    .set('Authorization', `Bearer ${token}`)
+    .field('level', 'A1')
+    .attach('audio', Buffer.from('voice-name-test'), {
+      filename: 'name.webm',
+      contentType: 'audio/webm',
+    });
+
+  assert.equal(response.status, 200);
+  assert.equal(aiCalls.at(-1).learnerName, 'Dana');
 });
