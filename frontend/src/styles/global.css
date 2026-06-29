@@ -1461,7 +1461,7 @@ a {
   background: white;
   color: var(--color-muted);
   font: inherit;
-  font-size: 0.72rem;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   user-select: none;
@@ -1702,7 +1702,7 @@ a {
 
 .chat-empty-state__title {
   margin: 0;
-  font-size: 1.35rem;
+  font-size: 1.5rem;
   font-weight: 800;
   color: var(--color-text);
 }
@@ -1710,7 +1710,7 @@ a {
 .chat-empty-state__description {
   margin: 0;
   max-width: 26rem;
-  font-size: 0.95rem;
+  font-size: 1.125rem;
   color: var(--color-muted);
   line-height: 1.6;
 }
@@ -1804,13 +1804,13 @@ a {
 }
 
 .chatbot-toolbar__title {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 800;
   color: var(--color-text);
 }
 
 .chatbot-toolbar__hint {
-  font-size: 0.7rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--color-muted);
   white-space: nowrap;
@@ -1835,7 +1835,7 @@ a {
   background: #fff;
   color: var(--color-primary);
   font: inherit;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 700;
   transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
 }
@@ -2001,7 +2001,7 @@ a {
   background: transparent;
   color: #6d28d9;
   font: inherit;
-  font-size: 0.8rem;
+  font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
   transition: color 160ms ease, background 160ms ease, box-shadow 160ms ease;

@@ -27,6 +27,7 @@ import {
   getUniqueGameWords,
 } from '../data/vocabGameCatalog.js';
 import { COLOR_MAP, getCategoryMeta } from '../data/vocabGameMeta.js';
+import { speakHebrew } from '../services/tts.js';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 const PASS_THRESHOLD = 6;
@@ -125,54 +126,6 @@ const LABELS = {
     fromLevel: 'שלב',
   },
 };
-
-function getHebrewVoice() {
-  if (typeof window === 'undefined' || !window.speechSynthesis) {
-    return null;
-  }
-
-  const voices = window.speechSynthesis.getVoices?.() || [];
-
-  return (
-    voices.find((voice) => voice.lang === 'he-IL') ||
-    voices.find((voice) => voice.lang === 'he') ||
-    voices.find((voice) => String(voice.lang || '').startsWith('he-')) ||
-    null
-  );
-}
-
-function pronounce(text) {
-  const spokenText = typeof text === 'string' ? text.trim() : '';
-
-  if (!spokenText || typeof window === 'undefined' || !window.speechSynthesis) {
-    return;
-  }
-
-  const doSpeak = () => {
-    const utterance = new SpeechSynthesisUtterance(spokenText);
-    utterance.lang = 'he-IL';
-    utterance.rate = 0.85;
-    utterance.pitch = 1;
-    utterance.volume = 1;
-
-    const hebrewVoice = getHebrewVoice();
-    if (hebrewVoice) {
-      utterance.voice = hebrewVoice;
-    }
-
-    window.speechSynthesis.cancel();
-    window.setTimeout(() => {
-      window.speechSynthesis.speak(utterance);
-    }, 50);
-  };
-
-  const voices = window.speechSynthesis.getVoices?.() || [];
-  if (voices.length > 0) {
-    doSpeak();
-  } else {
-    window.speechSynthesis.addEventListener('voiceschanged', doSpeak, { once: true });
-  }
-}
 
 function shuffle(arr) {
   const copy = [...arr];
@@ -511,21 +464,21 @@ function VocabGame() {
       <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-3 py-1 text-sm font-black text-violet-700">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-3 py-1 text-base font-black text-violet-700">
               <Gamepad2 className="h-4 w-4" aria-hidden="true" />
               {text.badge}
             </span>
-            <span className="rounded-full bg-white px-3 py-1 text-sm font-bold text-slate-500">
+            <span className="rounded-full bg-white px-3 py-1 text-base font-bold text-slate-500">
               {text.words(totalWordCount)}
             </span>
-            <span className="rounded-full bg-white px-3 py-1 text-sm font-bold text-slate-500">
+            <span className="rounded-full bg-white px-3 py-1 text-base font-bold text-slate-500">
               {text.levels(totalLevelCount)}
             </span>
           </div>
           <h2 className="mt-3 text-[clamp(1.7rem,2.1vw,2.7rem)] font-black text-slate-950">
             {text.title}
           </h2>
-          <p className="mt-2 max-w-3xl text-[clamp(0.95rem,1vw,1.15rem)] font-medium leading-7 text-slate-600">
+          <p className="mt-2 max-w-3xl text-2xl font-medium leading-7 text-slate-600">
             {text.intro}
           </p>
         </div>
@@ -596,11 +549,11 @@ function VocabGame() {
                     <span className="block text-base font-black text-slate-900">
                       {category.meta[language]}
                     </span>
-                    <span className="mt-1 block text-xs font-bold text-slate-500">
+                    <span className="mt-1 block text-base font-bold text-slate-500">
                       {text.completedLevels(completedCount, category.numLevels)}
                     </span>
                   </span>
-                  <span className="mt-auto flex flex-wrap items-center gap-1.5 text-xs font-bold text-slate-500">
+                  <span className="mt-auto flex flex-wrap items-center gap-1.5 text-base font-bold text-slate-500">
                     <span>{text.words(category.totalWords)}</span>
                     <span className="opacity-40">·</span>
                     <span>{text.levels(category.numLevels)}</span>
@@ -656,7 +609,7 @@ function VocabGame() {
                       </div>
                       <button
                         type="button"
-                        onClick={() => pronounce(word.hebrew)}
+                        onClick={() => speakHebrew(word.hebrew)}
                         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-50 text-violet-700 shadow-sm transition hover:bg-violet-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-95"
                         aria-label={text.listen}
                       >
@@ -706,7 +659,7 @@ function VocabGame() {
                 <h3 className="text-[clamp(1.5rem,1.8vw,2.25rem)] font-black text-slate-950">
                   {activeMeta?.[language]}
                 </h3>
-                <p className="text-sm font-bold text-slate-500">
+                <p className="text-lg font-bold text-slate-500">
                   {text.words(activeCategoryData.total_words)} · {text.levels(activeLevels.length)}
                 </p>
               </div>
@@ -720,7 +673,7 @@ function VocabGame() {
               {text.backToCategories}
             </button>
           </div>
-          <p className="mt-2 text-base font-medium leading-7 text-slate-600">
+          <p className="mt-2 text-2xl font-medium leading-7 text-slate-600">
             {text.chooseLevel}
           </p>
           <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5">
@@ -743,14 +696,14 @@ function VocabGame() {
                   >
                     {isCompleted ? <Check className="h-6 w-6" aria-hidden="true" /> : index + 1}
                   </span>
-                  <span className="mt-2 text-sm font-black text-slate-900">
+                  <span className="mt-2 text-base font-black text-slate-900">
                     {getLevelLabel(index)}
                   </span>
-                  <span className="text-xs font-bold text-slate-400">
+                  <span className="text-sm font-bold text-slate-400">
                     {text.cardCount(words.length)}
                   </span>
                   {isCompleted ? (
-                    <span className="mt-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-black text-emerald-700">
+                    <span className="mt-1 rounded-full bg-emerald-50 px-2.5 py-1 text-sm font-black text-emerald-700">
                       {text.completed}
                     </span>
                   ) : null}
@@ -779,7 +732,7 @@ function VocabGame() {
             </button>
           </div>
           <div className="mb-4 flex items-center gap-3">
-            <span dir="ltr" className="text-sm font-bold text-slate-500">
+            <span dir="ltr" className="text-base font-bold text-slate-500">
               {cardIndex + 1} / {levelWords.length}
             </span>
             <div className="h-2 flex-1 overflow-hidden rounded-full bg-violet-100">
@@ -823,7 +776,7 @@ function VocabGame() {
           <div className="mt-3 flex justify-center">
             <button
               type="button"
-              onClick={() => pronounce(currentCard.hebrew)}
+              onClick={() => speakHebrew(currentCard.hebrew)}
               className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-4 py-2 text-sm font-bold text-violet-700 shadow-sm transition hover:bg-violet-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-95"
             >
               <Volume2 className="h-4 w-4" aria-hidden="true" />
@@ -896,7 +849,7 @@ function VocabGame() {
             </span>
           </div>
           <div className="mb-2 flex items-center gap-3">
-            <span dir="ltr" className="text-sm font-bold text-slate-500">
+            <span dir="ltr" className="text-base font-bold text-slate-500">
               {qIndex + 1} / {questions.length}
             </span>
             <div className="h-2 flex-1 overflow-hidden rounded-full bg-violet-100">
@@ -927,7 +880,7 @@ function VocabGame() {
               </p>
               <button
                 type="button"
-                onClick={() => pronounce(currentQuestion.hebrew)}
+                onClick={() => speakHebrew(currentQuestion.hebrew)}
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-violet-50 text-violet-700 shadow-sm transition hover:bg-violet-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:scale-95"
                 aria-label={text.listen}
               >
