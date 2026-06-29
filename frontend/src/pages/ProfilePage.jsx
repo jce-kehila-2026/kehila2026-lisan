@@ -3,7 +3,9 @@ import {
   Award,
   BadgeCheck,
   Bell,
+  BookOpen,
   Gem,
+  Hand,
   Languages,
   LogOut,
   Rocket,
@@ -350,71 +352,102 @@ function ProfilePage() {
         <ProfileTopHeader />
 
         <section
-          className={`relative mt-4 overflow-hidden rounded-[24px] border border-white/85 bg-cover sm:mt-5 sm:rounded-[28px] ${surfaceClass}`}
+          id="profile-learning-journey"
+          className="relative mt-14 overflow-hidden rounded-[28px] border border-white/90 shadow-[0_24px_70px_rgba(124,58,237,0.13)] sm:mt-16"
           style={{
-            backgroundImage: 'url("/images/profilePhoto.png")',
-            backgroundPosition: 'center 52%',
+            background: 'linear-gradient(150deg, #ede9fe 0%, #f3efff 35%, #faf8ff 60%, #ede9fe 100%)',
           }}
+          dir="rtl"
         >
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.04)_0%,rgba(255,255,255,0.18)_40%,rgba(255,255,255,0.55)_100%)]" />
-          <div className="relative grid gap-6 p-6 sm:p-8 lg:grid-cols-2 lg:items-center" dir="rtl">
+          {/* decorative blobs */}
+          <div className="pointer-events-none absolute -left-10 -top-10 h-52 w-52 rounded-full opacity-40" style={{ background: 'radial-gradient(circle, #c4b5fd 0%, transparent 65%)' }} aria-hidden="true" />
+          <div className="pointer-events-none absolute bottom-0 left-1/3 h-36 w-36 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #a78bfa 0%, transparent 70%)' }} aria-hidden="true" />
 
-            {/* Hero identity — name, subtitle, level */}
-            <div className="flex min-w-0 flex-col items-center justify-center text-center">
-              <h2 className={`text-4xl font-black leading-tight sm:text-5xl lg:text-6xl ${headingTextClass}`}>
-                {user?.name || 'Lisan Student'}
-              </h2>
-              <p className={`mt-4 flex items-center justify-center gap-2 text-lg font-bold sm:text-xl ${mutedTextClass}`}>
-                {loading ? 'Loading...' : text.subtitle}
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-100 text-violet-700 shadow-[0_10px_24px_rgba(124,58,237,0.12)]">
-                  <Sparkles className="h-6 w-6" aria-hidden="true" />
-                </span>
+          <div className="relative px-5 pb-7 pt-7 sm:px-10 sm:pt-9">
+
+            {/* wave hand — top-right */}
+            <div className="absolute right-5 top-5 grid h-[60px] w-[60px] place-items-center rounded-full border border-white/70 bg-white/50 text-violet-500 shadow-[0_10px_24px_rgba(124,58,237,0.13)] backdrop-blur-sm sm:right-8 sm:top-7 sm:h-[72px] sm:w-[72px]" aria-hidden="true">
+              <Hand className="h-7 w-7 sm:h-9 sm:w-9" />
+            </div>
+
+            {/* greeting */}
+            <div className="pr-16 text-center sm:pr-20">
+              <h1 className="text-[2rem] font-black leading-tight text-indigo-950 sm:text-5xl">
+                {i18n.language === 'ar' ? 'شلوم،' : 'שלום,'}&nbsp;{user?.name || 'Student1'}
+              </h1>
+              <p className="mt-2 inline-flex items-center gap-2 text-base font-bold text-slate-500 sm:mt-3 sm:text-xl">
+                <Sparkles className="h-5 w-5 shrink-0 text-violet-500 sm:h-6 sm:w-6" aria-hidden="true" />
+                {i18n.language === 'ar' ? 'ברוך שובך! בוא נמשיך ללמוד ולהצליח' : 'ברוך שובך! בוא נמשיך ללמוד ולהצליח'}
               </p>
-              <div className="mt-6 inline-flex mx-auto w-fit items-center gap-3 rounded-full border border-violet-100 bg-white/86 px-6 py-2.5 text-base font-black text-violet-700 shadow-[0_12px_28px_rgba(124,58,237,0.1)]">
-                <span>{text.level}</span>
-                <span className="text-xl">{user?.level || 'A1'}</span>
-              </div>
             </div>
 
-            {/* Learning journey — progress ring + journey + next target, on a translucent panel */}
-            <div className="rounded-[22px] border border-white/70 bg-white/72 p-5 shadow-[0_16px_40px_rgba(91,33,182,0.1)] backdrop-blur-md sm:p-6">
-              <div className="flex flex-col items-center gap-5 sm:flex-row sm:items-center sm:justify-between">
+            {/* stats bar — 4 cols desktop / 2×2 mobile */}
+            <div className="mx-auto mt-6 grid grid-cols-2 overflow-hidden rounded-[20px] border-2 border-white/80 bg-white/55 shadow-[0_12px_32px_rgba(91,33,182,0.10)] backdrop-blur-md sm:grid-cols-4">
+
+              {/* COL 1 (right): level badge + progress bar */}
+              <div className="order-1 flex items-center gap-3 border-b border-l border-violet-100/70 p-4 sm:border-b-0" dir="rtl">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-violet-200 text-[20px] font-black text-violet-800 shadow-[0_6px_16px_rgba(124,58,237,0.20)] ring-2 ring-white sm:h-14 sm:w-14">
+                  {user?.level || 'א1'}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-black text-slate-900 sm:text-base">
+                    {i18n.language === 'ar' ? 'مسار تعلمي' : 'מסע הלמידה שלי'}
+                  </p>
+                  <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-violet-100/80 sm:h-3">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-l from-violet-700 to-violet-500 shadow-[0_3px_8px_rgba(124,58,237,0.30)]"
+                      style={{ width: `${Math.max(4, gameProgressPct)}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* COL 2: book + words learned */}
+              <div className="order-3 flex items-center gap-3 border-b border-l border-violet-100/70 p-4 sm:order-2 sm:border-b-0" dir="rtl">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-white bg-white/80 text-violet-600 shadow-[0_6px_14px_rgba(124,58,237,0.12)] sm:h-14 sm:w-14">
+                  <BookOpen className="h-6 w-6 sm:h-7 sm:w-7" aria-hidden="true" />
+                </span>
+                <div className="min-w-0 text-right">
+                  <p className="text-xs font-black text-violet-600 sm:text-sm">
+                    {i18n.language === 'ar' ? 'كلمات تعلمتها في اللعبة' : 'מילים שנלמדו במשחק'}
+                  </p>
+                  <p className="mt-0.5 text-lg font-black text-slate-800 sm:text-xl">
+                    {learnedWords}&nbsp;/&nbsp;1000
+                  </p>
+                  <p className="mt-0.5 text-xs font-bold text-slate-500 sm:text-sm">
+                    {i18n.language === 'ar' ? 'نقاط تجربة' : 'נקודות ניסיון'}
+                  </p>
+                </div>
+              </div>
+
+              {/* COL 3: target icon + next goal */}
+              <div className="order-4 flex items-center gap-3 border-l border-violet-100/70 p-4 sm:order-3" dir="rtl">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-white bg-white/80 text-violet-600 shadow-[0_6px_14px_rgba(124,58,237,0.12)] sm:h-14 sm:w-14">
+                  <Target className="h-6 w-6 sm:h-7 sm:w-7" aria-hidden="true" />
+                </span>
+                <div className="min-w-0 text-right">
+                  <p className="text-sm font-black text-violet-700 sm:text-base">
+                    {i18n.language === 'ar' ? 'الهدف التالي' : 'היעד הבא'}
+                  </p>
+                  <p className="mt-1 text-sm font-bold text-slate-500 sm:text-base">
+                    {i18n.language === 'ar' ? `بقيت ${wordsLeft} كلمة` : `נשארו ${wordsLeft} מילים`}
+                  </p>
+                </div>
+              </div>
+
+              {/* COL 4 (left): conic % ring */}
+              <div className="order-2 flex items-center justify-center border-b border-l border-violet-100/70 p-4 sm:order-4 sm:border-b-0">
                 <div
-                  className="grid h-32 w-32 shrink-0 place-items-center rounded-full sm:h-36 sm:w-36"
-                  style={{ background: `conic-gradient(#6d28d9 ${gameProgressPct * 3.6}deg, #f1eafd 0deg)` }}
+                  className="grid h-[72px] w-[72px] shrink-0 place-items-center rounded-full sm:h-[84px] sm:w-[84px]"
+                  style={{ background: `conic-gradient(#7c3aed ${gameProgressPct * 3.6}deg, rgba(196,181,253,0.75) 0deg)` }}
                 >
-                  <div className="grid h-24 w-24 place-items-center rounded-full bg-white text-center shadow-inner sm:h-28 sm:w-28">
-                    <div>
-                      <p className="text-2xl font-black text-slate-950 sm:text-3xl">{gameProgressPct}%</p>
-                      <p className="mt-1 text-xs font-black text-slate-600">{text.totalProgress}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="min-w-0 flex-1 text-right">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <p className="text-3xl font-black text-violet-700">{user?.level || 'A1'}</p>
-                    <div>
-                      <h2 className={`text-xl font-black ${headingTextClass}`}>{text.learningJourney}</h2>
-                      <p className={`mt-1 text-sm font-bold ${mutedTextClass}`}>{text.grammarLevel}</p>
-                    </div>
-                  </div>
-                  <div className="mt-4 h-3 overflow-hidden rounded-full bg-violet-50">
-                    <div className="h-full rounded-full bg-violet-600" style={{ width: `${gameProgressPct}%` }} />
-                  </div>
-                  <p className={`mt-2 text-sm font-bold ${mutedTextClass}`}>{xpPoints} / 1000 {text.xpPoints}</p>
-                  <div className="mt-4 flex items-center gap-3 border-t border-violet-100 pt-4">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-50 text-violet-700">
-                      <Target className="h-5 w-5" aria-hidden="true" />
-                    </span>
-                    <div>
-                      <h2 className={`text-lg font-black ${headingTextClass}`}>{text.nextTarget}</h2>
-                      <p className={`text-sm font-bold ${mutedTextClass}`}>{text.wordsLeft.replace('{{count}}', wordsLeft)}</p>
-                    </div>
+                  <div className="grid h-[52px] w-[52px] place-items-center rounded-full bg-white shadow-[inset_0_4px_12px_rgba(124,58,237,0.07),0_6px_14px_rgba(124,58,237,0.10)] sm:h-[62px] sm:w-[62px]">
+                    <p className="text-xl font-black text-violet-700 sm:text-2xl">{gameProgressPct}%</p>
                   </div>
                 </div>
               </div>
-            </div>
 
+            </div>
           </div>
         </section>
 
