@@ -83,7 +83,10 @@ function SharedChatRoom() {
     const [sending, setSending] = useState(false);
     const [error, setError] = useState('');
 
+    const chatNotFoundRef = React.useRef(false);
+
     const loadChat = async (silent = false) => {
+        if (chatNotFoundRef.current) return;
         try {
             if (!silent) {
                 setLoading(true);
@@ -100,6 +103,9 @@ function SharedChatRoom() {
             const data = await response.json();
 
             if (!response.ok) {
+                if (response.status === 404) {
+                    chatNotFoundRef.current = true;
+                }
                 throw new Error(data.error || 'Failed to load chat');
             }
 
@@ -114,13 +120,14 @@ function SharedChatRoom() {
     };
 
     useEffect(() => {
+        chatNotFoundRef.current = false;
         loadChat();
     }, [id]);
 
     useEffect(() => {
         const interval = setInterval(() => {
-            loadChat(true);
-        }, 2000);
+            if (!chatNotFoundRef.current) loadChat(true);
+        }, 5000);
 
         return () => clearInterval(interval);
     }, [id]);

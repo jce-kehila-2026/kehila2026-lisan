@@ -325,8 +325,7 @@ def strip_non_tts_chars(text: str) -> str:
 
 
 def enforce_hebrew_only_scope(include_arabic: bool) -> bool:
-    del include_arabic
-    return False
+    return bool(include_arabic)
 
 
 def is_precise_fallback_reason(reason: str | None) -> bool:

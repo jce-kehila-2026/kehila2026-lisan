@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Clock3,
@@ -268,7 +269,7 @@ function ConversationReviewModal({
       aria-labelledby="conversation-review-title"
       dir="rtl"
     >
-      <div className="max-h-[92vh] w-full max-w-2xl overflow-hidden rounded-[2rem] border border-white/80 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.28)]">
+      <div className="flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-[2rem] border border-white/80 bg-white shadow-[0_30px_90px_rgba(15,23,42,0.28)]">
         <div className="flex items-start justify-between gap-4 border-b border-violet-100 bg-[linear-gradient(135deg,#F3ECFF_0%,#FFFFFF_65%,#F8F2FF_100%)] p-4 sm:p-6">
           <div>
             <p className="inline-flex rounded-full bg-violet-100 px-3 py-1 text-xs font-black text-violet-700">
@@ -295,7 +296,7 @@ function ConversationReviewModal({
           </button>
         </div>
 
-        <div className="p-4 sm:p-6">
+        <div className="overflow-y-auto p-4 sm:p-6">
           {loading ? (
             <div className="flex min-h-[180px] items-center justify-center rounded-[24px] bg-violet-50/70 text-sm font-black text-violet-700">
               {t('admin.conversations.loadingConversationDetails')}
@@ -326,6 +327,30 @@ function ConversationReviewModal({
                   </p>
                 </div>
               </div>
+
+              {/* Chat messages */}
+              {Array.isArray(conversation.messages) && conversation.messages.length > 0 ? (
+                <div className="mt-4 rounded-[24px] border border-violet-100 bg-white p-4">
+                  <p className="mb-3 text-sm font-black text-violet-700">{t('admin.conversations.chatHistory')}</p>
+                  <div className="flex max-h-64 flex-col gap-2 overflow-y-auto">
+                    {conversation.messages.map((msg, idx) => {
+                      const isUser = msg.sender === 'user' || msg.role === 'user';
+                      return (
+                        <div
+                          key={idx}
+                          className={`rounded-2xl px-4 py-3 text-sm font-semibold leading-6 ${
+                            isUser
+                              ? 'ml-8 bg-violet-600 text-white'
+                              : 'mr-8 bg-violet-50 text-slate-800'
+                          }`}
+                        >
+                          {msg.text || msg.content || msg.textHe || ''}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
 
               <label className="mt-4 block rounded-[24px] border border-violet-100 bg-violet-50/70 p-4 text-sm font-black text-violet-800">
                 {t('admin.conversations.adminNotes')}
@@ -363,6 +388,7 @@ function ConversationReviewModal({
 
 function Conversations() {
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -476,6 +502,21 @@ function Conversations() {
   useEffect(() => {
     loadConversations();
   }, []);
+
+  // Auto-open modal when chatId is passed as query param (e.g. from notifications)
+  useEffect(() => {
+    const chatId = searchParams.get('chatId');
+    if (!chatId || loading || conversations.length === 0) return;
+
+    const match = conversations.find((c) => c.id === chatId);
+    if (match) {
+      openConversation(match);
+    } else {
+      // Chat not in list yet — fetch directly
+      openConversation({ id: chatId, title: '...', studentName: '', level: '', messages: [], messagesCount: 0 });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, loading, conversations.length]);
 
   const filteredConversations = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();

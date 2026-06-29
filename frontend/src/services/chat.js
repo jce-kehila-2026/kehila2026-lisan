@@ -196,6 +196,7 @@ function createChatApiError(response, responseBody = {}, fallbackMessage) {
 async function createConversation({
   title,
   level = DEFAULT_CHAT_LEVEL,
+  includeArabic = false,
   scenario = null,
   activityTitle = null,
   activitySubtitle = null,
@@ -206,6 +207,7 @@ async function createConversation({
     body: JSON.stringify({
       title: activityTitle || title || 'Hebrew practice',
       level,
+      defaultIncludeArabic: includeArabic === true,
       ...(scenario ? { scenario } : {}),
       ...(activityTitle ? { activityTitle } : {}),
       ...(activitySubtitle ? { activitySubtitle } : {}),
@@ -259,6 +261,7 @@ export async function sendChatMessage({
     const conversation = await createConversation({
       title: activityTitle || trimmedMessage || 'Hebrew practice',
       level,
+      includeArabic,
       scenario,
       activityTitle,
       activitySubtitle,
@@ -508,3 +511,4 @@ export async function deleteConversation(conversationId) {
 
   return responseBody.success === true;
 }
+

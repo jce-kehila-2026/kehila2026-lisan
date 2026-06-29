@@ -398,7 +398,6 @@ function AdminDashboard() {
   const user = getStoredUser();
 
   const [users, setUsers] = useState([]);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [teacherCodeOpen, setTeacherCodeOpen] = useState(false);
   const [teacherCode, setTeacherCode] = useState('');
@@ -456,10 +455,8 @@ function AdminDashboard() {
   }, []);
 
   useEffect(() => {
-    if (!notificationsOpen && !mobileNavOpen) return undefined;
 
     const closeOpenMenus = () => {
-      setNotificationsOpen(false);
       setMobileNavOpen(false);
     };
 
@@ -468,7 +465,7 @@ function AdminDashboard() {
     return () => {
       window.removeEventListener('scroll', closeOpenMenus);
     };
-  }, [mobileNavOpen, notificationsOpen]);
+  }, [mobileNavOpen]);
 
   useEffect(() => {
     if (!selectedSectionId) return undefined;
@@ -655,38 +652,14 @@ function AdminDashboard() {
                 <button
                   type="button"
                   onClick={() => {
-                    setNotificationsOpen((isOpen) => !isOpen);
                     setMobileNavOpen(false);
+                    navigate(user?.role === 'teacher' ? '/teacher/notifications' : '/admin/notifications');
                   }}
                   className="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/80 bg-white/80 text-violet-700 shadow-sm transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-10 sm:w-10"
                   aria-label={t('admin.dashboard.header.notificationsAria')}
-                  aria-expanded={notificationsOpen}
                 >
                   <Bell className="h-4 w-4" aria-hidden="true" />
-                  {getDashboardNotifications().length > 0 ? (
-                    <span className="absolute -left-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-black text-white">
-                      {getDashboardNotifications().length}
-                    </span>
-                  ) : null}
                 </button>
-
-                {notificationsOpen ? (
-                  <div className="admin-dashboard-notifications-menu fixed left-1/2 top-20 z-50 w-[min(20rem,calc(100vw-1.5rem))] -translate-x-1/2 rounded-[20px] border border-violet-100/80 bg-white/96 p-3 text-right shadow-[0_16px_48px_rgba(109,40,217,0.16)] backdrop-blur [animation:lisanDropdownIn_160ms_ease-out] md:absolute md:left-0 md:top-12 md:translate-x-0" dir="rtl">
-                    <div className="mb-2 flex items-center justify-between gap-3 px-2">
-                      <h2 className="text-sm font-black text-[#160A52]">{t('admin.dashboard.header.notificationsTitle')}</h2>
-                      <span className="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-black text-violet-700">
-                        {getDashboardNotifications().length}
-                      </span>
-                    </div>
-                    <div className="space-y-2">
-                      {getDashboardNotifications().map((notification) => (
-                        <div key={notification} className="rounded-2xl bg-violet-50/70 px-3 py-3 text-sm font-semibold leading-6 text-slate-700">
-                          {notification}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
               </div>
             </div>
           }
@@ -829,3 +802,4 @@ function AdminDashboard() {
 }
 
 export default AdminDashboard;
+
