@@ -20,7 +20,6 @@ import AdminWords from '../pages/admin/Words.jsx';
 import TeacherHome from '../pages/home/TeacherHome.jsx';
 import TeacherLogin from '../pages/teacher/Login.jsx';
 import TeacherReviews from '../pages/teacher/Reviews.jsx';
-import TeacherNotifications from '../pages/teacher/Notifications.jsx';
 import StudentLogin from '../pages/student/Login.jsx';
 import ProtectedRoute from './ProtectedRoute.jsx';
 import { getStoredUser } from '../services/auth.js';
@@ -63,14 +62,6 @@ function AppRoutes() {
           element={
             <ProtectedRoute role="teacher">
               <TeacherReviews />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/teacher/notifications"
-          element={
-            <ProtectedRoute role={['teacher', 'admin']}>
-              <TeacherNotifications />
             </ProtectedRoute>
           }
         />
