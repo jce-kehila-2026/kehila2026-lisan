@@ -114,11 +114,11 @@ function OverviewCard({ stat }) {
         </span>
       </div>
 
-      <h2 className="mt-4 text-sm font-black text-slate-900">
+      <h2 className="mt-4 text-lg font-black text-slate-900">
         {stat.title}
       </h2>
 
-      <p className="mt-1 text-xs font-semibold leading-5 text-slate-600">
+      <p className="mt-1 text-base font-semibold leading-5 text-slate-600">
         {stat.detail}
       </p>
     </article>
@@ -162,18 +162,18 @@ function DashboardSection({
         </span>
 
         <div className="min-w-0 flex-1">
-          <h2 className="text-xl font-black leading-7 text-[#160A52]">
+          <h2 className="text-3xl font-black leading-7 text-[#160A52]">
             {section.title}
           </h2>
 
-          <p className="mt-2 max-w-[24rem] text-sm font-semibold leading-6 text-slate-600">
+          <p className="mt-2 max-w-[24rem] text-lg font-semibold leading-6 text-slate-600">
             {section.subtitle}
           </p>
         </div>
       </div>
 
       <div className="mt-6 flex items-center justify-between gap-3 rounded-[20px] bg-violet-50/45 px-4 py-3 transition duration-300 group-hover:bg-violet-50">
-        <p className="text-sm font-bold leading-6 text-slate-600">
+        <p className="text-lg font-bold leading-6 text-slate-600">
           {section.detail}
         </p>
 
@@ -192,14 +192,14 @@ function MiniDistribution({ data, metric }) {
     <div className="grid gap-2">
       {data.map((item) => (
         <div key={`${metric}-${item.level}`} className="grid grid-cols-[2.5rem_1fr_2.25rem] items-center gap-2">
-          <span className="text-xs font-black text-violet-800">{item.level}</span>
+          <span className="text-base font-black text-violet-800">{item.level}</span>
           <span className="h-2 overflow-hidden rounded-full bg-white/70 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.7)]">
             <span
               className="block h-full rounded-full bg-gradient-to-l from-violet-600 to-fuchsia-400"
               style={{ width: `${Math.max(10, (item[metric] / maxValue) * 100)}%` }}
             />
           </span>
-          <span className="text-left text-xs font-black text-slate-600">{item[metric]}</span>
+          <span className="text-left text-base font-black text-slate-600">{item[metric]}</span>
         </div>
       ))}
     </div>
@@ -282,11 +282,11 @@ function AnalyticsOverview({ navigate }) {
     <section className="mt-3 rounded-[28px] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.84)_0%,rgba(245,240,255,0.82)_46%,rgba(255,241,248,0.78)_100%)] p-4 shadow-[0_22px_60px_rgba(109,40,217,0.12)] backdrop-blur-xl sm:mt-6 sm:p-5">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="inline-flex items-center gap-2 rounded-full bg-violet-100/80 px-3 py-1 text-xs font-black text-violet-700">
+          <p className="inline-flex items-center gap-2 rounded-full bg-violet-100/80 px-3 py-1 text-base font-black text-violet-700">
             <Sparkles className="h-4 w-4" aria-hidden="true" />
             {t('admin.dashboard.overview.badge')}
           </p>
-          <h2 className="mt-2 text-xl font-black text-[#160A52] sm:text-2xl">
+          <h2 className="mt-2 text-3xl font-black text-[#160A52] sm:text-4xl">
             {t('admin.dashboard.overview.title')}
           </h2>
         </div>
@@ -294,7 +294,7 @@ function AnalyticsOverview({ navigate }) {
         <button
           type="button"
           onClick={() => navigate('/admin/analytics')}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-violet-600 px-5 py-2 text-sm font-black text-white shadow-button transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-violet-600 px-5 py-2 text-lg font-black text-white shadow-button transition hover:-translate-y-0.5 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
         >
           <BarChart3 className="h-4 w-4" aria-hidden="true" />
           {t('admin.dashboard.overview.viewFullAnalytics')}
@@ -304,7 +304,7 @@ function AnalyticsOverview({ navigate }) {
       <div className="mt-4 grid gap-3 lg:grid-cols-[1.2fr_1fr_1.1fr]">
         <article className="rounded-[22px] border border-violet-100/70 bg-white/72 p-4 shadow-[0_10px_28px_rgba(109,40,217,0.08)]">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <h3 className="text-sm font-black text-slate-800">{t('admin.dashboard.overview.studentsDistribution')}</h3>
+            <h3 className="text-lg font-black text-slate-800">{t('admin.dashboard.overview.studentsDistribution')}</h3>
             <PieChart className="h-5 w-5 text-violet-600" aria-hidden="true" />
           </div>
           <MiniDistribution data={studentsByLevel} metric="students" />
@@ -337,9 +337,9 @@ function AnalyticsOverview({ navigate }) {
               return (
                 <div key={item.label} className="rounded-2xl bg-violet-50/80 px-2 py-3">
                   <Icon className="mx-auto h-4 w-4 text-violet-700" aria-hidden="true" />
-                  <p className="mt-2 text-base font-black text-[#160A52]">{item.value}</p>
-                  <p className="mt-1 text-[11px] font-black leading-4 text-slate-600">{item.label}</p>
-                  <p className="mt-1 text-[10px] font-bold text-violet-700">{item.detail}</p>
+                  <p className="mt-2 text-xl font-black text-[#160A52]">{item.value}</p>
+                  <p className="mt-1 text-[15px] font-black leading-4 text-slate-600">{item.label}</p>
+                  <p className="mt-1 text-[14px] font-bold text-violet-700">{item.detail}</p>
                 </div>
               );
             })}
@@ -348,18 +348,18 @@ function AnalyticsOverview({ navigate }) {
 
         <article className="rounded-[22px] border border-violet-100/70 bg-white/72 p-4 shadow-[0_10px_28px_rgba(109,40,217,0.08)]">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <h3 className="text-sm font-black text-slate-800">{t('admin.dashboard.overview.wordsByLevel')}</h3>
+            <h3 className="text-lg font-black text-slate-800">{t('admin.dashboard.overview.wordsByLevel')}</h3>
             <BookOpenCheck className="h-5 w-5 text-violet-600" aria-hidden="true" />
           </div>
           <div className="flex h-24 items-end justify-between gap-2 rounded-2xl bg-violet-50/60 px-3 py-2">
             {wordsByLevel.map((item) => (
               <div key={item.level} className="flex h-full flex-1 flex-col items-center justify-end gap-1">
-                <span className="text-[11px] font-black text-violet-800">{item.words}</span>
+                <span className="text-[15px] font-black text-violet-800">{item.words}</span>
                 <span
                   className="w-full rounded-t-full bg-gradient-to-t from-violet-600 to-fuchsia-300"
                   style={{ height: `${Math.max(8, (item.words / maxWords) * 100)}%` }}
                 />
-                <span className="text-[11px] font-black text-violet-800">{item.level}</span>
+                <span className="text-[15px] font-black text-violet-800">{item.level}</span>
               </div>
             ))}
           </div>
@@ -369,7 +369,7 @@ function AnalyticsOverview({ navigate }) {
       <div className="mt-3 grid gap-2 sm:grid-cols-4">
         {overviewStats.map((stat) => (
           <div key={stat.name} className="rounded-2xl bg-white/65 px-3 py-2 shadow-[inset_0_0_0_1px_rgba(221,214,254,0.65)]">
-            <div className="flex items-center justify-between gap-2 text-xs font-black text-slate-600">
+            <div className="flex items-center justify-between gap-2 text-base font-black text-slate-600">
               <span className="inline-flex items-center gap-1.5">
                 {stat.name === t('admin.dashboard.stats.sharedChats') ? (
                   <Share2 className="h-3.5 w-3.5 text-violet-500" aria-hidden="true" />
@@ -679,13 +679,13 @@ function AdminDashboard() {
 
             {/* Text — right side with gap from visual */}
             <div className="flex flex-1 flex-col justify-center text-right" style={{ paddingLeft: '4px', paddingRight: '20px' }} dir="rtl">
-              <p className="text-xs font-black text-violet-700 mb-1">
+              <p className="text-base font-black text-violet-700 mb-1">
                 {t('admin.dashboard.hero.greeting')}{user?.name || t('admin.dashboard.hero.defaultAdminName')}
               </p>
               <h1 className="text-3xl font-black leading-tight text-slate-950 md:text-4xl">
                 {t('admin.dashboard.hero.title')}
               </h1>
-              <p className="mt-1 text-sm font-semibold text-slate-600">
+              <p className="mt-1 text-lg font-semibold text-slate-600">
                 {t('admin.dashboard.hero.subtitle')}
               </p>
             </div>

@@ -37,7 +37,7 @@ import {
 } from '../data/vocabGameCatalog.js';
 import { getCategoryMeta, COLOR_MAP } from '../data/vocabGameMeta.js';
 import { getStoredToken, getStoredUser } from '../services/auth.js';
-import { synthesizeSpeech } from '../services/chat.js';
+import { speakHebrew } from '../services/tts.js';
 
 const API_BASE_URL = 'http://localhost:3000/api';
 const USEFUL_LINKS_DRIVE_URL =
@@ -667,85 +667,6 @@ function Home({
     });
   };
 
-  const pronounceHebrewWord = (hebrewWord) => {
-    if (typeof window === 'undefined' || !window.speechSynthesis) {
-      return;
-    }
-
-    const spokenText = typeof hebrewWord === 'string' ? hebrewWord.trim() : '';
-    if (!spokenText) return;
-
-    const doSpeak = () => {
-      const utterance = new SpeechSynthesisUtterance(spokenText);
-      utterance.lang = 'he-IL';
-      utterance.rate = 0.85;
-      utterance.pitch = 1;
-      utterance.volume = 1;
-
-      const voices = window.speechSynthesis.getVoices();
-      const hebrewVoice =
-        voices.find((v) => v.lang === 'he-IL') ||
-        voices.find((v) => v.lang === 'he') ||
-        voices.find((v) => String(v.lang || '').startsWith('he-')) ||
-        null;
-
-      if (hebrewVoice) {
-        utterance.voice = hebrewVoice;
-      }
-
-      window.speechSynthesis.cancel();
-      window.setTimeout(() => {
-        window.speechSynthesis.speak(utterance);
-      }, 50);
-    };
-
-    const voices = window.speechSynthesis.getVoices();
-    if (voices && voices.length > 0) {
-      doSpeak();
-    } else {
-      // Speak once, whichever trigger comes first. Some browsers (notably
-      // Chromium on Linux) populate voices lazily and may never fire
-      // 'voiceschanged', so a timeout guarantees we still attempt to speak.
-      let started = false;
-      const start = () => {
-        if (started) return;
-        started = true;
-        doSpeak();
-      };
-      window.speechSynthesis.addEventListener('voiceschanged', start, { once: true });
-      window.setTimeout(start, 250);
-    }
-  };
-
-  const speakWord = async (hebrewWord) => {
-    const spokenText = typeof hebrewWord === 'string' ? hebrewWord.trim() : '';
-    if (!spokenText) return;
-
-    let audioBase64 = null;
-    try {
-      ({ audioBase64 } = await synthesizeSpeech({ text: spokenText }));
-    } catch (error) {
-      // Azure TTS endpoint threw (e.g. 401 dead key) — use the browser voice.
-      pronounceHebrewWord(spokenText);
-      return;
-    }
-
-    // Endpoint responded OK but Azure produced no audio (audioBase64: null).
-    if (!audioBase64) {
-      pronounceHebrewWord(spokenText);
-      return;
-    }
-
-    try {
-      const audio = new Audio(`data:audio/mpeg;base64,${audioBase64}`);
-      // play() returns a promise that can reject (decode/autoplay) without
-      // throwing synchronously — await so the catch reaches the fallback.
-      await audio.play();
-    } catch (error) {
-      pronounceHebrewWord(spokenText);
-    }
-  };
-
   const scrollGames = (direction) => {
     const scroller = gamesScrollerRef.current;
     if (!scroller) return;
@@ -953,7 +874,7 @@ function Home({
                       <span className="mt-1 block text-3xl font-black text-amber-600">
                         {loading ? '–' : chatsDisplay}
                       </span>
-                      <span className="mt-0.5 block text-xs font-bold text-slate-500">{heroDaysSuffix}</span>
+                      <span className="mt-0.5 block text-base font-bold text-slate-500">{heroDaysSuffix}</span>
                     </span>
                     <span className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-amber-600">
                       <Flame className="h-6 w-6" aria-hidden="true" />
@@ -1056,7 +977,7 @@ function Home({
               <h2 className="text-[clamp(1.55rem,2vw,2.5rem)] font-black text-slate-950">
                 {dictionaryTitle}
               </h2>
-              <p className="mt-2 text-[clamp(0.95rem,1vw,1.1rem)] font-medium leading-7 text-slate-600">
+              <p className="mt-2 text-[clamp(1.25rem,1vw,1.5rem)] font-medium leading-7 text-slate-600">
                 {dictionaryDescription}
               </p>
 
@@ -1139,7 +1060,7 @@ function Home({
                         <td className="px-3 py-3 text-center">
                           <button
                             type="button"
-                            onClick={() => speakWord(word.hebrew)}
+                            onClick={() => speakHebrew(word.hebrew)}
                             className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-violet-50 text-violet-600 transition hover:-translate-y-0.5 hover:bg-violet-600 hover:text-white"
                             aria-label={`השמע את ${word.hebrew}`}
                           >
@@ -1201,7 +1122,7 @@ function Home({
               <h2 className="mt-3 text-2xl font-black text-slate-950 lg:text-3xl">
                 {gamesText.title}
               </h2>
-              <p className="mt-1.5 max-w-2xl text-sm font-medium leading-6 text-slate-600">
+              <p className="mt-1.5 max-w-2xl text-lg font-medium leading-6 text-slate-600">
                 {gamesText.subtitle}
               </p>
             </div>
@@ -1250,11 +1171,11 @@ function Home({
                       <span className="block text-base font-black text-slate-900">
                         {category.meta[isArabic ? 'ar' : 'he']}
                       </span>
-                      <span className="mt-1 block text-xs font-bold text-slate-500">
+                      <span className="mt-1 block text-base font-bold text-slate-500">
                         {gamesText.completed(completedCount, category.numLevels)}
                       </span>
                     </span>
-                    <span className="flex flex-wrap items-center justify-center gap-1.5 text-xs font-bold text-slate-500">
+                    <span className="flex flex-wrap items-center justify-center gap-1.5 text-base font-bold text-slate-500">
                       <span>{gamesText.words(category.totalWords)}</span>
                       <span className="opacity-40">·</span>
                       <span>{gamesText.levels(category.numLevels)}</span>
