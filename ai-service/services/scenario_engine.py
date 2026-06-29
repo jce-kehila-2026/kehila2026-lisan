@@ -276,8 +276,9 @@ def _level_words(level: str, topics: tuple[str, ...] | None = None) -> list[str]
 def _common_header(level: str, include_arabic: bool) -> str:
     max_words = _MAX_WORDS_BY_LEVEL.get(level, 12)
     arabic_rule = (
-        "You MAY add at most ONE short Arabic line AFTER the Hebrew, and only "
-        "if the learner seems stuck."
+        "After your Hebrew reply, ALWAYS add ONE final line that starts with "
+        "'AR:' followed by a SHORT Arabic translation/clarification of your "
+        "reply (one sentence). The Hebrew reply comes first, the AR: line last."
         if include_arabic
         else "Do not use Arabic or English."
     )
