@@ -159,7 +159,9 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
     student. Provider errors are already handled granularly inside the impl.
     """
     try:
-        return _generate_chat_response_impl(payload)
+        response = _generate_chat_response_impl(payload)
+        _ensure_arabic_gloss(payload, response)
+        return response
     except Exception as exc:  # noqa: BLE001 — last-resort guard, must not leak
         logger.exception("Unhandled error in chat pipeline: %s", exc)
         try:
@@ -173,6 +175,62 @@ def generate_chat_response(payload: ChatRequest) -> ChatResponse:
             fallback_reason="MODEL_ERROR",
             message=getattr(payload, "message", "") or "",
         )
+
+
+# Hebrew→Arabic fallback-translation cache (keyed by the Hebrew reply text).
+_AR_FALLBACK_CACHE: dict[str, str] = {}
+
+
+def _translate_he_to_ar(text: str) -> str | None:
+    """Translate a Hebrew reply to Arabic as a last resort, cached by text.
+
+    The model is instructed to append an 'AR:' gloss when the learner asks for
+    Arabic, but some providers / short correction turns drop it. This guarantees
+    an Arabic line regardless of which path produced the Hebrew.
+    """
+    clean = (text or "").strip()
+    if not clean:
+        return None
+    if clean in _AR_FALLBACK_CACHE:
+        return _AR_FALLBACK_CACHE[clean] or None
+    try:
+        provider, model = get_configured_provider()
+        system_message = (
+            "Translate the Hebrew text into clear, natural Arabic for a beginner "
+            "learner. Output ONLY the Arabic translation: no Hebrew, no quotes, "
+            "no extra words."
+        )
+        result = call_provider(
+            provider,
+            model,
+            system_message,
+            clean,
+            options=ProviderCallOptions(max_output_tokens=120, temperature=0.0),
+        )
+        ar = (result.answer or "").strip()
+        if ar and ARABIC_RE.search(ar):
+            if len(_AR_FALLBACK_CACHE) < 3000:
+                _AR_FALLBACK_CACHE[clean] = ar
+            return ar
+    except Exception as exc:  # noqa: BLE001 — translation is best-effort
+        logger.warning("AR fallback translation failed: %s", exc)
+    return None
+
+
+def _ensure_arabic_gloss(payload: ChatRequest, response: ChatResponse) -> None:
+    """Guarantee answerAr whenever the learner asked for Arabic.
+
+    Runs at the single public exit so every path (normal LLM, scenario, local
+    correction templates, router) ends up bilingual. Skips canned fallbacks
+    (their messages are system text, not a real reply to translate).
+    """
+    if not getattr(payload, "includeArabic", False):
+        return
+    if response.answerAr or not response.answerHe or response.fallbackUsed:
+        return
+    ar = _translate_he_to_ar(response.answerHe)
+    if ar:
+        response.answerAr = ar
 
 
 def _generate_chat_response_impl(payload: ChatRequest) -> ChatResponse:
