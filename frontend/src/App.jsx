@@ -24,6 +24,7 @@ import TeacherHome from './pages/home/TeacherHome.jsx';
 import StudentLogin from './pages/student/Login.jsx';
 import TeacherLogin from './pages/teacher/Login.jsx';
 import TeacherReviews from './pages/teacher/Reviews.jsx';
+import TeacherNotifications from './pages/teacher/Notifications.jsx';
 import DatasetUploader from './pages/teacher/DatasetUploader.jsx';
 import { getStoredUser } from './services/auth.js';
 
@@ -116,6 +117,14 @@ function App() {
           element={
             <ProtectedRoute role="teacher">
               <TeacherReviews />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/notifications"
+          element={
+            <ProtectedRoute role={['teacher', 'admin']}>
+              <TeacherNotifications />
             </ProtectedRoute>
           }
         />
@@ -310,3 +319,4 @@ function App() {
 }
 
 export default App;
+

@@ -240,6 +240,32 @@ exports.createUser = async (req, res) => {
 
     const docRef = await db.collection('users').add(userData);
 
+    // Notify teachers & admins when a new student is created (fire-and-forget)
+    if (role === 'student') {
+      try {
+        const teacherRecipients = normalizedTeacherIds.length > 0 ? normalizedTeacherIds : [];
+        const adminSnap = await db.collection('users').where('role', '==', 'admin').get();
+        const adminIds = adminSnap.docs.map((d) => d.id);
+        const recipients = [...new Set([...teacherRecipients, ...adminIds])].filter((id) => id !== req.user.uid);
+        const createdAt = new Date().toISOString();
+        await Promise.all(
+          recipients.map((recipientId) =>
+            db.collection('notifications').add({
+              userId: recipientId,
+              type: 'new_student_registered',
+              title: 'תלמידה חדשה נרשמה',
+              message: 'תלמידה חדשה "' + name + '" נוספה למערכת ברמה ' + (userData.level || 'A1'),
+              relatedChatId: null,
+              studentId: docRef.id,
+              studentName: name,
+              isRead: false,
+              createdAt,
+            })
+          )
+        );
+      } catch (notifErr) { console.error('Failed to send new student notification:', notifErr); }
+    }
+
     return res.status(201).json({
       success: true,
       user: {
@@ -1165,6 +1191,27 @@ exports.createWord = async (req, res) => {
       createdBy: req.user.uid,
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
+
+    // Notify all admins about new pending word (fire-and-forget)
+    try {
+      const adminSnap = await db.collection('users').where('role', '==', 'admin').get();
+      const createdAt = new Date().toISOString();
+      await Promise.all(
+        adminSnap.docs
+          .filter((d) => d.id !== req.user.uid)
+          .map((d) =>
+            db.collection('notifications').add({
+              userId: d.id,
+              type: 'new_word_pending',
+              title: 'מילה חדשה לאישור',
+              message: 'מילה חדשה "' + String(word).trim() + '" ממתינה לאישור ברמה ' + (level || 'A1'),
+              relatedChatId: null,
+              isRead: false,
+              createdAt,
+            })
+          )
+      );
+    } catch (notifErr) { console.error('Failed to send word notification:', notifErr); }
 
     return res.status(201).json({
       success: true,

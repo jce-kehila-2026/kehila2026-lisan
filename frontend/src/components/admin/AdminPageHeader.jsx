@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 
 import LisanHeader from '../LisanHeader.jsx';
-import { getStoredUser } from '../../services/auth.js';
+import { getStoredUser, logout } from '../../services/auth.js';
 
 const adminSections = [
   { id: 'students',      label: 'תלמידות', icon: Users,            to: '/admin/students' },
@@ -27,9 +27,8 @@ function AdminPageHeader({ extraLeft = null }) {
   const activeSection = adminSections.find((s) => s.to === location.pathname)?.id ?? '';
 
   const handleLogout = () => {
-    const { logout } = require('../../services/auth.js');
-    if (logout) logout();
-    navigate('/teacher/login', { replace: true });
+    logout();
+    navigate('/login', { replace: true });
   };
 
   return (

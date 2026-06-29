@@ -6,9 +6,7 @@ import {
   MessageSquareText,
   RefreshCw,
   BookOpen,
-  AlertTriangle,
   GraduationCap,
-  Inbox,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,6 +15,7 @@ import { getStoredToken } from '../../services/auth.js';
 
 const API_BASE_URL = '/api';
 
+// Teacher sees 3 tabs: chat reviews, new words, new students assigned to them
 const TABS = [
   {
     key: 'chat',
@@ -33,14 +32,6 @@ const TABS = [
     types: ['new_word_pending'],
     Icon: BookOpen,
     color: 'blue',
-  },
-  {
-    key: 'issues',
-    labelHe: 'אעטאל',
-    labelAr: 'أعطال',
-    types: ['ai_service_error'],
-    Icon: AlertTriangle,
-    color: 'red',
   },
   {
     key: 'students',
@@ -68,14 +59,6 @@ const TAB_COLORS = {
     icon: 'text-blue-600',
     iconBg: 'bg-blue-50',
     border: 'border-blue-200 bg-blue-50',
-  },
-  red: {
-    active: 'bg-red-600 text-white shadow-sm',
-    inactive: 'text-slate-600 hover:bg-red-50',
-    badge: 'bg-red-100 text-red-700',
-    icon: 'text-red-600',
-    iconBg: 'bg-red-50',
-    border: 'border-red-200 bg-red-50',
   },
   green: {
     active: 'bg-green-600 text-white shadow-sm',
@@ -132,9 +115,7 @@ function NotificationCard({ notification, onMarkRead, onOpen, markingId, tabColo
       }`}
     >
       <div className="flex items-start gap-4">
-        <span
-          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm ${colors.icon}`}
-        >
+        <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm ${colors.icon}`}>
           <MessageSquareText className="h-6 w-6" aria-hidden="true" />
         </span>
         <div className="min-w-0 flex-1">
@@ -167,8 +148,6 @@ function NotificationCard({ notification, onMarkRead, onOpen, markingId, tabColo
                     ? 'bg-violet-600 hover:bg-violet-700'
                     : tabColor === 'blue'
                     ? 'bg-blue-600 hover:bg-blue-700'
-                    : tabColor === 'red'
-                    ? 'bg-red-600 hover:bg-red-700'
                     : 'bg-green-600 hover:bg-green-700'
                 }`}
               >
@@ -194,7 +173,7 @@ function NotificationCard({ notification, onMarkRead, onOpen, markingId, tabColo
   );
 }
 
-function Notifications() {
+function TeacherNotifications() {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
   const isAr = i18n.language === 'ar';
@@ -210,7 +189,6 @@ function Notifications() {
     [notifications],
   );
 
-  // Per-tab unread counts for badges
   const tabUnreadCounts = useMemo(() => {
     const counts = {};
     TABS.forEach((tab) => {
@@ -240,7 +218,7 @@ function Notifications() {
       setNotifications(data.notifications || []);
     } catch (err) {
       console.error('Failed to load notifications:', err);
-      setError(isAr ? 'خطأ في تحميل الإشعارات. حاول مرة أخرى.' : 'שגיאה בטעינת ההתראות. נסי לרענן.');
+      setError(isAr ? 'خطأ في تحميل الإشعارات.' : 'שגיאה בטעינת ההתראות. נסי לרענן.');
     } finally {
       setLoading(false);
     }
@@ -286,15 +264,15 @@ function Notifications() {
         <section className="mt-8 overflow-hidden rounded-[24px] border border-[#EEE5FF] bg-white/75 p-4 shadow-card backdrop-blur-[8px] md:mt-10 md:rounded-[2rem] md:p-7">
           <p className="inline-flex items-center gap-2 text-sm font-black text-violet-700">
             <Bell className="h-4 w-4" aria-hidden="true" />
-            {isAr ? 'إشعارات النظام' : 'התראות מערכת'}
+            {isAr ? 'إشعاراتي' : 'ההתראות שלי'}
           </p>
           <h1 className="mt-2 text-[clamp(1.65rem,7vw,2.1rem)] font-black leading-tight text-slate-950 md:text-[clamp(2.2rem,4.2vw,4.25rem)]">
-            {isAr ? 'إشعاراتي' : 'ההתראות שלי'}
+            {isAr ? 'مركز الإشعارات' : 'מרכז ההתראות'}
           </h1>
           <p className="mt-2 max-w-4xl text-sm font-semibold leading-6 text-slate-600 md:mt-3 md:text-base md:leading-7">
             {isAr
-              ? 'هنا تظهر إشعارات المحادثات والكلمات والأعطال والطالبات.'
-              : 'כאן מופיעות התראות על שיחות, מילים, תקלות ותלמידות.'}
+              ? 'هنا تظهر إشعارات المحادثات والكلمات الجديدة والطالبات.'
+              : 'כאן מופיעות התראות על שיחות, מילים חדשות ותלמידות.'}
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <span className="rounded-full bg-violet-50 px-4 py-2 text-sm font-black text-violet-700">
@@ -379,4 +357,4 @@ function Notifications() {
   );
 }
 
-export default Notifications;
+export default TeacherNotifications;
