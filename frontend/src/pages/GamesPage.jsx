@@ -41,7 +41,7 @@ function GamesPage() {
                 </div>
                 <div className="min-w-0">
                   <h1 className="text-2xl font-black text-slate-950 sm:text-3xl">{text.title}</h1>
-                  <p className="mt-1 text-sm font-bold leading-6 text-slate-600 sm:text-base sm:leading-7">
+                  <p className="mt-1 text-base font-bold leading-6 text-slate-600 sm:text-lg sm:leading-7">
                     {text.description}
                   </p>
                 </div>
