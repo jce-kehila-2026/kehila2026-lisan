@@ -36,3 +36,6 @@ ai-service/data/chatbot_quality/*.sqlite-wal
 .firebase/
 .firebaserc
 ai-service/.venv/
+
+# pre-wipe learner-data backups — contain personal data, never commit
+backup-pre-wipe-*.json
