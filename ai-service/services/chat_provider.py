@@ -136,6 +136,16 @@ PROVIDER_CHAIN: list[ProviderConfig] = [
 
 def _build_fallback_chain() -> list[ProviderConfig]:
     chain = list(PROVIDER_CHAIN)
+    openrouter_keys = os.getenv("OPENROUTER_API_KEYS", "").strip()
+    if openrouter_keys:
+        chain.append(
+            ProviderConfig(
+                name="openrouter",
+                model=os.getenv("OPENROUTER_MODEL", "google/gemini-2.0-flash-exp:free").strip()
+                or "google/gemini-2.0-flash-exp:free",
+                timeout_seconds=float(os.getenv("OPENROUTER_TIMEOUT_SECONDS", "12.0")),
+            )
+        )
     groq_key = os.getenv("GROQ_API_KEY", "").strip()
     if groq_key:
         chain.append(
@@ -498,6 +508,8 @@ def _dispatch_provider_call(
         return _call_gemini(config.model, system_message, question, config.timeout_seconds, o)
     if config.name == "groq":
         return _call_groq(config.model, system_message, question, config.timeout_seconds, o)
+    if config.name == "openrouter":
+        return _call_openrouter(config.model, system_message, question, config.timeout_seconds, o)
     if config.name == "cloudflare":
         return _call_cloudflare_workers_ai(config.model, system_message, question, config.timeout_seconds, o)
     raise ChatProviderError(f"Unsupported provider: {config.name}")
@@ -679,6 +691,112 @@ def _call_groq(
         provider="groq",
         model=model,
     )
+
+
+_OPENROUTER_KEY_LOCK = threading.Lock()
+_openrouter_key_cursor = 0
+
+
+def _get_openrouter_keys() -> list[str]:
+    """
+    Return the configured OpenRouter API keys, de-duplicated, in order.
+
+    Reads OPENROUTER_API_KEYS (comma-separated). Keys from DIFFERENT
+    OpenRouter accounts each carry their own independent free-tier quota.
+    """
+    raw = os.getenv("OPENROUTER_API_KEYS", "").strip()
+    keys: list[str] = []
+    seen: set[str] = set()
+    for part in raw.split(","):
+        key = part.strip()
+        if key and key not in seen:
+            seen.add(key)
+            keys.append(key)
+    return keys
+
+
+def _next_openrouter_start_index(n: int) -> int:
+    """Round-robin starting point so load is spread across keys, not always #1."""
+    global _openrouter_key_cursor
+    with _OPENROUTER_KEY_LOCK:
+        idx = _openrouter_key_cursor % n
+        _openrouter_key_cursor = (_openrouter_key_cursor + 1) % n
+        return idx
+
+
+def _create_openrouter_client(timeout_seconds: float, api_key: str) -> Any:
+    if not api_key:
+        raise ChatProviderError(
+            "No OpenRouter API key configured. Set OPENROUTER_API_KEYS in ai-service/.env"
+        )
+    if OpenAI is None:
+        raise ChatProviderError("openai package is not installed. Run pip install -r requirements.txt")
+    return OpenAI(
+        api_key=api_key,
+        base_url="https://openrouter.ai/api/v1",
+        timeout=timeout_seconds,
+        max_retries=DEFAULT_MAX_RETRIES,
+        default_headers={
+            "HTTP-Referer": os.getenv("OPENROUTER_SITE_URL", "").strip() or "https://lisan.app",
+            "X-Title": os.getenv("OPENROUTER_SITE_NAME", "").strip() or "Lisan",
+        },
+    )
+
+
+def _call_openrouter(
+    model: str,
+    system_message: str,
+    question: str,
+    timeout_seconds: float,
+    opts: ProviderCallOptions | None = None,
+) -> ProviderResult:
+    o = opts or ProviderCallOptions()
+    keys = _get_openrouter_keys()
+    if not keys:
+        raise ChatProviderError(
+            "No OpenRouter API key configured. Set OPENROUTER_API_KEYS in ai-service/.env"
+        )
+
+    messages = (
+        [{"role": "system", "content": system_message}]
+        + list(o.history)
+        + [{"role": "user", "content": question}]
+    )
+
+    # Round-robin across keys (same pattern as Gemini): on a 429 (rate-limit)
+    # move to the NEXT key instead of failing immediately.
+    start = _next_openrouter_start_index(len(keys))
+    ordered_keys = [keys[(start + i) % len(keys)] for i in range(len(keys))]
+    last_exc: Exception | None = None
+    for api_key in ordered_keys:
+        client = _create_openrouter_client(timeout_seconds, api_key)
+        started_at = time.perf_counter()
+        try:
+            response = client.chat.completions.create(
+                model=model,
+                messages=messages,
+                max_tokens=o.max_output_tokens,
+                temperature=o.temperature,
+            )
+            answer = (response.choices[0].message.content or "").strip()
+            usage = response.usage
+            return ProviderResult(
+                answer=answer,
+                latency_seconds=time.perf_counter() - started_at,
+                input_tokens=getattr(usage, "prompt_tokens", 0) if usage else 0,
+                output_tokens=getattr(usage, "completion_tokens", 0) if usage else 0,
+                provider="openrouter",
+                model=model,
+            )
+        except Exception as exc:
+            last_exc = exc
+            if "429" in str(exc):
+                # This key is rate-limited — try the next key in the rotation.
+                continue
+            _classify_and_raise(exc)
+
+    # Every key was rate-limited.
+    _classify_and_raise(last_exc or ChatProviderQuotaError("All OpenRouter keys rate-limited"))
 
 
 def _call_cloudflare_workers_ai(
