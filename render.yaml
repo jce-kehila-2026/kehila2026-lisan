@@ -1,33 +1,42 @@
-# ─── Render Blueprint for the Lisan stack ───────────────────────────────────
-# Deploy: Render Dashboard → New → Blueprint → point at this repo.
-# Render will create 2 web services + 1 Redis instance and wire the URLs
-# together automatically via `fromService`. You still need to open each
-# service afterwards and fill in the "sync: false" secrets manually
-# (Environment tab) — they are intentionally NOT stored in this file or git.
+# ─── Render Blueprint for Lisan's ai-service ────────────────────────────────
+# Backend + frontend are deployed on Firebase (Cloud Functions + Hosting) —
+# this Blueprint ONLY covers the Python/FastAPI ai-service, plus the Redis
+# instance it uses for caching / session memory.
 #
-# NOTE: ai-service is a *private* service (no public URL) — only the backend
-# can reach it, over Render's internal network, exactly like the ai-service
-# container in docker-compose is only reachable from backend today.
+# Deploy: Render Dashboard → New → Blueprint → point at this repo.
+#
+# IMPORTANT — ai-service is a PUBLIC web service here (not private), because
+# it must be reachable from Firebase Cloud Functions over the public internet
+# (Firebase Functions run outside Render's private network, so they can't use
+# Render's internal service-to-service networking). Security is enforced by
+# the AI_SERVICE_INTERNAL_SECRET header check already built into the app
+# (see ai-service/routes/chat.py: require_internal_service_secret /
+# verify_jwt_token) — every request must carry the matching secret or a valid
+# JWT, or it's rejected with 401/403.
 
 services:
-  # ── Managed Redis (replaces the `redis` container in docker-compose) ────
+  # ── Managed Redis — caching + session memory for ai-service ─────────────
   - type: keyvalue
     name: lisan-redis
     plan: starter
     ipAllowList: []       # empty = only Render services in this workspace can reach it
 
-  # ── AI service (FastAPI / Python) ──────────────────────────────────────
-  - type: pserv
+  # ── AI service (FastAPI / Python) — PUBLIC, called by Firebase Functions ─
+  - type: web
     name: lisan-ai-service
     runtime: docker
     dockerfilePath: ./ai-service/Dockerfile
     dockerContext: ./ai-service
     plan: starter
+    healthCheckPath: /api/ai/health
     envVars:
+      # Shared secret — MUST match the value set in backend/.env (Firebase
+      # Functions) under the same key, or every request from the backend
+      # will be rejected with 401.
       - key: AI_SERVICE_INTERNAL_SECRET
-        sync: false          # same value as the backend's AI_SERVICE_INTERNAL_SECRET
+        sync: false
       - key: JWT_SECRET
-        sync: false          # same value as the backend's JWT_SECRET
+        sync: false
 
       # LLM — OpenRouter primary
       - key: LLM_PROVIDER
@@ -35,7 +44,7 @@ services:
       - key: LLM_MODEL
         value: google/gemini-2.5-flash-lite
       - key: OPENROUTER_API_KEYS
-        sync: false          # paste your OpenRouter key here
+        sync: false          # paste your (rotated) OpenRouter key here
       - key: OPENROUTER_MODEL
         value: google/gemini-2.5-flash-lite
       - key: OPENROUTER_SITE_URL
@@ -43,13 +52,13 @@ services:
       - key: OPENROUTER_SITE_NAME
         value: Lisan
 
-      # LLM — Gemini fallback
+      # LLM — Gemini fallback (optional but recommended)
       - key: GEMINI_API_KEYS
         sync: false
 
       # Azure Speech — STT + pronunciation scoring
       - key: AZURE_SPEECH_KEY
-        sync: false          # paste Key 1 from the Azure Speech resource
+        sync: false          # paste your rotated Azure Speech key here
       - key: AZURE_SPEECH_REGION
         value: swedencentral
       - key: STT_ENGINE
@@ -68,11 +77,11 @@ services:
           name: lisan-redis
           property: connectionString
 
-      # Backend callback + RAG source.
-      # `hostport` gives "host:port" with NO scheme, but this code expects a
-      # full URL (http://...), so fill these in manually after both services
-      # exist: open lisan-backend → Connect tab → copy its internal address →
-      # prefix with "http://". Example: http://lisan-backend:10000
+      # Backend callback (vocab tracking) + RAG transcript source.
+      # The backend now lives on Firebase, e.g.:
+      #   https://api-<hash>-uc.a.run.app   (Cloud Functions v2 direct URL), or
+      #   https://<your-project>.web.app/api  (via Firebase Hosting rewrite)
+      # Fill in whichever one your Firebase deploy actually uses.
       - key: BACKEND_URL
         sync: false
       - key: RAG_BACKEND_URL
@@ -84,40 +93,6 @@ services:
         value: production
       - key: LOG_PII_MODE
         value: hash
-      - key: CORS_ALLOWED_ORIGINS
-        sync: false
-
-  # ── Backend (Express) ───────────────────────────────────────────────────
-  - type: web
-    name: lisan-backend
-    runtime: docker
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
-    plan: starter
-    healthCheckPath: /api/health
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: JWT_SECRET
-        sync: false
-      - key: AI_SERVICE_INTERNAL_SECRET
-        sync: false
-      # Same caveat as BACKEND_URL below: hostport has no scheme.
-      # Fill in manually as http://<lisan-ai-service internal address>
-      # (copied from lisan-ai-service → Connect tab), e.g. http://lisan-ai-service:8000
-      - key: AI_SERVICE_URL
-        sync: false
-      - key: FIREBASE_SERVICE_ACCOUNT
-        sync: false          # paste the full service-account JSON as one line
-      - key: FIREBASE_STORAGE_BUCKET
-        sync: false
-      - key: FB_WEB_API_KEY
-        sync: false
-      - key: CORS_ALLOWED_ORIGINS
-        sync: false          # your deployed frontend origin(s)
-      - key: LOG_LEVEL
-        value: info
-      - key: LOG_PII_MODE
-        value: hash
+        
 
 databases: []   # this project doesn't use Postgres — Firestore is the DB
