@@ -35,7 +35,7 @@
   "emailInvalid": "أدخلي اسم مستخدم صحيحًا",
   "passwordRequired": "كلمة المرور مطلوبة",
   "passwordShort": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
-  "invalidCredentials": "بيانات الدخول غير صحيحة. جربي كلمة المرور 123456.",
+  "invalidCredentials": "بيانات الدخول غير صحيحة. اسم المستخدم هو بريدك الإلكتروني، وكلمة المرور هي رقم هويتك.",
   "genericLoginError": "تعذر تسجيل الدخول الآن. حاولي مرة أخرى.",
   "unknownUser": "اسم المستخدم غير معروف. استخدمي student أو teacher أو admin.",
   "studentWelcome": "أهلاً {{name}}",
@@ -591,5 +591,13 @@
   "teacher.reviews.status.rejected": "مرفوض",
   "teacher.reviews.status.pending": "قيد الانتظار",
   "teacher.reviews.actions.confirm": "موافقة",
-  "teacher.reviews.actions.reject": "رفض"
+  "teacher.reviews.actions.reject": "رفض",
+  "loginErrorMissingFields": "يرجى إدخال البريد الإلكتروني وكلمة المرور.",
+  "loginErrorAccountInactive": "حسابك غير مفعّل حاليًا. تواصلي مع معلمتك.",
+  "loginErrorNetwork": "لا يوجد اتصال بالخادم. تحققي من اتصال الإنترنت وحاولي مرة أخرى.",
+  "showPasswordShort": "إظهار",
+  "hidePasswordShort": "إخفاء",
+  "admin.passwordRequired": "يجب إدخال كلمة المرور (رقم الهوية).",
+  "admin.students.form.passwordIdNumber": "كلمة المرور (رقم الهوية)",
+  "admin.students.form.passwordIdNumberHint": "رقم هوية الطالبة"
 }
