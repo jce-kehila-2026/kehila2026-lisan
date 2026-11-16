@@ -83,3 +83,46 @@ vocab_tracker يجمع الـ in-flight threads لـ 5 ثوانٍ على الـ 
 | `/api/ready` يرجع 503 | راجع الـ `checks` field — أيّ خدمة معطلة؟ |
 | AI requests تفشل بـ timeout | تحقق أن `ai-service` container يعمل: `docker compose ps` |
 | Vocab progress غير محفوظ | تحقق من سجل `vocab_tracker_error` في ai-service logs |
+
+## 8. صفحة العمليات `/ops` (مراقبة تشغيلية للمالك)
+
+صفحة منفصلة للمشغّل التقني: من يستخدم النظام وكم، كم ننفق، أين الضغط، أين يتسرّب
+الطلاب، وأين الأخطاء. البيانات حقيقية ومحفوظة في Firestore (تبقى بعد إعادة التشغيل).
+
+### متغيّرات البيئة (backend)
+
+| المتغيّر | إلزامي | الوصف |
+|---|---|---|
+| `OPS_ADMIN_EMAILS` | نعم | قائمة إيميلات مفصولة بفواصل. فقط admin بإيميل من القائمة يدخل. **فارغ = لا أحد يدخل** (fail closed). |
+| `OPENROUTER_API_KEY_OPS` | لا | مفتاح OpenRouter لقراءة الرصيد. Management key → `GET /credits` (المشترى − المستهلك). مفتاح عادي → `GET /key` (`limit_remaining`، يحتاج limit على المفتاح). بدونه يظهر الرصيد "غير معروف". |
+| `OPS_TIMEZONE` | لا | افتراضي `Asia/Jerusalem` — حدود اليوم/الساعة في الإحصاءات. |
+| `OPS_PRICES` | لا | JSON لتعديل أسعار التقدير (`models`, `sttUsdPerSecond`, `ttsUsdPerMChars`, `voiceBytesPerSecond`). كلفة OpenRouter تُؤخذ من `usage.cost` الحقيقي؛ التقدير فقط لما لا يُبلّغ عنه. |
+| `OPS_TRACKING_DISABLED` | لا | `true` يوقف كل كتابات المراقبة (طوارئ). |
+
+### المجموعات في Firestore
+
+- `opsEvents/{auto}` — حدث لكل تفاعل AI / تسجيل دخول / خطأ HTTP. حقل `expireAt` = بعد 90 يومًا.
+- `opsDaily/{YYYY-MM-DD}` — عدّادات يومية بـ `FieldValue.increment` (مجاميع، لكل نموذج، لكل ساعة، latency histogram، أخطاء، طلاب نشطون، جلسات).
+- `opsUsers/{alias}` — آخر نشاط/آخر نتيجة لكل مستخدم (alias = hash، بدون أسماء).
+
+### TTL — يجب تفعيله
+
+`firestore.indexes.json` يعرّف TTL على `opsEvents.expireAt`، فالنشر يفعّله:
+
+```bash
+firebase deploy --only firestore:indexes
+```
+
+إن لم يُفعَّل عبر CLI: Firebase Console → Firestore → **TTL** → Create policy →
+Collection group: `opsEvents`، Timestamp field: `expireAt`. (الحذف يتم خلال ~24 ساعة من انتهاء الصلاحية.)
+بدون TTL تبقى الأحداث للأبد (التكلفة تكبر ببطء، لا شيء ينكسر).
+
+### الـ index المطلوب
+
+`opsEvents (outcome ASC, ts DESC)` — لقائمة آخر 50 خطأ. قبل نشره تُظهر الصفحة رسالة
+"الفهرس غير منشور" بدل القائمة، وباقي الأقسام تعمل.
+
+### ملاحظة Cloud Functions
+
+الكتابات تتم بعد إرسال الرد (fire-and-forget). على Cloud Functions gen2 قد يتأخّر
+تنفيذها حتى الطلب التالي إن جُمِّد الـ CPU — نادرًا ما تضيع أحداث، لكن الأرقام "تقريبية بدقة عالية" وليست محاسبية.

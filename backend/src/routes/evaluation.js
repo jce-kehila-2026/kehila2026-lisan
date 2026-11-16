@@ -11,8 +11,8 @@ const {
   normalizeAiServiceBaseUrl,
 } = require('../services/aiChatService');
 
-router.get('/context', evaluationController.getContext);
-router.post('/attempts', evaluationController.saveAttempt);
+router.get('/context', requireAuth, evaluationController.getContext);
+router.post('/attempts', requireAuth, evaluationController.saveAttempt);
 
 // ── Speaking evaluation proxy ────────────────────────────────────────────────
 router.post('/speaking', requireAuth, async (req, res) => {

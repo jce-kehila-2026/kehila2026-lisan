@@ -42,6 +42,8 @@ class ChatResponse(BaseModel):
     suggestedNextPrompts: list[str] = Field(default_factory=list)
     inputTokens: int | None = Field(default=None)
     outputTokens: int | None = Field(default=None)
+    # Provider-reported LLM cost in USD (ops monitoring); None when unknown.
+    costUsd: float | None = Field(default=None)
 
 
 class VoiceChatResponse(BaseModel):
@@ -58,6 +60,8 @@ class VoiceChatResponse(BaseModel):
     answerHe: str | None = ""
     answerAr: str | None = None
     audioBase64: str | None = None
+    # Which TTS provider produced audioBase64 (elevenlabs | azure), for ops cost.
+    ttsProvider: str | None = None
     fallbackUsed: bool = False
     fallbackReason: str | None = None
     level: str = "A1"
@@ -70,6 +74,8 @@ class VoiceChatResponse(BaseModel):
     suggestedNextPrompts: list[str] = Field(default_factory=list)
     inputTokens: int | None = Field(default=None)
     outputTokens: int | None = Field(default=None)
+    # Provider-reported LLM cost in USD (ops monitoring); None when unknown.
+    costUsd: float | None = Field(default=None)
 
 
     @model_validator(mode="after")
@@ -108,6 +114,11 @@ class ChatRequestContext:
     # The learner's raw includeArabic preference (before the Hebrew-only scope
     # override). Used to attach a short Arabic gloss (answerAr) to LLM replies.
     raw_include_arabic: bool = False
+    # Owner-approved rules from human reviewers for this level (newest first).
+    reviewer_corrections: tuple[str, ...] = ()
+    # CorrectionsGuidance (services.reviewer_corrections): rules + the AI-written
+    # summary of them. None -> the prompt falls back to reviewer_corrections.
+    reviewer_guidance: object | None = None
 
 
 @dataclass(frozen=True)

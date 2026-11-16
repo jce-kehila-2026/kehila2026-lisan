@@ -24,25 +24,61 @@ const readJsonResponse = async (response) => {
 
 export const getLandingPathForRole = (role) => {
   if (role === 'teacher') return '/admin/dashboard';
+  if (role === 'reviewer') return '/review';
   return '/home';
 };
 
-export const login = async ({ email, password }) => {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      email,
-      password
-    })
-  });
+// Backend login error codes -> i18n keys. Error messages thrown by login()
+// are always i18n keys, never raw (English) server text.
+const LOGIN_ERROR_KEY_BY_CODE = Object.freeze({
+  MISSING_FIELDS: 'loginErrorMissingFields',
+  INVALID_CREDENTIALS: 'invalidCredentials',
+  ACCOUNT_INACTIVE: 'loginErrorAccountInactive',
+  SERVER_ERROR: 'genericLoginError',
+});
 
-  const data = await readJsonResponse(response);
+const LOGIN_ERROR_KEY_BY_STATUS = Object.freeze({
+  400: 'loginErrorMissingFields',
+  401: 'invalidCredentials',
+  403: 'loginErrorAccountInactive',
+});
+
+export const getLoginErrorKey = ({ code, status } = {}) =>
+  LOGIN_ERROR_KEY_BY_CODE[code] ||
+  LOGIN_ERROR_KEY_BY_STATUS[status] ||
+  'genericLoginError';
+
+export const login = async ({ email, password }) => {
+  let response;
+
+  try {
+    response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email,
+        password
+      })
+    });
+  } catch {
+    throw new Error('loginErrorNetwork');
+  }
+
+  let data;
+
+  try {
+    data = await readJsonResponse(response);
+  } catch (error) {
+    if (!response.ok) {
+      throw new Error(getLoginErrorKey({ status: response.status }));
+    }
+    throw error;
+  }
 
   if (!response.ok) {
-    throw new Error(data.error || 'invalidCredentials');
+    throw new Error(getLoginErrorKey({ code: data?.code, status: response.status }));
   }
 
   return {

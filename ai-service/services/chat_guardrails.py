@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import NamedTuple
 
+from services.levels import normalize_cefr_level
+
 logger = logging.getLogger("lisan.chat")
 
 DEFAULT_LEVEL = "A1"
@@ -221,8 +223,9 @@ def normalize_hebrew_token(token: str) -> str:
 
 
 def normalize_level(level: str | None) -> str:
-    normalized = (level or DEFAULT_LEVEL).strip().upper()
-    return normalized or DEFAULT_LEVEL
+    # Accepts CEFR codes, Hebrew display labels (א1..ג) and legacy values;
+    # unknown values fall back to A1.
+    return normalize_cefr_level(level)
 
 
 def sanitize_input(text: str) -> str:
@@ -311,17 +314,82 @@ def strip_non_tts_chars(text: str) -> str:
     cleaned = re.sub(r"[\d()\[\]{}/\\|@#$%^&*+=<>~`]", "", text)
     # Collapse multiple spaces
     cleaned = re.sub(r"\s+", " ", cleaned).strip()
-    # Keep up to the first TWO sentences so a spoken tutor turn (a gentle
-    # correction followed by a question) isn't cut down to a single fragment.
-    parts = re.split(r"([.?!])", cleaned)
+    # Length/sentence limits are applied by fit_reply_keep_question so the
+    # tutor's closing question is never the part that gets cut.
+    return cleaned
+
+
+def _split_sentences(text: str) -> list[str]:
+    parts = re.split(r"([.?!])", text)
     sentences: list[str] = []
     for i in range(0, len(parts) - 1, 2):
         segment = (parts[i] + parts[i + 1]).strip()
-        if segment:
+        if segment and re.search(r"\w", segment):
             sentences.append(segment)
-    if sentences:
-        cleaned = " ".join(sentences[:2])
-    return cleaned
+        elif segment and sentences:
+            sentences[-1] = (sentences[-1] + segment).strip()
+    tail = parts[-1].strip() if len(parts) % 2 == 1 else ""
+    if tail:
+        sentences.append(tail)
+    return sentences
+
+
+def fit_reply_keep_question(
+    text: str,
+    max_words: int,
+    max_sentences: int | None = None,
+) -> str:
+    """Shorten a tutor reply WITHOUT losing its closing question.
+
+    The tutor is prompted to end every turn with one hook question so the
+    learner always has something to answer. Trimming from the end (old
+    behaviour) removed exactly that question and the conversation died.
+    Here the last question is always kept, and the sentences right before it
+    (usually the correction) fill whatever budget is left.
+    """
+    text = (text or "").strip()
+    if not text:
+        return text
+    sentences = _split_sentences(text)
+    if not sentences:
+        return text
+
+    def words(s: str) -> int:
+        return count_hebrew_words(s)
+
+    q_idx = max((i for i, s in enumerate(sentences) if "?" in s), default=None)
+
+    if q_idx is None:
+        if words(text) <= max_words and (max_sentences is None or len(sentences) <= max_sentences):
+            return text
+        kept: list[str] = []
+        for s in sentences:
+            if max_sentences is not None and len(kept) >= max_sentences:
+                break
+            if kept and words(" ".join(kept + [s])) > max_words:
+                break
+            kept.append(s)
+        out = " ".join(kept)
+        if words(out) > max_words:
+            tokens: list[str] = []
+            for token in out.split():
+                tokens.append(token)
+                if words(" ".join(tokens)) >= max_words:
+                    break
+            out = " ".join(tokens)
+        return out.strip()
+
+    question = sentences[q_idx]
+    kept_before: list[str] = []
+    budget = max_words - words(question)
+    for s in reversed(sentences[:q_idx]):
+        if max_sentences is not None and len(kept_before) + 1 >= max_sentences:
+            break
+        if words(s) > budget:
+            break
+        kept_before.insert(0, s)
+        budget -= words(s)
+    return " ".join(kept_before + [question]).strip()
 
 
 def enforce_hebrew_only_scope(include_arabic: bool) -> bool:

@@ -33,6 +33,7 @@ from services.chat_guardrails import (
     normalize_level,
     sanitize_input,
     strip_non_tts_chars,
+    fit_reply_keep_question,
 )
 from services.chat_provider import (
     AllProvidersFailedError,
@@ -58,6 +59,12 @@ from services.chat_schemas import ChatRequest, ChatRequestContext, ChatResponse,
 from services.chat_suggestions import get_suggestions
 from services.conversation_memory import CONVERSATION_MEMORY
 from services.curriculum import build_tutor_prompt, looks_like_tutor_driven_request
+from services.reviewer_corrections import (
+    build_corrections_block,
+    build_guidance_block,
+    get_corrections_guidance,
+    guidance_version,
+)
 from services.vocab_tracker import track_vocab_async
 
 logger = logging.getLogger("lisan.chat")
@@ -73,6 +80,7 @@ PROMPT_VOICE_PATH = BASE_DIR / "prompts" / "chat-system-prompt-voice.txt"
 # turn. Voice stays tighter to keep TTS playback short.
 TEXT_MAX_WORDS = int(os.getenv("CHAT_TEXT_MAX_WORDS", "30"))
 VOICE_MAX_WORDS = int(os.getenv("CHAT_VOICE_MAX_WORDS", "20"))
+VOICE_MAX_SENTENCES = int(os.getenv("CHAT_VOICE_MAX_SENTENCES", "3"))
 TEXT_MAX_OUTPUT_TOKENS = int(os.getenv("CHAT_TEXT_MAX_TOKENS", "256"))
 VOICE_OUTPUT_TOKENS = int(os.getenv("CHAT_VOICE_MAX_TOKENS", "128"))
 TEXT_TEMPERATURE = float(os.getenv("CHAT_TEXT_TEMPERATURE", "0.45"))
@@ -297,6 +305,7 @@ def _generate_chat_response_impl(payload: ChatRequest) -> ChatResponse:
     )
     cache_readable = (
         not session_sensitive
+        and not _in_active_conversation(request_context)
         and _cross_session_cache_allowed(request_context.message)
     )
     cached_response = (
@@ -373,8 +382,10 @@ def _generate_chat_response_impl(payload: ChatRequest) -> ChatResponse:
     if gatekeeper_response is not None:
         return gatekeeper_response
 
-    # 3b. Simple deterministic router (greetings, thanks, curriculum phrases, glossary)
-    routed_response = route_message(
+    # 3b. Simple deterministic router (greetings, thanks, curriculum phrases, glossary).
+    #     Skipped mid-conversation: a short answer there replies to the tutor's
+    #     question and needs the LLM's memory, not a context-free template.
+    routed_response = None if _in_active_conversation(request_context) else route_message(
         message=request_context.normalized_message,
         bundle=bundle,
         level=resolved_level,
@@ -488,6 +499,7 @@ def _generate_chat_response_impl(payload: ChatRequest) -> ChatResponse:
         grammar_hint=grammar_hint,
         include_arabic=request_context.raw_include_arabic,
         learner_context=learner_context,
+        corrections_block=_reviewer_block(request_context),
     )
 
     call_opts = ProviderCallOptions(
@@ -704,6 +716,7 @@ def _generate_chat_response_impl(payload: ChatRequest) -> ChatResponse:
         ),
         inputTokens=provider_result.input_tokens,
         outputTokens=provider_result.output_tokens,
+        costUsd=getattr(provider_result, "cost_usd", None),
     )
     # Only cache this LLM answer if it is a stateless GLOBAL lookup (e.g. an
     # explained word meaning). A normal conversation turn depends on the chat
@@ -801,6 +814,9 @@ def _generate_scenario_response(
         + "\n\n"
         + learner_context
     )
+    scenario_corrections = _reviewer_block(request_context)
+    if scenario_corrections:
+        system_message += "\n\n" + scenario_corrections
     call_opts = ProviderCallOptions(
         voice_mode=request_context.voice_mode,
         max_output_tokens=VOICE_OUTPUT_TOKENS if request_context.voice_mode else TEXT_MAX_OUTPUT_TOKENS,
@@ -908,6 +924,7 @@ def _generate_scenario_response(
         ),
         inputTokens=provider_result.input_tokens,
         outputTokens=provider_result.output_tokens,
+        costUsd=getattr(provider_result, "cost_usd", None),
     )
     # Remember the turn for multi-turn continuity, but do NOT cache: a live
     # role-play line is unique to this conversation state.
@@ -1096,6 +1113,7 @@ def stream_chat_response(payload: ChatRequest) -> Iterator[str]:
         context=retrieval_context.context_text,
         voice_mode=request_context.voice_mode,
         grammar_hint=grammar_hint,
+        corrections_block=_reviewer_block(request_context),
     )
 
     history = CONVERSATION_MEMORY.get_history(request_context.session_id or "")
@@ -1151,6 +1169,15 @@ def stream_chat_response(payload: ChatRequest) -> Iterator[str]:
     yield answer_he
 
 
+def _reviewer_block(request_context: ChatRequestContext) -> str:
+    """Reviewer guidance for the prompt: the AI summary when the backend sent
+    one that covers every active rule, else the bounded raw rule list."""
+    guidance = getattr(request_context, "reviewer_guidance", None)
+    if guidance is not None:
+        return build_guidance_block(guidance)
+    return build_corrections_block(list(request_context.reviewer_corrections))
+
+
 def _build_request_context(payload: ChatRequest) -> ChatRequestContext:
     provider, model = get_configured_provider()
     requested_level = normalize_level(payload.level)
@@ -1159,12 +1186,20 @@ def _build_request_context(payload: ChatRequest) -> ChatRequestContext:
     # the same clean text. Closes the Unicode edge cases from the hardening audit.
     sanitized_message = sanitize_input(payload.message or "")
     include_arabic = enforce_hebrew_only_scope(payload.includeArabic)
+    # Owner-approved reviewer rules for this level. Never raises / never blocks
+    # long: an unreachable backend just yields the last known rules (or none).
+    guidance = get_corrections_guidance(requested_level)
     return ChatRequestContext(
         message=sanitized_message,
         normalized_message=sanitized_message,
         requested_level=requested_level,
         include_arabic=include_arabic,
-        cache_key=build_cache_key(sanitized_message, requested_level, include_arabic),
+        cache_key=build_cache_key(
+            sanitized_message,
+            requested_level,
+            include_arabic,
+            corrections_version=guidance_version(guidance),
+        ),
         provider=provider,
         model=model,
         voice_mode=getattr(payload, "voiceMode", False),
@@ -1173,6 +1208,8 @@ def _build_request_context(payload: ChatRequest) -> ChatRequestContext:
         learner_name=_clean_learner_name(getattr(payload, "learnerName", None)),
         scenario=getattr(payload, "scenario", None) or None,
         raw_include_arabic=bool(getattr(payload, "includeArabic", False)),
+        reviewer_corrections=tuple(guidance.rules),
+        reviewer_guidance=guidance,
     )
 
 
@@ -1241,6 +1278,11 @@ def _try_gatekeeper(
         request_context.message, resolved_level, lang_profile
     )
     if decision is None or decision.needs_llm:
+        return None
+    # A "known phrase" answer just echoes the phrase back ("שלום" → "שלום.",
+    # "תודה" → "בבקשה.") with no question — a dead end on any turn. Defer to
+    # the router (greetings with a hook question) or the LLM.
+    if getattr(decision.template, "reason", None) == "KNOWN_PHRASE":
         return None
 
     response = _build_gatekeeper_response(
@@ -1316,6 +1358,21 @@ def _policy_key(text: str) -> str:
         for part in (text or "").split()
         if normalize_hebrew_token(part)
     ).strip()
+
+
+def _in_active_conversation(request_context: ChatRequestContext) -> bool:
+    """True once the tutor has already replied in this session.
+
+    From then on a short answer ("כן", "לא", "תודה", "שלום") is a reply to the
+    tutor's last question and must go to the LLM with memory. Canned replies
+    ("כן." / "בבקשה! ... מה זה חלב?") ignored the question and killed the
+    conversation (verified live 2026-11-16).
+    """
+    session_id = request_context.session_id
+    return bool(session_id) and _last_assistant_answer(session_id) is not None
+
+
+_GOODBYE_KEYS = {"להתראות", "ביי", "ביי ביי"}
 
 
 def _is_session_sensitive_message(message: str) -> bool:
@@ -1771,7 +1828,17 @@ def _deterministic_local_response(
     """
     # Greetings / thanks / politeness — fixed social replies.
     politeness_reply = _POLITENESS_REPLIES.get(key)
-    if politeness_reply is not None:
+    if politeness_reply is not None and _has_active_learning_scene(request_context) and key not in _GOODBYE_KEYS:
+        # Inside a scene, thank-you continues the scene with its next question.
+        return _build_static_response(
+            request_context=request_context,
+            level=level,
+            answer_he=_scene_continue_response(request_context, prefix="בבקשה."),
+            router_hit=True,
+        )
+    if politeness_reply is not None and (
+        key in _GOODBYE_KEYS or not _in_active_conversation(request_context)
+    ):
         return _build_static_response(
             request_context=request_context,
             level=level,
@@ -1897,7 +1964,11 @@ def _build_pre_llm_response(
         )
 
     politeness_reply = _POLITENESS_REPLIES.get(key)
-    if politeness_reply is not None:
+    if politeness_reply is not None and (
+        key in _GOODBYE_KEYS
+        or not _in_active_conversation(request_context)
+        or _has_active_learning_scene(request_context)
+    ):
         if _has_active_learning_scene(request_context):
             return _build_static_response(
                 request_context=request_context,
@@ -2296,6 +2367,7 @@ def _build_system_message(
     grammar_hint: str = "",
     include_arabic: bool = False,
     learner_context: str = "",
+    corrections_block: str = "",
 ) -> str:
     vocabulary_block = ", ".join(vocabulary)
     # Reinforce the two rules the model most often slips on, right next to the
@@ -2346,6 +2418,8 @@ def _build_system_message(
         )
     if grammar_hint:
         msg += f"\n\n{grammar_hint}"
+    if corrections_block:
+        msg += f"\n\n{corrections_block}"
     return msg
 
 
@@ -2511,16 +2585,15 @@ def _split_answer(answer: str, voice_mode: bool = False) -> str:
     answer_he = " ".join(hebrew_lines) if hebrew_lines else lines[0]
 
     cap = VOICE_MAX_WORDS if voice_mode else TEXT_MAX_WORDS
-    if not is_short_hebrew_answer(answer_he, max_words=cap):
-        trimmed_tokens: list[str] = []
-        for token in answer_he.split():
-            trimmed_tokens.append(token)
-            if count_hebrew_words(" ".join(trimmed_tokens)) >= cap:
-                break
-        answer_he = " ".join(trimmed_tokens).strip()
-
     if voice_mode:
         answer_he = strip_non_tts_chars(answer_he)
+    # Trim to the word cap (and ≤3 spoken sentences) but always keep the
+    # closing hook question — losing it is what stalled conversations.
+    answer_he = fit_reply_keep_question(
+        answer_he,
+        max_words=cap,
+        max_sentences=VOICE_MAX_SENTENCES if voice_mode else None,
+    )
 
     return answer_he
 

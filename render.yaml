@@ -38,6 +38,9 @@ services:
         sync: false          # paste your OpenRouter key here
       - key: OPENROUTER_MODEL
         value: google/gemini-2.5-flash-lite
+      # Used only when the primary is rate-limited/down (OpenRouter-native fallback)
+      - key: OPENROUTER_FALLBACK_MODELS
+        value: google/gemini-2.5-flash
       - key: OPENROUTER_SITE_URL
         value: https://lisan.app
       - key: OPENROUTER_SITE_NAME
@@ -61,6 +64,26 @@ services:
       - key: MAX_AUDIO_BYTES
         value: "26214400"
 
+      # TTS (speaking replies aloud) — ElevenLabs primary, Azure fallback.
+      # ElevenLabs reads replies aloud (owner decision 2026-11-16); Azure is the
+      # automatic fallback and still does speech-to-text + pronunciation.
+      - key: TTS_PROVIDER
+        value: elevenlabs
+      - key: TTS_FALLBACK_PROVIDER
+        value: azure
+      - key: ELEVENLABS_API_KEY
+        sync: false          # from the עמותה's ElevenLabs account
+      - key: ELEVENLABS_VOICE_ID
+        value: s0T0DT6EAPeX57MQpn3I
+      - key: ELEVENLABS_MODEL_ID
+        value: eleven_v3     # lists Hebrew; multilingual_v2 / flash do not
+      - key: ELEVENLABS_TIMEOUT_SECONDS
+        value: "8"           # keep < TTS_TIMEOUT_SECONDS so Azure can still answer
+      - key: TTS_NIQQUD_ENGINE
+        value: lexicon
+      - key: TTS_CACHE_MAX_ENTRIES
+        value: "256"
+
       # Redis (wired automatically from the lisan-redis service above)
       - key: REDIS_URL
         fromService:
@@ -82,6 +105,9 @@ services:
 
       - key: ENV_MODE
         value: production
+      # Free cold-start fix: ping the backend function every 4 min (needs BACKEND_URL)
+      - key: KEEP_WARM_BACKEND
+        value: "true"
       - key: LOG_PII_MODE
         value: hash
       - key: CORS_ALLOWED_ORIGINS

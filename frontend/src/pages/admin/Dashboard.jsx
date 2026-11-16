@@ -32,6 +32,8 @@ import {
 import { getFullAnalytics } from '../../services/adminApi.js';
 import AdminNavStrip from '../../components/admin/AdminNavStrip.jsx';
 import LisanHeader from '../../components/LisanHeader.jsx';
+import { ServerCog } from 'lucide-react';
+import { useOpsAccess } from '../../services/opsApi.js';
 import AdminHeroVisual from '../../components/admin/AdminHeroVisual.jsx';
 import i18n from '../../i18n/index.js';
 
@@ -40,6 +42,7 @@ import {
   getStoredUser,
   logout,
 } from '../../services/auth.js';
+import { isValidTeacherManagementCode } from '../../utils/teacherCode.js';
 
 const API_BASE_URL = '/api';
 
@@ -394,6 +397,8 @@ function AnalyticsOverview({ navigate }) {
 function AdminDashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const canSeeOps = useOpsAccess();
+  const currentUserRole = getStoredUser()?.role;
 
   const user = getStoredUser();
 
@@ -538,7 +543,7 @@ function AdminDashboard() {
   const handleTeacherCodeSubmit = (event) => {
     event.preventDefault();
 
-    if (teacherCode === '0000') {
+    if (isValidTeacherManagementCode(teacherCode)) {
       closeTeacherCodeModal();
       navigate('/admin/progress');
       return;
@@ -635,6 +640,30 @@ function AdminDashboard() {
           navLabel={t('admin.dashboard.header.quickNav')}
           extraLeft={
             <div className="flex items-center gap-1.5">
+              {canSeeOps ? (
+                <button
+                  type="button"
+                  onClick={() => navigate('/ops')}
+                  className="inline-flex h-9 items-center gap-1.5 rounded-full border border-violet-200/80 bg-white/80 px-2.5 text-xs font-black text-violet-700 shadow-sm transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-10 sm:px-3 sm:text-sm"
+                  aria-label="מרכז תפעול"
+                  title="מרכז תפעול"
+                >
+                  <ServerCog className="h-4 w-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">תפעול</span>
+                </button>
+              ) : null}
+              {currentUserRole === 'admin' || currentUserRole === 'teacher' ? (
+                <button
+                  type="button"
+                  onClick={() => navigate('/admin/ai-feedback')}
+                  className="inline-flex h-9 items-center gap-1.5 rounded-full border border-violet-200/80 bg-white/80 px-2.5 text-xs font-black text-violet-700 shadow-sm transition hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 sm:h-10 sm:px-3 sm:text-sm"
+                  aria-label="משוב AI מהמתנדבות"
+                  title="משוב AI מהמתנדבות"
+                >
+                  <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">משוב AI</span>
+                </button>
+              ) : null}
               {/* Student-view button */}
               <button
                 type="button"

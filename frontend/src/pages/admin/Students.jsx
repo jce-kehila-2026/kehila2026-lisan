@@ -169,14 +169,16 @@ function StudentForm({ initialValue, mode, onCancel, onSubmit, saving, teachers 
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label={isEdit ? t('admin.students.form.newPasswordOpt') : t('admin.students.form.tempPassword')}>
+        <Field label={isEdit ? t('admin.students.form.newPasswordOpt') : t('admin.students.form.passwordIdNumber')}>
           <input
             type="password"
             value={form.password}
             onChange={setField('password')}
             className={fieldClass}
             required={!isEdit}
-            placeholder={isEdit ? t('admin.students.form.leaveEmptyPlaceholder') : ''}
+            minLength={6}
+            autoComplete="new-password"
+            placeholder={isEdit ? t('admin.students.form.leaveEmptyPlaceholder') : t('admin.students.form.passwordIdNumberHint')}
           />
         </Field>
 

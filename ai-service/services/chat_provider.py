@@ -94,6 +94,9 @@ class ProviderResult:
     provider: str = ""
     model: str = ""
     attempts: list[ProviderAttemptLog] = field(default_factory=list)
+    # Provider-reported cost in USD (OpenRouter returns usage.cost on every
+    # response). None when the provider does not report it.
+    cost_usd: float | None = None
 
 
 class ChatProviderError(RuntimeError):
@@ -743,6 +746,43 @@ def _create_openrouter_client(timeout_seconds: float, api_key: str) -> Any:
     )
 
 
+def _extract_usage_cost(usage: Any) -> float | None:
+    """Read OpenRouter's ``usage.cost`` (USD credits) from an SDK usage object.
+
+    The OpenAI SDK keeps unknown fields as attributes / ``model_extra``.
+    Returns None when absent or not a non-negative number.
+    """
+    if usage is None:
+        return None
+    raw: Any = None
+    if isinstance(usage, dict):
+        raw = usage.get("cost")
+    else:
+        raw = getattr(usage, "cost", None)
+        if raw is None:
+            extra = getattr(usage, "model_extra", None)
+            if isinstance(extra, dict):
+                raw = extra.get("cost")
+    try:
+        value = float(raw)
+    except (TypeError, ValueError):
+        return None
+    if value != value or value < 0:  # NaN or negative
+        return None
+    return value
+
+
+def _openrouter_fallback_models(primary: str) -> list[str]:
+    """OPENROUTER_FALLBACK_MODELS (comma-separated), minus the primary model."""
+    raw = os.getenv("OPENROUTER_FALLBACK_MODELS", "")
+    seen: list[str] = []
+    for item in raw.split(","):
+        name = item.strip()
+        if name and name != primary and name not in seen:
+            seen.append(name)
+    return seen[:3]
+
+
 def _call_openrouter(
     model: str,
     system_message: str,
@@ -772,12 +812,20 @@ def _call_openrouter(
         client = _create_openrouter_client(timeout_seconds, api_key)
         started_at = time.perf_counter()
         try:
-            response = client.chat.completions.create(
-                model=model,
-                messages=messages,
-                max_tokens=o.max_output_tokens,
-                temperature=o.temperature,
-            )
+            create_kwargs: dict[str, Any] = {
+                "model": model,
+                "messages": messages,
+                "max_tokens": o.max_output_tokens,
+                "temperature": o.temperature,
+            }
+            fallback_models = _openrouter_fallback_models(model)
+            if fallback_models:
+                # OpenRouter-native fallback: if the primary model is
+                # rate-limited upstream (429) or down, OpenRouter retries the
+                # SAME request on the next model, so the student gets a real
+                # reply instead of a canned fallback. Billed per model used.
+                create_kwargs["extra_body"] = {"models": [model, *fallback_models]}
+            response = client.chat.completions.create(**create_kwargs)
             answer = (response.choices[0].message.content or "").strip()
             usage = response.usage
             return ProviderResult(
@@ -786,7 +834,8 @@ def _call_openrouter(
                 input_tokens=getattr(usage, "prompt_tokens", 0) if usage else 0,
                 output_tokens=getattr(usage, "completion_tokens", 0) if usage else 0,
                 provider="openrouter",
-                model=model,
+                model=(getattr(response, "model", None) or model),
+                cost_usd=_extract_usage_cost(usage),
             )
         except Exception as exc:
             last_exc = exc

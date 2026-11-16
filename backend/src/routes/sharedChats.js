@@ -1,6 +1,7 @@
 const express = require('express');
 const { db } = require('../config/firebase');
 const { requireAuth } = require('../middleware/auth');
+const { normalizeLevel } = require('../lib/levels');
 
 const router = express.Router();
 
@@ -34,23 +35,6 @@ const normalizeTeacherIds = (user) => {
 
 const normalizeRole = (role) => {
   return String(role || '').trim().toLowerCase();
-};
-
-const normalizeLevel = (level) => {
-  const value = String(level || '')
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '')
-    .replace(/[-_]/g, '');
-
-  if (value.includes('a1') || value.includes('א1')) return 'a1';
-  if (value.includes('a2') || value.includes('א2')) return 'a2';
-  if (value.includes('b1') || value.includes('ב1')) return 'b1';
-  if (value.includes('b2') || value.includes('ב2')) return 'b2';
-  if (value.includes('c1') || value === 'ג') return 'c1';
-  if (value.includes('c2') || value === 'ד') return 'c2';
-
-  return value;
 };
 
 const normalizeParticipants = (participants) => {
@@ -428,7 +412,7 @@ router.get('/available-users', requireAuth, async (req, res) => {
         name: user.name || user.email || 'User',
         email: user.email || '',
         role: user.role,
-        level: user.level || 'A1'
+        level: normalizeLevel(user.level)
       }));
 
     return res.status(200).json({

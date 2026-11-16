@@ -145,6 +145,20 @@ RESPONSE_CACHE_MAX_ENTRIES=2000
 # Pronunciation (Azure) — مطفي افتراضياً
 USE_AZURE_PRONUNCIATION=false
 
+# TTS (قراءة الرد بصوت) — ElevenLabs أساسي و Azure احتياطي
+# Azure يبقى لـ STT وتقييم النطق فقط؛ هذا الإعداد للـ TTS وحده.
+TTS_PROVIDER=azure                 # azure (افتراضي) | elevenlabs
+TTS_FALLBACK_PROVIDER=azure        # افتراضياً azure لما يكون الأساسي elevenlabs؛ '' = بدون احتياطي
+ELEVENLABS_API_KEY=...             # سرّ — من حساب الجمعية (העמותה)
+ELEVENLABS_VOICE_ID=s0T0DT6EAPeX57MQpn3I   # الصوت اللي اختاره صاحب المشروع
+ELEVENLABS_MODEL_ID=eleven_v3      # يدعم العبرية (multilingual_v2 و flash لا)
+ELEVENLABS_TIMEOUT_SECONDS=8       # أقل من TTS_TIMEOUT_SECONDS=15 حتى يلحق Azure
+ELEVENLABS_SPEED=0.9               # اختياري — سرعة الرد العادي (0.7–1.2)
+ELEVENLABS_FALLBACK_SPEED=0.8      # اختياري — أبطأ لردود الـ fallback
+TTS_NIQQUD_ENGINE=lexicon          # lexicon | dicta | off — تشكيل المؤنث قبل الإرسال
+TTS_CACHE_MAX_ENTRIES=256          # كاش صوت بالذاكرة (0 = مطفي)؛ ElevenLabs يحاسب بالحرف
+TTS_CACHE_MAX_BYTES=16777216
+
 # مشترك مع الباكند
 AI_SERVICE_INTERNAL_SECRET=...
 BACKEND_URL=http://127.0.0.1:3000

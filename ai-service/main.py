@@ -54,6 +54,7 @@ if _env_enabled("ENABLE_OTEL"):
 from routes.chat import router as chat_router
 from routes.evaluation import router as evaluation_router
 from routes.pronunciation import router as pronunciation_router
+from routes.internal import router as internal_router
 from services.chat_cache import check_rate_limit
 from services.chat_cache import initialize_chat_cache
 
@@ -252,6 +253,7 @@ app.add_middleware(
 app.include_router(chat_router, prefix="/api/ai")
 app.include_router(evaluation_router, prefix="/api/ai")
 app.include_router(pronunciation_router, prefix="/api/ai")
+app.include_router(internal_router, prefix="/api/ai")
 
 
 def _resolve_rate_identity(request: Request) -> str:
@@ -336,6 +338,15 @@ def warm_chat_cache() -> None:
     initialize_chat_cache()
 
 
+@app.on_event("startup")
+def _start_backend_keep_warm() -> None:
+    # Free cold-start fix: ping the backend function every few minutes.
+    if "pytest" in sys.modules:
+        return
+    from services.backend_keep_warm import start
+    start()
+
+
 @app.on_event("shutdown")
 def _on_shutdown() -> None:
     """
@@ -343,6 +354,11 @@ def _on_shutdown() -> None:
     the student's last few vocab events. Caps at 5 s so K8s SIGTERM grace
     isn't blown.
     """
+    try:
+        from services.backend_keep_warm import stop as _stop_keep_warm
+        _stop_keep_warm()
+    except Exception:
+        pass
     try:
         from services.vocab_tracker import wait_for_inflight
         unfinished = wait_for_inflight(timeout=5.0)
@@ -409,6 +425,8 @@ def readiness():
         "gemini": "GEMINI_API_KEY",
         "openai": "OPENAI_API_KEY",
         "anthropic": "ANTHROPIC_API_KEY",
+        "openrouter": "OPENROUTER_API_KEYS",
+        "groq": "GROQ_API_KEY",
     }.get(provider, "")
     if key_name and os.getenv(key_name, "").strip():
         checks[f"llm:{provider}"] = "ok"

@@ -86,7 +86,7 @@ def transcribe_audio(audio_bytes: bytes, filename: str = "audio.webm") -> str:
         # Azure's file input expects PCM WAV, but the browser records
         # webm/opus — transcode first (no-op if already canonical WAV).
         from services.audio_convert import to_wav_pcm16
-        wav_bytes = to_wav_pcm16(audio_bytes)
+        wav_bytes = _pad_trailing_silence(to_wav_pcm16(audio_bytes))
 
         # Azure SDK needs a file path — write the WAV to a temp file
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
@@ -100,17 +100,30 @@ def transcribe_audio(audio_bytes: bytes, filename: str = "audio.webm") -> str:
                 audio_config=audio_config,
             )
 
-            # recognize_once() is synchronous and respects the timeout via done event
+            # Continuous recognition over the whole file. Azure splits speech
+            # into one "recognized" segment per pause, so we must collect
+            # EVERY segment until the stream ends — stopping at the first one
+            # cut long sentences off at the student's first pause.
             import threading
-            result_holder: list = []
+            segments: list[str] = []
+            cancel_holder: list = []
             done_event = threading.Event()
 
             def handle_result(evt):
-                result_holder.append(evt.result)
-                done_event.set()
+                res = evt.result
+                if res.reason == speechsdk.ResultReason.RecognizedSpeech and res.text:
+                    segments.append(res.text.strip())
+
+            def handle_canceled(evt):
+                # EndOfStream is the normal end of a file; anything else is an error.
+                # Don't finish here on EndOfStream: the last "recognized"
+                # segment can still be in flight — session_stopped follows it.
+                if evt.cancellation_details.reason != speechsdk.CancellationReason.EndOfStream:
+                    cancel_holder.append(evt.cancellation_details)
+                    done_event.set()
 
             recognizer.recognized.connect(handle_result)
-            recognizer.canceled.connect(lambda evt: done_event.set())
+            recognizer.canceled.connect(handle_canceled)
             recognizer.session_stopped.connect(lambda evt: done_event.set())
 
             recognizer.start_continuous_recognition()
@@ -154,26 +167,55 @@ def transcribe_audio(audio_bytes: bytes, filename: str = "audio.webm") -> str:
 
     latency_ms = int((time.perf_counter() - t0) * 1000)
 
-    if not result_holder:
-        # Timeout or canceled with no result
+    if cancel_holder:
+        details = cancel_holder[0]
         stt_circuit.record_failure()
-        raise STTTimeoutError("Azure STT did not return a result within timeout")
+        if getattr(details, "code", None) == speechsdk.CancellationErrorCode.AuthenticationFailure:
+            raise STTAuthError(f"Azure STT auth failed: {details.error_details}")
+        raise STTError(f"Azure STT canceled: {details.error_details}")
 
-    result = result_holder[0]
-
-    import azure.cognitiveservices.speech as speechsdk
-    if result.reason == speechsdk.ResultReason.Canceled:
-        cancellation = speechsdk.CancellationDetails.from_result(result)
-        if cancellation.error_code == speechsdk.CancellationErrorCode.AuthenticationFailure:
+    if not done_event.is_set():
+        if not segments:
             stt_circuit.record_failure()
-            raise STTAuthError(f"Azure STT auth failed: {cancellation.error_details}")
-        stt_circuit.record_failure()
-        raise STTError(f"Azure STT canceled: {cancellation.error_details}")
+            raise STTTimeoutError("Azure STT did not return a result within timeout")
+        # Timed out mid-file: keep what we have rather than lose it all.
+        logger.warning({"event": "stt_partial_timeout", "segments": len(segments)})
 
-    transcript = result.text.strip() if result.text else ""
+    transcript = " ".join(seg for seg in segments if seg).strip()
     stt_circuit.record_success()
     logger.info({"event": "stt_success", "latency_ms": latency_ms, "chars": len(transcript)})
     return transcript
+
+
+def _pad_trailing_silence(wav_bytes: bytes, seconds: float | None = None) -> bytes:
+    """Append silence to a PCM WAV so Azure finalizes the last word.
+
+    Students press "stop" right after speaking. Without trailing silence Azure
+    cuts the final word at end-of-stream (verified: "...עם החברות שלי" came
+    back as "...עם הח"). STT_TRAILING_SILENCE_SECONDS, default 1.0; 0 disables.
+    """
+    import io
+    import wave
+
+    if seconds is None:
+        try:
+            seconds = float(os.getenv("STT_TRAILING_SILENCE_SECONDS", "1.0"))
+        except ValueError:
+            seconds = 1.0
+    if seconds <= 0:
+        return wav_bytes
+    try:
+        with wave.open(io.BytesIO(wav_bytes)) as src:
+            params = src.getparams()
+            frames = src.readframes(src.getnframes())
+        silence = b"\x00" * int(params.framerate * seconds) * params.sampwidth * params.nchannels
+        out = io.BytesIO()
+        with wave.open(out, "wb") as dst:
+            dst.setparams(params)
+            dst.writeframes(frames + silence)
+        return out.getvalue()
+    except (wave.Error, EOFError):
+        return wav_bytes
 
 
 def _get_suffix(filename: str) -> str:

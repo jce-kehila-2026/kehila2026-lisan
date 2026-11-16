@@ -1,4 +1,17 @@
+import i18n from '../i18n/index.js';
+import { getLevelLabel, labelToStoredLevel, normalizeLevel } from '../utils/levels.js';
+
 const API_BASE_URL = '/api';
+
+// No silent default passwords: student passwords are the ID number and must
+// be entered explicitly by the admin.
+const requirePassword = (password) => {
+  const value = typeof password === 'string' ? password.trim() : '';
+  if (!value) {
+    throw new Error(i18n.t('admin.passwordRequired'));
+  }
+  return value;
+};
 
 const getToken = () => localStorage.getItem('lisan-token');
 
@@ -39,7 +52,9 @@ const mapUserToStudent = (user) => ({
   id: user.id,
   name: user.name || '',
   email: user.email || '',
-  level: user.level || 'A1',
+  // Admin pages work with display labels (א1..ג); cefrLevel is the content level.
+  level: getLevelLabel(user.level, user.levelLabel),
+  cefrLevel: normalizeLevel(user.level),
   language: user.language || 'ar',
   role: user.role || 'student',
   status: user.isActive === false ? 'suspended' : 'active',
@@ -92,10 +107,10 @@ export const createStudent = async (student) => {
     method: 'POST',
     body: JSON.stringify({
       email: student.email,
-      password: student.password || 'Test1234!',
+      password: requirePassword(student.password),
       name: student.name,
       role: 'student',
-      level: student.level || 'A1',
+      ...labelToStoredLevel(student.level),
       language: student.language || 'ar',
       teacherIds: Array.isArray(student.teacherIds) ? student.teacherIds : []
     })
@@ -110,7 +125,7 @@ export const updateStudent = async (id, student) => {
   const body = {
     name: student.name,
     email: student.email,
-    level: student.level,
+    ...(student.level !== undefined ? labelToStoredLevel(student.level) : {}),
     language: student.language,
     teacherIds: Array.isArray(student.teacherIds) ? student.teacherIds : [],
     isActive: student.status ? student.status !== 'suspended' : undefined
@@ -160,11 +175,14 @@ export const toggleStudentSuspension = async (id) => {
   };
 };
 
-export const getTeachers = async () => {
+export const getTeachers = async ({ includeReviewers = false } = {}) => {
   const data = await request('/admin/users');
 
   const teachers = data.users
-    .filter((user) => user.role === 'teacher' || user.role === 'admin')
+    .filter((user) =>
+      user.role === 'teacher' ||
+      user.role === 'admin' ||
+      (includeReviewers && user.role === 'reviewer'))
     .map(mapUserToTeacher);
 
   return { teachers };
@@ -242,7 +260,7 @@ export const createTeacher = async (teacher) => {
     method: 'POST',
     body: JSON.stringify({
       email: teacher.email,
-      password: teacher.password || 'Test1234!',
+      password: requirePassword(teacher.password),
       name: teacher.name,
       role: 'teacher',
       language: teacher.language || 'ar'
@@ -259,7 +277,7 @@ export const createAdmin = async (admin) => {
     method: 'POST',
     body: JSON.stringify({
       email: admin.email,
-      password: admin.password || 'Admin1234!',
+      password: requirePassword(admin.password),
       name: admin.name,
       role: 'admin',
       language: admin.language || 'ar'
@@ -281,11 +299,11 @@ export const createUser = async (user) => {
     method: 'POST',
     body: JSON.stringify({
       email: user.email,
-      password: user.password,
+      password: requirePassword(user.password),
       name: user.name,
       role: user.role,
       language: user.language || 'ar',
-      level: user.level || 'A1',
+      ...(user.role === 'student' ? labelToStoredLevel(user.level) : {}),
       levels: Array.isArray(user.levels) ? user.levels : [],
       levelFocus: Array.isArray(user.levels) ? user.levels.join(', ') : '',
       teacherIds: Array.isArray(user.teacherIds)
@@ -310,3 +328,41 @@ export const getFullAnalytics = async ({ from, to, search } = {}) => {
 
   return request(`/admin/analytics/full${query ? `?${query}` : ''}`);
 };
+
+// ── Reviewer feedback approval queue (admin only) ─────────────────────────
+export const getReviewFeedback = async (status = 'pending') =>
+  request(`/admin/ai-feedback?status=${encodeURIComponent(status)}`);
+
+export const approveReviewFeedback = async (id, { ruleText, level }) =>
+  request(`/admin/ai-feedback/${encodeURIComponent(id)}/approve`, {
+    method: 'POST',
+    body: JSON.stringify({ ruleText, level })
+  });
+
+export const rejectReviewFeedback = async (id, reason = '') =>
+  request(`/admin/ai-feedback/${encodeURIComponent(id)}/reject`, {
+    method: 'POST',
+    body: JSON.stringify({ reason })
+  });
+
+export const getAiCorrections = async () => request('/admin/ai-corrections');
+
+export const setAiCorrectionActive = async (id, active) =>
+  request(`/admin/ai-corrections/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ active })
+  });
+
+export const getAiCorrectionSummaries = async () => request('/admin/ai-correction-summaries');
+
+export const updateAiCorrectionSummary = async (level, text) =>
+  request(`/admin/ai-correction-summaries/${encodeURIComponent(level)}`, {
+    method: 'PUT',
+    body: JSON.stringify({ text })
+  });
+
+export const regenerateAiCorrectionSummary = async (level) =>
+  request(`/admin/ai-correction-summaries/${encodeURIComponent(level)}/regenerate`, { method: 'POST' });
+
+export const revertAiCorrectionSummary = async (level) =>
+  request(`/admin/ai-correction-summaries/${encodeURIComponent(level)}/revert`, { method: 'POST' });
