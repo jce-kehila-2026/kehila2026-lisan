@@ -12,7 +12,8 @@ exports.login = async (req, res) => {
 
     if (!email || !password) {
       return res.status(400).json({
-        error: 'Email and password are required'
+        error: 'Email and password are required',
+        code: 'MISSING_FIELDS'
       });
     }
 
@@ -20,7 +21,7 @@ exports.login = async (req, res) => {
 
     if (!apiKey) {
       console.error('Login error: FB_WEB_API_KEY is not configured');
-      return res.status(500).json({ error: 'Server error' });
+      return res.status(500).json({ error: 'Server error', code: 'SERVER_ERROR' });
     }
 
     const normalizedEmail = String(email).trim().toLowerCase();
@@ -43,17 +44,24 @@ exports.login = async (req, res) => {
       console.error('Firebase auth error code:', code, '| email:', normalizedEmail);
 
       if (code === 'USER_DISABLED') {
-        return res.status(403).json({ error: 'User account is inactive' });
+        return res.status(403).json({
+          error: 'User account is inactive',
+          code: 'ACCOUNT_INACTIVE'
+        });
       }
 
       // INVALID_LOGIN_CREDENTIALS / EMAIL_NOT_FOUND / INVALID_PASSWORD / ...
+      // The raw Firebase code is logged above, never returned to the client.
       if (authError.response) {
-        return res.status(401).json({ error: 'Invalid credentials', code });
+        return res.status(401).json({
+          error: 'Invalid credentials',
+          code: 'INVALID_CREDENTIALS'
+        });
       }
 
       // Network / unexpected failure talking to Firebase Auth.
       console.error('Login error (auth verify):', code || authError.message);
-      return res.status(500).json({ error: 'Server error' });
+      return res.status(500).json({ error: 'Server error', code: 'SERVER_ERROR' });
     }
 
     // 2) Load the profile (role/level/teachers/...) from Firestore, keyed by
@@ -61,13 +69,19 @@ exports.login = async (req, res) => {
     const userDoc = await db.collection('users').doc(uid).get();
 
     if (!userDoc.exists) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({
+        error: 'Invalid credentials',
+        code: 'INVALID_CREDENTIALS'
+      });
     }
 
     const user = userDoc.data();
 
     if (user.isActive === false) {
-      return res.status(403).json({ error: 'User account is inactive' });
+      return res.status(403).json({
+        error: 'User account is inactive',
+        code: 'ACCOUNT_INACTIVE'
+      });
     }
 
     await db.collection('users').doc(uid).update({
@@ -105,7 +119,8 @@ exports.login = async (req, res) => {
     console.error('Login error:', error);
 
     return res.status(500).json({
-      error: 'Server error'
+      error: 'Server error',
+      code: 'SERVER_ERROR'
     });
   }
 };
