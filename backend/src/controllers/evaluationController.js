@@ -3,14 +3,23 @@ const {
     saveStudentAttempt
 } = require('../services/evaluationContextService');
 
+const STAFF_ROLES = ['admin', 'teacher'];
+
 exports.getContext = async (req, res) => {
     try {
-        const { userId, activityId, turnId } = req.query;
+        const { activityId, turnId } = req.query;
+
+        // Students only ever read their own context. Admins/teachers may
+        // pass ?userId= to read a student's context.
+        const isStaff = STAFF_ROLES.includes(req.user?.role);
+        const userId = isStaff && req.query.userId
+            ? String(req.query.userId)
+            : req.user?.uid;
 
         if (!userId || !activityId) {
             return res.status(400).json({
                 success: false,
-                error: 'userId and activityId are required',
+                error: 'activityId is required',
                 code: 'MISSING_REQUIRED_PARAMS'
             });
         }
@@ -37,7 +46,6 @@ exports.getContext = async (req, res) => {
 exports.saveAttempt = async (req, res) => {
     try {
         const {
-            userId,
             activityId,
             turnId,
             recognizedTextHe,
@@ -45,10 +53,14 @@ exports.saveAttempt = async (req, res) => {
             usage
         } = req.body;
 
+        // Attempts are always recorded for the authenticated user; any
+        // userId in the body is ignored.
+        const userId = req.user?.uid;
+
         if (!userId || !activityId || !recognizedTextHe) {
             return res.status(400).json({
                 success: false,
-                error: 'userId, activityId, and recognizedTextHe are required',
+                error: 'activityId and recognizedTextHe are required',
                 code: 'MISSING_REQUIRED_FIELDS'
             });
         }
