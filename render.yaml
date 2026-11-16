@@ -65,10 +65,10 @@ services:
         value: "26214400"
 
       # TTS (speaking replies aloud) — ElevenLabs primary, Azure fallback.
-      # Leave TTS_PROVIDER=azure until ELEVENLABS_API_KEY is set, then flip
-      # it to elevenlabs (no redeploy of code needed, just env).
+      # ElevenLabs reads replies aloud (owner decision 2026-11-16); Azure is the
+      # automatic fallback and still does speech-to-text + pronunciation.
       - key: TTS_PROVIDER
-        value: azure
+        value: elevenlabs
       - key: TTS_FALLBACK_PROVIDER
         value: azure
       - key: ELEVENLABS_API_KEY
