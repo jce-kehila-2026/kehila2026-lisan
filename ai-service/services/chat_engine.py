@@ -58,6 +58,11 @@ from services.chat_schemas import ChatRequest, ChatRequestContext, ChatResponse,
 from services.chat_suggestions import get_suggestions
 from services.conversation_memory import CONVERSATION_MEMORY
 from services.curriculum import build_tutor_prompt, looks_like_tutor_driven_request
+from services.reviewer_corrections import (
+    build_corrections_block,
+    corrections_version,
+    get_active_corrections,
+)
 from services.vocab_tracker import track_vocab_async
 
 logger = logging.getLogger("lisan.chat")
@@ -488,6 +493,7 @@ def _generate_chat_response_impl(payload: ChatRequest) -> ChatResponse:
         grammar_hint=grammar_hint,
         include_arabic=request_context.raw_include_arabic,
         learner_context=learner_context,
+        corrections_block=build_corrections_block(list(request_context.reviewer_corrections)),
     )
 
     call_opts = ProviderCallOptions(
@@ -801,6 +807,9 @@ def _generate_scenario_response(
         + "\n\n"
         + learner_context
     )
+    scenario_corrections = build_corrections_block(list(request_context.reviewer_corrections))
+    if scenario_corrections:
+        system_message += "\n\n" + scenario_corrections
     call_opts = ProviderCallOptions(
         voice_mode=request_context.voice_mode,
         max_output_tokens=VOICE_OUTPUT_TOKENS if request_context.voice_mode else TEXT_MAX_OUTPUT_TOKENS,
@@ -1096,6 +1105,7 @@ def stream_chat_response(payload: ChatRequest) -> Iterator[str]:
         context=retrieval_context.context_text,
         voice_mode=request_context.voice_mode,
         grammar_hint=grammar_hint,
+        corrections_block=build_corrections_block(list(request_context.reviewer_corrections)),
     )
 
     history = CONVERSATION_MEMORY.get_history(request_context.session_id or "")
@@ -1159,12 +1169,20 @@ def _build_request_context(payload: ChatRequest) -> ChatRequestContext:
     # the same clean text. Closes the Unicode edge cases from the hardening audit.
     sanitized_message = sanitize_input(payload.message or "")
     include_arabic = enforce_hebrew_only_scope(payload.includeArabic)
+    # Owner-approved reviewer rules for this level. Never raises / never blocks
+    # long: an unreachable backend just yields the last known rules (or none).
+    reviewer_rules = tuple(get_active_corrections(requested_level))
     return ChatRequestContext(
         message=sanitized_message,
         normalized_message=sanitized_message,
         requested_level=requested_level,
         include_arabic=include_arabic,
-        cache_key=build_cache_key(sanitized_message, requested_level, include_arabic),
+        cache_key=build_cache_key(
+            sanitized_message,
+            requested_level,
+            include_arabic,
+            corrections_version=corrections_version(list(reviewer_rules)),
+        ),
         provider=provider,
         model=model,
         voice_mode=getattr(payload, "voiceMode", False),
@@ -1173,6 +1191,7 @@ def _build_request_context(payload: ChatRequest) -> ChatRequestContext:
         learner_name=_clean_learner_name(getattr(payload, "learnerName", None)),
         scenario=getattr(payload, "scenario", None) or None,
         raw_include_arabic=bool(getattr(payload, "includeArabic", False)),
+        reviewer_corrections=reviewer_rules,
     )
 
 
@@ -2296,6 +2315,7 @@ def _build_system_message(
     grammar_hint: str = "",
     include_arabic: bool = False,
     learner_context: str = "",
+    corrections_block: str = "",
 ) -> str:
     vocabulary_block = ", ".join(vocabulary)
     # Reinforce the two rules the model most often slips on, right next to the
@@ -2346,6 +2366,8 @@ def _build_system_message(
         )
     if grammar_hint:
         msg += f"\n\n{grammar_hint}"
+    if corrections_block:
+        msg += f"\n\n{corrections_block}"
     return msg
 
 
