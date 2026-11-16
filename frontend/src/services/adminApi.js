@@ -160,11 +160,14 @@ export const toggleStudentSuspension = async (id) => {
   };
 };
 
-export const getTeachers = async () => {
+export const getTeachers = async ({ includeReviewers = false } = {}) => {
   const data = await request('/admin/users');
 
   const teachers = data.users
-    .filter((user) => user.role === 'teacher' || user.role === 'admin')
+    .filter((user) =>
+      user.role === 'teacher' ||
+      user.role === 'admin' ||
+      (includeReviewers && user.role === 'reviewer'))
     .map(mapUserToTeacher);
 
   return { teachers };
@@ -310,3 +313,27 @@ export const getFullAnalytics = async ({ from, to, search } = {}) => {
 
   return request(`/admin/analytics/full${query ? `?${query}` : ''}`);
 };
+
+// ── Reviewer feedback approval queue (admin only) ─────────────────────────
+export const getReviewFeedback = async (status = 'pending') =>
+  request(`/admin/ai-feedback?status=${encodeURIComponent(status)}`);
+
+export const approveReviewFeedback = async (id, { ruleText, level }) =>
+  request(`/admin/ai-feedback/${encodeURIComponent(id)}/approve`, {
+    method: 'POST',
+    body: JSON.stringify({ ruleText, level })
+  });
+
+export const rejectReviewFeedback = async (id, reason = '') =>
+  request(`/admin/ai-feedback/${encodeURIComponent(id)}/reject`, {
+    method: 'POST',
+    body: JSON.stringify({ reason })
+  });
+
+export const getAiCorrections = async () => request('/admin/ai-corrections');
+
+export const setAiCorrectionActive = async (id, active) =>
+  request(`/admin/ai-corrections/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ active })
+  });

@@ -24,6 +24,7 @@ const readJsonResponse = async (response) => {
 
 export const getLandingPathForRole = (role) => {
   if (role === 'teacher') return '/admin/dashboard';
+  if (role === 'reviewer') return '/review';
   return '/home';
 };
 
