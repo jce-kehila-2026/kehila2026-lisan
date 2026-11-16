@@ -42,3 +42,6 @@ backup-pre-wipe-*.json
 
 # ElevenLabs voice samples (scripts/elevenlabs_voice_samples.py output)
 tts_samples/
+
+# graphify knowledge graph (local)
+graphify-out/
