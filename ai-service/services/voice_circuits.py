@@ -49,9 +49,26 @@ whisper_circuit = CircuitBreaker(
     recovery_seconds=_float_env("WHISPER_CIRCUIT_RECOVERY_SECONDS", 30.0),
 )
 
-# ── TTS circuit ───────────────────────────────────────────────────────────────
+# ── TTS circuit (Azure TTS) ───────────────────────────────────────────────────
+# Name kept as `tts_circuit` for backwards compatibility: it guards the Azure
+# TTS provider (health / admin reset already reference it).
 tts_circuit = CircuitBreaker(
     failure_threshold=_int_env("TTS_CIRCUIT_FAILURE_THRESHOLD", 3),
     window_seconds=_float_env("TTS_CIRCUIT_WINDOW_SECONDS", 60.0),
     recovery_seconds=_float_env("TTS_CIRCUIT_RECOVERY_SECONDS", 30.0),
 )
+
+# ── ElevenLabs TTS circuit ────────────────────────────────────────────────────
+# Separate from tts_circuit so an ElevenLabs outage / quota exhaustion trips
+# only this breaker and the Azure fallback keeps answering, and vice-versa.
+elevenlabs_tts_circuit = CircuitBreaker(
+    failure_threshold=_int_env("ELEVENLABS_CIRCUIT_FAILURE_THRESHOLD", 3),
+    window_seconds=_float_env("ELEVENLABS_CIRCUIT_WINDOW_SECONDS", 60.0),
+    recovery_seconds=_float_env("ELEVENLABS_CIRCUIT_RECOVERY_SECONDS", 30.0),
+)
+
+# provider name → breaker (used by the TTS selector and /chat/voice/health)
+TTS_CIRCUITS = {
+    "azure": tts_circuit,
+    "elevenlabs": elevenlabs_tts_circuit,
+}
