@@ -17,6 +17,9 @@ const sharedChatsRoutes = require('./routes/sharedChats');
 const notificationsRoutes = require('./routes/notifications');
 const datasetRoutes = require('./routes/dataset');
 const vocabRoutes = require('./routes/vocab');
+const reviewRoutes = require('./routes/review');
+const aiFeedbackRoutes = require('./routes/aiFeedback');
+const internalRoutes = require('./routes/internal');
 
 require('./config/firebase');
 
@@ -184,6 +187,8 @@ function createApp() {
   app.use('/api/users', usersRoutes);
   app.use('/api/transcripts', transcriptsRoutes);
   app.use('/api/evaluation', evaluationRoutes);
+  // Admin-only reviewer-feedback queue; must precede the generic admin router.
+  app.use('/api/admin', aiFeedbackRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/chat', chatRoutes);
   app.use('/api/chats', chatRoutes);
@@ -193,6 +198,8 @@ function createApp() {
   app.use('/api/notifications', notificationsRoutes);
   app.use('/api/dataset', datasetRoutes);
   app.use('/api/vocab', vocabRoutes);
+  app.use('/api/review', reviewRoutes);
+  app.use('/api/internal', internalRoutes);
 
   return app;
 }

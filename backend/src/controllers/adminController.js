@@ -165,7 +165,7 @@ exports.createUser = async (req, res) => {
       });
     }
 
-    const allowedRoles = ['student', 'teacher', 'admin'];
+    const allowedRoles = ['student', 'teacher', 'admin', 'reviewer'];
 
     if (!allowedRoles.includes(role)) {
       return res.status(400).json({
@@ -344,7 +344,7 @@ exports.updateUser = async (req, res) => {
     }
 
     if (updateData.role !== undefined) {
-      const allowedRoles = ['student', 'teacher', 'admin'];
+      const allowedRoles = ['student', 'teacher', 'admin', 'reviewer'];
 
       if (!allowedRoles.includes(updateData.role)) {
         return res.status(400).json({
