@@ -18,7 +18,7 @@ from services.chat_cache import get_rate_limit_status
 from services.chat_engine import generate_chat_response, stream_chat_response
 from services.chat_provider import get_provider_logs
 from services.chat_schemas import ChatRequest, ChatResponse, VoiceChatResponse
-from services.text_to_speech import build_tts_markup, synthesize_speech
+from services.text_to_speech import build_tts_markup, synthesize_speech_with_provider
 from services.vocab_tracker import track_vocab_async
 from services.internal_auth import require_internal_service_secret  # noqa: F401 (re-exported)
 # STT exceptions live in speech_to_text (shared by every engine).
@@ -466,11 +466,12 @@ async def chat_voice(
 
     # ── 5b. TTS (TTS_PROVIDER, Azure fallback); graceful None on failure ─
     audio_base64: str | None = None
+    tts_provider: str | None = None
     if chat_response.answerHe:
         try:
-            audio_out = await asyncio.wait_for(
+            audio_out, tts_provider = await asyncio.wait_for(
                 run_in_threadpool(
-                    synthesize_speech,
+                    synthesize_speech_with_provider,
                     chat_response.answerHe,
                     is_fallback=chat_response.fallbackUsed,
                     pronunciation_score=pronunciation_score,
@@ -482,11 +483,13 @@ async def chat_voice(
         except Exception as exc:
             logger.warning({"event": "tts_failed", "detail": str(exc)})
             audio_base64 = None
+            tts_provider = None
 
     return VoiceChatResponse(
         answerHe=chat_response.answerHe,
         answerAr=chat_response.answerAr,
         audioBase64=audio_base64,
+        ttsProvider=tts_provider,
         fallbackUsed=chat_response.fallbackUsed,
         fallbackReason=chat_response.fallbackReason,
         level=chat_response.level,
@@ -561,9 +564,9 @@ async def chat_tts(
     )
 
     try:
-        audio_out = await asyncio.wait_for(
+        audio_out, tts_provider = await asyncio.wait_for(
             run_in_threadpool(
-                synthesize_speech,
+                synthesize_speech_with_provider,
                 text,
                 is_fallback=payload.isFallback,
                 pronunciation_score=payload.pronunciationScore,
@@ -578,6 +581,7 @@ async def chat_tts(
         return {
             "audioBase64": audio_base64,
             "ssmlText": ssml or None,
+            "provider": tts_provider,
             "fallbackUsed": False,
             "fallbackReason": None,
         }

@@ -591,10 +591,27 @@ def synthesize_speech(
     pronunciation_score: int | None = None,
     voice: str | None = None,
 ) -> bytes:
+    """Synthesize Hebrew speech; see synthesize_speech_with_provider."""
+    audio, _provider = synthesize_speech_with_provider(
+        text,
+        is_fallback=is_fallback,
+        pronunciation_score=pronunciation_score,
+        voice=voice,
+    )
+    return audio
+
+
+def synthesize_speech_with_provider(
+    text: str,
+    *,
+    is_fallback: bool = False,
+    pronunciation_score: int | None = None,
+    voice: str | None = None,
+) -> tuple[bytes, str]:
     """
     Synthesize Hebrew speech with the configured TTS provider.
 
-    Returns MP3 audio bytes. Raises a TTSError subclass when every configured
+    Returns (MP3 audio bytes, provider that produced them). Raises a TTSError subclass when every configured
     provider fails, so the voice endpoint can fall back to audioBase64: null
     (browser TTS).
 
@@ -612,12 +629,15 @@ def synthesize_speech(
     fallback = get_tts_fallback_provider()
 
     try:
-        return _synthesize_with(
+        return (
+            _synthesize_with(
+                primary,
+                clean,
+                is_fallback=is_fallback,
+                pronunciation_score=pronunciation_score,
+                voice=voice,
+            ),
             primary,
-            clean,
-            is_fallback=is_fallback,
-            pronunciation_score=pronunciation_score,
-            voice=voice,
         )
     except TTSError as primary_error:
         if not fallback:
@@ -629,12 +649,15 @@ def synthesize_speech(
             "error": str(primary_error),
         })
         try:
-            return _synthesize_with(
+            return (
+                _synthesize_with(
+                    fallback,
+                    clean,
+                    is_fallback=is_fallback,
+                    pronunciation_score=pronunciation_score,
+                    voice=voice,
+                ),
                 fallback,
-                clean,
-                is_fallback=is_fallback,
-                pronunciation_score=pronunciation_score,
-                voice=voice,
             )
         except TTSError as fallback_error:
             logger.error({

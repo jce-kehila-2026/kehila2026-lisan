@@ -60,6 +60,8 @@ class VoiceChatResponse(BaseModel):
     answerHe: str | None = ""
     answerAr: str | None = None
     audioBase64: str | None = None
+    # Which TTS provider produced audioBase64 (elevenlabs | azure), for ops cost.
+    ttsProvider: str | None = None
     fallbackUsed: bool = False
     fallbackReason: str | None = None
     level: str = "A1"

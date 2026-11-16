@@ -41,7 +41,7 @@ const DEFAULT_PRICES = {
   // Azure Speech standard tier: $1 per audio hour.
   sttUsdPerSecond: 1 / 3600,
   // Per 1M characters of synthesized speech, by provider.
-  ttsUsdPerMChars: { azure: 16, elevenlabs: 100, default: 16 },
+  ttsUsdPerMChars: { azure: 16, elevenlabs: 80, default: 16 },
   // Pronunciation assessment is billed as speech-to-text audio time.
   pronunciationUsdPerSecond: 1 / 3600,
   // Encoded bytes per second of uploaded voice audio (webm/opus ≈ 32 kbps).
