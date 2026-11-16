@@ -20,7 +20,7 @@ import {
 import { getStoredToken } from '../services/auth.js';
 import { useGameSounds } from '../hooks/useGameSounds.js';
 import {
-  gameCatalog,
+  useGameCatalog,
   getCompletedWordEntries,
   getTotalLevelCount,
   getUniqueGameWordCount,
@@ -163,6 +163,7 @@ function VocabGame() {
   const text = LABELS[language];
   const sounds = useGameSounds();
 
+  const gameCatalog = useGameCatalog();
   const initialCategoryParam = searchParams.get('category');
   const initialCategory =
     initialCategoryParam && gameCatalog[initialCategoryParam] ? initialCategoryParam : null;
@@ -186,12 +187,12 @@ function VocabGame() {
   const [bestStreak, setBestStreak] = useState(0);
   const [cheer, setCheer] = useState(null);
 
-  const allWords = useMemo(() => getUniqueGameWords(gameCatalog), []);
-  const totalWordCount = useMemo(() => getUniqueGameWordCount(), []);
-  const totalLevelCount = useMemo(() => getTotalLevelCount(), []);
+  const allWords = useMemo(() => getUniqueGameWords(gameCatalog), [gameCatalog]);
+  const totalWordCount = useMemo(() => getUniqueGameWordCount(gameCatalog), [gameCatalog]);
+  const totalLevelCount = useMemo(() => getTotalLevelCount(gameCatalog), [gameCatalog]);
   const completedWords = useMemo(
     () => getCompletedWordEntries(gameProgress, gameCatalog),
-    [gameProgress],
+    [gameProgress, gameCatalog],
   );
 
   const categories = useMemo(() => {
@@ -208,7 +209,7 @@ function VocabGame() {
       .sort((a, b) => {
         return b.totalWords - a.totalWords;
       });
-  }, []);
+  }, [gameCatalog]);
 
   const activeCategoryData = activeCategory ? gameCatalog[activeCategory] : null;
   const activeMeta = activeCategory ? getCategoryMeta(activeCategory) : null;

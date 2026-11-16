@@ -24,7 +24,7 @@ import BottomNav from '../components/BottomNav.jsx';
 import StudentHeroVisual from '../components/student/StudentHeroVisual.jsx';
 import { getCurrentUser, getStoredToken, getStoredUser } from '../services/auth.js';
 import {
-  gameCatalog,
+  useGameCatalog,
   getCompletedWordCount,
   getTotalLevelCount,
 } from '../data/vocabGameCatalog.js';
@@ -189,6 +189,7 @@ function ProfilePage() {
   const { i18n, t } = useTranslation();
   const text = labels[i18n.language === 'he' ? 'he' : 'ar'];
   const storedUser = getStoredUser();
+  const gameCatalog = useGameCatalog();
   const [user, setUser] = useState(storedUser);
   const [progress, setProgress] = useState(null);
   const [gameLearnedWords, setGameLearnedWords] = useState(0);

@@ -1,19 +1,18 @@
+import { useMemo } from 'react';
 import rawGameData from './gameWords.json';
 import { getStoredUser } from '../services/auth.js';
+import { CEFR_LEVELS, DEFAULT_LEVEL as DEFAULT_CEFR_LEVEL, normalizeLevel as normalizeCefrLevel } from '../utils/levels.js';
 
 // gameWords.json is now keyed by level: { A1: {category: {...}}, A2: {...}, ... }
 // Each category is { total_words, num_levels, levels: [[word, ...], ...] }.
 
-export const GAME_LEVELS = ['A1', 'A2', 'B1', 'B2'];
-export const DEFAULT_LEVEL = 'A2';
+export const GAME_LEVELS = CEFR_LEVELS;
+// Unknown/unrecognised levels get the beginner game (A1), never A2.
+export const DEFAULT_LEVEL = DEFAULT_CEFR_LEVEL;
 
-const LEVEL_ALIASES = { beginner: 'A1', a1: 'A1', a2: 'A2', b1: 'B1', b2: 'B2' };
-
+// Accepts CEFR codes, Hebrew labels (א1..ב2, ג → B2) and legacy 'beginner'.
 export function normalizeLevel(value) {
-  if (!value) return DEFAULT_LEVEL;
-  const key = String(value).trim().toLowerCase();
-  const mapped = LEVEL_ALIASES[key] || String(value).trim().toUpperCase();
-  return GAME_LEVELS.includes(mapped) ? mapped : DEFAULT_LEVEL;
+  return normalizeCefrLevel(value);
 }
 
 export function getActiveLevel() {
@@ -46,20 +45,25 @@ export function getUniqueGameWords(catalog = getCatalogForLevel()) {
   return Array.from(byKey.values());
 }
 
-export const gameCatalog = getCatalogForLevel();
+// The catalog depends on the logged-in student's level, so it must be read
+// per user at render time — never frozen at module import (before login).
+export function useGameCatalog() {
+  const level = getActiveLevel();
+  return useMemo(() => getCatalogForLevel(level), [level]);
+}
 
-export function getTotalLevelCount(catalog = gameCatalog) {
+export function getTotalLevelCount(catalog = getCatalogForLevel()) {
   return Object.values(catalog).reduce((total, category) => {
     if (!Array.isArray(category?.levels)) return total;
     return total + category.levels.length;
   }, 0);
 }
 
-export function getUniqueGameWordCount(catalog = gameCatalog) {
+export function getUniqueGameWordCount(catalog = getCatalogForLevel()) {
   return getUniqueGameWords(catalog).length;
 }
 
-export function getCompletedWordEntries(progressCategories = {}, catalog = gameCatalog) {
+export function getCompletedWordEntries(progressCategories = {}, catalog = getCatalogForLevel()) {
   const byKey = new Map();
   for (const [categoryKey, completedLevels] of Object.entries(progressCategories || {})) {
     if (!Array.isArray(completedLevels)) continue;
@@ -78,6 +82,6 @@ export function getCompletedWordEntries(progressCategories = {}, catalog = gameC
   return Array.from(byKey.values());
 }
 
-export function getCompletedWordCount(progressCategories = {}, catalog = gameCatalog) {
+export function getCompletedWordCount(progressCategories = {}, catalog = getCatalogForLevel()) {
   return getCompletedWordEntries(progressCategories, catalog).length;
 }
