@@ -9,7 +9,7 @@
     "test": "node --test src/tests/**/*.test.js"
   },
   "engines": {
-    "node": "20"
+    "node": "22"
   },
   "keywords": [],
   "author": "",
