@@ -20,6 +20,7 @@ from services.chat_provider import get_provider_logs
 from services.chat_schemas import ChatRequest, ChatResponse, VoiceChatResponse
 from services.text_to_speech import build_ssml, synthesize_speech
 from services.vocab_tracker import track_vocab_async
+from services.internal_auth import require_internal_service_secret  # noqa: F401 (re-exported)
 # STT exceptions live in speech_to_text (shared by every engine).
 from services.speech_to_text import (
     STTAuthError,
@@ -52,27 +53,6 @@ class TtsRequest(BaseModel):
     text: str = Field(default="")
     isFallback: bool = Field(default=False)
     pronunciationScore: int | None = Field(default=None)
-
-
-def require_internal_service_secret(
-    x_internal_service_secret: str | None = Header(default=None),
-) -> None:
-    expected_secret = os.getenv("AI_SERVICE_INTERNAL_SECRET", "").strip()
-
-    if not expected_secret:
-        return
-
-    if not x_internal_service_secret:
-        raise HTTPException(
-            status_code=401,
-            detail="Missing internal service secret",
-        )
-
-    if x_internal_service_secret != expected_secret:
-        raise HTTPException(
-            status_code=403,
-            detail="Invalid internal service secret",
-        )
 
 
 def verify_jwt_token(

@@ -1,4 +1,5 @@
 const { db } = require('../config/firebase');
+const { userLevelFields } = require('../lib/levels');
 
 const normalizeTeacherIds = (student) => {
   const teacherIds = [];
@@ -40,7 +41,7 @@ exports.getMyStudents = async (req, res) => {
         id: doc.id,
         name: data.name || '',
         email: data.email || '',
-        level: data.level || '',
+        ...userLevelFields({ ...data, role: 'student' }),
         language: data.language || 'ar',
         isActive: data.isActive ?? true,
         teacherId: data.teacherId || null,
@@ -122,7 +123,7 @@ exports.getStudentProgress = async (req, res) => {
         studentId,
         name: student.name || '',
         email: student.email || '',
-        level: student.level || '',
+        ...userLevelFields({ ...student, role: 'student' }),
         totalAttempts,
         correctMeaningCount,
         totalChats,

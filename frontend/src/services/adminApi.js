@@ -1,4 +1,17 @@
+import i18n from '../i18n/index.js';
+import { getLevelLabel, labelToStoredLevel, normalizeLevel } from '../utils/levels.js';
+
 const API_BASE_URL = '/api';
+
+// No silent default passwords: student passwords are the ID number and must
+// be entered explicitly by the admin.
+const requirePassword = (password) => {
+  const value = typeof password === 'string' ? password.trim() : '';
+  if (!value) {
+    throw new Error(i18n.t('admin.passwordRequired'));
+  }
+  return value;
+};
 
 const getToken = () => localStorage.getItem('lisan-token');
 
@@ -39,7 +52,9 @@ const mapUserToStudent = (user) => ({
   id: user.id,
   name: user.name || '',
   email: user.email || '',
-  level: user.level || 'A1',
+  // Admin pages work with display labels (א1..ג); cefrLevel is the content level.
+  level: getLevelLabel(user.level, user.levelLabel),
+  cefrLevel: normalizeLevel(user.level),
   language: user.language || 'ar',
   role: user.role || 'student',
   status: user.isActive === false ? 'suspended' : 'active',
@@ -92,10 +107,10 @@ export const createStudent = async (student) => {
     method: 'POST',
     body: JSON.stringify({
       email: student.email,
-      password: student.password || 'Test1234!',
+      password: requirePassword(student.password),
       name: student.name,
       role: 'student',
-      level: student.level || 'A1',
+      ...labelToStoredLevel(student.level),
       language: student.language || 'ar',
       teacherIds: Array.isArray(student.teacherIds) ? student.teacherIds : []
     })
@@ -110,7 +125,7 @@ export const updateStudent = async (id, student) => {
   const body = {
     name: student.name,
     email: student.email,
-    level: student.level,
+    ...(student.level !== undefined ? labelToStoredLevel(student.level) : {}),
     language: student.language,
     teacherIds: Array.isArray(student.teacherIds) ? student.teacherIds : [],
     isActive: student.status ? student.status !== 'suspended' : undefined
@@ -242,7 +257,7 @@ export const createTeacher = async (teacher) => {
     method: 'POST',
     body: JSON.stringify({
       email: teacher.email,
-      password: teacher.password || 'Test1234!',
+      password: requirePassword(teacher.password),
       name: teacher.name,
       role: 'teacher',
       language: teacher.language || 'ar'
@@ -259,7 +274,7 @@ export const createAdmin = async (admin) => {
     method: 'POST',
     body: JSON.stringify({
       email: admin.email,
-      password: admin.password || 'Admin1234!',
+      password: requirePassword(admin.password),
       name: admin.name,
       role: 'admin',
       language: admin.language || 'ar'
@@ -281,11 +296,11 @@ export const createUser = async (user) => {
     method: 'POST',
     body: JSON.stringify({
       email: user.email,
-      password: user.password,
+      password: requirePassword(user.password),
       name: user.name,
       role: user.role,
       language: user.language || 'ar',
-      level: user.level || 'A1',
+      ...(user.role === 'student' ? labelToStoredLevel(user.level) : {}),
       levels: Array.isArray(user.levels) ? user.levels : [],
       levelFocus: Array.isArray(user.levels) ? user.levels.join(', ') : '',
       teacherIds: Array.isArray(user.teacherIds)

@@ -1,4 +1,5 @@
 const { db } = require('../config/firebase');
+const { userLevelFields } = require('../lib/levels');
 
 exports.getMe = async (req, res) => {
   try {
@@ -27,7 +28,7 @@ exports.getMe = async (req, res) => {
       email: user.email || '',
       role: user.role || '',
       language: user.language || 'ar',
-      level: user.level || '',
+      ...userLevelFields(user),
       teacherId: user.teacherId || '',
       teacherIds: Array.isArray(user.teacherIds) ? user.teacherIds : []
     });

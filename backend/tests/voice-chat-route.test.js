@@ -992,3 +992,73 @@ test('POST /api/chat/voice forwards learner name to AI service', async () => {
   assert.equal(response.status, 200);
   assert.equal(aiCalls.at(-1).learnerName, 'Dana');
 });
+
+test('POST /api/chat/:chatId/ai-message uses the student level from the user record, not the request body', async () => {
+  const { app, seedUser, aiCalls } = loadAppWithMocks();
+  const token = createAuthToken({ uid: 'student-hebrew-level', level: 'א1' });
+  seedUser({
+    id: 'student-hebrew-level',
+    level: 'א1',
+    chatPreferences: { defaultIncludeArabic: false },
+  });
+
+  const createChatResponse = await request(app)
+    .post('/api/chat')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ title: 'Level chat', level: 'B2' });
+
+  assert.equal(createChatResponse.status, 201);
+  const chatId = createChatResponse.body.chat.id;
+
+  const response = await request(app)
+    .post(`/api/chat/${chatId}/ai-message`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({ text: 'שלום', level: 'B2' });
+
+  assert.equal(response.status, 200);
+  assert.equal(aiCalls.at(-1).level, 'A1');
+});
+
+test('POST /api/chat/:chatId/ai-message maps label ג to B2 content', async () => {
+  const { app, seedUser, aiCalls } = loadAppWithMocks();
+  const token = createAuthToken({ uid: 'student-gimel' });
+  seedUser({
+    id: 'student-gimel',
+    level: 'ג',
+    chatPreferences: { defaultIncludeArabic: false },
+  });
+
+  const createChatResponse = await request(app)
+    .post('/api/chat')
+    .set('Authorization', `Bearer ${token}`)
+    .send({ title: 'Gimel chat' });
+  const chatId = createChatResponse.body.chat.id;
+
+  const response = await request(app)
+    .post(`/api/chat/${chatId}/ai-message`)
+    .set('Authorization', `Bearer ${token}`)
+    .send({ text: 'שלום', level: 'A1' });
+
+  assert.equal(response.status, 200);
+  assert.equal(aiCalls.at(-1).level, 'B2');
+});
+
+test('POST /api/chat/voice in an existing conversation uses the user record level, not the request level', async () => {
+  const { app, seedUser, seedChat, aiCalls } = loadAppWithMocks();
+  const token = createAuthToken({ uid: 'student-voice-existing' });
+  seedUser({ id: 'student-voice-existing', level: 'beginner' });
+  const chatId = seedChat({ userId: 'student-voice-existing', title: 'x', level: 'B2', messages: [] });
+
+  const response = await request(app)
+    .post('/api/chat/voice')
+    .set('Authorization', `Bearer ${token}`)
+    .field('level', 'B2')
+    .field('conversationId', chatId)
+    .attach('audio', Buffer.from('voice-existing-level'), {
+      filename: 'existing.webm',
+      contentType: 'audio/webm',
+    });
+
+  assert.equal(response.status, 200);
+  assert.equal(aiCalls.at(-1).level, 'A1');
+});

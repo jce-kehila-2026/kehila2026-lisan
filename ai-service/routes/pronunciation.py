@@ -8,8 +8,9 @@ from __future__ import annotations
 
 import os
 
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 
+from services.internal_auth import require_internal_service_secret
 from services.pronunciation import assess_pronunciation
 from services.pronunciation import validate_pronunciation_reference
 
@@ -20,7 +21,10 @@ router = APIRouter()
 MAX_AUDIO_BYTES = int(os.getenv("MAX_AUDIO_BYTES", str(25 * 1024 * 1024)))
 
 
-@router.post("/pronunciation/assess")
+@router.post(
+    "/pronunciation/assess",
+    dependencies=[Depends(require_internal_service_secret)],
+)
 async def assess(
     audio: UploadFile = File(..., description="WAV file (16kHz, 16-bit, mono)"),
     reference_text: str = Form(..., description="Expected Hebrew text"),
@@ -86,7 +90,10 @@ async def assess(
         )
 
 
-@router.post("/pronunciation/validate")
+@router.post(
+    "/pronunciation/validate",
+    dependencies=[Depends(require_internal_service_secret)],
+)
 async def validate_pronunciation(
     word: str = Form(..., description="Hebrew word to validate"),
     language_level: str = Form(default="A1", description="Curriculum level, e.g. A1/A2/B1/B2"),

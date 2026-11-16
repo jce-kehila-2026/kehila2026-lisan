@@ -41,9 +41,9 @@ import ConversationSidebar from '../components/chat/ConversationSidebar.jsx';
 import ChatWindow from '../components/chat/ChatWindow.jsx';
 import ChatReview from '../components/chat/ChatReview.jsx';
 import { useAudioRecorder } from '../hooks/useAudioRecorder.js';
-import { logout, getStoredToken } from '../services/auth.js';
+import { logout, getStoredToken, getStoredUser } from '../services/auth.js';
+import { normalizeLevel } from '../utils/levels.js';
 import {
-  DEFAULT_CHAT_LEVEL,
   deleteConversation,
   fetchConversation,
   fetchConversations,
@@ -555,7 +555,8 @@ function ChatbotPage({
       const response = await sendChatMessage({
         message: trimmedMessage,
         conversationId,
-        level: DEFAULT_CHAT_LEVEL,
+        // Hint only — the backend always uses the level from the user record.
+        level: normalizeLevel(getStoredUser()?.level),
         includeArabic,
       });
 
@@ -600,7 +601,8 @@ function ChatbotPage({
         const response = await sendVoiceMessage({
           audioBlob,
           conversationId,
-          level: DEFAULT_CHAT_LEVEL,
+          // Hint only — the backend always uses the level from the user record.
+        level: normalizeLevel(getStoredUser()?.level),
           includeArabic,
         });
 

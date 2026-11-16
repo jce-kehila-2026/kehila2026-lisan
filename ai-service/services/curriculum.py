@@ -3,6 +3,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
+from services.levels import normalize_cefr_level
+
 
 LEVEL_RANKS = {"A1": 1, "A2": 2, "B1": 3, "B2": 4}
 
@@ -69,8 +71,8 @@ _HEBREW_START_RE = re.compile(r"(?:בוא נלמד|תלמד|נתרגל|נלמד|
 
 
 def normalize_level(level: str | None) -> str:
-    normalized = (level or "A1").strip().upper()
-    return normalized if normalized in LEVEL_RANKS else "A1"
+    # Accepts CEFR codes, Hebrew display labels (א1..ג) and legacy values.
+    return normalize_cefr_level(level)
 
 
 def level_rank(level: str | None) -> int:

@@ -35,7 +35,7 @@
   "emailInvalid": "הכניסי שם משתמש תקין",
   "passwordRequired": "סיסמה היא שדה חובה",
   "passwordShort": "הסיסמה חייבת להכיל לפחות 6 תווים",
-  "invalidCredentials": "פרטי הכניסה אינם נכונים. נסי את הסיסמה 123456.",
+  "invalidCredentials": "פרטי הכניסה אינם נכונים. שם המשתמש הוא כתובת האימייל שלך, והסיסמה היא מספר תעודת הזהות שלך.",
   "genericLoginError": "לא ניתן להתחבר כרגע. נסי שוב.",
   "unknownUser": "שם המשתמש לא מוכר. השתמשי ב-student, teacher או admin.",
   "studentWelcome": "שלום {{name}}",
@@ -591,5 +591,13 @@
   "teacher.reviews.status.rejected": "נדחה",
   "teacher.reviews.status.pending": "ממתין",
   "teacher.reviews.actions.confirm": "אשר",
-  "teacher.reviews.actions.reject": "דחה"
+  "teacher.reviews.actions.reject": "דחה",
+  "loginErrorMissingFields": "נא למלא אימייל וסיסמה.",
+  "loginErrorAccountInactive": "החשבון שלך אינו פעיל כרגע. פני למורה שלך.",
+  "loginErrorNetwork": "אין חיבור לשרת. בדקי את חיבור האינטרנט ונסי שוב.",
+  "showPasswordShort": "הצגה",
+  "hidePasswordShort": "הסתרה",
+  "admin.passwordRequired": "יש להזין סיסמה (מספר תעודת זהות).",
+  "admin.students.form.passwordIdNumber": "סיסמה (מספר תעודת זהות)",
+  "admin.students.form.passwordIdNumberHint": "מספר תעודת הזהות של התלמידה"
 }

@@ -12,7 +12,8 @@ import { useSearchParams } from 'react-router-dom';
 import PageHeader from '../components/PageHeader.jsx';
 import VoiceOrb from '../components/VoiceOrb.jsx';
 import ChatReview from '../components/chat/ChatReview.jsx';
-import { getStoredToken } from '../services/auth.js';
+import { getStoredToken, getStoredUser } from '../services/auth.js';
+import { normalizeLevel } from '../utils/levels.js';
 import { useAudioRecorder } from '../hooks/useAudioRecorder.js';
 import { useWhisperTranscription } from '../hooks/useWhisperTranscription.js';
 
@@ -203,7 +204,8 @@ function Chatbot({
           method: 'POST',
           body: JSON.stringify({
             title: title || t('chatbot'),
-            level: 'A1',
+            // Hint only — the backend uses the level from the user record.
+            level: normalizeLevel(getStoredUser()?.level),
             // Binds this conversation to a quick-activity mode (role-play,
             // quiz ...) so every turn drives that activity in the ai-service.
             ...(scenario ? { scenario } : {}),
@@ -395,7 +397,7 @@ function Chatbot({
         const file = new File([blob], 'voice.webm', { type: 'audio/webm' });
         form.append('audio', file);
         form.append('conversationId', chatId);
-        form.append('level', 'A1');
+        form.append('level', normalizeLevel(getStoredUser()?.level));
 
         const response = await fetch(`${API_BASE_URL}/chats/voice`, {
           method: 'POST',

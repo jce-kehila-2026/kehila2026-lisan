@@ -68,7 +68,7 @@ function StudentLogin() {
               onClick={() => setShowPassword((current) => !current)}
               aria-label={showPassword ? t('hidePassword') : t('showPassword')}
             >
-              {showPassword ? 'Hide' : 'Show'}
+              {showPassword ? t('hidePasswordShort') : t('showPasswordShort')}
             </button>
           }
         />

@@ -40,6 +40,7 @@ import {
   getStoredUser,
   logout,
 } from '../../services/auth.js';
+import { isValidTeacherManagementCode } from '../../utils/teacherCode.js';
 
 const API_BASE_URL = '/api';
 
@@ -538,7 +539,7 @@ function AdminDashboard() {
   const handleTeacherCodeSubmit = (event) => {
     event.preventDefault();
 
-    if (teacherCode === '0000') {
+    if (isValidTeacherManagementCode(teacherCode)) {
       closeTeacherCodeModal();
       navigate('/admin/progress');
       return;

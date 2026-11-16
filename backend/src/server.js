@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
+const path = require('path');
+const { requireAuth } = require('./middleware/auth');
 
 dotenv.config();
 
@@ -116,7 +118,14 @@ function createApp() {
 
   app.use(morgan('dev'));
   app.use(express.json());
-  app.use('/uploads', express.static('uploads'));
+  // Uploaded course material (admin audio recordings) is private: only
+  // logged-in users may download it. Resolved relative to the backend folder
+  // (where adminController writes files), not the process cwd.
+  app.use(
+    '/uploads',
+    requireAuth,
+    express.static(path.join(__dirname, '..', 'uploads'), { fallthrough: false })
+  );
 
   app.get('/', (req, res) => {
     res.send('Lisan backend is running');

@@ -30,7 +30,7 @@ import {
   studentStories,
 } from '../data/studentStories.jsx';
 import {
-  gameCatalog,
+  useGameCatalog,
   getCompletedWordCount,
   getTotalLevelCount,
   getUniqueGameWordCount,
@@ -219,6 +219,7 @@ function Home({
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const storedUser = getStoredUser();
+  const gameCatalog = useGameCatalog();
   const isArabic = i18n.language === 'ar';
 
   const chatsLabel = isArabic ? 'المحادثة' : 'שיחה';
@@ -628,7 +629,7 @@ function Home({
       .sort((a, b) => {
         return b.totalWords - a.totalWords;
       });
-  }, []);
+  }, [gameCatalog]);
 
   const filteredDictionaryWords = useMemo(() => {
     const query = dictionaryQuery.trim().toLowerCase();
@@ -1113,10 +1114,10 @@ function Home({
                   {gamesText.badge}
                 </span>
                 <span className="rounded-full bg-white px-3 py-1 text-sm font-bold text-slate-500">
-                  {gamesText.words(getUniqueGameWordCount())}
+                  {gamesText.words(getUniqueGameWordCount(gameCatalog))}
                 </span>
                 <span className="rounded-full bg-white px-3 py-1 text-sm font-bold text-slate-500">
-                  {gamesText.levels(getTotalLevelCount())}
+                  {gamesText.levels(getTotalLevelCount(gameCatalog))}
                 </span>
               </div>
               <h2 className="mt-3 text-2xl font-black text-slate-950 lg:text-3xl">

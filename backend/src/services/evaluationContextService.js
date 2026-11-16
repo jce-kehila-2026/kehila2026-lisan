@@ -1,4 +1,7 @@
 const { db } = require('../config/firebase');
+const { normalizeLevel } = require('../lib/levels');
+
+const isBeginnerLevel = (level) => level === 'A1' || level === 'A2';
 
 async function getEvaluationContext({
   userId,
@@ -84,10 +87,7 @@ async function getEvaluationContext({
   // 5) Build normalized context
   // =========================
 
-  const level =
-    user.level ||
-    activity.level ||
-    'A1';
+  const level = normalizeLevel(user.level || activity.level);
 
   const monthlyLimit =
     user.pronunciationUsage?.monthlyLimit || 30;
@@ -120,7 +120,7 @@ async function getEvaluationContext({
 
       analysisDepth:
         activity.analysisDepth ||
-        (level === 'A1' || level === 'A2'
+        (isBeginnerLevel(level)
           ? 'meaning_only'
           : 'standard'),
 
@@ -141,7 +141,7 @@ async function getEvaluationContext({
 
       maxFeedbackItems:
         activity.maxFeedbackItems ||
-        (level === 'A1' || level === 'A2'
+        (isBeginnerLevel(level)
           ? 1
           : 2),
 

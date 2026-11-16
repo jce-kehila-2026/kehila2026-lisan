@@ -18,6 +18,7 @@ import {
   adminStudentsSeed,
   adminTeachersSeed,
 } from '../../data/adminMockData.js';
+import { getLevelLabel } from '../../utils/levels.js';
 import {
   assignStudentsToTeacher,
   createUser,
@@ -36,7 +37,7 @@ function getStudentTeacherIds(student) {
   return [];
 }
 
-function getTeacherLevels(teacher) {
+function getRawTeacherLevels(teacher) {
   if (Array.isArray(teacher?.levels) && teacher.levels.length > 0) {
     return teacher.levels;
   }
@@ -53,6 +54,12 @@ function getTeacherLevels(teacher) {
   }
 
   return [];
+}
+
+// Teacher levels may be stored as CEFR codes (legacy) or Hebrew labels;
+// compare everything as display labels (students are mapped the same way).
+function getTeacherLevels(teacher) {
+  return [...new Set(getRawTeacherLevels(teacher).map((level) => getLevelLabel(level)))];
 }
 
 function getTeachersLayoutClass() {
@@ -106,7 +113,7 @@ function CreateUserForm({ onCancel, onSubmit, saving }) {
     password: '',
     role: 'teacher',
     language: 'ar',
-    level: 'A1',
+    level: adminLevels[0],
   });
 
   const setField = (field) => (event) => {
@@ -146,10 +153,11 @@ function CreateUserForm({ onCancel, onSubmit, saving }) {
         <label className="grid gap-2 text-sm font-black text-slate-700">
           {t('admin.progress.form.level')}
           <select value={form.level} onChange={setField('level')} className={fieldClass}>
-            <option value="A1">A1</option>
-            <option value="A2">A2</option>
-            <option value="B1">B1</option>
-            <option value="B2">B2</option>
+            {adminLevels.map((level) => (
+              <option key={level} value={level}>
+                {level}
+              </option>
+            ))}
           </select>
         </label>
       ) : null}

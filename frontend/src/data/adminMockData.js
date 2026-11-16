@@ -1,4 +1,5 @@
-export const adminLevels = ['א1', 'א2', 'ב1', 'ב2', 'ג'];
+// Admin-facing level labels. Content level: א1=A1, א2=A2, ב1=B1, ב2=B2, ג=B2.
+export { LEVEL_LABEL_OPTIONS as adminLevels } from '../utils/levels.js';
 
 export const adminStudentsSeed = [
   {
