@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import NamedTuple
 
+from services.levels import normalize_cefr_level
+
 logger = logging.getLogger("lisan.chat")
 
 DEFAULT_LEVEL = "A1"
@@ -221,8 +223,9 @@ def normalize_hebrew_token(token: str) -> str:
 
 
 def normalize_level(level: str | None) -> str:
-    normalized = (level or DEFAULT_LEVEL).strip().upper()
-    return normalized or DEFAULT_LEVEL
+    # Accepts CEFR codes, Hebrew display labels (א1..ג) and legacy values;
+    # unknown values fall back to A1.
+    return normalize_cefr_level(level)
 
 
 def sanitize_input(text: str) -> str:

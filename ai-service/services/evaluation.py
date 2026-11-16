@@ -6,6 +6,8 @@ import time
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from typing import Any
 
+from services.levels import is_beginner_level, normalize_cefr_level
+
 from google import genai
 from google.genai import types as genai_types
 
@@ -162,7 +164,7 @@ def has_retry_worthy_correction(
         if severity in {"medium", "high"}:
             return True
         if (
-            level.upper() in {"A1", "A2"}
+            is_beginner_level(level)
             and correction_type in {"grammar", "vocabulary", "meaning"}
         ):
             return True
@@ -566,13 +568,13 @@ def build_evaluation_prompt(
     max_items_text = (
         str(max_feedback_items)
         if max_feedback_items is not None
-        else ("1" if level.upper() in {"A1", "A2"} else "2")
+        else ("1" if is_beginner_level(level) else "2")
     )
     level_policy = (
         "For A1/A2: focus on meaning, basic vocabulary, simple sentence order, "
         "and communication quality. Correct only one main issue. Keep spokenFeedbackHe "
         "very short and simple. Do not overcorrect pronunciation."
-        if level.upper() in {"A1", "A2"}
+        if is_beginner_level(level)
         else "For B1/B2: allow deeper correction, natural phrasing, terminology, "
         "and more precise feedback when useful. Still keep spokenFeedbackHe short."
     )
@@ -845,9 +847,9 @@ def normalize_evaluation_output(
         payload = {}
     fallback_rule = str(payload.get("fallbackRule") or "").strip() or None
 
-    normalized_level = str(payload.get("level") or level or "A1")
+    normalized_level = normalize_cefr_level(level or payload.get("level"))
     correction_limit = max_feedback_items
-    if correction_limit is None and normalized_level.upper() in {"A1", "A2"}:
+    if correction_limit is None and normalized_is_beginner_level(level):
         correction_limit = 1
     elif correction_limit is None:
         correction_limit = 2
@@ -974,7 +976,7 @@ def normalize_evaluation_output(
     if normalized["nextAction"] == "retry":
         normalized["score"] = min(normalized["score"], 60)
     if (
-        normalized_level.upper() in {"A1", "A2"}
+        normalized_is_beginner_level(level)
         and normalized_corrections
         and not advanced_but_correct
     ):
