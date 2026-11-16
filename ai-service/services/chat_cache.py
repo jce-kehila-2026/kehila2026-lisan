@@ -98,7 +98,7 @@ DEFAULT_RESPONSE_CACHE_MAX_ENTRIES = int(
 )
 # Request-level limit (all paths, including the free local ones). Generous,
 # because local answers cost nothing — this only stops outright flooding.
-DEFAULT_RATE_LIMIT_MAX_REQUESTS = int(os.getenv("RATE_LIMIT_MAX_REQUESTS", "10"))
+DEFAULT_RATE_LIMIT_MAX_REQUESTS = int(os.getenv("RATE_LIMIT_MAX_REQUESTS", "20"))
 DEFAULT_RATE_LIMIT_WINDOW_SECONDS = int(
     os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60")
 )
@@ -107,7 +107,7 @@ DEFAULT_RATE_LIMIT_WINDOW_SECONDS = int(
 # many questions a minute as long as cache/router/templates answer them; only
 # the ones that fall through to the model are counted here.
 DEFAULT_LLM_RATE_LIMIT_MAX_REQUESTS = int(
-    os.getenv("LLM_RATE_LIMIT_MAX_REQUESTS", "4")
+    os.getenv("LLM_RATE_LIMIT_MAX_REQUESTS", "12")
 )
 DEFAULT_LLM_RATE_LIMIT_WINDOW_SECONDS = int(
     os.getenv("LLM_RATE_LIMIT_WINDOW_SECONDS", "60")
