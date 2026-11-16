@@ -704,6 +704,7 @@ def _generate_chat_response_impl(payload: ChatRequest) -> ChatResponse:
         ),
         inputTokens=provider_result.input_tokens,
         outputTokens=provider_result.output_tokens,
+        costUsd=getattr(provider_result, "cost_usd", None),
     )
     # Only cache this LLM answer if it is a stateless GLOBAL lookup (e.g. an
     # explained word meaning). A normal conversation turn depends on the chat
@@ -908,6 +909,7 @@ def _generate_scenario_response(
         ),
         inputTokens=provider_result.input_tokens,
         outputTokens=provider_result.output_tokens,
+        costUsd=getattr(provider_result, "cost_usd", None),
     )
     # Remember the turn for multi-turn continuity, but do NOT cache: a live
     # role-play line is unique to this conversation state.

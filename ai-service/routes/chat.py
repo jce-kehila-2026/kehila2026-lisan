@@ -499,6 +499,7 @@ async def chat_voice(
         suggestedNextPrompts=chat_response.suggestedNextPrompts,
         inputTokens=chat_response.inputTokens,
         outputTokens=chat_response.outputTokens,
+        costUsd=getattr(chat_response, "costUsd", None),
     )
 
 

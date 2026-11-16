@@ -42,6 +42,8 @@ class ChatResponse(BaseModel):
     suggestedNextPrompts: list[str] = Field(default_factory=list)
     inputTokens: int | None = Field(default=None)
     outputTokens: int | None = Field(default=None)
+    # Provider-reported LLM cost in USD (ops monitoring); None when unknown.
+    costUsd: float | None = Field(default=None)
 
 
 class VoiceChatResponse(BaseModel):
@@ -70,6 +72,8 @@ class VoiceChatResponse(BaseModel):
     suggestedNextPrompts: list[str] = Field(default_factory=list)
     inputTokens: int | None = Field(default=None)
     outputTokens: int | None = Field(default=None)
+    # Provider-reported LLM cost in USD (ops monitoring); None when unknown.
+    costUsd: float | None = Field(default=None)
 
 
     @model_validator(mode="after")

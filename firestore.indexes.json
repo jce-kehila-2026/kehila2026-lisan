@@ -33,7 +33,27 @@
         { "fieldPath": "userId",    "order": "ASCENDING"  },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "opsEvents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "outcome", "order": "ASCENDING"  },
+        { "fieldPath": "ts",      "order": "DESCENDING" }
+      ]
     }
   ],
-  "fieldOverrides": []
+  "fieldOverrides": [
+    { "collectionGroup": "opsEvents", "fieldPath": "expireAt", "ttl": true, "indexes": [] },
+    { "collectionGroup": "opsDaily", "fieldPath": "totals",          "indexes": [] },
+    { "collectionGroup": "opsDaily", "fieldPath": "byKind",          "indexes": [] },
+    { "collectionGroup": "opsDaily", "fieldPath": "byModel",         "indexes": [] },
+    { "collectionGroup": "opsDaily", "fieldPath": "hours",           "indexes": [] },
+    { "collectionGroup": "opsDaily", "fieldPath": "errors",          "indexes": [] },
+    { "collectionGroup": "opsDaily", "fieldPath": "fallbackReasons", "indexes": [] },
+    { "collectionGroup": "opsDaily", "fieldPath": "activeUsers",     "indexes": [] },
+    { "collectionGroup": "opsDaily", "fieldPath": "chats",           "indexes": [] },
+    { "collectionGroup": "opsDaily", "fieldPath": "logins",          "indexes": [] },
+    { "collectionGroup": "opsDaily", "fieldPath": "http",            "indexes": [] }
+  ]
 }

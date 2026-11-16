@@ -94,6 +94,9 @@ class ProviderResult:
     provider: str = ""
     model: str = ""
     attempts: list[ProviderAttemptLog] = field(default_factory=list)
+    # Provider-reported cost in USD (OpenRouter returns usage.cost on every
+    # response). None when the provider does not report it.
+    cost_usd: float | None = None
 
 
 class ChatProviderError(RuntimeError):
@@ -743,6 +746,32 @@ def _create_openrouter_client(timeout_seconds: float, api_key: str) -> Any:
     )
 
 
+def _extract_usage_cost(usage: Any) -> float | None:
+    """Read OpenRouter's ``usage.cost`` (USD credits) from an SDK usage object.
+
+    The OpenAI SDK keeps unknown fields as attributes / ``model_extra``.
+    Returns None when absent or not a non-negative number.
+    """
+    if usage is None:
+        return None
+    raw: Any = None
+    if isinstance(usage, dict):
+        raw = usage.get("cost")
+    else:
+        raw = getattr(usage, "cost", None)
+        if raw is None:
+            extra = getattr(usage, "model_extra", None)
+            if isinstance(extra, dict):
+                raw = extra.get("cost")
+    try:
+        value = float(raw)
+    except (TypeError, ValueError):
+        return None
+    if value != value or value < 0:  # NaN or negative
+        return None
+    return value
+
+
 def _call_openrouter(
     model: str,
     system_message: str,
@@ -787,6 +816,7 @@ def _call_openrouter(
                 output_tokens=getattr(usage, "completion_tokens", 0) if usage else 0,
                 provider="openrouter",
                 model=model,
+                cost_usd=_extract_usage_cost(usage),
             )
         except Exception as exc:
             last_exc = exc
