@@ -61,8 +61,9 @@ from services.conversation_memory import CONVERSATION_MEMORY
 from services.curriculum import build_tutor_prompt, looks_like_tutor_driven_request
 from services.reviewer_corrections import (
     build_corrections_block,
-    corrections_version,
-    get_active_corrections,
+    build_guidance_block,
+    get_corrections_guidance,
+    guidance_version,
 )
 from services.vocab_tracker import track_vocab_async
 
@@ -498,7 +499,7 @@ def _generate_chat_response_impl(payload: ChatRequest) -> ChatResponse:
         grammar_hint=grammar_hint,
         include_arabic=request_context.raw_include_arabic,
         learner_context=learner_context,
-        corrections_block=build_corrections_block(list(request_context.reviewer_corrections)),
+        corrections_block=_reviewer_block(request_context),
     )
 
     call_opts = ProviderCallOptions(
@@ -813,7 +814,7 @@ def _generate_scenario_response(
         + "\n\n"
         + learner_context
     )
-    scenario_corrections = build_corrections_block(list(request_context.reviewer_corrections))
+    scenario_corrections = _reviewer_block(request_context)
     if scenario_corrections:
         system_message += "\n\n" + scenario_corrections
     call_opts = ProviderCallOptions(
@@ -1112,7 +1113,7 @@ def stream_chat_response(payload: ChatRequest) -> Iterator[str]:
         context=retrieval_context.context_text,
         voice_mode=request_context.voice_mode,
         grammar_hint=grammar_hint,
-        corrections_block=build_corrections_block(list(request_context.reviewer_corrections)),
+        corrections_block=_reviewer_block(request_context),
     )
 
     history = CONVERSATION_MEMORY.get_history(request_context.session_id or "")
@@ -1168,6 +1169,15 @@ def stream_chat_response(payload: ChatRequest) -> Iterator[str]:
     yield answer_he
 
 
+def _reviewer_block(request_context: ChatRequestContext) -> str:
+    """Reviewer guidance for the prompt: the AI summary when the backend sent
+    one that covers every active rule, else the bounded raw rule list."""
+    guidance = getattr(request_context, "reviewer_guidance", None)
+    if guidance is not None:
+        return build_guidance_block(guidance)
+    return build_corrections_block(list(request_context.reviewer_corrections))
+
+
 def _build_request_context(payload: ChatRequest) -> ChatRequestContext:
     provider, model = get_configured_provider()
     requested_level = normalize_level(payload.level)
@@ -1178,7 +1188,7 @@ def _build_request_context(payload: ChatRequest) -> ChatRequestContext:
     include_arabic = enforce_hebrew_only_scope(payload.includeArabic)
     # Owner-approved reviewer rules for this level. Never raises / never blocks
     # long: an unreachable backend just yields the last known rules (or none).
-    reviewer_rules = tuple(get_active_corrections(requested_level))
+    guidance = get_corrections_guidance(requested_level)
     return ChatRequestContext(
         message=sanitized_message,
         normalized_message=sanitized_message,
@@ -1188,7 +1198,7 @@ def _build_request_context(payload: ChatRequest) -> ChatRequestContext:
             sanitized_message,
             requested_level,
             include_arabic,
-            corrections_version=corrections_version(list(reviewer_rules)),
+            corrections_version=guidance_version(guidance),
         ),
         provider=provider,
         model=model,
@@ -1198,7 +1208,8 @@ def _build_request_context(payload: ChatRequest) -> ChatRequestContext:
         learner_name=_clean_learner_name(getattr(payload, "learnerName", None)),
         scenario=getattr(payload, "scenario", None) or None,
         raw_include_arabic=bool(getattr(payload, "includeArabic", False)),
-        reviewer_corrections=reviewer_rules,
+        reviewer_corrections=tuple(guidance.rules),
+        reviewer_guidance=guidance,
     )
 
 
