@@ -1,18 +1,25 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, ShieldCheck, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Pencil, RefreshCw, RotateCcw, ShieldCheck, Sparkles, XCircle } from 'lucide-react';
 
 import AdminPageHeader from '../../components/admin/AdminPageHeader.jsx';
 import {
   approveReviewFeedback,
+  getAiCorrectionSummaries,
   getAiCorrections,
   getReviewFeedback,
+  regenerateAiCorrectionSummary,
   rejectReviewFeedback,
+  revertAiCorrectionSummary,
   setAiCorrectionActive,
+  updateAiCorrectionSummary,
 } from '../../services/adminApi.js';
 
 const MAX_RULE_CHARS = 300;
+const MAX_SUMMARY_CHARS = 1200;
+const SUMMARY_POLL_MS = 3000;
+const SUMMARY_MAX_POLLS = 20;
 const RULE_LEVELS = ['A1', 'A2', 'B1', 'B2', 'ALL'];
 
 const fieldClass =
@@ -127,13 +134,220 @@ function FeedbackCard({ item, onDecided }) {
   );
 }
 
+function formatDate(iso) {
+  if (!iso) return '';
+  try {
+    return new Date(iso).toLocaleString('he-IL', { dateStyle: 'short', timeStyle: 'short' });
+  } catch {
+    return iso;
+  }
+}
+
+function SummaryCard({ summary, onChanged }) {
+  const { t } = useTranslation();
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(summary.text || '');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  const run = async (action) => {
+    setBusy(true);
+    setError('');
+    try {
+      const data = await action();
+      onChanged(data.summary);
+      setEditing(false);
+    } catch (requestError) {
+      setError(requestError.message || t('admin.aiFeedback.error'));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const startEdit = () => {
+    setDraft(summary.text || '');
+    setEditing(true);
+  };
+
+  const revert = () => {
+    if (!summary.previous) return;
+    if (!window.confirm(t('admin.aiFeedback.summary.revertConfirm', { version: summary.previous.version }))) return;
+    run(() => revertAiCorrectionSummary(summary.level));
+  };
+
+  const statusLabel = summary.regenerating
+    ? t('admin.aiFeedback.summary.regenerating')
+    : summary.status === 'failed'
+      ? t('admin.aiFeedback.summary.statusFailed')
+      : summary.status === 'none'
+        ? t('admin.aiFeedback.summary.statusNone')
+        : t('admin.aiFeedback.summary.statusOk');
+  const statusClass = summary.regenerating
+    ? 'bg-amber-50 text-amber-700'
+    : summary.status === 'failed'
+      ? 'bg-rose-50 text-rose-700'
+      : summary.status === 'none'
+        ? 'bg-slate-100 text-slate-600'
+        : 'bg-emerald-50 text-emerald-700';
+  const showRawListNotice =
+    !summary.regenerating && summary.activeRuleCount > 0 && !summary.coversCurrentRules;
+
+  return (
+    <article className="rounded-[1.75rem] border border-[#EEE5FF] bg-white p-5 shadow-card">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="flex items-center gap-2 text-base font-black text-slate-950">
+          <Sparkles className="h-4 w-4 text-violet-600" />
+          {t('admin.aiFeedback.summary.cardTitle', { level: summary.level })}
+        </h3>
+        <span className={`rounded-full px-3 py-1 text-xs font-black ${statusClass}`}>{statusLabel}</span>
+      </div>
+
+      <div className="mt-2 flex flex-wrap gap-2 text-[11px] font-black text-slate-500">
+        {summary.version ? (
+          <span className="rounded-full bg-violet-50 px-3 py-1 text-violet-700">
+            {t('admin.aiFeedback.summary.version', { version: summary.version })}
+          </span>
+        ) : null}
+        {summary.generatedAt ? (
+          <span className="rounded-full bg-slate-100 px-3 py-1">
+            {t('admin.aiFeedback.summary.generatedAt', { date: formatDate(summary.generatedAt) })}
+          </span>
+        ) : null}
+        {summary.version ? (
+          <span className="rounded-full bg-slate-100 px-3 py-1">
+            {summary.edited ? t('admin.aiFeedback.summary.edited') : t('admin.aiFeedback.summary.byAi')}
+          </span>
+        ) : null}
+        <span className="rounded-full bg-slate-100 px-3 py-1">
+          {t('admin.aiFeedback.summary.ruleCount', { count: summary.activeRuleCount })}
+        </span>
+      </div>
+
+      {summary.status === 'failed' && summary.error ? (
+        <p className="mt-3 flex items-start gap-2 rounded-2xl bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+          <span dir="auto">{t('admin.aiFeedback.summary.failedNotice', { error: summary.error })}</span>
+        </p>
+      ) : null}
+      {showRawListNotice ? (
+        <p className="mt-3 rounded-2xl bg-amber-50 px-4 py-3 text-sm font-bold text-amber-800">
+          {t('admin.aiFeedback.summary.rawListInUse')}
+        </p>
+      ) : null}
+
+      {editing ? (
+        <label className="mt-3 grid gap-1 text-xs font-black text-slate-700">
+          <textarea
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            maxLength={MAX_SUMMARY_CHARS}
+            rows={6}
+            dir="auto"
+            className={fieldClass}
+          />
+          <span className="text-[11px] font-semibold text-slate-400">
+            {t('admin.aiFeedback.summary.editHint', { max: MAX_SUMMARY_CHARS })}
+          </span>
+        </label>
+      ) : (
+        <p className="mt-3 whitespace-pre-line rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold leading-7 text-slate-900" dir="auto">
+          {summary.text || t('admin.aiFeedback.summary.empty')}
+        </p>
+      )}
+
+      {error ? <p className="mt-3 text-sm font-bold text-rose-700">{error}</p> : null}
+
+      <div className="mt-4 flex flex-wrap justify-end gap-2">
+        {editing ? (
+          <>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => setEditing(false)}
+              className="rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-700 disabled:opacity-60"
+            >
+              {t('admin.aiFeedback.summary.cancel')}
+            </button>
+            <button
+              type="button"
+              disabled={busy || draft.trim().length < 5}
+              onClick={() => run(() => updateAiCorrectionSummary(summary.level, draft))}
+              className="rounded-2xl bg-violet-600 px-4 py-2 text-sm font-black text-white shadow-button disabled:opacity-60"
+            >
+              {busy ? t('admin.aiFeedback.summary.updating') : t('admin.aiFeedback.summary.save')}
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              disabled={busy || !summary.previous}
+              onClick={revert}
+              className="inline-flex items-center gap-2 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-black text-slate-700 disabled:opacity-50"
+            >
+              <RotateCcw className="h-4 w-4" />
+              {t('admin.aiFeedback.summary.revert')}
+            </button>
+            <button
+              type="button"
+              disabled={busy || summary.regenerating || summary.activeRuleCount === 0}
+              onClick={() => run(() => regenerateAiCorrectionSummary(summary.level))}
+              className="inline-flex items-center gap-2 rounded-2xl bg-violet-50 px-4 py-2 text-sm font-black text-violet-700 hover:bg-violet-100 disabled:opacity-50"
+            >
+              <RefreshCw className={`h-4 w-4 ${busy ? 'animate-spin' : ''}`} />
+              {busy ? t('admin.aiFeedback.summary.updating') : t('admin.aiFeedback.summary.regenerate')}
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={startEdit}
+              className="inline-flex items-center gap-2 rounded-2xl bg-violet-600 px-4 py-2 text-sm font-black text-white shadow-button disabled:opacity-60"
+            >
+              <Pencil className="h-4 w-4" />
+              {t('admin.aiFeedback.summary.edit')}
+            </button>
+          </>
+        )}
+      </div>
+    </article>
+  );
+}
+
 function AiFeedback() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [feedback, setFeedback] = useState([]);
   const [corrections, setCorrections] = useState([]);
+  const [summaries, setSummaries] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const pollTimer = useRef(null);
+  const pollCount = useRef(0);
+
+  // Summaries regenerate in the background after approve/deactivate — poll
+  // briefly while any level is still regenerating.
+  const loadSummaries = useCallback(async () => {
+    clearTimeout(pollTimer.current);
+    try {
+      const data = await getAiCorrectionSummaries();
+      const list = data.summaries || [];
+      setSummaries(list);
+      if (list.some((item) => item.regenerating) && pollCount.current < SUMMARY_MAX_POLLS) {
+        pollCount.current += 1;
+        pollTimer.current = setTimeout(loadSummaries, SUMMARY_POLL_MS);
+      }
+    } catch {
+      setError(t('admin.aiFeedback.error'));
+    }
+  }, [t]);
+
+  const refreshSummariesSoon = useCallback(() => {
+    pollCount.current = 0;
+    clearTimeout(pollTimer.current);
+    pollTimer.current = setTimeout(loadSummaries, 1000);
+  }, [loadSummaries]);
+
+  useEffect(() => () => clearTimeout(pollTimer.current), []);
 
   const load = useCallback(async () => {
     setError('');
@@ -153,7 +367,18 @@ function AiFeedback() {
 
   useEffect(() => {
     load();
-  }, [load]);
+    loadSummaries();
+  }, [load, loadSummaries]);
+
+  const onDecided = useCallback(() => {
+    load();
+    refreshSummariesSoon();
+  }, [load, refreshSummariesSoon]);
+
+  const onSummaryChanged = (updated) => {
+    if (!updated) return;
+    setSummaries((current) => current.map((item) => (item.level === updated.level ? updated : item)));
+  };
 
   const toggleRule = async (rule) => {
     try {
@@ -161,6 +386,7 @@ function AiFeedback() {
       setCorrections((current) =>
         current.map((item) => (item.id === rule.id ? { ...item, active: !rule.active } : item)),
       );
+      refreshSummariesSoon();
     } catch {
       setError(t('admin.aiFeedback.error'));
     }
@@ -205,7 +431,15 @@ function AiFeedback() {
             </p>
           ) : null}
           {feedback.map((item) => (
-            <FeedbackCard key={item.id} item={item} onDecided={load} />
+            <FeedbackCard key={item.id} item={item} onDecided={onDecided} />
+          ))}
+        </div>
+
+        <h2 className="mt-8 text-lg font-black text-slate-950">{t('admin.aiFeedback.summary.sectionTitle')}</h2>
+        <p className="mt-1 text-sm font-semibold text-slate-500">{t('admin.aiFeedback.summary.sectionSubtitle')}</p>
+        <div className="mt-3 grid gap-4 lg:grid-cols-2">
+          {summaries.map((summary) => (
+            <SummaryCard key={summary.level} summary={summary} onChanged={onSummaryChanged} />
           ))}
         </div>
 

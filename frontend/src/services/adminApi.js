@@ -352,3 +352,17 @@ export const setAiCorrectionActive = async (id, active) =>
     method: 'PATCH',
     body: JSON.stringify({ active })
   });
+
+export const getAiCorrectionSummaries = async () => request('/admin/ai-correction-summaries');
+
+export const updateAiCorrectionSummary = async (level, text) =>
+  request(`/admin/ai-correction-summaries/${encodeURIComponent(level)}`, {
+    method: 'PUT',
+    body: JSON.stringify({ text })
+  });
+
+export const regenerateAiCorrectionSummary = async (level) =>
+  request(`/admin/ai-correction-summaries/${encodeURIComponent(level)}/regenerate`, { method: 'POST' });
+
+export const revertAiCorrectionSummary = async (level) =>
+  request(`/admin/ai-correction-summaries/${encodeURIComponent(level)}/revert`, { method: 'POST' });
