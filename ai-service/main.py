@@ -338,6 +338,15 @@ def warm_chat_cache() -> None:
     initialize_chat_cache()
 
 
+@app.on_event("startup")
+def _start_backend_keep_warm() -> None:
+    # Free cold-start fix: ping the backend function every few minutes.
+    if "pytest" in sys.modules:
+        return
+    from services.backend_keep_warm import start
+    start()
+
+
 @app.on_event("shutdown")
 def _on_shutdown() -> None:
     """
@@ -345,6 +354,11 @@ def _on_shutdown() -> None:
     the student's last few vocab events. Caps at 5 s so K8s SIGTERM grace
     isn't blown.
     """
+    try:
+        from services.backend_keep_warm import stop as _stop_keep_warm
+        _stop_keep_warm()
+    except Exception:
+        pass
     try:
         from services.vocab_tracker import wait_for_inflight
         unfinished = wait_for_inflight(timeout=5.0)
