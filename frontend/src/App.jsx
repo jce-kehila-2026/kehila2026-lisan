@@ -25,6 +25,8 @@ import TeacherLogin from './pages/teacher/Login.jsx';
 import TeacherReviews from './pages/teacher/Reviews.jsx';
 import TeacherNotifications from './pages/teacher/Notifications.jsx';
 import DatasetUploader from './pages/teacher/DatasetUploader.jsx';
+import ReviewPage from './pages/review/ReviewPage.jsx';
+import AdminAiFeedback from './pages/admin/AiFeedback.jsx';
 import { getStoredUser } from './services/auth.js';
 
 const SKIP_AUTH = import.meta.env.VITE_SKIP_AUTH === 'true';
@@ -307,6 +309,30 @@ function App() {
           element={
             <ProtectedRoute role={['admin', 'teacher']}>
               <AdminAnalytics />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/ai-feedback"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminAiFeedback />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/review"
+          element={
+            <ProtectedRoute role={['reviewer', 'admin']}>
+              <ReviewPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/review/:id"
+          element={
+            <ProtectedRoute role={['reviewer', 'admin']}>
+              <ReviewPage />
             </ProtectedRoute>
           }
         />

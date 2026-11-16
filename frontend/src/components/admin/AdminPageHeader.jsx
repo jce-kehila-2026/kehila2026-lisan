@@ -6,6 +6,7 @@ import {
   FilePlus2,
   GraduationCap,
   MessageSquareText,
+  ShieldCheck,
   Users,
 } from 'lucide-react';
 
@@ -24,7 +25,12 @@ function AdminPageHeader({ extraLeft = null }) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const activeSection = adminSections.find((s) => s.to === location.pathname)?.id ?? '';
+  // Reviewer-feedback queue is admin-only (not teachers).
+  const sections = getStoredUser()?.role === 'admin'
+    ? [...adminSections, { id: 'ai-feedback', label: 'משוב AI', icon: ShieldCheck, to: '/admin/ai-feedback' }]
+    : adminSections;
+
+  const activeSection = sections.find((s) => s.to === location.pathname)?.id ?? '';
 
   const handleLogout = () => {
     logout();
@@ -33,7 +39,7 @@ function AdminPageHeader({ extraLeft = null }) {
 
   return (
     <LisanHeader
-      sections={adminSections}
+      sections={sections}
       activeSection={activeSection}
       onSectionClick={() => {}}
       logoTarget="/admin/dashboard"
