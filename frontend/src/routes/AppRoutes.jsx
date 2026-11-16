@@ -17,6 +17,7 @@ import AdminProgress from '../pages/admin/Progress.jsx';
 import AdminStudents from '../pages/admin/Students.jsx';
 import AdminStatistics from '../pages/admin/Statistics.jsx';
 import AdminWords from '../pages/admin/Words.jsx';
+import AdminOps from '../pages/admin/Ops.jsx';
 import TeacherHome from '../pages/home/TeacherHome.jsx';
 import TeacherLogin from '../pages/teacher/Login.jsx';
 import TeacherReviews from '../pages/teacher/Reviews.jsx';
@@ -140,6 +141,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute role="admin">
               <AdminNotifications />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ops"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminOps />
             </ProtectedRoute>
           }
         />

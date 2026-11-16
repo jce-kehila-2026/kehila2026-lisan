@@ -6,11 +6,13 @@ import {
   FilePlus2,
   GraduationCap,
   MessageSquareText,
+  ServerCog,
   Users,
 } from 'lucide-react';
 
 import LisanHeader from '../LisanHeader.jsx';
 import { getStoredUser, logout } from '../../services/auth.js';
+import { useOpsAccess } from '../../services/opsApi.js';
 
 const adminSections = [
   { id: 'students',      label: 'תלמידות', icon: Users,            to: '/admin/students' },
@@ -20,11 +22,16 @@ const adminSections = [
   { id: 'materials',     label: 'חומרים',  icon: FilePlus2,         to: '/teacher/stories/upload' },
 ];
 
+// Shown only to admins on the server-side OPS_ADMIN_EMAILS allowlist.
+const opsSection = { id: 'ops', label: 'תפעול', icon: ServerCog, to: '/ops' };
+
 function AdminPageHeader({ extraLeft = null }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const canSeeOps = useOpsAccess();
+  const sections = canSeeOps ? [...adminSections, opsSection] : adminSections;
 
-  const activeSection = adminSections.find((s) => s.to === location.pathname)?.id ?? '';
+  const activeSection = sections.find((s) => s.to === location.pathname)?.id ?? '';
 
   const handleLogout = () => {
     logout();
@@ -33,9 +40,12 @@ function AdminPageHeader({ extraLeft = null }) {
 
   return (
     <LisanHeader
-      sections={adminSections}
+      sections={sections}
       activeSection={activeSection}
-      onSectionClick={() => {}}
+      onSectionClick={(id) => {
+        const target = sections.find((s) => s.id === id)?.to;
+        if (target) navigate(target);
+      }}
       logoTarget="/admin/dashboard"
       onLogout={handleLogout}
       navLabel="ניווט ניהול"
