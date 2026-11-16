@@ -409,6 +409,8 @@ def readiness():
         "gemini": "GEMINI_API_KEY",
         "openai": "OPENAI_API_KEY",
         "anthropic": "ANTHROPIC_API_KEY",
+        "openrouter": "OPENROUTER_API_KEYS",
+        "groq": "GROQ_API_KEY",
     }.get(provider, "")
     if key_name and os.getenv(key_name, "").strip():
         checks[f"llm:{provider}"] = "ok"
