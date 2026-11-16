@@ -7,7 +7,7 @@ from io import BytesIO
 from typing import Any
 
 from fastapi.concurrency import run_in_threadpool
-from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import JSONResponse
 
 from services.evaluation import (
@@ -15,6 +15,7 @@ from services.evaluation import (
     evaluate_hebrew_speaking,
     infer_pronunciation_warning,
 )
+from services.internal_auth import require_internal_service_secret
 from services.levels import normalize_cefr_level
 from services.pronunciation import assess_pronunciation
 
@@ -41,7 +42,10 @@ class AzureDecision:
     requested: bool
 
 
-@router.post("/evaluate-speaking")
+@router.post(
+    "/evaluate-speaking",
+    dependencies=[Depends(require_internal_service_secret)],
+)
 async def evaluate_speaking(
     request: Request,
     audio: UploadFile | None = File(default=None),
