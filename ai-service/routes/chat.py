@@ -18,7 +18,7 @@ from services.chat_cache import get_rate_limit_status
 from services.chat_engine import generate_chat_response, stream_chat_response
 from services.chat_provider import get_provider_logs
 from services.chat_schemas import ChatRequest, ChatResponse, VoiceChatResponse
-from services.text_to_speech import build_ssml, synthesize_speech
+from services.text_to_speech import build_tts_markup, synthesize_speech
 from services.vocab_tracker import track_vocab_async
 # STT exceptions live in speech_to_text (shared by every engine).
 from services.speech_to_text import (
@@ -478,13 +478,13 @@ async def chat_voice(
         "latency_ms": _elapsed_ms(wall_start),
     })
 
-    ssml = build_ssml(
+    ssml = build_tts_markup(
         text=chat_response.answerHe,
         is_fallback=chat_response.fallbackUsed,
         pronunciation_score=pronunciation_score,
     )
 
-    # ── 5b. Azure TTS — he-IL speech; graceful None on failure ───────────
+    # ── 5b. TTS (TTS_PROVIDER, Azure fallback); graceful None on failure ─
     audio_base64: str | None = None
     if chat_response.answerHe:
         try:
@@ -573,7 +573,7 @@ async def chat_tts(
     if not text:
         raise HTTPException(status_code=400, detail="Text is required")
 
-    ssml = build_ssml(
+    ssml = build_tts_markup(
         text,
         is_fallback=payload.isFallback,
         pronunciation_score=payload.pronunciationScore,
@@ -615,13 +615,26 @@ async def chat_tts(
 @router.get("/chat/voice/health")
 async def voice_health(
     x_internal_service_secret: str | None = Header(default=None),
-) -> dict[str, str]:
-    """Returns the current state of STT and TTS circuit breakers."""
+) -> dict[str, object]:
+    """Returns the current state of STT and TTS circuit breakers.
+
+    `tts_circuit` (Azure) is kept for backwards compatibility; `tts_circuits`
+    reports every TTS provider's breaker.
+    """
     require_internal_service_secret(x_internal_service_secret)
-    from services.voice_circuits import stt_circuit, tts_circuit
+    from services.text_to_speech import (
+        get_tts_fallback_provider,
+        get_tts_provider,
+    )
+    from services.voice_circuits import TTS_CIRCUITS, stt_circuit, tts_circuit
     return {
         "stt_circuit": stt_circuit.state.value,
         "tts_circuit": tts_circuit.state.value,
+        "tts_provider": get_tts_provider(),
+        "tts_fallback_provider": get_tts_fallback_provider() or None,
+        "tts_circuits": {
+            name: breaker.state.value for name, breaker in TTS_CIRCUITS.items()
+        },
     }
 
 
@@ -651,10 +664,11 @@ async def reset_circuits(
         logger.warning({"event": "circuit_reset_llm_failed", "detail": str(exc)})
 
     try:
-        from services.voice_circuits import stt_circuit, tts_circuit
+        from services.voice_circuits import elevenlabs_tts_circuit, stt_circuit, tts_circuit
         stt_circuit.reset()
         tts_circuit.reset()
-        reset_list.extend(["stt", "tts"])
+        elevenlabs_tts_circuit.reset()
+        reset_list.extend(["stt", "tts", "tts_elevenlabs"])
     except Exception as exc:
         logger.warning({"event": "circuit_reset_voice_failed", "detail": str(exc)})
 
