@@ -9,6 +9,11 @@ from the backend's internal endpoint:
     GET {BACKEND_URL}/api/internal/ai-corrections?level=A1
     X-Internal-Service-Secret: <AI_SERVICE_INTERNAL_SECRET>
 
+When the backend also returns an AI-written summary of the level's rules
+(`summary: {text, version}` — only when it covers every current active rule),
+the summary replaces the raw list in the prompt; otherwise the raw list is used
+exactly as before (capped at MAX_RULES).
+
 Rules are cached per level (TTL, default 5 min). Fetching must never block or
 break a chat: short timeout, stale-while-revalidate in a background thread,
 and on any failure we keep the last known rules (or none).
@@ -40,11 +45,24 @@ DEFAULT_TIMEOUT_SECONDS = 1.0
 FAILURE_RETRY_SECONDS = 60.0
 
 BLOCK_HEADER = "Corrections from human reviewers — follow these (most recent first):"
+SUMMARY_HEADER = "Corrections from human reviewers — follow these:"
+MAX_SUMMARY_CHARS = 1200
+
+
+@dataclass(frozen=True)
+class CorrectionsGuidance:
+    """What the prompt needs: the raw rules, plus the summary when present."""
+    rules: tuple[str, ...] = ()
+    summary: str = ""
+    summary_version: str = ""
+
+
+EMPTY_GUIDANCE = CorrectionsGuidance()
 
 
 @dataclass
 class _Entry:
-    rules: list[str]
+    guidance: CorrectionsGuidance
     expires_at: float
 
 
@@ -89,7 +107,27 @@ def _clean_rule(value: object) -> str:
     return text
 
 
-def _fetch_from_backend(level: str) -> list[str]:
+def _clean_summary(value: object) -> str:
+    if not isinstance(value, str):
+        return ""
+    text = " ".join(value.split())
+    if len(text) > MAX_SUMMARY_CHARS:
+        text = text[: MAX_SUMMARY_CHARS - 1].rstrip() + "…"
+    return text
+
+
+def _parse_summary(payload: object) -> tuple[str, str]:
+    summary = payload.get("summary") if isinstance(payload, dict) else None
+    if not isinstance(summary, dict):
+        return "", ""
+    text = _clean_summary(summary.get("text"))
+    version = summary.get("version")
+    if not text or version is None or isinstance(version, bool):
+        return "", ""
+    return text, str(version)
+
+
+def _fetch_from_backend(level: str) -> CorrectionsGuidance:
     base_url = _backend_base_url()
     url = f"{base_url}/api/internal/ai-corrections?level={urllib.parse.quote(level, safe='')}"
     headers = {"Accept": "application/json", "User-Agent": "lisan-ai-corrections/1.0"}
@@ -111,50 +149,60 @@ def _fetch_from_backend(level: str) -> list[str]:
         text = _clean_rule(record.get("ruleText") if isinstance(record, dict) else record)
         if text and text not in rules:
             rules.append(text)
-    return rules[:MAX_RULES]
+    summary, summary_version = _parse_summary(payload)
+    return CorrectionsGuidance(
+        rules=tuple(rules[:MAX_RULES]),
+        summary=summary,
+        summary_version=summary_version,
+    )
 
 
-def _refresh(level: str, previous: list[str]) -> list[str]:
+def _refresh(level: str, previous: CorrectionsGuidance) -> CorrectionsGuidance:
     try:
-        rules = _fetch_from_backend(level)
+        guidance = _fetch_from_backend(level)
         expires_at = time.monotonic() + _ttl_seconds()
     except Exception as exc:  # never let this reach a chat turn
         logger.warning({"event": "ai_corrections_fetch_failed", "level": level, "error": str(exc)})
-        rules = previous
+        guidance = previous
         expires_at = time.monotonic() + min(FAILURE_RETRY_SECONDS, _ttl_seconds())
     with _lock:
-        _cache[level] = _Entry(rules=list(rules), expires_at=expires_at)
+        _cache[level] = _Entry(guidance=guidance, expires_at=expires_at)
         _refreshing.discard(level)
-    return list(rules)
+    return guidance
 
 
-def get_active_corrections(level: str | None, background: bool = True) -> list[str]:
-    """Return active reviewer rules for a level, newest first. Never raises."""
+def get_corrections_guidance(level: str | None, background: bool = True) -> CorrectionsGuidance:
+    """Rules (newest first) and summary for a level. Never raises."""
     try:
         if not _backend_base_url():
-            return []
+            return EMPTY_GUIDANCE
         normalized = normalize_level(level)
         now = time.monotonic()
         with _lock:
             entry = _cache.get(normalized)
             if entry is not None and entry.expires_at > now:
-                return list(entry.rules)
+                return entry.guidance
             if entry is not None and background:
-                # Stale: serve last known rules, refresh off the request path.
+                # Stale: serve last known guidance, refresh off the request path.
                 if normalized not in _refreshing:
                     _refreshing.add(normalized)
                     threading.Thread(
                         target=_refresh,
-                        args=(normalized, list(entry.rules)),
+                        args=(normalized, entry.guidance),
                         daemon=True,
                     ).start()
-                return list(entry.rules)
-            previous = list(entry.rules) if entry is not None else []
+                return entry.guidance
+            previous = entry.guidance if entry is not None else EMPTY_GUIDANCE
         # First request for this level: short synchronous fetch.
         return _refresh(normalized, previous)
     except Exception as exc:
         logger.warning({"event": "ai_corrections_unavailable", "error": str(exc)})
-        return []
+        return EMPTY_GUIDANCE
+
+
+def get_active_corrections(level: str | None, background: bool = True) -> list[str]:
+    """Return active reviewer rules for a level, newest first. Never raises."""
+    return list(get_corrections_guidance(level, background=background).rules)
 
 
 def build_corrections_block(rules: list[str]) -> str:
@@ -175,6 +223,30 @@ def build_corrections_block(rules: list[str]) -> str:
     if not lines:
         return ""
     return BLOCK_HEADER + "\n" + "\n".join(lines)
+
+
+def build_guidance_block(guidance: CorrectionsGuidance | None) -> str:
+    """Summary block when a summary is present, else the bounded raw list.
+
+    The 12-rule cap applies only to the raw list; the summary already covers
+    every active rule and is bounded by characters (MAX_SUMMARY_CHARS).
+    """
+    if guidance is None:
+        return ""
+    summary = _clean_summary(guidance.summary)
+    if summary:
+        return SUMMARY_HEADER + "\n" + summary
+    return build_corrections_block(list(guidance.rules))
+
+
+def guidance_version(guidance: CorrectionsGuidance | None) -> str:
+    """Cache-key component: changes with the summary version or the rule set."""
+    if guidance is None:
+        return ""
+    if guidance.summary:
+        raw = f"summary:{guidance.summary_version}\n{guidance.summary}"
+        return "s" + hashlib.sha1(raw.encode("utf-8"), usedforsecurity=False).hexdigest()[:10]
+    return corrections_version(list(guidance.rules))
 
 
 def corrections_version(rules: list[str]) -> str:

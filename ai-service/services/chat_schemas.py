@@ -116,6 +116,9 @@ class ChatRequestContext:
     raw_include_arabic: bool = False
     # Owner-approved rules from human reviewers for this level (newest first).
     reviewer_corrections: tuple[str, ...] = ()
+    # CorrectionsGuidance (services.reviewer_corrections): rules + the AI-written
+    # summary of them. None -> the prompt falls back to reviewer_corrections.
+    reviewer_guidance: object | None = None
 
 
 @dataclass(frozen=True)

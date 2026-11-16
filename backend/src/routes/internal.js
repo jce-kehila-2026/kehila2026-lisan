@@ -9,6 +9,7 @@ const crypto = require('crypto');
 const express = require('express');
 
 const reviewService = require('../services/aiReviewService');
+const summaryService = require('../services/aiCorrectionSummaryService');
 
 const router = express.Router();
 
@@ -54,7 +55,16 @@ function requireInternalSecret(req, res, next) {
 router.get('/ai-corrections', requireInternalSecret, async (req, res) => {
   try {
     const corrections = await reviewService.getActiveCorrectionsForLevel(req.query.level);
-    return res.status(200).json({ success: true, corrections });
+    // AI summary of these rules — only when it covers exactly the current
+    // active rules; otherwise null and ai-service uses the raw list.
+    let summary = null;
+    try {
+      const level = String(req.query.level || '').trim().toUpperCase();
+      summary = await summaryService.getServableSummary(level, corrections);
+    } catch (error) {
+      console.error('[internal] ai-correction summary:', error?.message || error);
+    }
+    return res.status(200).json({ success: true, corrections, summary });
   } catch (error) {
     const status = error?.status || 500;
     if (status >= 500) console.error('[internal] ai-corrections:', error?.message || error);

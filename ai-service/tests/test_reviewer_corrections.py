@@ -175,3 +175,83 @@ def test_cache_key_changes_when_rules_change():
     # level must still be extractable from the key
     from services.chat_cache import _extract_level_from_cache_key
     assert _extract_level_from_cache_key(key1) == "A1"
+
+
+# ── AI-written summary of the rules ─────────────────────────────────────────
+
+def _backend_with_summary(rules, summary_text, version):
+    def fake_urlopen(request, timeout=None):
+        payload = {"success": True, "corrections": rules}
+        if summary_text is not None:
+            payload["summary"] = {"text": summary_text, "version": version}
+        return _FakeResponse(payload)
+
+    return fake_urlopen
+
+
+def test_prompt_uses_summary_instead_of_raw_list_when_present():
+    rules = [{"id": f"r{i}", "ruleText": f"RAW RULE {i}"} for i in range(20)]
+    fake = _backend_with_summary(rules, "Always address her in feminine forms. Keep A1 words simple.", 3)
+    captured = []
+    with patch.object(rc.urllib.request, "urlopen", side_effect=fake), \
+            patch.object(chat_engine, "call_provider", side_effect=_stub_provider(captured)):
+        chat_engine.generate_chat_response(
+            ChatRequest(message="אני רוצה לקנות חלב", level="A1", sessionId="rc-sum-1")
+        )
+    assert captured
+    prompt = captured[-1]
+    assert "Corrections from human reviewers — follow these:" in prompt
+    assert "Always address her in feminine forms." in prompt
+    assert "RAW RULE" not in prompt
+
+
+def test_prompt_falls_back_to_raw_list_without_summary():
+    rules = [{"id": "r1", "ruleText": "RAW RULE ONE"}]
+    fake = _backend_with_summary(rules, None, None)
+    captured = []
+    with patch.object(rc.urllib.request, "urlopen", side_effect=fake), \
+            patch.object(chat_engine, "call_provider", side_effect=_stub_provider(captured)):
+        chat_engine.generate_chat_response(
+            ChatRequest(message="אני רוצה לקנות חלב", level="A1", sessionId="rc-sum-2")
+        )
+    assert "- RAW RULE ONE" in captured[-1]
+
+
+def test_summary_block_is_bounded_and_raw_cap_only_applies_to_list():
+    long_summary = "Use feminine forms. " * 200
+    guidance = rc.CorrectionsGuidance(rules=tuple(f"r{i}" for i in range(40)), summary=long_summary, summary_version="1")
+    block = rc.build_guidance_block(guidance)
+    assert block.startswith(rc.SUMMARY_HEADER)
+    assert len(block) <= rc.MAX_SUMMARY_CHARS + len(rc.SUMMARY_HEADER) + 1
+    raw = rc.build_guidance_block(rc.CorrectionsGuidance(rules=tuple(f"rule {i}" for i in range(40))))
+    assert raw.count("\n- ") <= rc.MAX_RULES
+    assert rc.build_guidance_block(rc.EMPTY_GUIDANCE) == ""
+
+
+def test_summary_with_bad_version_is_ignored():
+    fake = _backend_with_summary([{"ruleText": "RAW"}], "Some summary", None)
+    with patch.object(rc.urllib.request, "urlopen", side_effect=fake):
+        guidance = rc.get_corrections_guidance("A1")
+    assert guidance.summary == ""
+    assert guidance.rules == ("RAW",)
+
+
+def test_cache_key_changes_when_summary_version_changes():
+    rules = [{"id": "r1", "ruleText": "same rule"}]
+    keys = []
+    for version in (1, 2):
+        rc.clear_corrections_cache()
+        with patch.object(rc.urllib.request, "urlopen",
+                          side_effect=_backend_with_summary(rules, "Same summary text.", version)):
+            keys.append(chat_engine._build_request_context(
+                ChatRequest(message="מה זה בית", level="A1")
+            ).cache_key)
+    rc.clear_corrections_cache()
+    with patch.object(rc.urllib.request, "urlopen",
+                      side_effect=_backend_with_summary(rules, None, None)):
+        keys.append(chat_engine._build_request_context(
+            ChatRequest(message="מה זה בית", level="A1")
+        ).cache_key)
+    assert len(set(keys)) == 3
+    from services.chat_cache import _extract_level_from_cache_key
+    assert all(_extract_level_from_cache_key(k) == "A1" for k in keys)

@@ -567,7 +567,7 @@ async function setCorrectionActive(correctionId, active, adminId) {
   const snap = await ref.get();
   if (!snap.exists) throw httpError(404, 'CORRECTION_NOT_FOUND', 'Rule not found');
   await ref.update({ active, updatedBy: adminId, updatedAt: new Date() });
-  return { id: snap.id, active };
+  return { id: snap.id, active, level: snap.data()?.level || null };
 }
 
 /** Active rules for one level (plus 'ALL'), newest first — for ai-service. */

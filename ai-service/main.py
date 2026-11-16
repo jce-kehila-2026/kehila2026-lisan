@@ -54,6 +54,7 @@ if _env_enabled("ENABLE_OTEL"):
 from routes.chat import router as chat_router
 from routes.evaluation import router as evaluation_router
 from routes.pronunciation import router as pronunciation_router
+from routes.internal import router as internal_router
 from services.chat_cache import check_rate_limit
 from services.chat_cache import initialize_chat_cache
 
@@ -252,6 +253,7 @@ app.add_middleware(
 app.include_router(chat_router, prefix="/api/ai")
 app.include_router(evaluation_router, prefix="/api/ai")
 app.include_router(pronunciation_router, prefix="/api/ai")
+app.include_router(internal_router, prefix="/api/ai")
 
 
 def _resolve_rate_identity(request: Request) -> str:
