@@ -46,7 +46,7 @@ export const getOpsErrors = (range = '7d') => request(`/ops/errors?range=${encod
  */
 export async function checkOpsAccess() {
   const user = getStoredUser();
-  if (!user || user.role !== 'admin') return false;
+  if (!user || !['admin', 'teacher'].includes(user.role)) return false;
   const cacheKey = `${ACCESS_CACHE_KEY}:${user.uid || user.id || ''}`;
   try {
     const cached = sessionStorage.getItem(cacheKey);

@@ -302,7 +302,7 @@ function App() {
         <Route
           path="/ops"
           element={
-            <ProtectedRoute role="admin">
+            <ProtectedRoute role={['admin', 'teacher']}>
               <AdminOps />
             </ProtectedRoute>
           }

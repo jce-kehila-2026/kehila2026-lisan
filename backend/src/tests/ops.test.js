@@ -355,12 +355,19 @@ describe('ops routes access control', () => {
     assert.equal(res.status, 401);
   });
 
-  test('teacher and student → 403', async () => {
+  test('student → 403 even with an allowlisted email', async () => {
     const app = buildOpsApp({ env });
-    for (const role of ['teacher', 'student']) {
-      const res = await supertest(app).get('/api/ops/summary').set('Authorization', token({ uid: 'adm', role }));
-      assert.equal(res.status, 403);
-    }
+    const res = await supertest(app).get('/api/ops/summary').set('Authorization', token({ uid: 'adm', role: 'student' }));
+    assert.equal(res.status, 403);
+  });
+
+  test('teacher: allowlisted email gets in, others → 403', async () => {
+    const app = buildOpsApp({ env });
+    const other = await supertest(app).get('/api/ops/summary').set('Authorization', token({ uid: 'adm2', role: 'teacher' }));
+    assert.equal(other.status, 403);
+    const owner = await supertest(app).get('/api/ops/summary').set('Authorization', token({ uid: 'adm', role: 'teacher' }));
+    assert.notEqual(owner.status, 403);
+    assert.notEqual(owner.status, 401);
   });
 
   test('admin not on the allowlist → 403', async () => {

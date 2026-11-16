@@ -76,8 +76,8 @@ describe('checkOpsAccess', () => {
     sessionStorage.clear();
   });
 
-  it('never asks the server for non-admins', async () => {
-    localStorage.setItem('lisan-user', JSON.stringify({ uid: 't1', role: 'teacher' }));
+  it('never asks the server for students or reviewers', async () => {
+    localStorage.setItem('lisan-user', JSON.stringify({ uid: 's1', role: 'student' }));
     const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
     expect(await checkOpsAccess()).toBe(false);

@@ -9,7 +9,8 @@
  *   GET /api/ops/dropoff             → funnel, short sessions, inactive students
  *   GET /api/ops/errors?range=       → top error codes/routes/providers + recent 50
  *
- * Guard: requireAuth → requireRole('admin') → OPS_ADMIN_EMAILS allowlist
+ * Guard: requireAuth → requireRole('admin','teacher') → OPS_ADMIN_EMAILS allowlist
+ * (the allowlist is the real gate; the owner's account is a teacher account)
  * (fail closed). Responses are cached in memory briefly so the page's 60 s
  * auto-refresh does not multiply Firestore reads.
  */
@@ -80,7 +81,7 @@ function createOpsRouter(deps = {}) {
   }
   router.clearCache = () => cache.clear();
 
-  router.use(requireAuth, requireRole('admin'), requireOpsAllowlist({ db: deps.db, env: deps.env }));
+  router.use(requireAuth, requireRole('admin', 'teacher'), requireOpsAllowlist({ db: deps.db, env: deps.env }));
 
   const handle = (fn) => async (req, res) => {
     try {

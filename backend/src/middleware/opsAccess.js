@@ -3,7 +3,7 @@
 /**
  * Server-side allowlist for the operations page.
  *
- * Runs after requireAuth + requireRole('admin'). Fails closed: when
+ * Runs after requireAuth + requireRole('admin','teacher'). Fails closed: when
  * OPS_ADMIN_EMAILS is unset or empty, nobody gets in. Entries are matched
  * case-insensitively against the user's email (looked up in users/{uid},
  * because the session JWT only carries uid/role/level).
