@@ -39,3 +39,6 @@ ai-service/.venv/
 
 # pre-wipe learner-data backups — contain personal data, never commit
 backup-pre-wipe-*.json
+
+# ElevenLabs voice samples (scripts/elevenlabs_voice_samples.py output)
+tts_samples/
