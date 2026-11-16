@@ -17,6 +17,8 @@ const sharedChatsRoutes = require('./routes/sharedChats');
 const notificationsRoutes = require('./routes/notifications');
 const datasetRoutes = require('./routes/dataset');
 const vocabRoutes = require('./routes/vocab');
+const opsRoutes = require('./routes/ops');
+const { opsTracker, opsErrorHandler } = require('./middleware/opsTracker');
 
 require('./config/firebase');
 
@@ -115,6 +117,8 @@ function createApp() {
   }));
 
   app.use(morgan('dev'));
+  // Ops monitoring capture (fire-and-forget; never blocks a request).
+  app.use(opsTracker);
   app.use(express.json());
   app.use('/uploads', express.static('uploads'));
 
@@ -193,6 +197,10 @@ function createApp() {
   app.use('/api/notifications', notificationsRoutes);
   app.use('/api/dataset', datasetRoutes);
   app.use('/api/vocab', vocabRoutes);
+  app.use('/api/ops', opsRoutes);
+
+  // Last: JSON error handler so unhandled errors are answered and recorded.
+  app.use(opsErrorHandler);
 
   return app;
 }

@@ -224,6 +224,7 @@ router.post('/:chatId/stream', requireAuth, async (req, res) => {
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('X-Accel-Buffering', 'no');
     res.flushHeaders();
+    res.locals.ops = { stream: true };
 
     // Abort upstream if client disconnects (saves LLM tokens).
     req.on('close', () => {
@@ -235,6 +236,9 @@ router.post('/:chatId/stream', requireAuth, async (req, res) => {
     // pipeline() handles backpressure + cleanup automatically.
     await pipeline(upstream.data, res);
   } catch (error) {
+    // Ops monitoring: a stream that fails mid-flight still answered 200.
+    res.locals.ops = { streamError: true, errorCode: 'AI_STREAM_ERROR', stream: true };
+
     // If headers already sent, we can only write to the open SSE stream.
     if (res.headersSent && !res.writableEnded) {
       try {

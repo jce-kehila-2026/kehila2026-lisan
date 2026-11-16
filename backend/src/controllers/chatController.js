@@ -364,6 +364,17 @@ exports.sendAiMessage = async (req, res) => {
       });
     }
 
+    // Ops monitoring extras (not part of the response body).
+    res.locals.ops = {
+      provider: aiResponse?.provider || null,
+      model: aiResponse?.model || null,
+      level: aiResponse?.level || effectiveLevel,
+      inputTokens,
+      outputTokens,
+      costUsd: typeof aiResponse?.costUsd === 'number' ? aiResponse.costUsd : null,
+      aiLatencyMs: aiResponse?.latencyMs ?? null,
+    };
+
     return res.status(200).json({
       success: true,
       userMessage,
