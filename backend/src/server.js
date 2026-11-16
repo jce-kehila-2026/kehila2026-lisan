@@ -20,6 +20,7 @@ const vocabRoutes = require('./routes/vocab');
 const reviewRoutes = require('./routes/review');
 const aiFeedbackRoutes = require('./routes/aiFeedback');
 const internalRoutes = require('./routes/internal');
+const { restrictReviewerScope } = require('./middleware/reviewerScope');
 
 require('./config/firebase');
 
@@ -182,6 +183,9 @@ function createApp() {
       checks,
     });
   });
+
+  // Reviewer tokens may only reach the /api/review area (see middleware).
+  app.use('/api', restrictReviewerScope);
 
   app.use('/api/auth', authRoutes);
   app.use('/api/users', usersRoutes);

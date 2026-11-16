@@ -187,6 +187,44 @@ describe('access control', () => {
     }
   });
 
+  test('reviewer token is confined to /api/review (student APIs -> 403)', async () => {
+    const denied = [
+      ['post', '/api/chat'],
+      ['get', '/api/chat/my'],
+      ['post', '/api/chats/c1/ai-message'],
+      ['post', '/api/chat/c1/stream'],
+      ['post', '/api/chat/tts'],
+      ['get', '/api/progress/me'],
+      ['post', '/api/progress/game/complete'],
+      ['post', '/api/evaluation/attempts'],
+      ['post', '/api/evaluation/speaking'],
+      ['get', '/api/vocab/progress/x'],
+      ['get', '/api/notifications/my'],
+      ['get', '/api/shared-chats/my'],
+      ['put', '/api/users/me'],
+      ['get', '/api/internal/ai-corrections?level=A1'],
+      ['get', '/api/CHAT/my'],
+    ];
+    for (const [method, path] of denied) {
+      const res = await supertest(app)[method](path).set('Authorization', REVIEWER).send({});
+      assert.equal(res.status, 403, `${method} ${path} returned ${res.status}`);
+    }
+    const stats = await supertest(app).get('/api/review/stats').set('Authorization', REVIEWER);
+    assert.equal(stats.status, 200);
+  });
+
+  test('reviewer scope guard leaves other roles and bad tokens alone', async () => {
+    const { isAllowedForReviewer } = require('../middleware/reviewerScope');
+    assert.equal(isAllowedForReviewer('GET', '/users/me'), true);
+    assert.equal(isAllowedForReviewer('PUT', '/users/me'), false);
+    assert.equal(isAllowedForReviewer('POST', '/auth/login'), true);
+    assert.equal(isAllowedForReviewer('GET', '/reviewers'), false);
+    const bad = await supertest(app).get('/api/chat/my').set('Authorization', 'Bearer not-a-jwt');
+    assert.equal(bad.status, 401);
+    const student = await supertest(app).get('/api/review/stats').set('Authorization', STUDENT);
+    assert.equal(student.status, 403);
+  });
+
   test('teacher cannot use the owner approval queue', async () => {
     const res = await supertest(app).get('/api/admin/ai-feedback').set('Authorization', TEACHER);
     assert.equal(res.status, 403);
@@ -267,6 +305,36 @@ describe('GET /api/review/conversations/:id', () => {
     for (const secret of ['student-secret-uid', 'Fatima', 'audioUrl', 'storage/x.webm', 'clientMessageId', 'title']) {
       assert.ok(!raw.includes(secret), `response leaked ${secret}`);
     }
+  });
+
+  test('masks the learner name inside message text', async () => {
+    fakeDb._store.set('users', new Map([['student-secret-uid', { name: 'יסמין חדאד', role: 'student' }]]));
+    seedChat('c1', {
+      messages: [
+        { sender: 'user', text: 'שלום, קוראים לי יסמין', learnerName: 'יסמין חדאד' },
+        { sender: 'ai', text: 'שלום יסמין! נעים מאוד, Fatima.' },
+        { sender: 'user', text: 'ליסמין יש חתול' },
+        { sender: 'ai', text: 'יופי. ספרי עוד.' },
+      ],
+    });
+    const res = await supertest(app).get('/api/review/conversations/c1').set('Authorization', REVIEWER);
+    assert.equal(res.status, 200);
+    const texts = res.body.conversation.messages.map((m) => m.text);
+    assert.deepEqual(texts, [
+      'שלום, קוראים לי [שם]',
+      'שלום [שם]! נעים מאוד, [שם].',
+      'ל[שם] יש חתול',
+      'יופי. ספרי עוד.',
+    ]);
+    const raw = JSON.stringify(res.body);
+    for (const secret of ['יסמין', 'חדאד', 'Fatima']) assert.ok(!raw.includes(secret), secret);
+
+    const flag = await supertest(app).post('/api/review/conversations/c1/flags').set('Authorization', REVIEWER)
+      .send({ messageIndex: 1, category: 'other', comment: 'check' });
+    assert.equal(flag.status, 201);
+    const stored = [...fakeDb._store.get('aiReviewFlags').values()][0];
+    assert.equal(stored.aiMessageText, 'שלום [שם]! נעים מאוד, [שם].');
+    assert.equal(stored.studentMessageText, 'שלום, קוראים לי [שם]');
   });
 
   test('404 for unknown conversation', async () => {
@@ -377,7 +445,7 @@ describe('owner approval queue', () => {
 
   test('approve validates rule text and level', async () => {
     const id = await createPendingFlag();
-    for (const body of [{ ruleText: '', level: 'B1' }, { ruleText: 'x'.repeat(301), level: 'B1' }, { ruleText: 'Valid rule', level: 'Z1' }]) {
+    for (const body of [{ ruleText: '', level: 'B1' }, { ruleText: 'x'.repeat(301), level: 'B1' }, { ruleText: 'Valid rule', level: 'Z1' }, { ruleText: 'Valid rule', level: 'C1' }, { ruleText: 'Valid rule', level: 'C2' }]) {
       const res = await supertest(app).post(`/api/admin/ai-feedback/${id}/approve`).set('Authorization', ADMIN).send(body);
       assert.equal(res.status, 400, JSON.stringify(body));
     }

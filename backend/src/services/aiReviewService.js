@@ -31,7 +31,8 @@ const FLAG_CATEGORIES = Object.freeze([
 
 const REVIEW_STATUSES = Object.freeze(['unreviewed', 'reviewed', 'has_flags']);
 const VALID_LEVELS = Object.freeze(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
-const RULE_LEVELS = Object.freeze([...VALID_LEVELS, 'ALL']);
+// Levels the product actually teaches (C1/C2 are not offered) plus 'ALL'.
+const RULE_LEVELS = Object.freeze(['A1', 'A2', 'B1', 'B2', 'ALL']);
 
 const MAX_COMMENT_CHARS = 1000;
 const MAX_RULE_CHARS = 300;
@@ -94,13 +95,64 @@ function messageText(message) {
   return typeof text === 'string' ? text : '';
 }
 
-function sanitizeMessages(messages) {
+const NAME_PLACEHOLDER = '[שם]';
+// Optional one-letter Hebrew/Arabic prefixes glued to a name ("ליסמין", "وأحمد").
+const NAME_PREFIX = '(?:[\u05D5\u05D4\u05D1\u05DB\u05DC\u05DE\u05E9]|[\u0648\u0641\u0628\u0644\u0643])?';
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * The tutor knows the learner's name and greets her with it, and students
+ * type it themselves ("קוראים לי ..."). Reviewers must never see it, so every
+ * known name (profile name, learnerName fields) is masked inside message text.
+ */
+function buildNameRedactor(names) {
+  const tokens = new Set();
+  for (const raw of names) {
+    if (typeof raw !== 'string') continue;
+    const full = raw.trim().replace(/\s+/g, ' ');
+    if (full.length >= 2) tokens.add(full);
+    for (const part of full.split(/[\s\-_.]+/)) {
+      if (part.length >= 2) tokens.add(part);
+    }
+  }
+  if (tokens.size === 0) return (text) => text;
+  const alternation = [...tokens]
+    .sort((a, b) => b.length - a.length)
+    .map(escapeRegExp)
+    .join('|');
+  const pattern = new RegExp(
+    `(?<![\\p{L}\\p{N}])(${NAME_PREFIX})(?:${alternation})(?![\\p{L}\\p{N}])`,
+    'giu'
+  );
+  return (text) => (typeof text === 'string' ? text.replace(pattern, `$1${NAME_PLACEHOLDER}`) : text);
+}
+
+async function loadNameRedactor(db, chatData) {
+  const names = [chatData?.learnerName];
+  for (const message of Array.isArray(chatData?.messages) ? chatData.messages : []) {
+    names.push(message?.learnerName);
+  }
+  if (chatData?.userId) {
+    try {
+      const userSnap = await db.collection('users').doc(String(chatData.userId)).get();
+      if (userSnap.exists) names.push(userSnap.data()?.name);
+    } catch (error) {
+      console.error('[review] name lookup failed:', error?.message || error);
+    }
+  }
+  return buildNameRedactor(names);
+}
+
+function sanitizeMessages(messages, redact = (text) => text) {
   if (!Array.isArray(messages)) return [];
   // Whitelist only — never copy audioUrl, clientMessageId, learnerName, etc.
   return messages.map((message, index) => ({
     index,
     role: senderToRole(message?.sender),
-    text: messageText(message),
+    text: redact(messageText(message)),
     type: message?.type === 'voice' ? 'voice' : 'text',
     timestamp: toIso(message?.createdAt),
   }));
@@ -244,6 +296,7 @@ async function getConversation(chatId, reviewerId) {
     .collection('aiReviewCompletions')
     .doc(`${snap.id}_${reviewerId}`)
     .get();
+  const redact = await loadNameRedactor(db, data);
 
   return {
     id: snap.id,
@@ -252,7 +305,7 @@ async function getConversation(chatId, reviewerId) {
     date: toIso(data.updatedAt) || toIso(data.startedAt),
     reviewStatus: statusFromDoc(statusData),
     completedByMe: completionSnap.exists,
-    messages: sanitizeMessages(data.messages),
+    messages: sanitizeMessages(data.messages, redact),
     myFlags,
   };
 }
@@ -317,10 +370,13 @@ async function createFlag(chatId, reviewerId, body) {
     throw httpError(400, 'NOT_AN_AI_MESSAGE', 'Only AI messages can be flagged');
   }
 
+  // Snapshots feed the admin queue and, via approved rules, the tutor prompt
+  // of every student — store them with the learner's name masked.
+  const redact = await loadNameRedactor(db, data);
   let studentMessageText = '';
   for (let i = input.messageIndex - 1; i >= 0; i -= 1) {
     if (senderToRole(messages[i]?.sender) === 'student') {
-      studentMessageText = messageText(messages[i]);
+      studentMessageText = redact(messageText(messages[i]));
       break;
     }
   }
@@ -334,7 +390,7 @@ async function createFlag(chatId, reviewerId, body) {
     category: input.category,
     comment: input.comment,
     suggestedCorrection: input.suggestedCorrection,
-    aiMessageText: messageText(target),
+    aiMessageText: redact(messageText(target)),
     studentMessageText,
     status: 'pending',
     createdAt: new Date(),
@@ -566,6 +622,7 @@ module.exports = {
   MAX_RULE_CHARS,
   studentAlias,
   sanitizeMessages,
+  buildNameRedactor,
   deriveRuleText,
   listConversations,
   getConversation,
