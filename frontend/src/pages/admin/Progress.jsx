@@ -146,6 +146,7 @@ function CreateUserForm({ onCancel, onSubmit, saving }) {
           <option value="teacher">Teacher</option>
           <option value="admin">Admin</option>
           <option value="student">Student</option>
+          <option value="reviewer">{t('admin.progress.form.roleReviewer')}</option>
         </select>
       </label>
 
@@ -351,7 +352,7 @@ function TeachersManagement() {
       setError('');
 
       const [teachersData, studentsData] = await Promise.all([
-        getTeachers(),
+        getTeachers({ includeReviewers: true }),
         getStudents(),
       ]);
 
@@ -648,6 +649,12 @@ function TeachersManagement() {
                   {teacher.name}
                 </h2>
 
+                {teacher.role === 'reviewer' ? (
+                  <span className="mt-2 inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-black text-amber-700">
+                    {t('admin.progress.reviewerBadge')}
+                  </span>
+                ) : null}
+
                 <p className="mt-2 text-sm font-semibold leading-6 text-slate-600">
                   {teacher.email}
                 </p>
@@ -728,6 +735,7 @@ function TeachersManagement() {
                     {t('admin.progress.editBtn')}
                   </button>
 
+                  {teacher.role !== 'reviewer' ? (
                   <button type="button" onClick={() => {
                     setSelectedTeacher(teacher);
                     setModal('assign');
@@ -735,6 +743,7 @@ function TeachersManagement() {
                     <Link2 className="h-4 w-4" />
                     {t('admin.progress.assignBtn')}
                   </button>
+                  ) : null}
 
                   <button type="button" onClick={() => {
                     setSelectedTeacher(teacher);

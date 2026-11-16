@@ -21,6 +21,10 @@ const datasetRoutes = require('./routes/dataset');
 const vocabRoutes = require('./routes/vocab');
 const opsRoutes = require('./routes/ops');
 const { opsTracker, opsErrorHandler } = require('./middleware/opsTracker');
+const reviewRoutes = require('./routes/review');
+const aiFeedbackRoutes = require('./routes/aiFeedback');
+const internalRoutes = require('./routes/internal');
+const { restrictReviewerScope } = require('./middleware/reviewerScope');
 
 require('./config/firebase');
 
@@ -193,10 +197,15 @@ function createApp() {
     });
   });
 
+  // Reviewer tokens may only reach the /api/review area (see middleware).
+  app.use('/api', restrictReviewerScope);
+
   app.use('/api/auth', authRoutes);
   app.use('/api/users', usersRoutes);
   app.use('/api/transcripts', transcriptsRoutes);
   app.use('/api/evaluation', evaluationRoutes);
+  // Admin-only reviewer-feedback queue; must precede the generic admin router.
+  app.use('/api/admin', aiFeedbackRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/chat', chatRoutes);
   app.use('/api/chats', chatRoutes);
@@ -206,6 +215,8 @@ function createApp() {
   app.use('/api/notifications', notificationsRoutes);
   app.use('/api/dataset', datasetRoutes);
   app.use('/api/vocab', vocabRoutes);
+  app.use('/api/review', reviewRoutes);
+  app.use('/api/internal', internalRoutes);
   app.use('/api/ops', opsRoutes);
 
   // Last: JSON error handler so unhandled errors are answered and recorded.

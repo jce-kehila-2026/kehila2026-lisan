@@ -114,6 +114,8 @@ class ChatRequestContext:
     # The learner's raw includeArabic preference (before the Hebrew-only scope
     # override). Used to attach a short Arabic gloss (answerAr) to LLM replies.
     raw_include_arabic: bool = False
+    # Owner-approved rules from human reviewers for this level (newest first).
+    reviewer_corrections: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)

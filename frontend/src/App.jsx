@@ -2,7 +2,7 @@ import Chatbot from './pages/Chatbot.jsx';
 import ChatbotPage from './pages/ChatbotPage.jsx';
 import React, { useEffect } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
-import ProtectedRoute from './routes/ProtectedRoute.jsx';
+import ProtectedRoute, { getRedirectPath } from './routes/ProtectedRoute.jsx';
 import ExistingPlaceholderPage from './pages/PlaceholderPage.jsx';
 import GamesPage from './pages/GamesPage.jsx';
 import MorePage from './pages/MorePage.jsx';
@@ -26,9 +26,21 @@ import TeacherLogin from './pages/teacher/Login.jsx';
 import TeacherReviews from './pages/teacher/Reviews.jsx';
 import TeacherNotifications from './pages/teacher/Notifications.jsx';
 import DatasetUploader from './pages/teacher/DatasetUploader.jsx';
-import { getStoredUser } from './services/auth.js';
+import ReviewPage from './pages/review/ReviewPage.jsx';
+import AdminAiFeedback from './pages/admin/AiFeedback.jsx';
+import { getStoredToken, getStoredUser } from './services/auth.js';
 
 const SKIP_AUTH = import.meta.env.VITE_SKIP_AUTH === 'true';
+
+// Unknown URLs: a signed-in volunteer reviewer goes back to /review (never a
+// login screen or another role's area); everyone else keeps the old behaviour.
+function FallbackRedirect() {
+  const user = getStoredUser();
+  if (!SKIP_AUTH && getStoredToken() && user?.role === 'reviewer') {
+    return <Navigate to={getRedirectPath(user.role)} replace />;
+  }
+  return <Navigate to={SKIP_AUTH ? '/home' : '/login'} replace />;
+}
 
 function MoreByRole() {
   const user = getStoredUser();
@@ -319,7 +331,31 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="*" element={<Navigate to={SKIP_AUTH ? '/home' : '/login'} replace />} />
+        <Route
+          path="/admin/ai-feedback"
+          element={
+            <ProtectedRoute role="admin">
+              <AdminAiFeedback />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/review"
+          element={
+            <ProtectedRoute role={['reviewer', 'admin']}>
+              <ReviewPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/review/:id"
+          element={
+            <ProtectedRoute role={['reviewer', 'admin']}>
+              <ReviewPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<FallbackRedirect />} />
       </Routes>
     </Router>
   );

@@ -3,8 +3,13 @@ const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const { normalizeLevel, userLevelFields } = require('../lib/levels');
 
-const IDENTITY_TOOLKIT_SIGNIN_URL =
-  'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword';
+// Local development only: when the Firebase Auth emulator is configured
+// (FIREBASE_AUTH_EMULATOR_HOST, same variable the Admin SDK honours), verify
+// passwords against the emulator instead of the real Identity Toolkit.
+const AUTH_EMULATOR_HOST = String(process.env.FIREBASE_AUTH_EMULATOR_HOST || '').trim();
+const IDENTITY_TOOLKIT_SIGNIN_URL = AUTH_EMULATOR_HOST
+  ? `http://${AUTH_EMULATOR_HOST}/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword`
+  : 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword';
 
 exports.login = async (req, res) => {
   try {

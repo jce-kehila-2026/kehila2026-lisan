@@ -515,16 +515,27 @@ _HASH_TO_QUERY_MAP: dict[str, str] = {}
 CACHE_SCHEMA_VERSION = os.getenv("CACHE_SCHEMA_VERSION", "v2").strip() or "v2"
 
 
-def build_cache_key(message: str, level: str, include_arabic: bool) -> str:
+def build_cache_key(
+    message: str,
+    level: str,
+    include_arabic: bool,
+    corrections_version: str = "",
+) -> str:
     # Hash the normalized message so colons / whitespace / diacritics in the
     # input can't collide with the structural ":" separators in the key.
+    # corrections_version (hash of the active reviewer rules for the level) is
+    # folded into the PREFIX so a newly approved rule invalidates cached LLM
+    # replies without moving the level out of its rsplit position.
     import hashlib
     normalized_message = normalize_message_for_cache(message)
     msg_hash = hashlib.sha1(
         normalized_message.encode("utf-8"), usedforsecurity=False
     ).hexdigest()[:16]
+    prefix = CACHE_SCHEMA_VERSION
+    if corrections_version:
+        prefix = f"{prefix}+rc{corrections_version}"
     key = (
-        f"{CACHE_SCHEMA_VERSION}:{msg_hash}:"
+        f"{prefix}:{msg_hash}:"
         f"{normalize_level(level)}:{str(include_arabic).lower()}"
     )
     _HASH_TO_QUERY_MAP[key] = message
