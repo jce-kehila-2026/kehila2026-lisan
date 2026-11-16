@@ -334,7 +334,7 @@ function App() {
         <Route
           path="/admin/ai-feedback"
           element={
-            <ProtectedRoute role="admin">
+            <ProtectedRoute role={['admin', 'teacher']}>
               <AdminAiFeedback />
             </ProtectedRoute>
           }

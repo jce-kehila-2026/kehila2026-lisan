@@ -32,7 +32,7 @@ function renderAt(path, role) {
           <Route path="/chatbot" element={<ProtectedRoute role={['student', 'teacher']}><p>chatbot</p></ProtectedRoute>} />
           <Route path="/admin/dashboard" element={<ProtectedRoute role={['admin', 'teacher']}><p>dashboard</p></ProtectedRoute>} />
           <Route path="/admin/analytics" element={<ProtectedRoute role={['admin', 'teacher']}><p>analytics</p></ProtectedRoute>} />
-          <Route path="/admin/ai-feedback" element={<ProtectedRoute role="admin"><p>ai-feedback</p></ProtectedRoute>} />
+          <Route path="/admin/ai-feedback" element={<ProtectedRoute role={['admin', 'teacher']}><p>ai-feedback</p></ProtectedRoute>} />
           <Route path="/teacher/dashboard" element={<ProtectedRoute role="teacher"><p>teacher</p></ProtectedRoute>} />
           <Route path="/review" element={<ProtectedRoute role={['reviewer', 'admin']}><p>review</p></ProtectedRoute>} />
           <Route path="/review/:id" element={<ProtectedRoute role={['reviewer', 'admin']}><p>review-detail</p></ProtectedRoute>} />
@@ -85,7 +85,7 @@ describe('reviewer routing', () => {
   });
 
   it('teacher cannot open the AI feedback queue', () => {
-    expect(renderAt('/admin/ai-feedback', 'teacher')).toBe('/admin/dashboard');
+    expect(renderAt('/admin/ai-feedback', 'teacher')).toBe('/admin/ai-feedback');
   });
 });
 

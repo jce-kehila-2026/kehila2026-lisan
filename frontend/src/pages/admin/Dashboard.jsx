@@ -652,7 +652,7 @@ function AdminDashboard() {
                   <span className="hidden sm:inline">תפעול</span>
                 </button>
               ) : null}
-              {currentUserRole === 'admin' ? (
+              {currentUserRole === 'admin' || currentUserRole === 'teacher' ? (
                 <button
                   type="button"
                   onClick={() => navigate('/admin/ai-feedback')}

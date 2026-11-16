@@ -13,7 +13,8 @@ const { requireRole } = require('../middleware/roles');
 const reviewService = require('../services/aiReviewService');
 
 const router = express.Router();
-const adminOnly = [requireAuth, requireRole('admin')];
+// Teachers and admins both review the volunteers' flags (owner decision 2026-11-16).
+const staffOnly = [requireAuth, requireRole('admin', 'teacher')];
 
 function sendError(res, error, fallbackCode) {
   const status = error?.status || 500;
@@ -27,7 +28,7 @@ function sendError(res, error, fallbackCode) {
   });
 }
 
-router.get('/ai-feedback', ...adminOnly, async (req, res) => {
+router.get('/ai-feedback', ...staffOnly, async (req, res) => {
   try {
     const feedback = await reviewService.listFeedback({
       status: req.query.status || 'pending',
@@ -38,7 +39,7 @@ router.get('/ai-feedback', ...adminOnly, async (req, res) => {
   }
 });
 
-router.post('/ai-feedback/:id/approve', ...adminOnly, async (req, res) => {
+router.post('/ai-feedback/:id/approve', ...staffOnly, async (req, res) => {
   try {
     const correction = await reviewService.approveFeedback(req.params.id, req.user.uid, req.body);
     return res.status(200).json({ success: true, correction });
@@ -47,7 +48,7 @@ router.post('/ai-feedback/:id/approve', ...adminOnly, async (req, res) => {
   }
 });
 
-router.post('/ai-feedback/:id/reject', ...adminOnly, async (req, res) => {
+router.post('/ai-feedback/:id/reject', ...staffOnly, async (req, res) => {
   try {
     const result = await reviewService.rejectFeedback(req.params.id, req.user.uid, req.body);
     return res.status(200).json({ success: true, ...result });
@@ -56,7 +57,7 @@ router.post('/ai-feedback/:id/reject', ...adminOnly, async (req, res) => {
   }
 });
 
-router.get('/ai-corrections', ...adminOnly, async (req, res) => {
+router.get('/ai-corrections', ...staffOnly, async (req, res) => {
   try {
     const corrections = await reviewService.listCorrections({
       activeOnly: req.query.active === 'true',
@@ -67,7 +68,7 @@ router.get('/ai-corrections', ...adminOnly, async (req, res) => {
   }
 });
 
-router.patch('/ai-corrections/:id', ...adminOnly, async (req, res) => {
+router.patch('/ai-corrections/:id', ...staffOnly, async (req, res) => {
   try {
     const result = await reviewService.setCorrectionActive(
       req.params.id,

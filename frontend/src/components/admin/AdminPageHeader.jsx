@@ -31,9 +31,9 @@ function AdminPageHeader({ extraLeft = null }) {
   const navigate = useNavigate();
   const canSeeOps = useOpsAccess();
 
-  // Reviewer-feedback queue is admin-only (not teachers).
-  const isAdmin = getStoredUser()?.role === 'admin';
-  const baseSections = isAdmin
+  // Reviewer-feedback queue: admins and teachers review the volunteers' flags.
+  const canReviewFeedback = ['admin', 'teacher'].includes(getStoredUser()?.role);
+  const baseSections = canReviewFeedback
     ? [...adminSections, { id: 'ai-feedback', label: 'משוב AI', icon: ShieldCheck, to: '/admin/ai-feedback' }]
     : adminSections;
   const sections = canSeeOps ? [...baseSections, opsSection] : baseSections;

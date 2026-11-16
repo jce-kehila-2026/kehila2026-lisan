@@ -225,9 +225,9 @@ describe('access control', () => {
     assert.equal(student.status, 403);
   });
 
-  test('teacher cannot use the owner approval queue', async () => {
+  test('teacher can use the approval queue (teachers review volunteers too)', async () => {
     const res = await supertest(app).get('/api/admin/ai-feedback').set('Authorization', TEACHER);
-    assert.equal(res.status, 403);
+    assert.equal(res.status, 200);
   });
 });
 
