@@ -70,6 +70,10 @@ def _clear_caches():
         from services.voice_circuits import stt_circuit, tts_circuit
         stt_circuit.reset()
         tts_circuit.reset()
+        from services.voice_circuits import elevenlabs_tts_circuit
+        elevenlabs_tts_circuit.reset()
+        from services.text_to_speech import clear_tts_audio_cache
+        clear_tts_audio_cache()
     except (ImportError, AttributeError):
         pass
 
