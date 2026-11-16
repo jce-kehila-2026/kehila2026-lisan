@@ -33,7 +33,7 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCAN_EXTENSIONS = (".py", ".json", ".jsonl", ".yaml", ".yml", ".txt", ".md")
 
 # Directories we never scan (binary / vendored / generated).
-SKIP_DIR_PARTS = {"__pycache__", ".git", ".pytest_cache", "node_modules", "voice_stt_audio"}
+SKIP_DIR_PARTS = {"__pycache__", ".git", ".venv", "venv", ".pytest_cache", "node_modules", "voice_stt_audio"}
 
 # Files that legitimately contain mojibake / replacement examples *as data*
 # (the scanner and its test describe the very patterns they hunt for).
