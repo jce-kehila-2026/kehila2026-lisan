@@ -54,10 +54,14 @@ _lock = threading.Lock()
 
 
 def _backend_base_url() -> str:
-    return (
+    url = (
         os.getenv("BACKEND_URL", "")
         or os.getenv("RAG_BACKEND_URL", "")
     ).strip().rstrip("/")
+    # Render's `hostport` has no scheme ("lisan-backend:10000").
+    if url and "://" not in url:
+        url = f"http://{url}"
+    return url
 
 
 def _float_env(name: str, default: float) -> float:
