@@ -329,6 +329,12 @@ describe('GET /api/review/conversations/:id', () => {
     const raw = JSON.stringify(res.body);
     for (const secret of ['יסמין', 'חדאד', 'Fatima']) assert.ok(!raw.includes(secret), secret);
 
+    // Profile name in Arabic/Latin script, tutor writes it in Hebrew.
+    fakeDb._store.get('users').set('student-secret-uid', { name: 'Rania Khoury', role: 'student' });
+    seedChat('c2', { messages: [{ sender: 'user', text: 'היי' }, { sender: 'ai', text: 'יופי, רניה! מה שלומך?' }] });
+    const res2 = await supertest(app).get('/api/review/conversations/c2').set('Authorization', REVIEWER);
+    assert.equal(res2.body.conversation.messages[1].text, 'יופי, [שם]! מה שלומך?');
+
     const flag = await supertest(app).post('/api/review/conversations/c1/flags').set('Authorization', REVIEWER)
       .send({ messageIndex: 1, category: 'other', comment: 'check' });
     assert.equal(flag.status, 201);

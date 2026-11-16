@@ -20,6 +20,8 @@
 
 const crypto = require('crypto');
 
+const { buildNameRedactor } = require('./nameRedaction');
+
 const FLAG_CATEGORIES = Object.freeze([
   'hebrew_error',
   'wrong_level_too_hard',
@@ -93,41 +95,6 @@ function messageText(message) {
   if (!message || typeof message !== 'object') return '';
   const text = message.text ?? message.transcribedText ?? '';
   return typeof text === 'string' ? text : '';
-}
-
-const NAME_PLACEHOLDER = '[שם]';
-// Optional one-letter Hebrew/Arabic prefixes glued to a name ("ליסמין", "وأحمد").
-const NAME_PREFIX = '(?:[\u05D5\u05D4\u05D1\u05DB\u05DC\u05DE\u05E9]|[\u0648\u0641\u0628\u0644\u0643])?';
-
-function escapeRegExp(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-/**
- * The tutor knows the learner's name and greets her with it, and students
- * type it themselves ("קוראים לי ..."). Reviewers must never see it, so every
- * known name (profile name, learnerName fields) is masked inside message text.
- */
-function buildNameRedactor(names) {
-  const tokens = new Set();
-  for (const raw of names) {
-    if (typeof raw !== 'string') continue;
-    const full = raw.trim().replace(/\s+/g, ' ');
-    if (full.length >= 2) tokens.add(full);
-    for (const part of full.split(/[\s\-_.]+/)) {
-      if (part.length >= 2) tokens.add(part);
-    }
-  }
-  if (tokens.size === 0) return (text) => text;
-  const alternation = [...tokens]
-    .sort((a, b) => b.length - a.length)
-    .map(escapeRegExp)
-    .join('|');
-  const pattern = new RegExp(
-    `(?<![\\p{L}\\p{N}])(${NAME_PREFIX})(?:${alternation})(?![\\p{L}\\p{N}])`,
-    'giu'
-  );
-  return (text) => (typeof text === 'string' ? text.replace(pattern, `$1${NAME_PLACEHOLDER}`) : text);
 }
 
 async function loadNameRedactor(db, chatData) {
