@@ -1,6 +1,12 @@
 const { admin, db } = require('../config/firebase');
 const fs = require('fs');
 const path = require('path');
+const {
+  isRecognizedLevel,
+  parseLevel,
+  toStoredLevel,
+  userLevelFields
+} = require('../lib/levels');
 
 const normalizeTeacherIds = (teacherIds, teacherId) => {
   if (Array.isArray(teacherIds)) {
@@ -54,7 +60,7 @@ exports.getAllUsers = async (req, res) => {
         email: data.email,
         name: data.name,
         role: data.role,
-        level: data.level,
+        ...userLevelFields(data),
         language: data.language,
         isActive: data.isActive ?? true,
         teacherIds: normalizeTeacherIds(data.teacherIds, data.teacherId),
@@ -152,6 +158,7 @@ exports.createUser = async (req, res) => {
       name,
       role,
       level,
+      levelLabel,
       language,
       teacherIds,
       teacherId
@@ -182,6 +189,25 @@ exports.createUser = async (req, res) => {
         code: 'WEAK_PASSWORD'
       });
     }
+
+    if (
+      role === 'student' &&
+      level !== undefined &&
+      level !== null &&
+      level !== '' &&
+      !isRecognizedLevel(level)
+    ) {
+      return res.status(400).json({
+        success: false,
+        error: 'level must be one of A1, A2, B1, B2 (or א1, א2, ב1, ב2, ג)',
+        code: 'INVALID_LEVEL'
+      });
+    }
+
+    const storedLevel =
+      role === 'student'
+        ? toStoredLevel(level, levelLabel)
+        : { level: '', levelLabel: '' };
 
     const normalizedEmail = email.trim().toLowerCase();
 
@@ -239,7 +265,8 @@ exports.createUser = async (req, res) => {
       email: normalizedEmail,
       name,
       role,
-      level: role === 'student' ? level || 'A1' : '',
+      level: storedLevel.level,
+      levelLabel: storedLevel.levelLabel,
       language: language || 'ar',
       isActive: true,
       pronunciationUsage: {
@@ -271,7 +298,7 @@ exports.createUser = async (req, res) => {
               userId: recipientId,
               type: 'new_student_registered',
               title: 'תלמידה חדשה נרשמה',
-              message: 'תלמידה חדשה "' + name + '" נוספה למערכת ברמה ' + (userData.level || 'A1'),
+              message: 'תלמידה חדשה "' + name + '" נוספה למערכת ברמה ' + (userData.levelLabel || userData.level),
               relatedChatId: null,
               studentId: docRef.id,
               studentName: name,
@@ -291,6 +318,7 @@ exports.createUser = async (req, res) => {
         name,
         role,
         level: userData.level,
+        levelLabel: userData.levelLabel,
         language: userData.language,
         isActive: true,
         teacherIds: userData.teacherIds || []
@@ -327,6 +355,7 @@ exports.updateUser = async (req, res) => {
       'email',
       'role',
       'level',
+      'levelLabel',
       'language',
       'isActive'
     ];
@@ -356,7 +385,29 @@ exports.updateUser = async (req, res) => {
 
       if (updateData.role !== 'student') {
         updateData.level = '';
+        updateData.levelLabel = '';
       }
+    }
+
+    // Normalize level to CEFR and keep the admin-facing label (ג → B2 + 'ג').
+    const levelTouched =
+      updateData.level !== undefined || updateData.levelLabel !== undefined;
+    const effectiveRole = updateData.role ?? userDoc.data()?.role;
+
+    if (levelTouched && effectiveRole === 'student') {
+      const rawLevel = updateData.level !== undefined ? updateData.level : updateData.levelLabel;
+
+      if (!isRecognizedLevel(rawLevel)) {
+        return res.status(400).json({
+          success: false,
+          error: 'level must be one of A1, A2, B1, B2 (or א1, א2, ב1, ב2, ג)',
+          code: 'INVALID_LEVEL'
+        });
+      }
+
+      const storedLevel = toStoredLevel(rawLevel, updateData.levelLabel);
+      updateData.level = storedLevel.level;
+      updateData.levelLabel = storedLevel.levelLabel;
     }
 
     const normalizedTeacherIds = normalizeTeacherIds(
@@ -1432,7 +1483,9 @@ exports.getFullAnalytics = async (req, res) => {
           name: data.name || '',
           email: data.email || '',
           role: data.role || '',
-          level: data.level || '',
+          // Normalized CEFR so legacy Hebrew-labelled students are counted.
+          level: data.role === 'student' ? userLevelFields(data).level : (data.level || ''),
+          levelLabel: userLevelFields(data).levelLabel,
           isActive: data.isActive ?? true,
           teacherIds: normalizeTeacherIds(data.teacherIds, data.teacherId),
           createdAt: data.createdAt || null,
@@ -1460,7 +1513,7 @@ exports.getFullAnalytics = async (req, res) => {
         chatSessions.push({
           id: doc.id,
           userId: data.userId || null,
-          level: allowedLevels.includes(data.level) ? data.level : null,
+          level: parseLevel(data.level),
           isArchived: data.isArchived === true,
           startedAt: data.startedAt || null,
           updatedAt: data.updatedAt || null,
@@ -1751,6 +1804,7 @@ exports.getFullAnalytics = async (req, res) => {
         name: student.name,
         email: student.email,
         level: student.level,
+        levelLabel: student.levelLabel,
         teacherNames,
         lastLoginAt: student.lastLoginAt,
         aiChatsCount: chatsForStudent.length,

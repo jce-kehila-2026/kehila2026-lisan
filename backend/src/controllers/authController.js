@@ -1,6 +1,7 @@
 const { admin, db } = require('../config/firebase');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
+const { normalizeLevel, userLevelFields } = require('../lib/levels');
 
 const IDENTITY_TOOLKIT_SIGNIN_URL =
   'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword';
@@ -78,7 +79,7 @@ exports.login = async (req, res) => {
       {
         uid,
         role: user.role,
-        level: user.level || 'A1'
+        level: normalizeLevel(user.level)
       },
       process.env.JWT_SECRET,
       {
@@ -95,7 +96,7 @@ exports.login = async (req, res) => {
         email: user.email || normalizedEmail,
         role: user.role || '',
         language: user.language || 'ar',
-        level: user.level || '',
+        ...userLevelFields(user),
         teacherId: user.teacherId || '',
         teacherIds: Array.isArray(user.teacherIds) ? user.teacherIds : []
       }

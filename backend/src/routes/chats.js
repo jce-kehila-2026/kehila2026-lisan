@@ -178,7 +178,6 @@ router.post('/:chatId/stream', requireAuth, async (req, res) => {
 
     const {
       text,
-      level = 'A1',
       includeArabic = false,
       scenario = null,
       activityTitle = null,
@@ -193,6 +192,8 @@ router.post('/:chatId/stream', requireAuth, async (req, res) => {
       });
     }
 
+    // Level is resolved server-side; any client-sent level is ignored.
+    const level = await chatController.resolveEffectiveUserLevel(req);
     const userToken = req.headers.authorization?.replace('Bearer ', '') || null;
 
     const config = createAiRequestConfig({
@@ -275,7 +276,8 @@ router.post('/:chatId/stream', requireAuth, async (req, res) => {
 router.post('/:chatId/pronunciation', requireAuth, async (req, res) => {
   try {
     const { chatId } = req.params;
-    const { audioBase64, transcribedText, level = 'A1' } = req.body;
+    const { audioBase64, transcribedText } = req.body;
+    const level = await chatController.resolveEffectiveUserLevel(req);
 
     if (!audioBase64 || !transcribedText) {
       return res.status(400).json({

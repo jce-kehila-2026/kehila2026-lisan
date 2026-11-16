@@ -14,6 +14,7 @@ const {
   uploadStudentVoiceAudio,
 } = require('../services/chatPersistenceService');
 const { logger, toErrorPayload, hashUserId } = require('../lib/logger');
+const { normalizeLevel } = require('../lib/levels');
 
 const AI_VOICE_FAILURE_MESSAGE = 'אוי, יש בעיה. נסו שוב מאוחר יותר.';
 
@@ -267,10 +268,9 @@ exports.sendAiMessage = async (req, res) => {
       await chatRef.set(activityPatch, { merge: true });
     }
 
-    const effectiveLevel =
-      normalizeOptionalString(req.body?.level) ||
-      normalizeOptionalString(chat.level) ||
-      'A1';
+    // The student's real level comes from the server (user record / JWT),
+    // never from the client body.
+    const effectiveLevel = await resolveEffectiveUserLevel(req);
 
     const includeArabic = resolveIncludeArabicPreference(
       req.body?.includeArabic,
@@ -527,7 +527,6 @@ exports.sendVoiceMessage = async (req, res) => {
     const userId = req.user.uid;
     const {
       conversationId = null,
-      level = 'A1',
       clientMessageId = null,
     } = req.body || {};
 
@@ -560,9 +559,7 @@ exports.sendVoiceMessage = async (req, res) => {
     const normalizedConversationId = normalizeOptionalString(conversationId);
     normalizedClientMessageId = normalizeOptionalString(clientMessageId);
 
-    normalizedLevel = normalizedConversationId
-      ? normalizeOptionalString(level) || 'A1'
-      : await resolveEffectiveUserLevel(req);
+    normalizedLevel = await resolveEffectiveUserLevel(req);
 
     const requestedActivityContext = resolveActivityContext({
       body: req.body,
@@ -1043,32 +1040,34 @@ async function getUserChatPreferences(userId) {
 }
 
 async function resolveEffectiveUserLevel(req) {
+  // Source of truth is the user record (an admin may have changed the level
+  // after the JWT was issued). The JWT level is only a fallback. Every value
+  // is normalized to CEFR, so legacy Hebrew labels ('א1', 'ג') and
+  // 'beginner' work before the migration runs.
   const tokenLevel = normalizeOptionalString(req?.user?.level);
-
-  if (tokenLevel) {
-    return tokenLevel;
-  }
-
+  const fallbackLevel = normalizeLevel(tokenLevel);
   const userId = normalizeOptionalString(req?.user?.uid);
 
   if (!userId) {
-    return 'A1';
+    return fallbackLevel;
   }
 
   try {
     const userDoc = await db.collection('users').doc(userId).get();
 
     if (!userDoc.exists) {
-      return 'A1';
+      return fallbackLevel;
     }
 
     const user = userDoc.data() || {};
-    return normalizeOptionalString(user.level) || 'A1';
+    return normalizeOptionalString(user.level)
+      ? normalizeLevel(user.level)
+      : fallbackLevel;
   } catch (error) {
     logChatError('resolve_effective_user_level_failed', error, {
       userId,
     });
-    return 'A1';
+    return fallbackLevel;
   }
 }
 
@@ -1425,3 +1424,5 @@ exports.submitChatReview = async (req, res) => {
   }
 };
 
+
+exports.resolveEffectiveUserLevel = resolveEffectiveUserLevel;
